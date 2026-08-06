@@ -1,0 +1,58 @@
+import type { Country } from "@/types/content";
+import { drink, recipe as r } from "./content-helpers";
+export const peCountry: Country = {
+  code: "pe",
+  slug: "peru",
+  name: "Peru",
+  flag: "🇵🇪",
+  region: "Americas",
+  introduction:
+    "Peruvian food draws on coastal seafood, Andean potatoes and grains, Amazonian ingredients, and immigrant cooking. Its bright chile-and-lime flavours are recognisable around the world.",
+  cuisineAliases: ["Peruvian restaurant", "Peruaans restaurant", "cevichería"],
+  nationalDishId: "ceviche",
+  nationalDrink: drink(
+    "Pisco Sour",
+    "Pisco sour",
+    "cocktail",
+    true,
+    "Pisco, lime, sugar, and egg white shaken into a foamy cocktail.",
+  ),
+  menu: {
+    starter: r("causa", "Potato Causa", "Causa limeña", "starter", [
+      { name: "yellow potatoes", quantity: 800, unit: "g" },
+      { name: "lime", quantity: 3, unit: "pieces" },
+      { name: "avocado", quantity: 2, unit: "pieces" },
+    ]),
+    main: r(
+      "ceviche",
+      "Peruvian Ceviche",
+      "Ceviche",
+      "main",
+      [
+        { name: "very fresh white fish", quantity: 700, unit: "g" },
+        { name: "lime juice", quantity: 250, unit: "ml" },
+        { name: "red onion", quantity: 1, unit: "piece" },
+        { name: "ají amarillo paste", quantity: 30, unit: "g" },
+      ],
+      "Fresh fish briefly cured in lime with chile, onion, sweet potato, and corn.",
+    ),
+    side: r("choclo", "Peruvian Corn", "Choclo", "side", [
+      { name: "corn on cob", quantity: 4, unit: "pieces" },
+      { name: "butter", quantity: 40, unit: "g" },
+      { name: "fresh cheese", quantity: 150, unit: "g" },
+    ]),
+    dessert: r("arroz-zambito", "Spiced Rice Pudding", "Arroz zambito", "dessert", [
+      { name: "rice", quantity: 180, unit: "g" },
+      { name: "evaporated milk", quantity: 400, unit: "ml" },
+      { name: "chancaca", quantity: 180, unit: "g" },
+    ]),
+    drink: drink(
+      "Chicha Morada",
+      "Chicha morada",
+      "soft-drink",
+      false,
+      "Purple-corn drink perfumed with pineapple, cinnamon, and clove.",
+    ),
+  },
+  status: "published",
+};

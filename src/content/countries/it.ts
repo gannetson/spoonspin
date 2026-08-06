@@ -1,0 +1,123 @@
+import type { Country, Recipe } from "@/types/content";
+const r = (
+  id: string,
+  name: string,
+  localName: string,
+  description: string,
+  category: Recipe["category"],
+  ingredients: Recipe["ingredients"],
+  steps: string[],
+  substitutions?: string[],
+): Recipe => ({
+  id,
+  name,
+  localName,
+  description,
+  category,
+  servings: 4,
+  prepMinutes: 20,
+  cookMinutes: 25,
+  difficulty: "medium",
+  dietaryLabels: [],
+  ingredients,
+  steps,
+  substitutions,
+});
+export const itCountry: Country = {
+  code: "it",
+  slug: "italy",
+  name: "Italy",
+  flag: "🇮🇹",
+  region: "Europe",
+  introduction:
+    "Italian cooking is regional, seasonal, and proud of excellent few-ingredient dishes. Pasta, olive oil, tomatoes, cheese, and ritual coffee shape many everyday meals.",
+  cuisineAliases: ["Italian restaurant", "Italiaans restaurant", "trattoria"],
+  nationalDishId: "spaghetti-carbonara",
+  nationalDrink: {
+    name: "Italian Wine",
+    type: "wine",
+    alcoholic: true,
+    description:
+      "Regional wines, from crisp whites to structured reds, are central at the table.",
+  },
+  menu: {
+    starter: r(
+      "bruschetta",
+      "Tomato Bruschetta",
+      "Bruschetta al pomodoro",
+      "Grilled bread rubbed with garlic and topped with juicy tomatoes.",
+      "starter",
+      [
+        { name: "ciabatta", quantity: 8, unit: "slices" },
+        { name: "tomatoes", quantity: 400, unit: "g" },
+        { name: "basil", quantity: 15, unit: "g" },
+      ],
+      [
+        "1. Toast bread and rub each slice with garlic.",
+        "2. Dice tomatoes and dress with olive oil, salt, and basil.",
+        "3. Spoon over bread immediately.",
+      ],
+    ),
+    main: r(
+      "spaghetti-carbonara",
+      "Spaghetti Carbonara",
+      "Spaghetti alla carbonara",
+      "Silky Roman pasta made with egg, pecorino, pepper, and cured pork.",
+      "main",
+      [
+        { name: "spaghetti", quantity: 400, unit: "g" },
+        { name: "guanciale", quantity: 180, unit: "g" },
+        { name: "eggs", quantity: 4, unit: "pieces" },
+        { name: "pecorino romano", quantity: 100, unit: "g" },
+      ],
+      [
+        "1. Render diced guanciale until crisp.",
+        "2. Whisk eggs, cheese, and abundant black pepper.",
+        "3. Toss hot pasta off heat with pork and egg mixture, loosening with pasta water.",
+      ],
+      ["Pancetta is the closest easy Dutch substitute for guanciale."],
+    ),
+    side: r(
+      "insalata-rucola",
+      "Rocket Salad",
+      "Insalata di rucola",
+      "Peppery rocket leaves dressed with lemon, olive oil, and shaved Parmesan.",
+      "side",
+      [
+        { name: "rocket", quantity: 120, unit: "g" },
+        { name: "Parmesan", quantity: 60, unit: "g" },
+        { name: "lemon", quantity: 1, unit: "piece" },
+      ],
+      [
+        "1. Wash and dry rocket.",
+        "2. Dress lightly with olive oil and lemon.",
+        "3. Shave Parmesan over just before serving.",
+      ],
+    ),
+    dessert: r(
+      "tiramisu",
+      "Tiramisu",
+      "Tiramisù",
+      "Coffee-soaked biscuits layered with mascarpone cream.",
+      "dessert",
+      [
+        { name: "mascarpone", quantity: 500, unit: "g" },
+        { name: "eggs", quantity: 4, unit: "pieces" },
+        { name: "ladyfingers", quantity: 250, unit: "g" },
+        { name: "espresso", quantity: 250, unit: "ml" },
+      ],
+      [
+        "1. Whisk yolks with sugar, then fold into mascarpone.",
+        "2. Briefly dip biscuits in cooled espresso and layer with cream.",
+        "3. Chill four hours and dust with cocoa.",
+      ],
+    ),
+    drink: {
+      name: "Espresso",
+      type: "coffee",
+      alcoholic: false,
+      description: "A short, intense coffee commonly enjoyed after a meal.",
+    },
+  },
+  status: "published",
+};
