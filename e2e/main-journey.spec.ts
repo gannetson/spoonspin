@@ -12,7 +12,7 @@ test("main journey: pick country, cook, recipe, dine search", async ({
     }),
   ).toBeVisible();
 
-  await page.getByRole("button", { name: /pick a country/i }).click();
+  await page.getByRole("button", { name: /spin the spoon/i }).click();
   await expect(page.getByRole("button", { name: "Cook" })).toBeVisible({
     timeout: 10_000,
   });
@@ -40,7 +40,7 @@ test("main journey: pick country, cook, recipe, dine search", async ({
   await expect(
     page
       .getByText(
-        /no restaurant provider is configured|google places|mapbox|restaurants|google maps/i,
+        /no local restaurants|no restaurant provider|google places|mapbox|restaurants|google maps/i,
       )
       .first(),
   ).toBeVisible({ timeout: 10_000 });

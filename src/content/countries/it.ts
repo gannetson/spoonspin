@@ -1,4 +1,5 @@
 import type { Country, Recipe } from "@/types/content";
+import { drink } from "./content-helpers";
 const r = (
   id: string,
   name: string,
@@ -7,6 +8,7 @@ const r = (
   category: Recipe["category"],
   ingredients: Recipe["ingredients"],
   steps: string[],
+  dietaryLabels: string[] = [],
   substitutions?: string[],
 ): Recipe => ({
   id,
@@ -18,7 +20,7 @@ const r = (
   prepMinutes: 20,
   cookMinutes: 25,
   difficulty: "medium",
-  dietaryLabels: [],
+  dietaryLabels,
   ingredients,
   steps,
   substitutions,
@@ -33,13 +35,13 @@ export const itCountry: Country = {
     "Italian cooking is regional, seasonal, and proud of excellent few-ingredient dishes. Pasta, olive oil, tomatoes, cheese, and ritual coffee shape many everyday meals.",
   cuisineAliases: ["Italian restaurant", "Italiaans restaurant", "trattoria"],
   nationalDishId: "spaghetti-carbonara",
-  nationalDrink: {
-    name: "Italian Wine",
-    type: "wine",
-    alcoholic: true,
-    description:
-      "Regional wines, from crisp whites to structured reds, are central at the table.",
-  },
+  nationalDrink: drink(
+    "Italian Wine",
+    "Vino",
+    "wine",
+    true,
+    "Regional wines, from crisp whites to structured reds, are central at the table.",
+  ),
   menu: {
     starter: r(
       "bruschetta",
@@ -57,6 +59,7 @@ export const itCountry: Country = {
         "2. Dice tomatoes and dress with olive oil, salt, and basil.",
         "3. Spoon over bread immediately.",
       ],
+      ["vegetarian", "vegan"],
     ),
     main: r(
       "spaghetti-carbonara",
@@ -75,6 +78,7 @@ export const itCountry: Country = {
         "2. Whisk eggs, cheese, and abundant black pepper.",
         "3. Toss hot pasta off heat with pork and egg mixture, loosening with pasta water.",
       ],
+      ["contains-meat"],
       ["Pancetta is the closest easy Dutch substitute for guanciale."],
     ),
     side: r(
@@ -93,6 +97,7 @@ export const itCountry: Country = {
         "2. Dress lightly with olive oil and lemon.",
         "3. Shave Parmesan over just before serving.",
       ],
+      ["vegetarian"],
     ),
     dessert: r(
       "tiramisu",
@@ -111,13 +116,96 @@ export const itCountry: Country = {
         "2. Briefly dip biscuits in cooled espresso and layer with cream.",
         "3. Chill four hours and dust with cocoa.",
       ],
+      ["vegetarian"],
     ),
-    drink: {
-      name: "Espresso",
-      type: "coffee",
-      alcoholic: false,
-      description: "A short, intense coffee commonly enjoyed after a meal.",
-    },
+    drink: drink(
+      "Espresso",
+      "Espresso",
+      "coffee",
+      false,
+      "A short, intense coffee commonly enjoyed after a meal.",
+    ),
+    moreRecipes: [
+      r(
+        "caprese",
+        "Caprese Salad",
+        "Insalata Caprese",
+        "Ripe tomatoes, mozzarella, and basil dressed simply with olive oil.",
+        "starter",
+        [
+          { name: "tomatoes", quantity: 400, unit: "g" },
+          { name: "mozzarella", quantity: 250, unit: "g" },
+          { name: "basil", quantity: 20, unit: "g" },
+        ],
+        [
+          "1. Slice tomatoes and mozzarella into even rounds.",
+          "2. Arrange alternately with basil leaves.",
+          "3. Drizzle with olive oil and season lightly with salt.",
+        ],
+        ["vegetarian"],
+      ),
+      r(
+        "risotto-milanese",
+        "Saffron Risotto",
+        "Risotto alla milanese",
+        "Creamy risotto tinted gold with saffron and finished with butter and cheese.",
+        "main",
+        [
+          { name: "arborio rice", quantity: 320, unit: "g" },
+          { name: "saffron", quantity: 0.5, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "Parmesan", quantity: 80, unit: "g" },
+        ],
+        [
+          "1. Soften onion in butter, then toast the rice.",
+          "2. Add warm stock ladle by ladle with saffron infused in some of it.",
+          "3. Finish off heat with butter and Parmesan until creamy.",
+        ],
+        ["vegetarian"],
+      ),
+      r(
+        "panna-cotta",
+        "Panna Cotta",
+        "Panna cotta",
+        "Silky set cream dessert often served with a bright berry or caramel sauce.",
+        "dessert",
+        [
+          { name: "cream", quantity: 500, unit: "ml" },
+          { name: "sugar", quantity: 80, unit: "g" },
+          { name: "gelatin", quantity: 8, unit: "g" },
+          { name: "vanilla", quantity: 1, unit: "piece" },
+        ],
+        [
+          "1. Bloom gelatin in cold water.",
+          "2. Warm cream with sugar and vanilla, then dissolve gelatin.",
+          "3. Pour into moulds and chill until softly set.",
+        ],
+        ["vegetarian"],
+      ),
+    ],
+    moreDrinks: [
+      drink(
+        "Chianti",
+        "Chianti",
+        "wine",
+        true,
+        "Classic Tuscan red that pairs well with tomato-rich pasta dishes.",
+      ),
+      drink(
+        "Peroni / Italian Lager",
+        "Birra",
+        "beer",
+        true,
+        "Crisp lager suited to pizza, fried snacks, and casual meals.",
+      ),
+      drink(
+        "Chinotto",
+        "Chinotto",
+        "soft-drink",
+        false,
+        "Bittersweet citrus soda with a distinctive Italian herbal edge.",
+      ),
+    ],
   },
   status: "published",
 };

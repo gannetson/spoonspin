@@ -22,7 +22,7 @@ describe("URL state", () => {
   it("fails gracefully for invalid country codes", () => {
     renderAt("/?country=zz");
     expect(screen.getByText(/could not find a published country/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /pick a country/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /spin the spoon/i })).toBeInTheDocument();
   });
 
   it("opens a recipe from cook mode", async () => {
@@ -30,5 +30,15 @@ describe("URL state", () => {
     renderAt("/?country=nl&mode=cook");
     await user.click(screen.getByRole("button", { name: /stamppot/i }));
     expect(screen.getByRole("button", { name: /back to menu/i })).toBeInTheDocument();
+  });
+
+  it("lets you manually select a country", async () => {
+    const user = userEvent.setup();
+    renderAt("/");
+    await user.selectOptions(
+      screen.getByLabelText(/or choose a country/i),
+      "bg",
+    );
+    expect(screen.getByRole("heading", { name: "Bulgaria" })).toBeInTheDocument();
   });
 });

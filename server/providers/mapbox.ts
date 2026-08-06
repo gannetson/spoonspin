@@ -10,6 +10,7 @@ type MapboxFeature = {
     full_address?: string;
     place_formatted?: string;
     address?: string;
+    poi_category?: string[];
     coordinates?: {
       latitude?: number;
       longitude?: number;
@@ -27,11 +28,32 @@ type MapboxFeature = {
   };
 };
 
+const FOOD_CATEGORIES = new Set([
+  "restaurant",
+  "food",
+  "food and drink",
+  "cafe",
+  "fast food",
+  "food court",
+]);
+
+const BLOCKED_CATEGORIES = new Set([
+  "health services",
+  "medical practice",
+  "psychological services",
+  "psychotherapist",
+  "services",
+  "hotel",
+  "lodging",
+]);
+
 /**
  * Mapbox Search Box forward search.
  * Free monthly allowance on Mapbox accounts; token must stay server-side.
  */
-export function createMapboxProvider(accessToken: string): LiveRestaurantProvider {
+export function createMapboxProvider(
+  accessToken: string,
+): LiveRestaurantProvider {
   return {
     id: "mapbox",
     async search(input: ProviderSearchInput): Promise<Restaurant[]> {
@@ -40,7 +62,9 @@ export function createMapboxProvider(accessToken: string): LiveRestaurantProvide
           forwardSearch(alias, input, accessToken),
         ),
       );
-      return dedupeRestaurantsByPlaceId(batches.flat());
+      return dedupeRestaurantsByPlaceId(batches.flat()).filter((restaurant) =>
+        looksLikeSpecialtyMatch(restaurant, input),
+      );
     },
   };
 }
@@ -74,8 +98,49 @@ async function forwardSearch(
   const data = (await response.json()) as { features?: MapboxFeature[] };
 
   return (data.features ?? [])
+    .filter((feature) => isFoodPoi(feature))
     .map((feature) => toRestaurant(feature))
     .filter((restaurant): restaurant is Restaurant => restaurant != null);
+}
+
+function isFoodPoi(feature: MapboxFeature): boolean {
+  const categories = (feature.properties?.poi_category ?? []).map((c) =>
+    c.toLowerCase(),
+  );
+  if (categories.length === 0) return false;
+  if (categories.some((c) => BLOCKED_CATEGORIES.has(c))) return false;
+  return categories.some((c) => FOOD_CATEGORIES.has(c));
+}
+
+function looksLikeSpecialtyMatch(
+  restaurant: Restaurant,
+  input: ProviderSearchInput,
+): boolean {
+  const haystack = `${restaurant.name} ${restaurant.address}`.toLowerCase();
+  const needles = [
+    input.countryName,
+    ...input.cuisineAliases,
+  ]
+    .flatMap((value) => value.toLowerCase().split(/\s+/))
+    .map((part) => part.replace(/[^a-zà-öø-ÿ]/gi, ""))
+    .filter((part) => part.length >= 4);
+
+  // Keep results that mention the cuisine/country, or a distinctive alias word
+  // (e.g. "Georgian", "Georgisch", "Kaukasisch", "Bulgaars").
+  const distinctive = needles.filter(
+    (part) =>
+      ![
+        "restaurant",
+        "restaurants",
+        "italiaans",
+        "italian",
+        "food",
+        "keuken",
+      ].includes(part),
+  );
+
+  if (distinctive.length === 0) return false;
+  return distinctive.some((part) => haystack.includes(part));
 }
 
 function toRestaurant(feature: MapboxFeature): Restaurant | null {

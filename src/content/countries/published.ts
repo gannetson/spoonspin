@@ -19,6 +19,16 @@ import { mxCountry } from "./mx";
 import { peCountry } from "./pe";
 import { brCountry } from "./br";
 import { jmCountry } from "./jm";
+import { frCountry } from "./fr";
+import { deCountry } from "./de";
+import { thCountry } from "./th";
+import { krCountry } from "./kr";
+import { cnCountry } from "./cn";
+import { ptCountry } from "./pt";
+import { arCountry } from "./ar";
+import { ngCountry } from "./ng";
+import { egCountry } from "./eg";
+import { phCountry } from "./ph";
 export const publishedCountries: Country[] = [
   nlCountry,
   bgCountry,
@@ -40,4 +50,14 @@ export const publishedCountries: Country[] = [
   peCountry,
   brCountry,
   jmCountry,
+  frCountry,
+  deCountry,
+  thCountry,
+  krCountry,
+  cnCountry,
+  ptCountry,
+  arCountry,
+  ngCountry,
+  egCountry,
+  phCountry,
 ];

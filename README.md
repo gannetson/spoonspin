@@ -6,7 +6,7 @@ Randomly discover a country, then choose whether to **cook** its food at home or
 
 Spoon Spin is a mobile-friendly MVP for food-and-travel inspiration:
 
-1. Tap **Pick a country** for a short spin animation.
+1. Tap **Spin the spoon** for a short spin animation, or choose a country from the list.
 2. Land on a published cuisine card (flag, region, iconic dish, typical drink).
 3. Choose **Cook** for a full menu and recipes, or **Dine** to search Dutch restaurants.
 4. Share a deep link such as `/?country=bg&mode=cook`.
@@ -49,23 +49,109 @@ npm run dev
 | `npm test`                 | Unit / component tests                 |
 | `npm run test:e2e`         | Playwright main journey                |
 | `npm run validate:content` | Zod validation for published countries |
+| `npm run agent:restaurants`| One-shot OSM harvest for chosen hubs/cuisines |
+| `npm run agent:gather`     | Incremental gather over time (resumable batches) |
+| `npm run agent:curate`     | Import reviewed restaurants + authenticity ratings |
+| `npm run agent:ratings`    | Enrich guest ratings from Google (and Tripadvisor if keyed) |
 
 ## Environment variables
 
 Copy `.env.example` to `.env`:
 
-| Variable                | Required                      | Description                                      |
-| ----------------------- | ----------------------------- | ------------------------------------------------ |
-| `MAPBOX_ACCESS_TOKEN`   | No (recommended free option)  | Server-only Mapbox access token                  |
-| `GOOGLE_PLACES_API_KEY` | No                            | Server-only Google Places API key                |
-| `RESTAURANT_PROVIDER`   | No                            | `auto` (default), `mapbox`, or `google`          |
-| `API_PORT`              | No                            | Defaults to `3001`                               |
+| Variable                | Required                     | Description                             |
+| ----------------------- | ---------------------------- | --------------------------------------- |
+| `MAPBOX_ACCESS_TOKEN`   | No (live fallback)           | Server-only Mapbox access token         |
+| `GOOGLE_PLACES_API_KEY` | No (ratings + live fallback) | Google Places key for rating enrichment |
+| `TRIPADVISOR_API_KEY`   | No                           | Tripadvisor Content API key (optional)  |
+| `RESTAURANT_PROVIDER`   | No                           | `auto` (default), `mapbox`, or `google` |
+| `RESTAURANT_LIVE_FALLBACK` | No                        | Set `1` to allow Mapbox/Google when curated DB has no match (off by default) |
+| `RESTAURANTS_DB_PATH`   | No                           | Defaults to `data/restaurants.sqlite`   |
+| `API_PORT`              | No                           | Defaults to `3001`                      |
 
 Never put provider secrets in Vite `VITE_*` variables or client code.
 
-## Restaurant providers
+## Local restaurant database (primary)
 
-Spoon Spin supports two live providers, plus a Maps fallback when none are configured.
+Dine searches a local SQLite database first (`data/restaurants.sqlite`, gitignored). By default it returns **reviewed** restaurants only, sorted by **authenticity rating** (5→1), then distance from Leiden/your city. Live Mapbox/Google providers are used only when there are no reviewed matches for that cuisine.
+
+### Authenticity scale
+
+| Rating | Meaning |
+| ------ | ------- |
+| 5 | Highly authentic specialty kitchen |
+| 4 | Strong specialty focus |
+| 3 | Solid specialty with some adaptation |
+| 2 | Partial / thin specialty signal |
+| 1 | Weak |
+
+### Quality curation agent
+
+Reviewed seed data lives in `src/content/restaurants/curated.json`. Import or refresh it with:
+
+```bash
+npm run agent:curate
+```
+
+The agent upserts each entry as `reviewed` with an authenticity rating and notes, then prints coverage gaps for published countries. Add real restaurants only — never invent names.
+
+### Incremental gather agent (more restaurants over time)
+
+```bash
+# Status / remaining jobs
+npm run agent:gather -- --status
+
+# Process next small batch (default 4 hub×cuisine jobs), then promote specialty matches
+npm run agent:gather
+
+# Larger batch
+npm run agent:gather -- --batch 8 --hubs nl-major --radius-km 25
+
+# Promote from already-harvested OSM rows only (no network)
+npm run agent:gather -- --promote-only
+
+# Reset job progress (does not delete restaurants)
+npm run agent:gather -- --reset
+```
+
+Progress lives in `data/gather-progress.json` (gitignored). Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Sparse cuisines are harvested first. Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in `curated.json`.
+
+### Guest ratings (Google / The Fork / Tripadvisor)
+
+```bash
+npm run agent:ratings
+```
+
+- **Google** — fetched automatically when `GOOGLE_PLACES_API_KEY` is set
+- **Tripadvisor** — fetched when `TRIPADVISOR_API_KEY` is set (Content API access required)
+- **The Fork** — no free public API; add `ratings.theFork` manually in `curated.json` (`score` on a `/10` scale with `"scale": 10`)
+
+Scores are stored per source, shown in Dine, and combined into one guest rating for sorting.
+
+### Fill / refresh the OSM harvest (optional)
+
+```bash
+# Randstad hubs (default): Leiden, Amsterdam, Rotterdam, The Hague, Utrecht
+npm run agent:restaurants
+
+# Leiden only
+npm run agent:restaurants -- --hubs leiden
+
+# Broader NL major cities
+npm run agent:restaurants -- --hubs nl-major --radius-km 25
+
+# Specific cuisines
+npm run agent:restaurants -- --hubs randstad --countries fr,de,th,kr,cn,pt,ar,ng,eg,ph
+```
+
+The harvest agent queries the free Overpass/OpenStreetMap API for specialty cuisine tags around each hub, then upserts results. Harvested rows stay **unreviewed** until you promote them via `curated.json` / `agent:curate`.
+
+Hub presets: `leiden`, `randstad` (default), `nl-major`.
+
+Re-run periodically to pick up new OSM tags. Be polite to Overpass (the script waits between requests and retries on rate limits).
+
+## Live restaurant providers (fallback)
+
+Spoon Spin can also call Mapbox or Google Places when the local DB is empty for a cuisine.
 
 ### Mapbox (free tier friendly)
 
@@ -87,22 +173,17 @@ Mapbox includes a recurring free monthly allowance for Search Box usage. Keep an
 
 ### Provider selection
 
-With `RESTAURANT_PROVIDER=auto` (default):
+Search order:
 
-1. Use Mapbox when `MAPBOX_ACCESS_TOKEN` is set
-2. Else use Google when `GOOGLE_PLACES_API_KEY` is set
-3. Else show the development fallback + Google Maps search link
+1. Local SQLite matches for the selected country code
+2. With `RESTAURANT_PROVIDER=auto`: Mapbox if token set, else Google if key set
+3. Otherwise show a friendly fallback + Google Maps search link
 
-The server:
-
-- searches each cuisine alias (English + Dutch where useful)
-- merges results and deduplicates by place ID
-- caches successful searches for 24 hours in memory
-- never invents restaurant names
+Live provider responses are cached in memory for 24 hours.
 
 ### Cost notes
 
-Both Google Places and Mapbox Search can incur cost after free allowances. Caching reduces repeat traffic. Restrict tokens/keys and set budget alerts.
+Overpass/OSM harvesting is free. Mapbox and Google Places can incur cost after free allowances. Restrict tokens/keys and set budget alerts.
 
 ## How to add another country
 
@@ -133,15 +214,17 @@ npx playwright install chromium   # first time only
 npm run test:e2e
 ```
 
-## Published MVP countries (20)
+## Published MVP countries (30)
 
-Netherlands, Bulgaria, Georgia, Italy, Spain, Greece, Turkey, Lebanon, Morocco, Ethiopia, Senegal, South Africa, India, Indonesia, Vietnam, Japan, Mexico, Peru, Brazil, Jamaica.
+Netherlands, Bulgaria, Georgia, Italy, Spain, Greece, Turkey, Lebanon, Morocco, Ethiopia, Senegal, South Africa, India, Indonesia, Vietnam, Japan, Mexico, Peru, Brazil, Jamaica, France, Germany, Thailand, South Korea, China, Portugal, Argentina, Nigeria, Egypt, Philippines.
 
 The catalog lists 197 entries (193 UN members + Palestine, Vatican City, Kosovo, Taiwan). Draft entries are never selectable.
 
 ## Limitations
 
-- Restaurant search depends on Mapbox or Google Places when configured; otherwise Maps fallback only.
-- In-memory Places cache resets when the API process restarts.
+- Dine prefers **reviewed** local restaurants with authenticity ratings (`npm run agent:curate`). Unreviewed OSM harvest rows are ignored until curated.
+- Sparse cuisines (e.g. Bulgaria, Senegal, Egypt, Philippines) may still fall back to Mapbox/Google when no reviewed entry exists.
+- The SQLite file is local (`data/restaurants.sqlite`) and not committed; run `npm run agent:curate` (and optionally `npm run agent:restaurants`) on each machine.
+- In-memory live-provider cache resets when the API process restarts.
 - Production hosting should run the Express API alongside the static Vite build (or put the API behind the same origin `/api` proxy).
 - Catalog coverage beyond the 20 published countries is intentional scaffolding for later content work.

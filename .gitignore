@@ -3,6 +3,7 @@ dist
 dist-ssr
 *.local
 .env
+data/
 coverage
 playwright-report
 test-results

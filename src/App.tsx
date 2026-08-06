@@ -12,6 +12,7 @@ import {
 } from "@/lib/picker";
 import type { Recipe } from "@/types/content";
 import { CountryCard } from "@/components/CountryCard";
+import { CountrySelect } from "@/components/CountrySelect";
 import { CountrySpinner } from "@/components/CountrySpinner";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
@@ -106,6 +107,19 @@ export default function App() {
     }, 70);
   }, [published, setSearchParams, spinning]);
 
+  const selectCountry = useCallback(
+    (code: string) => {
+      if (spinning) return;
+      const country = getCountryByCode(code);
+      if (!country) return;
+      setFallbackNotice(null);
+      rememberCountryCode(country.code);
+      setAnnouncement(`Selected ${country.name}`);
+      setSearchParams({ country: country.code }, { replace: false });
+    },
+    [setSearchParams, spinning],
+  );
+
   const openRecipe = (recipe: Recipe) => {
     updateParams({ mode: "cook", recipe: recipe.id });
   };
@@ -150,7 +164,13 @@ export default function App() {
           </p>
         ) : null}
 
-        {!selectedCountry && !spinning ? <HomeHero onPick={pickCountry} /> : null}
+        {!selectedCountry && !spinning ? (
+          <HomeHero
+            countries={published}
+            onPick={pickCountry}
+            onSelectCountry={selectCountry}
+          />
+        ) : null}
 
         {spinning ? <CountrySpinner current={spinNames[0]} /> : null}
 
@@ -158,7 +178,7 @@ export default function App() {
           <section className="space-y-6" aria-label={`${selectedCountry.name} result`}>
             <CountryCard country={selectedCountry} />
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-end gap-3">
               <ModeButton
                 active={mode === "cook"}
                 onClick={() => updateParams({ mode: "cook", recipe: null })}
@@ -176,8 +196,15 @@ export default function App() {
                 onClick={pickCountry}
                 className="min-h-12 rounded-full border-2 border-ink/20 bg-transparent px-5 text-base font-semibold text-ink transition hover:border-tomato hover:text-tomato"
               >
-                Pick another country
+                Spin the spoon
               </button>
+              <CountrySelect
+                countries={published}
+                value={selectedCountry.code}
+                onSelect={selectCountry}
+                id="result-country-select"
+                label="Or pick a country"
+              />
             </div>
 
             {mode === "cook" && !selectedRecipe ? (

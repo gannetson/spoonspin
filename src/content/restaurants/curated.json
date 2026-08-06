@@ -1,0 +1,1520 @@
+[
+  {
+    "id": "curated:ge-marani-delft",
+    "name": "Marani",
+    "address": "Choorstraat, Delft",
+    "city": "Delft",
+    "postcode": null,
+    "lat": 52.0125,
+    "lng": 4.3568,
+    "cuisineCodes": [
+      "ge"
+    ],
+    "cuisineTags": [
+      "georgian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Georgian specialty restaurant near Leiden; khachapuri/khinkali-focused rather than generic Caucasus fusion.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.6,
+    "reviewCount": 220,
+    "ratings": {
+      "google": {
+        "score": 4.6,
+        "count": 220,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=5345439687933108293&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:47.659Z"
+      }
+    }
+  },
+  {
+    "id": "curated:ge-tiflis-denhaag",
+    "name": "Tiflis",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": 52.0786,
+    "lng": 4.2888,
+    "cuisineCodes": [
+      "ge"
+    ],
+    "cuisineTags": [
+      "georgian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Dedicated Georgian restaurant in The Hague with classic specialty dishes.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.7,
+    "reviewCount": 419,
+    "ratings": {
+      "google": {
+        "score": 4.7,
+        "count": 419,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=17119369453749737737&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:48.093Z"
+      }
+    }
+  },
+  {
+    "id": "curated:ge-suhumi-denhaag",
+    "name": "Suhumi",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": 52.0705,
+    "lng": 4.3007,
+    "cuisineCodes": [
+      "ge"
+    ],
+    "cuisineTags": [
+      "georgian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Georgian-labelled kitchen in The Hague; strong specialty signal for Leiden-area diners.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 1483,
+    "ratings": {
+      "google": {
+        "score": 4.5,
+        "count": 1483,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=8056502086023185382&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:48.558Z"
+      }
+    }
+  },
+  {
+    "id": "curated:ge-kfamily-delft",
+    "name": "Restobar K Family",
+    "address": "Oude Langendijk 6, Delft",
+    "city": "Delft",
+    "postcode": "2611 GK",
+    "lat": 52.0115,
+    "lng": 4.3585,
+    "cuisineCodes": [
+      "ge"
+    ],
+    "cuisineTags": [
+      "georgian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Explicitly Georgian restaurant in Delft; convenient from Leiden.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 439,
+    "ratings": {
+      "google": {
+        "score": 4.5,
+        "count": 439,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=5078264859358343290&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:49.003Z"
+      }
+    }
+  },
+  {
+    "id": "curated:et-blue-nile-denhaag",
+    "name": "Blue Nile",
+    "address": "Weissenbruchstraat 18, 2596 GJ Den Haag",
+    "city": "Den Haag",
+    "postcode": "2596 GJ",
+    "lat": 52.0895,
+    "lng": 4.3182,
+    "cuisineCodes": [
+      "et"
+    ],
+    "cuisineTags": [
+      "ethiopian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Ethiopian specialty restaurant in The Hague; injera-led kitchen rather than generic African buffet.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.7,
+    "reviewCount": 238,
+    "ratings": {
+      "google": {
+        "score": 4.7,
+        "count": 238,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=9367576434075455628&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:49.427Z"
+      }
+    }
+  },
+  {
+    "id": "curated:et-aregash-denhaag",
+    "name": "Aregash",
+    "address": "Amsterdamse Veerkade 8, 2512 AJ Den Haag",
+    "city": "Den Haag",
+    "postcode": "2512 AJ",
+    "lat": 52.0749,
+    "lng": 4.3153,
+    "cuisineCodes": [
+      "et"
+    ],
+    "cuisineTags": [
+      "ethiopian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Ethiopian restaurant in The Hague with classic specialty dishes.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.8,
+    "reviewCount": 182,
+    "ratings": {
+      "google": {
+        "score": 4.8,
+        "count": 182,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=11629836425717192962&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:49.829Z"
+      }
+    }
+  },
+  {
+    "id": "curated:gr-katelios-leiden",
+    "name": "Katelios De Griek",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1605,
+    "lng": 4.492,
+    "cuisineCodes": [
+      "gr"
+    ],
+    "cuisineTags": [
+      "greek"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Greek restaurant in Leiden with mezze and grill classics.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.8,
+    "reviewCount": 374,
+    "ratings": {
+      "google": {
+        "score": 4.8,
+        "count": 374,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=17417228798671095579&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:50.259Z"
+      }
+    }
+  },
+  {
+    "id": "curated:es-casa-ramon-leiden",
+    "name": "Casa Ramon",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.159,
+    "lng": 4.491,
+    "cuisineCodes": [
+      "es"
+    ],
+    "cuisineTags": [
+      "spanish"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Spanish kitchen in Leiden; Iberian focus rather than generic Mediterranean.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.4,
+    "reviewCount": 634,
+    "ratings": {
+      "google": {
+        "score": 4.4,
+        "count": 634,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=15587690166361293122&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:50.685Z"
+      }
+    }
+  },
+  {
+    "id": "curated:es-la-plancha-leiden",
+    "name": "La Plancha",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1585,
+    "lng": 4.4935,
+    "cuisineCodes": [
+      "es"
+    ],
+    "cuisineTags": [
+      "spanish"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Spanish grill/tapas restaurant in Leiden.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.2,
+    "reviewCount": 435,
+    "ratings": {
+      "google": {
+        "score": 4.2,
+        "count": 435,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=15760131831350838101&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:51.114Z"
+      }
+    }
+  },
+  {
+    "id": "curated:in-everest-leiden",
+    "name": "Everest Tandoori",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1612,
+    "lng": 4.495,
+    "cuisineCodes": [
+      "in"
+    ],
+    "cuisineTags": [
+      "indian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Indian tandoori restaurant; clearer specialty than pan-Asian takeaway.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.3,
+    "reviewCount": 375,
+    "ratings": {
+      "google": {
+        "score": 4.3,
+        "count": 375,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=1808994450995845804&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:51.550Z"
+      }
+    }
+  },
+  {
+    "id": "curated:in-indiaway-leiden",
+    "name": "India Way",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1578,
+    "lng": 4.489,
+    "cuisineCodes": [
+      "in"
+    ],
+    "cuisineTags": [
+      "indian"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Indian restaurant with NL-friendly menu adaptations; solid but not a regional specialist.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.1,
+    "reviewCount": 707,
+    "ratings": {
+      "google": {
+        "score": 4.1,
+        "count": 707,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=1665959599856393898&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:51.996Z"
+      }
+    }
+  },
+  {
+    "id": "curated:in-royal-leiden",
+    "name": "Indian Royal Food",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.162,
+    "lng": 4.5,
+    "cuisineCodes": [
+      "in"
+    ],
+    "cuisineTags": [
+      "indian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Indian restaurant in Leiden with tandoor and curry staples.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4,
+    "reviewCount": 111,
+    "ratings": {
+      "google": {
+        "score": 4,
+        "count": 111,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=4842286598702980925&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:52.611Z"
+      }
+    }
+  },
+  {
+    "id": "curated:jp-dining-tokyo-leiden",
+    "name": "Dining Tokyo",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1608,
+    "lng": 4.494,
+    "cuisineCodes": [
+      "jp"
+    ],
+    "cuisineTags": [
+      "japanese"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Japanese restaurant identity rather than pan-Asian buffet.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.7,
+    "reviewCount": 235,
+    "ratings": {
+      "google": {
+        "score": 4.7,
+        "count": 235,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=18102961043815207559&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:53.052Z"
+      }
+    }
+  },
+  {
+    "id": "curated:jp-fujiyama-leiden",
+    "name": "Fujiyama55",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1595,
+    "lng": 4.498,
+    "cuisineCodes": [
+      "jp"
+    ],
+    "cuisineTags": [
+      "japanese"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Japanese-branded Leiden restaurant; mid authenticity depending on menu depth.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.3,
+    "reviewCount": 205,
+    "ratings": {}
+  },
+  {
+    "id": "curated:jp-ilovesushi-leiden",
+    "name": "I love sushi",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.158,
+    "lng": 4.496,
+    "cuisineCodes": [
+      "jp"
+    ],
+    "cuisineTags": [
+      "sushi",
+      "japanese"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Sushi-led Japanese offering; authentic on sushi, less of a full washoku house.",
+    "reviewSource": "editorial-curation",
+    "userRating": 3.3,
+    "reviewCount": 252,
+    "ratings": {
+      "google": {
+        "score": 3.3,
+        "count": 252,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=6079077829670028087&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:53.931Z"
+      }
+    }
+  },
+  {
+    "id": "curated:jp-ichiban-leiden",
+    "name": "Ichi Ban",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1591,
+    "lng": 4.4952,
+    "cuisineCodes": [
+      "jp"
+    ],
+    "cuisineTags": [
+      "sushi",
+      "japanese"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Sushi restaurant in Leiden; specialty sushi focus.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.6,
+    "reviewCount": 253,
+    "ratings": {
+      "google": {
+        "score": 4.6,
+        "count": 253,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=6490471167075063293&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:54.361Z"
+      }
+    }
+  },
+  {
+    "id": "curated:tr-akmir-leiden",
+    "name": "Ak Mir",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1615,
+    "lng": 4.4905,
+    "cuisineCodes": [
+      "tr"
+    ],
+    "cuisineTags": [
+      "turkish"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Turkish grillroom in Leiden; stronger specialty cue than anonymous shoarma counters.",
+    "reviewSource": "editorial-curation",
+    "userRating": 3.7,
+    "reviewCount": 351,
+    "ratings": {
+      "google": {
+        "score": 3.7,
+        "count": 351,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=4701291977243350612&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:54.815Z"
+      }
+    }
+  },
+  {
+    "id": "curated:tr-sphinx-leiden",
+    "name": "Grillroom Sphinx",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1575,
+    "lng": 4.4925,
+    "cuisineCodes": [
+      "tr"
+    ],
+    "cuisineTags": [
+      "turkish"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Turkish grillroom format; authentic for kebab/grill classics.",
+    "reviewSource": "editorial-curation",
+    "userRating": 3.9,
+    "reviewCount": 113,
+    "ratings": {
+      "google": {
+        "score": 3.9,
+        "count": 113,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=5304598911382419428&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:55.274Z"
+      }
+    }
+  },
+  {
+    "id": "curated:tr-ak-al-leiden",
+    "name": "AK-AL",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1603,
+    "lng": 4.491,
+    "cuisineCodes": [
+      "tr"
+    ],
+    "cuisineTags": [
+      "turkish"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Turkish kebab restaurant in Leiden.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.2,
+    "reviewCount": 426,
+    "ratings": {
+      "google": {
+        "score": 4.2,
+        "count": 426,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=3215229040249809218&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:55.746Z"
+      }
+    }
+  },
+  {
+    "id": "curated:it-aperitivo-leiden",
+    "name": "Aperitivo",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1602,
+    "lng": 4.4918,
+    "cuisineCodes": [
+      "it"
+    ],
+    "cuisineTags": [
+      "italian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Italian trattoria-style restaurant (not a pizza chain).",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.1,
+    "reviewCount": 763,
+    "ratings": {
+      "google": {
+        "score": 4.1,
+        "count": 763,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=7478158825048583855&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:56.169Z"
+      }
+    }
+  },
+  {
+    "id": "curated:it-bocconi-leiden",
+    "name": "Bocconi",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1592,
+    "lng": 4.4942,
+    "cuisineCodes": [
+      "it"
+    ],
+    "cuisineTags": [
+      "italian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Italian kitchen focused on pasta-style dining.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.6,
+    "reviewCount": 1093,
+    "ratings": {
+      "google": {
+        "score": 4.6,
+        "count": 1093,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=15754815544264698197&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:56.586Z"
+      }
+    }
+  },
+  {
+    "id": "curated:it-farina-leiden",
+    "name": "Farina",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1588,
+    "lng": 4.4975,
+    "cuisineCodes": [
+      "it"
+    ],
+    "cuisineTags": [
+      "italian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Italian restaurant with dough/pasta emphasis.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.8,
+    "reviewCount": 212,
+    "ratings": {
+      "google": {
+        "score": 4.8,
+        "count": 212,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=17665811051907061911&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:57.022Z"
+      }
+    }
+  },
+  {
+    "id": "curated:it-fratelli-leiden",
+    "name": "Fratelli",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1618,
+    "lng": 4.493,
+    "cuisineCodes": [
+      "it"
+    ],
+    "cuisineTags": [
+      "italian"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Italian-branded Leiden restaurant; mid authenticity.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 1164,
+    "ratings": {
+      "google": {
+        "score": 4.5,
+        "count": 1164,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=87947086843288424&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:57.451Z"
+      }
+    }
+  },
+  {
+    "id": "curated:fr-annaetfred-leiden",
+    "name": "Anna et Fred",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1606,
+    "lng": 4.4955,
+    "cuisineCodes": [
+      "fr"
+    ],
+    "cuisineTags": [
+      "french"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "French bistro identity in Leiden.",
+    "reviewSource": "editorial-curation",
+    "userRating": 3.9,
+    "reviewCount": 143,
+    "ratings": {
+      "google": {
+        "score": 3.9,
+        "count": 143,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=13902794636286856159&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:57.863Z"
+      }
+    }
+  },
+  {
+    "id": "curated:fr-bistro-bordo-leiden",
+    "name": "Bistro Bord'o",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1598,
+    "lng": 4.4898,
+    "cuisineCodes": [
+      "fr"
+    ],
+    "cuisineTags": [
+      "french"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "French bistro in Leiden.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.7,
+    "reviewCount": 305,
+    "ratings": {
+      "google": {
+        "score": 4.7,
+        "count": 305,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=15360147454661064321&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:58.273Z"
+      }
+    }
+  },
+  {
+    "id": "curated:nl-indoofpot-leiden",
+    "name": "In den Doofpot",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": 52.1609,
+    "lng": 4.4885,
+    "cuisineCodes": [
+      "nl"
+    ],
+    "cuisineTags": [
+      "dutch"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Local Leiden restaurant with Dutch/European classic cooking.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 260,
+    "ratings": {}
+  },
+  {
+    "id": "curated:ma-catootje-leiden",
+    "name": "Catootje aan de markt",
+    "address": "Kaasmarkt 10, 2312 HZ Leiden",
+    "city": "Leiden",
+    "postcode": "2312 HZ",
+    "lat": 52.1589,
+    "lng": 4.4928,
+    "cuisineCodes": [
+      "ma"
+    ],
+    "cuisineTags": [
+      "moroccan"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Moroccan-tagged Leiden restaurant; mid authenticity — good starting point.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.8,
+    "reviewCount": 382,
+    "ratings": {
+      "google": {
+        "score": 4.8,
+        "count": 382,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=1796836015634551833&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:59.109Z"
+      }
+    }
+  },
+  {
+    "id": "curated:id-tempo-doeloe-amsterdam",
+    "name": "Tempo Doeloe",
+    "address": "Utrechtsestraat 75, 1017 VJ Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1017 VJ",
+    "lat": 52.3638,
+    "lng": 4.8985,
+    "cuisineCodes": [
+      "id"
+    ],
+    "cuisineTags": [
+      "indonesian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Classic Amsterdam Indonesian restaurant; rijsttafel tradition with deep Indo-Dutch roots.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4,
+    "reviewCount": 334,
+    "ratings": {
+      "google": {
+        "score": 4,
+        "count": 334,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=1045107623356096844&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:59.535Z"
+      }
+    }
+  },
+  {
+    "id": "curated:id-blauw-amsterdam",
+    "name": "Restaurant Blauw",
+    "address": "Amstelveenseweg 158-160, Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1075 XN",
+    "lat": 52.3485,
+    "lng": 4.8555,
+    "cuisineCodes": [
+      "id"
+    ],
+    "cuisineTags": [
+      "indonesian"
+    ],
+    "website": "https://www.restaurantblauw.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Well-regarded Indonesian restaurant for Indo classics in the Randstad.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.4,
+    "reviewCount": 1413,
+    "ratings": {
+      "google": {
+        "score": 4.4,
+        "count": 1413,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=10810799535682388201&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:43:59.990Z"
+      }
+    }
+  },
+  {
+    "id": "curated:th-bird-amsterdam",
+    "name": "Bird",
+    "address": "Zeedijk 72-74, 1012 BA Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1012 BA",
+    "lat": 52.3742,
+    "lng": 4.9003,
+    "cuisineCodes": [
+      "th"
+    ],
+    "cuisineTags": [
+      "thai"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Long-running Thai restaurant in Amsterdam; stronger specialty than generic Asian wok counters.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.2,
+    "reviewCount": 4352,
+    "ratings": {
+      "google": {
+        "score": 4.2,
+        "count": 4352,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=5158916063863294215&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:00.438Z"
+      }
+    }
+  },
+  {
+    "id": "curated:vn-vinas-leiden",
+    "name": "Vina's Noodles & More",
+    "address": "Steenstraat 8, 2312 BW Leiden",
+    "city": "Leiden",
+    "postcode": "2312 BW",
+    "lat": 52.1633,
+    "lng": 4.4846,
+    "cuisineCodes": [
+      "vn"
+    ],
+    "cuisineTags": [
+      "vietnamese"
+    ],
+    "website": "https://www.vinasnoodles.nl",
+    "authenticityRating": 4,
+    "authenticityNotes": "Vietnamese noodle specialist in Leiden; clearer specialty than pan-Asian takeaway.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.1,
+    "reviewCount": 408,
+    "ratings": {
+      "google": {
+        "score": 4.1,
+        "count": 408,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=1999469256057524407&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:00.856Z"
+      }
+    }
+  },
+  {
+    "id": "curated:vn-luc-delft",
+    "name": "Luc",
+    "address": "Pieterstraat 41, 2611 CT Delft",
+    "city": "Delft",
+    "postcode": "2611 CT",
+    "lat": 52.0099,
+    "lng": 4.3624,
+    "cuisineCodes": [
+      "vn"
+    ],
+    "cuisineTags": [
+      "vietnamese"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Vietnamese restaurant in Delft; convenient specialty option from Leiden.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.9,
+    "reviewCount": 196,
+    "ratings": {
+      "google": {
+        "score": 4.9,
+        "count": 196,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=869599228496318056&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:01.270Z"
+      }
+    }
+  },
+  {
+    "id": "curated:lb-taratoer-leiden",
+    "name": "Taratoer",
+    "address": "Van der Waalsstraat 3, 2313 VB Leiden",
+    "city": "Leiden",
+    "postcode": "2313 VB",
+    "lat": 52.1489,
+    "lng": 4.4944,
+    "cuisineCodes": [
+      "lb"
+    ],
+    "cuisineTags": [
+      "lebanese"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Lebanese restaurant in Leiden with mezze-focused cooking.",
+    "reviewSource": "editorial-curation",
+    "userRating": 5,
+    "reviewCount": 113,
+    "ratings": {
+      "google": {
+        "score": 5,
+        "count": 113,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=14532516811019995663&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:01.686Z"
+      }
+    }
+  },
+  {
+    "id": "curated:lb-cedars-amsterdam",
+    "name": "Cedars",
+    "address": "Heemstedestraat 80, 1058 NP Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1058 NP",
+    "lat": 52.3515,
+    "lng": 4.8405,
+    "cuisineCodes": [
+      "lb"
+    ],
+    "cuisineTags": [
+      "lebanese"
+    ],
+    "website": "https://cedars.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Long-running waterfront Lebanese restaurant known for traditional mazza.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.1,
+    "reviewCount": 2259,
+    "ratings": {
+      "google": {
+        "score": 4.2,
+        "count": 2059,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=9313965091167117493&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:02.210Z"
+      },
+      "tripadvisor": {
+        "score": 4,
+        "count": 200,
+        "scale": 5
+      }
+    }
+  },
+  {
+    "id": "curated:mx-kua-denhaag",
+    "name": "Kua",
+    "address": "Torenstraat 77, 2513 BP Den Haag",
+    "city": "Den Haag",
+    "postcode": "2513 BP",
+    "lat": 52.0789,
+    "lng": 4.3043,
+    "cuisineCodes": [
+      "mx"
+    ],
+    "cuisineTags": [
+      "mexican"
+    ],
+    "website": "https://www.kuarestaurant.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Mexican kitchen in The Hague focused on regional Mexican cooking rather than Tex-Mex.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 1780,
+    "ratings": {
+      "google": {
+        "score": 4.6,
+        "count": 1630,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=10840505807364003798&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:02.652Z"
+      },
+      "tripadvisor": {
+        "score": 4.4,
+        "count": 150,
+        "scale": 5
+      }
+    }
+  },
+  {
+    "id": "curated:mx-queru-denhaag",
+    "name": "Queru",
+    "address": "Prinsestraat 30, 2513 CD Den Haag",
+    "city": "Den Haag",
+    "postcode": "2513 CD",
+    "lat": 52.0786,
+    "lng": 4.306,
+    "cuisineCodes": [
+      "mx"
+    ],
+    "cuisineTags": [
+      "mexican"
+    ],
+    "website": "https://www.cantinaqueru.com",
+    "authenticityRating": 4,
+    "authenticityNotes": "Mexican cantina-style restaurant in The Hague with specialty tacos and plates.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.6,
+    "reviewCount": 855,
+    "ratings": {
+      "google": {
+        "score": 4.6,
+        "count": 855,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=11880062277562087390&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:03.099Z"
+      }
+    }
+  },
+  {
+    "id": "curated:pe-callao-denhaag",
+    "name": "Callao",
+    "address": "Dr. Lelykade 29, 2583 CL Den Haag",
+    "city": "Den Haag",
+    "postcode": "2583 CL",
+    "lat": 52.0949,
+    "lng": 4.2655,
+    "cuisineCodes": [
+      "pe"
+    ],
+    "cuisineTags": [
+      "peruvian"
+    ],
+    "website": "https://www.callao.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Peruvian specialty restaurant in Scheveningen; ceviche and classic Peruvian cooking.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 806,
+    "ratings": {
+      "google": {
+        "score": 4.5,
+        "count": 806,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=18044932303670834675&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:03.509Z"
+      }
+    }
+  },
+  {
+    "id": "curated:pe-somos-denhaag",
+    "name": "Somos Perú",
+    "address": "Javastraat 13, 2585 AB Den Haag",
+    "city": "Den Haag",
+    "postcode": "2585 AB",
+    "lat": 52.0886,
+    "lng": 4.3075,
+    "cuisineCodes": [
+      "pe"
+    ],
+    "cuisineTags": [
+      "peruvian"
+    ],
+    "website": "https://somos-peru.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Peruvian restaurant in The Hague with clear specialty identity.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.6,
+    "reviewCount": 823,
+    "ratings": {
+      "google": {
+        "score": 4.6,
+        "count": 823,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=9855728392881655339&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:03.948Z"
+      }
+    }
+  },
+  {
+    "id": "curated:br-rodizio-denhaag",
+    "name": "Rodizio Brazilian Grill",
+    "address": "Gevers Deynootplein 125, 2586 CR Den Haag",
+    "city": "Den Haag",
+    "postcode": "2586 CR",
+    "lat": 52.1125,
+    "lng": 4.2824,
+    "cuisineCodes": [
+      "br"
+    ],
+    "cuisineTags": [
+      "brazilian"
+    ],
+    "website": "https://www.rodizio.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Brazilian churrascaria / rodizio format; strong specialty signal for Brazil spins.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.3,
+    "reviewCount": 3563,
+    "ratings": {
+      "google": {
+        "score": 4.3,
+        "count": 3563,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=18389188570525926011&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:04.431Z"
+      }
+    }
+  },
+  {
+    "id": "curated:kr-hongdae-amsterdam",
+    "name": "Hongdae",
+    "address": "Lange Leidsedwarsstraat 57, 1017 NH Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1017 NH",
+    "lat": 52.3638,
+    "lng": 4.8835,
+    "cuisineCodes": [
+      "kr"
+    ],
+    "cuisineTags": [
+      "korean"
+    ],
+    "website": "https://hongdae.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Korean street-food restaurant in Amsterdam; clearer specialty than pan-Asian counters.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.4,
+    "reviewCount": 843,
+    "ratings": {
+      "google": {
+        "score": 4.4,
+        "count": 843,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=9782857564672545876&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:04.864Z"
+      }
+    }
+  },
+  {
+    "id": "curated:kr-samalain-rotterdam",
+    "name": "Samalain",
+    "address": "Prinsenlaan 666, 3066 KG Rotterdam",
+    "city": "Rotterdam",
+    "postcode": "3066 KG",
+    "lat": 51.9389,
+    "lng": 4.5468,
+    "cuisineCodes": [
+      "kr"
+    ],
+    "cuisineTags": [
+      "korean"
+    ],
+    "website": "https://samalain.nl/",
+    "authenticityRating": 3,
+    "authenticityNotes": "Korean-tagged kitchen in Rotterdam; useful Randstad specialty option, mid authenticity.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 673,
+    "ratings": {
+      "google": {
+        "score": 4.5,
+        "count": 673,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=15588704174101576140&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:05.289Z"
+      }
+    }
+  },
+  {
+    "id": "curated:cn-m-noodle-leiden",
+    "name": "M Noodle Bar",
+    "address": "Beestenmarkt 4, 2312 CC Leiden",
+    "city": "Leiden",
+    "postcode": "2312 CC",
+    "lat": 52.1629,
+    "lng": 4.485,
+    "cuisineCodes": [
+      "cn"
+    ],
+    "cuisineTags": [
+      "chinese"
+    ],
+    "website": "http://www.mnoodlebar.nl/",
+    "authenticityRating": 3,
+    "authenticityNotes": "Chinese noodle bar in Leiden; specialty noodle focus rather than generic Chinese-Indonesian takeaway.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.4,
+    "reviewCount": 894,
+    "ratings": {
+      "google": {
+        "score": 4.4,
+        "count": 894,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=8867248297289565000&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:05.728Z"
+      }
+    }
+  },
+  {
+    "id": "curated:cn-hang-yee-denhaag",
+    "name": "Hang Yee",
+    "address": "Weimarstraat 404, 2562 HX Den Haag",
+    "city": "Den Haag",
+    "postcode": "2562 HX",
+    "lat": 52.0718,
+    "lng": 4.2737,
+    "cuisineCodes": [
+      "cn"
+    ],
+    "cuisineTags": [
+      "chinese"
+    ],
+    "website": "https://www.hangyee.nl/",
+    "authenticityRating": 3,
+    "authenticityNotes": "Chinese restaurant in The Hague; solid specialty signal with some Indo-Chinese overlap common in NL.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.1,
+    "reviewCount": 97,
+    "ratings": {
+      "google": {
+        "score": 4.1,
+        "count": 97,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=7397777801905593297&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:06.192Z"
+      }
+    }
+  },
+  {
+    "id": "curated:pt-portugalia-amsterdam",
+    "name": "Portugália Tasca",
+    "address": "Bakkersstraat 12, 1017 CW Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1017 CW",
+    "lat": 52.3663,
+    "lng": 4.8995,
+    "cuisineCodes": [
+      "pt"
+    ],
+    "cuisineTags": [
+      "portuguese"
+    ],
+    "website": "https://portugalia.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Portuguese tasca in Amsterdam; traditional Portuguese cooking rather than generic Iberian tapas.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.6,
+    "reviewCount": 2347,
+    "ratings": {
+      "google": {
+        "score": 4.6,
+        "count": 2347,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=16434772265827695728&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:06.610Z"
+      }
+    }
+  },
+  {
+    "id": "curated:pt-tapisco-denhaag",
+    "name": "Tapisco",
+    "address": "Kneuterdijk 11, 2514 EM Den Haag",
+    "city": "Den Haag",
+    "postcode": "2514 EM",
+    "lat": 52.0809,
+    "lng": 4.3094,
+    "cuisineCodes": [
+      "pt"
+    ],
+    "cuisineTags": [
+      "portuguese"
+    ],
+    "website": "https://www.restauranttapisco.nl/",
+    "authenticityRating": 3,
+    "authenticityNotes": "Portuguese/Spanish-labelled kitchen in The Hague; useful for Portugal spins, mid authenticity.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.3,
+    "reviewCount": 876,
+    "ratings": {
+      "google": {
+        "score": 4.3,
+        "count": 876,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=8160303756693884539&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:07.056Z"
+      }
+    }
+  },
+  {
+    "id": "curated:th-baibun-voorschoten",
+    "name": "Baibun",
+    "address": "Schoolstraat 121, 2251 BG Voorschoten",
+    "city": "Voorschoten",
+    "postcode": "2251 BG",
+    "lat": 52.1236,
+    "lng": 4.4439,
+    "cuisineCodes": [
+      "th"
+    ],
+    "cuisineTags": [
+      "thai"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Thai restaurant near Leiden; local specialty option alongside Amsterdam Thai houses.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.3,
+    "reviewCount": 205,
+    "ratings": {}
+  },
+  {
+    "id": "curated:ng-pac-afro-denhaag",
+    "name": "Pac Afro Kitchen & Bar",
+    "address": "Stationsweg 112, 2515 BR Den Haag",
+    "city": "Den Haag",
+    "postcode": "2515 BR",
+    "lat": 52.072,
+    "lng": 4.3204,
+    "cuisineCodes": [
+      "ng"
+    ],
+    "cuisineTags": [
+      "nigerian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Nigerian-tagged kitchen in The Hague; rare specialty match for Nigeria spins.",
+    "reviewSource": "editorial-curation",
+    "userRating": 5,
+    "reviewCount": 6,
+    "ratings": {
+      "google": {
+        "score": 5,
+        "count": 6,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=8928007282346793121&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:07.938Z"
+      }
+    }
+  },
+  {
+    "id": "curated:ar-amigo-amsterdam",
+    "name": "Amigo Grill",
+    "address": "Prinsengracht 188, 1016 HA Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1016 HA",
+    "lat": 52.3758,
+    "lng": 4.8835,
+    "cuisineCodes": [
+      "ar"
+    ],
+    "cuisineTags": [
+      "argentinian"
+    ],
+    "website": "https://amigogrill.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Argentine steakhouse with tableside parrilla and Argentine beef focus.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 1657,
+    "ratings": {
+      "google": {
+        "score": 4.5,
+        "count": 1657,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=5146178745320317956&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:08.367Z"
+      }
+    }
+  },
+  {
+    "id": "curated:de-wush-amsterdam",
+    "name": "Wurst & Schnitzelhaus",
+    "address": "Prinsengracht 474hs, 1017 KG Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1017 KG",
+    "lat": 52.3655,
+    "lng": 4.8855,
+    "cuisineCodes": [
+      "de"
+    ],
+    "cuisineTags": [
+      "german"
+    ],
+    "website": "https://wush.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "German schnitzel and wurst restaurant; clearer specialty than generic European bistros.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.5,
+    "reviewCount": 2339,
+    "ratings": {
+      "google": {
+        "score": 4.5,
+        "count": 2339,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=7619337895146824276&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:08.790Z"
+      }
+    }
+  },
+  {
+    "id": "curated:jm-reggae-rita-amsterdam",
+    "name": "Reggae Rita",
+    "address": "Lange Leidsedwarsstraat 71A, 1017 NH Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1017 NH",
+    "lat": 52.3635,
+    "lng": 4.8838,
+    "cuisineCodes": [
+      "jm"
+    ],
+    "cuisineTags": [
+      "jamaican"
+    ],
+    "website": "https://www.reggaerita-amsterdam.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Jamaican restaurant in Amsterdam known for jerk, oxtail, and island classics.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.3,
+    "reviewCount": 688,
+    "ratings": {
+      "google": {
+        "score": 4.3,
+        "count": 688,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=12641820579426276011&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:09.362Z"
+      }
+    }
+  },
+  {
+    "id": "curated:za-braai-amsterdam",
+    "name": "Braai Westerpark",
+    "address": "Van Limburg Stirumstraat 14A, 1051 BB Amsterdam",
+    "city": "Amsterdam",
+    "postcode": "1051 BB",
+    "lat": 52.3865,
+    "lng": 4.8735,
+    "cuisineCodes": [
+      "za"
+    ],
+    "cuisineTags": [
+      "south_african"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "South African braai restaurant in Amsterdam Westerpark; charcoal-grill specialty focus.",
+    "reviewSource": "editorial-curation",
+    "userRating": 4.3,
+    "reviewCount": 808,
+    "ratings": {
+      "google": {
+        "score": 4.3,
+        "count": 808,
+        "scale": 5,
+        "url": "https://maps.google.com/?cid=8149889978093646085&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
+        "fetchedAt": "2026-08-06T19:44:09.931Z"
+      }
+    }
+  }
+]

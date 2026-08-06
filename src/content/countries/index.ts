@@ -1,6 +1,7 @@
 import type { Country, Recipe } from "@/types/content";
 import { countryCatalog, CATALOG_SIZE } from "./catalog";
 import { publishedCountries } from "./published";
+import { getCountryRecipes } from "./menuAccessors";
 
 const publishedByCode = new Map(
   publishedCountries.map((country) => [country.code, country]),
@@ -18,13 +19,7 @@ export function getRecipeFromCountry(
   country: Country,
   recipeId: string,
 ): Recipe | undefined {
-  const recipes = [
-    country.menu.starter,
-    country.menu.main,
-    country.menu.side,
-    country.menu.dessert,
-  ];
-  return recipes.find((recipe) => recipe.id === recipeId);
+  return getCountryRecipes(country).find((recipe) => recipe.id === recipeId);
 }
 
 export function isPublishedCatalogConsistent(): boolean {
@@ -35,3 +30,11 @@ export function isPublishedCatalogConsistent(): boolean {
 }
 
 export { countryCatalog, CATALOG_SIZE, publishedCountries };
+export {
+  getCountryRecipes,
+  getCountryDrinks,
+  getSpecialtyShops,
+  recipeMatchesDiet,
+  recipeMatchesCategory,
+  drinkMatchesAlcohol,
+} from "./menuAccessors";

@@ -1,4 +1,5 @@
 import type { Country } from "@/types/content";
+import { drink } from "./content-helpers";
 
 export const geCountry: Country = {
   code: "ge",
@@ -14,13 +15,13 @@ export const geCountry: Country = {
     "Kaukasisch restaurant",
   ],
   nationalDishId: "khachapuri-adjaruli",
-  nationalDrink: {
-    name: "Qvevri Wine",
-    localName: "ქვევრის ღვინო",
-    type: "wine",
-    alcoholic: true,
-    description: "Georgian wine traditionally fermented in large clay vessels.",
-  },
+  nationalDrink: drink(
+    "Qvevri Wine",
+    "ქვევრის ღვინო",
+    "wine",
+    true,
+    "Georgian wine traditionally fermented in large clay vessels.",
+  ),
   menu: {
     starter: {
       id: "pkhali",
@@ -32,7 +33,7 @@ export const geCountry: Country = {
       prepMinutes: 20,
       cookMinutes: 5,
       difficulty: "easy",
-      dietaryLabels: ["vegan", "gluten-free"],
+      dietaryLabels: ["vegetarian", "vegan"],
       ingredients: [
         { name: "spinach", quantity: 400, unit: "g" },
         { name: "walnuts", quantity: 120, unit: "g" },
@@ -83,7 +84,7 @@ export const geCountry: Country = {
       prepMinutes: 15,
       cookMinutes: 35,
       difficulty: "easy",
-      dietaryLabels: ["vegan", "gluten-free"],
+      dietaryLabels: ["vegetarian", "vegan"],
       ingredients: [
         { name: "cooked kidney beans", quantity: 800, unit: "g" },
         { name: "onion", quantity: 1, unit: "piece" },
@@ -106,7 +107,7 @@ export const geCountry: Country = {
       prepMinutes: 25,
       cookMinutes: 25,
       difficulty: "medium",
-      dietaryLabels: ["vegan"],
+      dietaryLabels: ["vegetarian", "vegan"],
       ingredients: [
         { name: "walnuts", quantity: 300, unit: "g" },
         { name: "grape juice", quantity: 750, unit: "ml" },
@@ -119,13 +120,110 @@ export const geCountry: Country = {
         "3. Dip strings twice, allowing them to set between coats.",
       ],
     },
-    drink: {
-      name: "Tarragon Lemonade",
-      localName: "Тархун",
-      type: "soft-drink",
-      alcoholic: false,
-      description: "A bright green, anise-scented Georgian soft drink.",
-    },
+    drink: drink(
+      "Tarragon Lemonade",
+      "Тархун",
+      "soft-drink",
+      false,
+      "A bright green, anise-scented Georgian soft drink.",
+    ),
+    moreRecipes: [
+      {
+        id: "khinkali",
+        name: "Khinkali Dumplings",
+        localName: "ხინკალი",
+        description:
+          "Pleated soup dumplings filled with seasoned meat and eaten by hand.",
+        category: "main",
+        servings: 4,
+        prepMinutes: 45,
+        cookMinutes: 20,
+        difficulty: "challenging",
+        dietaryLabels: ["contains-meat"],
+        ingredients: [
+          { name: "flour", quantity: 500, unit: "g" },
+          { name: "minced beef and pork", quantity: 500, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "coriander", quantity: 15, unit: "g" },
+        ],
+        steps: [
+          "1. Mix a firm dough and rest while preparing the filling.",
+          "2. Combine minced meat with grated onion, herbs, salt, and pepper.",
+          "3. Wrap into gathered dumplings and boil until the wrappers are tender.",
+        ],
+      },
+      {
+        id: "badrijani",
+        name: "Walnut-Stuffed Eggplant",
+        localName: "ბადრიჯანი ნიგვზით",
+        description:
+          "Fried eggplant rolls filled with a garlicky walnut paste for sharing plates.",
+        category: "starter",
+        servings: 4,
+        prepMinutes: 25,
+        cookMinutes: 20,
+        difficulty: "medium",
+        dietaryLabels: ["vegetarian", "vegan"],
+        ingredients: [
+          { name: "eggplants", quantity: 3, unit: "pieces" },
+          { name: "walnuts", quantity: 200, unit: "g" },
+          { name: "garlic", quantity: 3, unit: "cloves" },
+          { name: "coriander", quantity: 20, unit: "g" },
+        ],
+        steps: [
+          "1. Slice eggplants lengthwise and fry until soft and golden.",
+          "2. Grind walnuts with garlic, coriander, and a splash of vinegar.",
+          "3. Spread the paste, roll, and garnish with pomegranate seeds if available.",
+        ],
+      },
+      {
+        id: "ajapsandali",
+        name: "Vegetable Stew",
+        localName: "აჯაფსანდალი",
+        description:
+          "A summery stew of eggplant, peppers, tomatoes, and herbs cooked until jammy.",
+        category: "side",
+        servings: 4,
+        prepMinutes: 20,
+        cookMinutes: 40,
+        difficulty: "easy",
+        dietaryLabels: ["vegetarian", "vegan"],
+        ingredients: [
+          { name: "eggplant", quantity: 400, unit: "g" },
+          { name: "bell peppers", quantity: 300, unit: "g" },
+          { name: "tomatoes", quantity: 400, unit: "g" },
+          { name: "onion", quantity: 2, unit: "pieces" },
+        ],
+        steps: [
+          "1. Soften onion, then add diced eggplant and peppers.",
+          "2. Stir in tomatoes and simmer until thick and glossy.",
+          "3. Finish with fresh herbs and serve warm or at room temperature.",
+        ],
+      },
+    ],
+    moreDrinks: [
+      drink(
+        "Saperavi",
+        "საფერავი",
+        "wine",
+        true,
+        "Deep Georgian red wine that stands up to rich walnut and meat dishes.",
+      ),
+      drink(
+        "Natakhtari Beer",
+        "ნათახტარი",
+        "beer",
+        true,
+        "Popular Georgian lager for casual supra-style sharing meals.",
+      ),
+      drink(
+        "Borjomi",
+        "ბორჯომი",
+        "soft-drink",
+        false,
+        "Naturally sparkling mineral water often served with feasts.",
+      ),
+    ],
   },
   status: "published",
 };

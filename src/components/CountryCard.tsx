@@ -1,5 +1,6 @@
 import { Beer, UtensilsCrossed } from "lucide-react";
 import type { Country } from "@/types/content";
+import { getCountryRecipes } from "@/content/countries/menuAccessors";
 
 type CountryCardProps = {
   country: Country;
@@ -7,12 +8,9 @@ type CountryCardProps = {
 
 export function CountryCard({ country }: CountryCardProps) {
   const nationalDish =
-    [
-      country.menu.starter,
-      country.menu.main,
-      country.menu.side,
-      country.menu.dessert,
-    ].find((recipe) => recipe.id === country.nationalDishId) ?? country.menu.main;
+    getCountryRecipes(country).find(
+      (recipe) => recipe.id === country.nationalDishId,
+    ) ?? country.menu.main;
 
   return (
     <article className="overflow-hidden rounded-[2rem] border border-ink/10 bg-gradient-to-br from-cream via-parchment to-parchment-deep shadow-[0_18px_50px_rgba(59,31,58,0.1)]">

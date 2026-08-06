@@ -1,5 +1,11 @@
 export type DrinkType =
-  "beer" | "wine" | "spirit" | "cocktail" | "soft-drink" | "tea" | "coffee";
+  | "beer"
+  | "wine"
+  | "spirit"
+  | "cocktail"
+  | "soft-drink"
+  | "tea"
+  | "coffee";
 
 export type Drink = {
   name: string;
@@ -37,12 +43,27 @@ export type Recipe = {
   drinkPairing?: string;
 };
 
+export type SpecialtyShop = {
+  id: string;
+  name: string;
+  city: string;
+  address: string;
+  specialty: string;
+  website?: string;
+  mapsUrl: string;
+  notes?: string;
+};
+
 export type Menu = {
   starter: Recipe;
   main: Recipe;
   side: Recipe;
   dessert: Recipe;
   drink: Drink;
+  /** Additional recipes beyond the core four-course set. */
+  moreRecipes?: Recipe[];
+  /** Additional drinks (beer, wine, soft drinks, etc.). */
+  moreDrinks?: Drink[];
 };
 
 export type CountryStatus = "draft" | "published";
@@ -58,6 +79,8 @@ export type Country = {
   nationalDishId: string;
   nationalDrink: Drink;
   menu: Menu;
+  /** Netherlands specialty grocers / shops useful for cooking this cuisine. */
+  specialtyShops?: SpecialtyShop[];
   status: CountryStatus;
 };
 

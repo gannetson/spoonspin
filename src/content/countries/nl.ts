@@ -27,7 +27,7 @@ export const nlCountry: Country = {
       prepMinutes: 30,
       cookMinutes: 15,
       difficulty: "medium",
-      dietaryLabels: [],
+      dietaryLabels: ["contains-meat"],
       ingredients: [
         { name: "cooked beef", quantity: 250, unit: "g" },
         { name: "butter", quantity: 40, unit: "g" },
@@ -53,7 +53,7 @@ export const nlCountry: Country = {
       prepMinutes: 15,
       cookMinutes: 30,
       difficulty: "easy",
-      dietaryLabels: ["gluten-free"],
+      dietaryLabels: ["contains-meat", "gluten-free"],
       ingredients: [
         { name: "floury potatoes", quantity: 1200, unit: "g" },
         { name: "curly kale", quantity: 400, unit: "g" },
@@ -125,6 +125,105 @@ export const nlCountry: Country = {
       alcoholic: true,
       description: "A clean, light pilsner commonly poured alongside snacks and dinner.",
     },
+    moreRecipes: [
+      {
+        id: "erwtensoep",
+        name: "Split Pea Soup",
+        localName: "Erwtensoep",
+        description:
+          "Thick winter soup of split peas, vegetables, and smoked sausage.",
+        category: "main",
+        servings: 6,
+        prepMinutes: 20,
+        cookMinutes: 90,
+        difficulty: "easy",
+        dietaryLabels: ["contains-meat"],
+        ingredients: [
+          { name: "green split peas", quantity: 500, unit: "g" },
+          { name: "celeriac", quantity: 300, unit: "g" },
+          { name: "rookworst", quantity: 1, unit: "piece" },
+          { name: "leek", quantity: 1, unit: "piece" },
+        ],
+        steps: [
+          "1. Simmer soaked split peas with diced vegetables until thick and soft.",
+          "2. Add sliced rookworst for the final 15 minutes.",
+          "3. Season generously and serve with rye bread if you like.",
+        ],
+      },
+      {
+        id: "poffertjes",
+        name: "Poffertjes",
+        description:
+          "Tiny fluffy buckwheat pancakes dusted with icing sugar and butter.",
+        category: "dessert",
+        servings: 4,
+        prepMinutes: 15,
+        cookMinutes: 20,
+        difficulty: "easy",
+        dietaryLabels: ["vegetarian"],
+        ingredients: [
+          { name: "buckwheat flour", quantity: 150, unit: "g" },
+          { name: "wheat flour", quantity: 150, unit: "g" },
+          { name: "milk", quantity: 400, unit: "ml" },
+          { name: "yeast", quantity: 7, unit: "g" },
+        ],
+        steps: [
+          "1. Mix a yeasted batter and let it rise until bubbly.",
+          "2. Cook teaspoonfuls in a poffertjes pan until golden on both sides.",
+          "3. Serve immediately with butter and icing sugar.",
+        ],
+      },
+      {
+        id: "haring",
+        name: "Hollandse Nieuwe Herring",
+        localName: "Haring",
+        description:
+          "Lightly cured raw herring traditionally eaten with onion and pickles.",
+        category: "starter",
+        servings: 2,
+        prepMinutes: 10,
+        cookMinutes: 0,
+        difficulty: "easy",
+        dietaryLabels: ["contains-meat"],
+        ingredients: [
+          { name: "Hollandse nieuwe herring", quantity: 4, unit: "pieces" },
+          { name: "white onion", quantity: 1, unit: "piece" },
+          { name: "pickle", quantity: 2, unit: "pieces" },
+        ],
+        steps: [
+          "1. Rinse and dry the cleaned herring if needed.",
+          "2. Finely chop onion and slice pickles.",
+          "3. Eat the herring with onion, either held by the tail or on soft bread.",
+        ],
+        substitutions: [
+          "In the Netherlands, buy cleaned Hollandse nieuwe from a fish stall.",
+        ],
+      },
+    ],
+    moreDrinks: [
+      {
+        name: "Jenever",
+        localName: "Jenever",
+        type: "spirit",
+        alcoholic: true,
+        description:
+          "Juniper-led Dutch spirit traditionally sipped chilled from a tulip glass.",
+      },
+      {
+        name: "Chocomel",
+        type: "soft-drink",
+        alcoholic: false,
+        description:
+          "Sweet Dutch chocolate milk, a popular non-alcoholic comfort drink.",
+      },
+      {
+        name: "Apple juice / Appelsap",
+        type: "soft-drink",
+        alcoholic: false,
+        description:
+          "Fresh apple juice commonly poured with family meals and kids' tables.",
+      },
+    ],
   },
   status: "published",
 };

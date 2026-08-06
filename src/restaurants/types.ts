@@ -1,3 +1,5 @@
+import type { RestaurantRatings } from "./ratings";
+
 export type Restaurant = {
   id: string;
   name: string;
@@ -5,6 +7,7 @@ export type Restaurant = {
   city: string;
   rating?: number;
   reviewCount?: number;
+  ratings?: RestaurantRatings;
   website?: string;
   mapsUrl: string;
   location?: {
@@ -12,11 +15,15 @@ export type Restaurant = {
     lng: number;
   };
   distanceKm?: number;
+  authenticityRating?: number;
+  authenticityNotes?: string;
+  reviewed?: boolean;
 };
 
 export type RestaurantSearchParams = {
   cuisineAliases: string[];
   countryName: string;
+  countryCode?: string;
   cityOrPostcode?: string;
   visitorLocation?: {
     lat: number;
@@ -24,12 +31,15 @@ export type RestaurantSearchParams = {
   };
 };
 
+export type RestaurantSource = "local" | "google" | "mapbox" | "fallback";
+
 export type RestaurantSearchResult =
   | {
       status: "ok";
       restaurants: Restaurant[];
-      source: "google" | "mapbox" | "fallback";
+      source: RestaurantSource;
       mapsSearchUrl: string;
+      message?: string;
     }
   | {
       status: "unconfigured";
@@ -41,7 +51,7 @@ export type RestaurantSearchResult =
   | {
       status: "error";
       restaurants: Restaurant[];
-      source: "google" | "mapbox" | "fallback";
+      source: RestaurantSource;
       mapsSearchUrl: string;
       message: string;
     };

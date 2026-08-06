@@ -3,7 +3,15 @@ import { z } from "zod";
 export const drinkSchema = z.object({
   name: z.string().min(1),
   localName: z.string().min(1).optional(),
-  type: z.enum(["beer", "wine", "spirit", "cocktail", "soft-drink", "tea", "coffee"]),
+  type: z.enum([
+    "beer",
+    "wine",
+    "spirit",
+    "cocktail",
+    "soft-drink",
+    "tea",
+    "coffee",
+  ]),
   alcoholic: z.boolean(),
   description: z.string().min(20),
 });
@@ -33,12 +41,25 @@ export const recipeSchema = z.object({
   drinkPairing: z.string().optional(),
 });
 
+export const specialtyShopSchema = z.object({
+  id: z.string().min(1),
+  name: z.string().min(1),
+  city: z.string().min(1),
+  address: z.string().min(1),
+  specialty: z.string().min(3),
+  website: z.string().url().optional(),
+  mapsUrl: z.string().url(),
+  notes: z.string().optional(),
+});
+
 export const menuSchema = z.object({
   starter: recipeSchema,
   main: recipeSchema,
   side: recipeSchema,
   dessert: recipeSchema,
   drink: drinkSchema,
+  moreRecipes: z.array(recipeSchema).optional(),
+  moreDrinks: z.array(drinkSchema).optional(),
 });
 
 export const countrySchema = z
@@ -56,6 +77,7 @@ export const countrySchema = z
     nationalDishId: z.string().min(1),
     nationalDrink: drinkSchema,
     menu: menuSchema,
+    specialtyShops: z.array(specialtyShopSchema).optional(),
     status: z.enum(["draft", "published"]),
   })
   .superRefine((country, ctx) => {
@@ -64,8 +86,16 @@ export const countrySchema = z
       country.menu.main,
       country.menu.side,
       country.menu.dessert,
+      ...(country.menu.moreRecipes ?? []),
     ];
     const ids = recipes.map((r) => r.id);
+    if (new Set(ids).size !== ids.length) {
+      ctx.addIssue({
+        code: "custom",
+        message: "Recipe ids must be unique within a country menu",
+        path: ["menu"],
+      });
+    }
     if (!ids.includes(country.nationalDishId)) {
       ctx.addIssue({
         code: "custom",

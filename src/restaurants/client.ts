@@ -11,6 +11,7 @@ export async function fetchRestaurants(
       body: JSON.stringify({
         cuisineAliases: params.cuisineAliases,
         countryName: params.countryName,
+        countryCode: params.countryCode,
         cityOrPostcode: params.cityOrPostcode,
         visitorLocation: params.visitorLocation,
       }),

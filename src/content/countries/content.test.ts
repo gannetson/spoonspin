@@ -10,7 +10,7 @@ import {
 describe("published country content", () => {
   it("validates every published country against the Zod schema", () => {
     const published = getPublishedCountries();
-    expect(published.length).toBeGreaterThanOrEqual(20);
+    expect(published).toHaveLength(30);
     for (const country of published) {
       const result = countrySchema.safeParse(country);
       if (!result.success) {
@@ -29,6 +29,6 @@ describe("published country content", () => {
   it("only exposes published countries via getCountryByCode", () => {
     expect(getCountryByCode("bg")?.name).toBe("Bulgaria");
     expect(getCountryByCode("xx")).toBeUndefined();
-    expect(getCountryByCode("fr")).toBeUndefined();
+    expect(getCountryByCode("fr")?.name).toBe("France");
   });
 });

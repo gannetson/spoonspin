@@ -1,10 +1,14 @@
 import { ChefHat } from "lucide-react";
+import type { Country } from "@/types/content";
+import { CountrySelect } from "@/components/CountrySelect";
 
 type HomeHeroProps = {
+  countries: Country[];
   onPick: () => void;
+  onSelectCountry: (code: string) => void;
 };
 
-export function HomeHero({ onPick }: HomeHeroProps) {
+export function HomeHero({ countries, onPick, onSelectCountry }: HomeHeroProps) {
   return (
     <section
       aria-labelledby="hero-heading"
@@ -31,14 +35,22 @@ export function HomeHero({ onPick }: HomeHeroProps) {
         Netherlands.
       </p>
 
-      <button
-        type="button"
-        onClick={onPick}
-        className="mt-10 inline-flex min-h-14 items-center gap-3 rounded-full bg-tomato px-8 text-lg font-semibold text-cream shadow-lg shadow-tomato/25 transition hover:bg-tomato-deep"
-      >
-        <ChefHat aria-hidden="true" className="size-6" />
-        Pick a country
-      </button>
+      <div className="mt-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-8">
+        <button
+          type="button"
+          onClick={onPick}
+          className="inline-flex min-h-14 shrink-0 items-center gap-3 rounded-full bg-tomato px-8 text-lg font-semibold text-cream shadow-lg shadow-tomato/25 transition hover:bg-tomato-deep"
+        >
+          <ChefHat aria-hidden="true" className="size-6" />
+          Spin the spoon
+        </button>
+
+        <CountrySelect
+          countries={countries}
+          onSelect={onSelectCountry}
+          id="home-country-select"
+        />
+      </div>
     </section>
   );
 }

@@ -60,7 +60,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Argentina",
     flag: "🇦🇷",
     region: "Americas",
-    status: "draft",
+    status: "published",
   },
   {
     code: "am",
@@ -292,7 +292,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "China",
     flag: "🇨🇳",
     region: "Asia",
-    status: "draft",
+    status: "published",
   },
   {
     code: "co",
@@ -420,7 +420,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Egypt",
     flag: "🇪🇬",
     region: "Africa",
-    status: "draft",
+    status: "published",
   },
   {
     code: "sv",
@@ -492,7 +492,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "France",
     flag: "🇫🇷",
     region: "Europe",
-    status: "draft",
+    status: "published",
   },
   {
     code: "ga",
@@ -524,7 +524,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Germany",
     flag: "🇩🇪",
     region: "Europe",
-    status: "draft",
+    status: "published",
   },
   {
     code: "gh",
@@ -718,7 +718,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "South Korea",
     flag: "🇰🇷",
     region: "Asia",
-    status: "draft",
+    status: "published",
   },
   {
     code: "xk",
@@ -1015,7 +1015,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Nigeria",
     flag: "🇳🇬",
     region: "Africa",
-    status: "draft",
+    status: "published",
   },
   {
     code: "mk",
@@ -1096,7 +1096,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Philippines",
     flag: "🇵🇭",
     region: "Asia",
-    status: "draft",
+    status: "published",
   },
   {
     code: "pl",
@@ -1112,7 +1112,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Portugal",
     flag: "🇵🇹",
     region: "Europe",
-    status: "draft",
+    status: "published",
   },
   {
     code: "qa",
@@ -1376,7 +1376,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Thailand",
     flag: "🇹🇭",
     region: "Asia",
-    status: "draft",
+    status: "published",
   },
   {
     code: "tl",
