@@ -77,4 +77,31 @@
   .stamp-border {
     border: 2px dashed color-mix(in srgb, var(--color-stamp) 55%, transparent);
   }
+
+  @keyframes spoon-spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(720deg);
+    }
+  }
+
+  @keyframes wiggle {
+    0%,
+    100% {
+      transform: rotate(-1.5deg);
+    }
+    50% {
+      transform: rotate(1.5deg);
+    }
+  }
+
+  .animate-spoon-spin {
+    animation: spoon-spin 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  }
+
+  .animate-wiggle {
+    animation: wiggle 0.35s ease-in-out infinite;
+  }
 }

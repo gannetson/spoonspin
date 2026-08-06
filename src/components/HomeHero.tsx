@@ -1,6 +1,6 @@
-import { ChefHat } from "lucide-react";
 import type { Country } from "@/types/content";
 import { CountrySelect } from "@/components/CountrySelect";
+import { SpinSpoonButton } from "@/components/SpinSpoonButton";
 
 type HomeHeroProps = {
   countries: Country[];
@@ -35,16 +35,8 @@ export function HomeHero({ countries, onPick, onSelectCountry }: HomeHeroProps) 
         Netherlands.
       </p>
 
-      <div className="mt-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:gap-8">
-        <button
-          type="button"
-          onClick={onPick}
-          className="inline-flex min-h-14 shrink-0 items-center gap-3 rounded-full bg-tomato px-8 text-lg font-semibold text-cream shadow-lg shadow-tomato/25 transition hover:bg-tomato-deep"
-        >
-          <ChefHat aria-hidden="true" className="size-6" />
-          Spin the spoon
-        </button>
-
+      <div className="mt-10 flex flex-col items-center gap-8 sm:items-start">
+        <SpinSpoonButton spinning={false} onClick={onPick} size="lg" />
         <CountrySelect
           countries={countries}
           onSelect={onSelectCountry}

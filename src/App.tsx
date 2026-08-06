@@ -13,12 +13,12 @@ import {
 import type { Recipe } from "@/types/content";
 import { CountryCard } from "@/components/CountryCard";
 import { CountrySelect } from "@/components/CountrySelect";
-import { CountrySpinner } from "@/components/CountrySpinner";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
 import { HomeHero } from "@/components/HomeHero";
 import { RecipeView } from "@/components/RecipeView";
 import { ShareButton } from "@/components/ShareButton";
+import { FlagSpinner, SpinSpoonButton } from "@/components/SpinSpoonButton";
 
 export type AppMode = "choose" | "cook" | "dine";
 
@@ -44,6 +44,7 @@ export default function App() {
 
   const [spinning, setSpinning] = useState(false);
   const [spinNames, setSpinNames] = useState<{ flag: string; name: string }[]>([]);
+  const [spinButtonSize, setSpinButtonSize] = useState<"lg" | "sm">("lg");
   const [announcement, setAnnouncement] = useState("");
   const [fallbackNotice, setFallbackNotice] = useState<string | null>(null);
   const spinTimer = useRef<number | null>(null);
@@ -84,6 +85,7 @@ export default function App() {
   const pickCountry = useCallback(() => {
     if (spinning) return;
     setFallbackNotice(null);
+    setSpinButtonSize(selectedCountry ? "sm" : "lg");
     setSpinning(true);
     const pool = published.map((c) => ({ flag: c.flag, name: c.name }));
     setSpinNames(pool);
@@ -105,7 +107,7 @@ export default function App() {
         setSearchParams({ country: picked.code }, { replace: false });
       }
     }, 70);
-  }, [published, setSearchParams, spinning]);
+  }, [published, selectedCountry, setSearchParams, spinning]);
 
   const selectCountry = useCallback(
     (code: string) => {
@@ -164,6 +166,20 @@ export default function App() {
           </p>
         ) : null}
 
+        {spinning ? (
+          <section
+            aria-label="Spinning for a country"
+            className="flex flex-col items-center gap-8 rounded-[2rem] border border-ink/10 bg-cream/80 px-6 py-12 shadow-[0_20px_60px_rgba(59,31,58,0.08)] sm:items-start sm:px-10 sm:py-14"
+          >
+            <SpinSpoonButton
+              spinning
+              onClick={pickCountry}
+              size={spinButtonSize}
+            />
+            <FlagSpinner current={spinNames[0]} />
+          </section>
+        ) : null}
+
         {!selectedCountry && !spinning ? (
           <HomeHero
             countries={published}
@@ -172,13 +188,11 @@ export default function App() {
           />
         ) : null}
 
-        {spinning ? <CountrySpinner current={spinNames[0]} /> : null}
-
         {selectedCountry && !spinning ? (
           <section className="space-y-6" aria-label={`${selectedCountry.name} result`}>
             <CountryCard country={selectedCountry} />
 
-            <div className="flex flex-wrap items-end gap-3">
+            <div className="flex flex-wrap items-end gap-4">
               <ModeButton
                 active={mode === "cook"}
                 onClick={() => updateParams({ mode: "cook", recipe: null })}
@@ -191,13 +205,7 @@ export default function App() {
                 label="Dine"
                 description="Find restaurants in the Netherlands"
               />
-              <button
-                type="button"
-                onClick={pickCountry}
-                className="min-h-12 rounded-full border-2 border-ink/20 bg-transparent px-5 text-base font-semibold text-ink transition hover:border-tomato hover:text-tomato"
-              >
-                Spin the spoon
-              </button>
+              <SpinSpoonButton spinning={false} onClick={pickCountry} size="sm" />
               <CountrySelect
                 countries={published}
                 value={selectedCountry.code}
