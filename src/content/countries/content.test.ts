@@ -21,6 +21,19 @@ describe("published country content", () => {
     }
   });
 
+  it("keeps recipe ids and names unique within each published country", () => {
+    for (const country of getPublishedCountries()) {
+      const recipes = [
+        country.menu.starter,
+        country.menu.main,
+        country.menu.side,
+        country.menu.dessert,
+      ];
+      expect(new Set(recipes.map((recipe) => recipe.id)).size).toBe(recipes.length);
+      expect(new Set(recipes.map((recipe) => recipe.name)).size).toBe(recipes.length);
+    }
+  });
+
   it("keeps the catalog at the intended 197-country scope", () => {
     expect(CATALOG_SIZE).toBe(197);
     expect(countryCatalog).toHaveLength(197);

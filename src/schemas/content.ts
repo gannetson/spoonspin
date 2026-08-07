@@ -15,6 +15,12 @@ export const ingredientSchema = z.object({
   note: z.string().optional(),
 });
 
+export const recipeSourceSchema = z.object({
+  title: z.string().min(1),
+  url: z.url(),
+  type: z.enum(["full-recipe", "photo-guide", "video"]),
+});
+
 export const recipeSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -31,6 +37,7 @@ export const recipeSchema = z.object({
   substitutions: z.array(z.string()).optional(),
   servingSuggestion: z.string().optional(),
   drinkPairing: z.string().optional(),
+  sources: z.array(recipeSourceSchema).optional(),
 });
 
 export const menuSchema = z.object({
@@ -39,6 +46,13 @@ export const menuSchema = z.object({
   side: recipeSchema,
   dessert: recipeSchema,
   drink: drinkSchema,
+});
+
+export const specialtyShopSchema = z.object({
+  name: z.string().min(1),
+  url: z.url(),
+  description: z.string().min(20),
+  ingredients: z.array(z.string().min(1)).min(1),
 });
 
 export const countrySchema = z
@@ -56,6 +70,7 @@ export const countrySchema = z
     nationalDishId: z.string().min(1),
     nationalDrink: drinkSchema,
     menu: menuSchema,
+    specialtyShops: z.array(specialtyShopSchema).optional(),
     status: z.enum(["draft", "published"]),
   })
   .superRefine((country, ctx) => {

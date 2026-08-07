@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, Printer } from "lucide-react";
+import { ArrowLeft, ExternalLink, Printer } from "lucide-react";
 import type { Country, Drink, Recipe } from "@/types/content";
 import { formatQuantity, scaleIngredients } from "@/lib/scaleIngredients";
 
@@ -148,6 +148,34 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
         </section>
       ) : null}
 
+      {recipe.sources && recipe.sources.length > 0 ? (
+        <section className="mt-8 print:hidden" aria-labelledby="sources-heading">
+          <h3 id="sources-heading" className="font-display text-2xl">
+            Recipe research links
+          </h3>
+          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+            {recipe.sources.map((source) => (
+              <li key={source.url}>
+                <a
+                  href={source.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex min-h-12 items-center justify-between gap-3 rounded-xl border border-ink/10 bg-white/60 px-4 py-3 text-sm font-semibold text-ink transition hover:border-tomato hover:text-tomato"
+                >
+                  <span>
+                    <span className="block text-xs uppercase tracking-wide text-ink-soft">
+                      {formatSourceType(source.type)}
+                    </span>
+                    {source.title}
+                  </span>
+                  <ExternalLink aria-hidden="true" className="size-4 shrink-0" />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
       <section className="mt-8 grid gap-4 sm:grid-cols-2">
         {recipe.servingSuggestion ? (
           <div className="rounded-2xl bg-parchment p-4">
@@ -165,6 +193,12 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
       </section>
     </article>
   );
+}
+
+function formatSourceType(type: NonNullable<Recipe["sources"]>[number]["type"]) {
+  if (type === "full-recipe") return "Full recipe";
+  if (type === "photo-guide") return "Photos";
+  return "Instruction video";
 }
 
 function Meta({ label, value }: { label: string; value: string }) {

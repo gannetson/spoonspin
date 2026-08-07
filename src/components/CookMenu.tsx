@@ -1,4 +1,4 @@
-import { Clock3, Flame } from "lucide-react";
+import { Clock3, ExternalLink, Flame, ShoppingBasket } from "lucide-react";
 import type { Country, Recipe } from "@/types/content";
 
 type CookMenuProps = {
@@ -85,6 +85,39 @@ export function CookMenu({ country, onOpenRecipe }: CookMenuProps) {
         </p>
         <p className="mt-1 text-sm text-ink-soft">{country.menu.drink.description}</p>
       </div>
+
+      {country.specialtyShops && country.specialtyShops.length > 0 ? (
+        <section
+          aria-labelledby="specialty-shops-heading"
+          className="rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-5"
+        >
+          <div className="flex items-center gap-2 text-tomato">
+            <ShoppingBasket aria-hidden="true" className="size-5" />
+            <h3 id="specialty-shops-heading" className="font-display text-xl text-ink">
+              Specialty ingredient shops
+            </h3>
+          </div>
+          <ul className="mt-3 grid gap-3">
+            {country.specialtyShops.map((shop) => (
+              <li key={shop.url} className="rounded-xl bg-cream/70 p-4">
+                <a
+                  href={shop.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 font-semibold text-ink hover:text-tomato"
+                >
+                  {shop.name}
+                  <ExternalLink aria-hidden="true" className="size-4" />
+                </a>
+                <p className="mt-1 text-sm text-ink-soft">{shop.description}</p>
+                <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                  Look for: {shop.ingredients.join(", ")}
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
     </section>
   );
 }

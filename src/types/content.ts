@@ -16,6 +16,14 @@ export type Ingredient = {
   note?: string;
 };
 
+export type RecipeSourceType = "full-recipe" | "photo-guide" | "video";
+
+export type RecipeSource = {
+  title: string;
+  url: string;
+  type: RecipeSourceType;
+};
+
 export type RecipeCategory = "starter" | "main" | "side" | "dessert" | "snack";
 export type Difficulty = "easy" | "medium" | "challenging";
 
@@ -35,6 +43,7 @@ export type Recipe = {
   substitutions?: string[];
   servingSuggestion?: string;
   drinkPairing?: string;
+  sources?: RecipeSource[];
 };
 
 export type Menu = {
@@ -47,6 +56,13 @@ export type Menu = {
 
 export type CountryStatus = "draft" | "published";
 
+export type SpecialtyShop = {
+  name: string;
+  url: string;
+  description: string;
+  ingredients: string[];
+};
+
 export type Country = {
   code: string;
   slug: string;
@@ -58,6 +74,7 @@ export type Country = {
   nationalDishId: string;
   nationalDrink: Drink;
   menu: Menu;
+  specialtyShops?: SpecialtyShop[];
   status: CountryStatus;
 };
 
