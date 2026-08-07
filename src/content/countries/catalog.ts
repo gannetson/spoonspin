@@ -694,7 +694,7 @@ export const countryCatalog: CountryCatalogEntry[] = [
     name: "Kenya",
     flag: "🇰🇪",
     region: "Africa",
-    status: "draft",
+    status: "published",
   },
   {
     code: "ki",

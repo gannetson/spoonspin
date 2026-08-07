@@ -15,6 +15,7 @@ import { inCountry } from "./in";
 import { idCountry } from "./id";
 import { vnCountry } from "./vn";
 import { jpCountry } from "./jp";
+import { keCountry } from "./ke";
 import { mxCountry } from "./mx";
 import { peCountry } from "./pe";
 import { brCountry } from "./br";
@@ -50,6 +51,7 @@ export const authoredCountries: AuthoredCountry[] = [
   idCountry,
   vnCountry,
   jpCountry,
+  keCountry,
   mxCountry,
   peCountry,
   brCountry,
