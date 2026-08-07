@@ -8,11 +8,7 @@ export const keCountry: Country = {
   region: "Africa",
   introduction:
     "Kenyan food is shaped by regional communities, Indian Ocean trade, and everyday staples such as maize, beans, greens, tea, and grilled meat. Ugali, sukuma wiki, nyama choma, mandazi, and spiced chai are widely recognised comfort foods, while the coast adds coconut, cardamom, and pilau spices.",
-  cuisineAliases: [
-    "Kenyan restaurant",
-    "Keniaans restaurant",
-    "East African restaurant",
-  ],
+  cuisineAliases: ["Kenyan restaurant", "Keniaans restaurant", "East African restaurant"],
   nationalDishId: "nyama-choma",
   nationalDrink: {
     name: "Kenyan Chai",
@@ -82,7 +78,8 @@ export const keCountry: Country = {
       ],
       servingSuggestion:
         "Serve chilled or at room temperature beside nyama choma, ugali, or any grilled food.",
-      drinkPairing: "Kenyan chai is classic later in the meal; fresh passion fruit juice also works.",
+      drinkPairing:
+        "Kenyan chai is classic later in the meal; fresh passion fruit juice also works.",
       sources: [
         {
           title: "Kenyan Food Journal kachumbari method within nyama choma",
@@ -184,7 +181,8 @@ export const keCountry: Country = {
       ],
       servingSuggestion:
         "Pinch off pieces of ugali by hand or slice it into wedges for scooping the greens and juices.",
-      drinkPairing: "Milky Kenyan chai balances the greens and maize with gentle sweetness.",
+      drinkPairing:
+        "Milky Kenyan chai balances the greens and maize with gentle sweetness.",
       sources: [
         {
           title: "Serious Eats ugali recipe with serving photo",
