@@ -4,6 +4,7 @@ import {
   LoaderCircle,
   MapPin,
   Navigation,
+  Plus,
   RotateCcw,
   Star,
 } from "lucide-react";
@@ -26,6 +27,9 @@ import {
   saveDineLocation,
   setRememberCityPreference,
 } from "@/restaurants/locationPreference";
+import { restaurantImageFor } from "@/lib/images";
+import { dineBannerUrl } from "@/content/countries/cuisineImages";
+import { SuggestModal } from "@/components/SuggestModal";
 
 type DineSearchProps = {
   country: Country;
@@ -79,6 +83,7 @@ export function DineSearch({ country }: DineSearchProps) {
   >(() => getSavedDineCoords());
   const [sortMode, setSortMode] = useState<RestaurantSortMode>("default");
   const [state, setState] = useState<ViewState>({ status: "idle" });
+  const [suggestOpen, setSuggestOpen] = useState(false);
 
   const searchRef = useRef({
     country,
@@ -255,13 +260,38 @@ export function DineSearch({ country }: DineSearchProps) {
 
   return (
     <section aria-labelledby="dine-heading" className="space-y-5">
-      <div>
-        <h2 id="dine-heading" className="font-display text-3xl text-ink">
-          Dine in the Netherlands
-        </h2>
-        <p className="mt-1 text-ink-soft">
-          Find reviewed {country.name} restaurants within about 100 km.
-        </p>
+      <div className="relative overflow-hidden rounded-[2rem]">
+        <img
+          src={dineBannerUrl(country)}
+          alt=""
+          className="h-40 w-full object-cover sm:h-52"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/55 to-ink/20"
+        />
+        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+          <h2
+            id="dine-heading"
+            className="font-display text-3xl text-cream sm:text-5xl"
+          >
+            Dine in the Netherlands
+          </h2>
+          <p className="mt-2 max-w-lg text-cream/85">
+            Find reviewed {country.name} restaurants within about 100 km.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <button
+          type="button"
+          onClick={() => setSuggestOpen(true)}
+          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+        >
+          <Plus aria-hidden="true" className="size-4" />
+          Suggest a restaurant
+        </button>
       </div>
 
       {!showLocationForm ? (
@@ -405,98 +435,105 @@ export function DineSearch({ country }: DineSearchProps) {
             </div>
           </div>
           <ul className="grid gap-3">
-            {sortedRestaurants.map((restaurant) => (
+            {sortedRestaurants.map((restaurant, index) => (
               <li
                 key={restaurant.id}
-                className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10"
+                className="flex overflow-hidden rounded-2xl bg-cream ring-1 ring-ink/10"
               >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-display text-2xl text-ink">
-                      {restaurant.name}
-                    </h3>
-                    <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
-                      <MapPin
-                        aria-hidden="true"
-                        className="mt-0.5 size-4 shrink-0"
-                      />
-                      <span>
-                        {restaurant.address}
-                        {restaurant.city ? ` · ${restaurant.city}` : ""}
-                      </span>
-                    </p>
-                    {restaurant.distanceKm != null ? (
-                      <p className="mt-2 text-base font-semibold text-ink">
-                        {formatDistanceKm(restaurant.distanceKm)} away
-                      </p>
-                    ) : null}
-                    {restaurant.authenticityNotes ? (
-                      <p className="mt-2 max-w-xl text-sm text-ink-soft">
-                        {restaurant.authenticityNotes}
-                      </p>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-col items-end gap-2">
-                    {restaurant.authenticityRating != null ? (
-                      <p
-                        className="inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1 text-sm font-semibold text-cream"
-                        title="Editorial authenticity rating for this cuisine"
-                      >
-                        Authenticity {restaurant.authenticityRating.toFixed(0)}
-                        /5
-                      </p>
-                    ) : null}
-                    {restaurant.rating != null ? (
-                      <p className="inline-flex items-center gap-1 rounded-full bg-parchment px-3 py-1 text-sm font-semibold">
-                        <Star
+                <img
+                  src={restaurant.photoUrl ?? restaurantImageFor(index)}
+                  alt=""
+                  className="hidden w-36 shrink-0 object-cover sm:block"
+                />
+                <div className="flex min-w-0 flex-1 flex-col">
+                  <div className="flex flex-wrap items-start justify-between gap-3 p-5">
+                    <div>
+                      <h3 className="font-display text-2xl text-ink">
+                        {restaurant.name}
+                      </h3>
+                      <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
+                        <MapPin
                           aria-hidden="true"
-                          className="size-4 text-saffron"
+                          className="mt-0.5 size-4 shrink-0"
                         />
-                        {restaurant.rating.toFixed(1)}
-                        {restaurant.reviewCount != null
-                          ? ` (${restaurant.reviewCount})`
-                          : ""}
+                        <span>
+                          {restaurant.address}
+                          {restaurant.city ? ` · ${restaurant.city}` : ""}
+                        </span>
                       </p>
-                    ) : null}
-                    {listSourceRatings(restaurant.ratings).map((item) => (
-                      <p
-                        key={item.source}
-                        className="inline-flex items-center gap-1 rounded-full border border-ink/15 bg-white px-3 py-1 text-xs font-semibold text-ink"
-                        title={`${item.label} guest rating`}
-                      >
-                        {item.label}{" "}
-                        {item.rating.scale === 10
-                          ? `${item.rating.score.toFixed(1)}/10`
-                          : `${normalizeToFive(item.rating).toFixed(1)}/5`}
-                        {item.rating.count != null
-                          ? ` · ${item.rating.count}`
-                          : ""}
-                      </p>
-                    ))}
+                      {restaurant.distanceKm != null ? (
+                        <p className="mt-2 text-base font-semibold text-ink">
+                          {formatDistanceKm(restaurant.distanceKm)} away
+                        </p>
+                      ) : null}
+                      {restaurant.authenticityNotes ? (
+                        <p className="mt-2 max-w-xl text-sm text-ink-soft">
+                          {restaurant.authenticityNotes}
+                        </p>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-col items-end gap-2">
+                      {restaurant.authenticityRating != null ? (
+                        <p
+                          className="inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1 text-sm font-semibold text-cream"
+                          title="Editorial authenticity rating for this cuisine"
+                        >
+                          Authenticity {restaurant.authenticityRating.toFixed(0)}
+                          /5
+                        </p>
+                      ) : null}
+                      {restaurant.rating != null ? (
+                        <p className="inline-flex items-center gap-1 rounded-full bg-parchment px-3 py-1 text-sm font-semibold">
+                          <Star
+                            aria-hidden="true"
+                            className="size-4 text-saffron"
+                          />
+                          {restaurant.rating.toFixed(1)}
+                          {restaurant.reviewCount != null
+                            ? ` (${restaurant.reviewCount})`
+                            : ""}
+                        </p>
+                      ) : null}
+                      {listSourceRatings(restaurant.ratings).map((item) => (
+                        <p
+                          key={item.source}
+                          className="inline-flex items-center gap-1 rounded-full border border-ink/15 bg-white px-3 py-1 text-xs font-semibold text-ink"
+                          title={`${item.label} guest rating`}
+                        >
+                          {item.label}{" "}
+                          {item.rating.scale === 10
+                            ? `${item.rating.score.toFixed(1)}/10`
+                            : `${normalizeToFive(item.rating).toFixed(1)}/5`}
+                          {item.rating.count != null
+                            ? ` · ${item.rating.count}`
+                            : ""}
+                        </p>
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <div className="mt-4 flex flex-wrap gap-3">
-                  {restaurant.website ? (
+                  <div className="flex flex-wrap gap-3 px-5 pb-5">
+                    {restaurant.website ? (
+                      <a
+                        href={restaurant.website}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                      >
+                        Website
+                        <ExternalLink aria-hidden="true" className="size-4" />
+                      </a>
+                    ) : null}
                     <a
-                      href={restaurant.website}
+                      href={restaurant.mapsUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                      className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
                     >
-                      Website
+                      Open in Google Maps
                       <ExternalLink aria-hidden="true" className="size-4" />
                     </a>
-                  ) : null}
-                  <a
-                    href={restaurant.mapsUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                  >
-                    Open in Google Maps
-                    <ExternalLink aria-hidden="true" className="size-4" />
-                  </a>
+                  </div>
                 </div>
               </li>
             ))}
@@ -509,6 +546,16 @@ export function DineSearch({ country }: DineSearchProps) {
           Enter a city or postcode, or use your location to search.
         </p>
       ) : null}
+
+      <SuggestModal
+        kind="restaurant"
+        country={country}
+        open={suggestOpen}
+        onClose={() => setSuggestOpen(false)}
+        onAdded={() => {
+          void runSearch();
+        }}
+      />
     </section>
   );
 }

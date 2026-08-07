@@ -41,6 +41,13 @@ export type Recipe = {
   substitutions?: string[];
   servingSuggestion?: string;
   drinkPairing?: string;
+  /** Dish photo URL (Wikimedia / curated). */
+  imageUrl?: string;
+  imageAttribution?: string;
+  /** External recipe article or reference page. */
+  sourceUrl?: string;
+  /** Video page or search URL (e.g. YouTube). */
+  videoUrl?: string;
 };
 
 export type SpecialtyShop = {
@@ -68,7 +75,15 @@ export type Menu = {
 
 export type CountryStatus = "draft" | "published";
 
-export type Country = {
+/** Wikipedia extract for "{Country} cuisine" (or closest page). */
+export type WikipediaCuisine = {
+  title: string;
+  summary: string;
+  url: string;
+};
+
+/** Hand-authored country module (full Cook menu). */
+export type AuthoredCountry = {
   code: string;
   slug: string;
   name: string;
@@ -79,8 +94,28 @@ export type Country = {
   nationalDishId: string;
   nationalDrink: Drink;
   menu: Menu;
-  /** Netherlands specialty grocers / shops useful for cooking this cuisine. */
   specialtyShops?: SpecialtyShop[];
+  status: CountryStatus;
+};
+
+/** Spinable country — full catalog, with optional Cook menu. */
+export type Country = {
+  code: string;
+  slug: string;
+  name: string;
+  flag: string;
+  region: string;
+  introduction: string;
+  /** Main cuisine description from Wikipedia when available. */
+  wikipedia?: WikipediaCuisine;
+  cuisineAliases: string[];
+  nationalDishId?: string;
+  nationalDrink?: Drink;
+  /** Present when Cook mode has a full hand-authored menu. */
+  menu?: Menu;
+  specialtyShops?: SpecialtyShop[];
+  /** True when recipes are ready for Cook mode. */
+  cookReady: boolean;
   status: CountryStatus;
 };
 

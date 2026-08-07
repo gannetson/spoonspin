@@ -39,6 +39,10 @@ export const recipeSchema = z.object({
   substitutions: z.array(z.string()).optional(),
   servingSuggestion: z.string().optional(),
   drinkPairing: z.string().optional(),
+  imageUrl: z.string().url().optional(),
+  imageAttribution: z.string().min(2).optional(),
+  sourceUrl: z.string().url().optional(),
+  videoUrl: z.string().url().optional(),
 });
 
 export const specialtyShopSchema = z.object({
@@ -62,6 +66,13 @@ export const menuSchema = z.object({
   moreDrinks: z.array(drinkSchema).optional(),
 });
 
+export const wikipediaCuisineSchema = z.object({
+  title: z.string().min(2),
+  summary: z.string().min(40),
+  url: z.string().url(),
+});
+
+/** Hand-authored countries with full Cook menus. */
 export const countrySchema = z
   .object({
     code: z
@@ -73,11 +84,13 @@ export const countrySchema = z
     flag: z.string().min(1),
     region: z.string().min(2),
     introduction: z.string().min(60),
+    wikipedia: wikipediaCuisineSchema.optional(),
     cuisineAliases: z.array(z.string().min(2)).min(1),
     nationalDishId: z.string().min(1),
     nationalDrink: drinkSchema,
     menu: menuSchema,
     specialtyShops: z.array(specialtyShopSchema).optional(),
+    cookReady: z.literal(true),
     status: z.enum(["draft", "published"]),
   })
   .superRefine((country, ctx) => {
@@ -104,6 +117,23 @@ export const countrySchema = z
       });
     }
   });
+
+/** Catalog countries that are spinable without a full Cook menu yet. */
+export const stubCountrySchema = z.object({
+  code: z
+    .string()
+    .length(2)
+    .regex(/^[a-z]{2}$/),
+  slug: z.string().min(2),
+  name: z.string().min(2),
+  flag: z.string().min(1),
+  region: z.string().min(2),
+  introduction: z.string().min(40),
+  wikipedia: wikipediaCuisineSchema.optional(),
+  cuisineAliases: z.array(z.string().min(2)).min(1),
+  cookReady: z.literal(false),
+  status: z.literal("published"),
+});
 
 export const countryCatalogEntrySchema = z.object({
   code: z

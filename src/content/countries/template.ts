@@ -1,11 +1,11 @@
-import type { Country } from "@/types/content";
+import type { AuthoredCountry } from "@/types/content";
 
 /**
  * TEMPLATE: add a country in its own `<code>.ts` file, export `<code>Country`,
  * complete all four menu recipes and both drinks, then add it to published.ts.
  * Keep this example out of `publishedCountries` until its content is complete.
  */
-export const countryContentTemplate: Country = {
+export const countryContentTemplate: AuthoredCountry = {
   code: "xx",
   slug: "example-country",
   name: "Example Country",

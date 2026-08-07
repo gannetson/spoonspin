@@ -1,0 +1,937 @@
+{
+  "af": {
+    "code": "af",
+    "name": "Afghanistan",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Afghan_cuisine",
+    "dishes": [
+      {
+        "name": "Pilaf",
+        "wikipediaTitle": "Pilaf",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pilaf",
+        "summary": "Pilaf is a rice dish, or in some regions, a wheat dish, whose recipe usually involves cooking in stock or broth, adding spices, and other ingredients such as vegetables and meat, and employing some technique for achieving cooked grains that do not adhere.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Afghani_Zarda_Pulao.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Miansari66 / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pilaf",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pilaf%20Afghanistan%20recipe"
+      },
+      {
+        "name": "Korma",
+        "wikipediaTitle": "Korma",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Korma",
+        "summary": "Korma, kurma, qorma or qurma is a curry dish originating in the Indian subcontinent influenced by Mughlai cuisine, versions of which later were modified to Anglo-Indian and then to British tastes. It consists of meat or vegetables braised with yogurt, water or stock, and spices to produce a thick sauce or gravy. The flavours of kormas are less intense than those of meat-containing dishes, and the fragrances more aromatic.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Afghan_Qurma.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "ANBI / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Korma",
+        "videoUrl": "https://www.youtube.com/results?search_query=Korma%20Afghanistan%20recipe"
+      },
+      {
+        "name": "Kabuli pulao",
+        "wikipediaTitle": "Kabuli pulao",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kabuli_pulao",
+        "summary": "Kabuli pulao is a variety of pilaf made in Afghanistan and Uzbekistan. It is known in Afghanistan as Qābilī palaw, and in Uzbekistan as the Osh palov, with neither country referring to it by the name of the city, Kabul. In English the dish tends to be known by the name Kabuli. In Saudi Arabia it is known by the name Bukhari rice, after the city of Bukhara, Uzbekistan.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/dd/Afghan_Palo.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Jost Wagner / CC BY-SA 1.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kabuli_pulao",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kabuli%20pulao%20Afghanistan%20recipe"
+      },
+      {
+        "name": "National dish",
+        "wikipediaTitle": "National dish",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/National_dish",
+        "summary": "A national dish is a culinary dish that is strongly associated with a particular country. A dish can be considered a national dish for a variety of reasons:It is a staple food, made from a selection of locally available foodstuffs that can be prepared in a distinctive way, such as fruits de mer, served along the west coast of France.\nIt contains a particular ingredient that is produced locally, such as a paprika grown in the European Pyrenees.\nIt is served as a festive culinary tradition that forms part of a cultural heritage—for example, barbecues at summer camp or fondue at dinner parties—or as part of a religious practice, such as Korban Pesach or Iftar celebrations.\nIt has been promoted as a national dish, by the country itself, such as the promotion of fondue as a national dish of Switzerland by the Swiss Cheese Union in the 1930s.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fe/Food_and_feeding_%28IA_foodfeeding00thom%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Thompson, Henry, Sir, 1820-1904 / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/National_dish",
+        "videoUrl": "https://www.youtube.com/results?search_query=National%20dish%20Afghanistan%20recipe"
+      },
+      {
+        "name": "Naan",
+        "wikipediaTitle": "Naan",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Naan",
+        "summary": "Naan is a leavened, oven-baked or tawa-fried flatbread, that can also be baked in a tandoor. It is characterised by a light and fluffy texture and golden-brown spots from the baking process. Naan is used in many cuisines worldwide.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/45/Eggplant_borani_at_Naan_Kabob_in_Toronto.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Sdkb / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Naan",
+        "videoUrl": "https://www.youtube.com/results?search_query=Naan%20Afghanistan%20recipe"
+      },
+      {
+        "name": "Tandoor",
+        "wikipediaTitle": "Tandoor",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Tandoor",
+        "summary": "A tandoor is a large vase-shaped oven, usually made of clay. Since antiquity, tandoors have been used to bake unleavened flatbreads, such as roti and traditional lavash, as well as leavened ones, such as naan and tandoor bread or matnakash. It is also used to roast meat and vegetables. Tandoors are predominantly used in South Asia, Western Asia, Central Asia, and the Horn of Africa.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Afghan_Qurma_and_bread.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "ANBI / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Tandoor",
+        "videoUrl": "https://www.youtube.com/results?search_query=Tandoor%20Afghanistan%20recipe"
+      },
+      {
+        "name": "Flatbread",
+        "wikipediaTitle": "Flatbread",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Flatbread",
+        "summary": "A flatbread is bread typically made with flour, water, and salt, with or without leavening, which are mixed and rolled into flattened dough. They are usually baked quickly at high temperatures and range from below one millimeter to a few centimeters in thickness. Flatbreads are distinguished from other flour-based foods such as loaf breads, which have lower proportions of crust relative to crumb; pancakes, which use liquid batter rather than firm dough; and crackers, which are dry and crisp. Flatbreads are the oldest and most common type of bread, and are often staple foods. Many types of flatbread are eaten globally.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/21/Buying_influence-_the_relationship_of_incentives_and_values_%28IA_buyinginfluencer1094544585%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Hutchinson, Michael T. / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Flatbread",
+        "videoUrl": "https://www.youtube.com/results?search_query=Flatbread%20Afghanistan%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:13:09.687Z"
+  },
+  "al": {
+    "code": "al",
+    "name": "Albania",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Albanian_cuisine",
+    "dishes": [
+      {
+        "name": "Breakfast",
+        "wikipediaTitle": "Breakfast",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Breakfast",
+        "summary": "Breakfast is the first meal of the day, usually eaten in the morning. The word in English refers to breaking the fasting period of the previous night. Various \"typical\" or \"traditional\" breakfast menus exist, with food choices varying by regions and traditions worldwide.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/12/Buk%C3%AB_me_vez%C3%AB.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Nesakitchenhome / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Breakfast",
+        "videoUrl": "https://www.youtube.com/results?search_query=Breakfast%20Albania%20recipe"
+      },
+      {
+        "name": "Bread",
+        "wikipediaTitle": "Bread",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Bread",
+        "summary": "Bread is a baked food product made from water, flour, and often yeast. It is a staple food across the world, particularly in Europe and the Middle East. Throughout recorded history and around the world, it has been an important part of many cultures' diets. It is one of the oldest human-made foods, having been of significance since the dawn of agriculture, and plays an essential role in both religious rituals and secular culture.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/69/Traditional_Albanian_breads.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Liridon / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bread",
+        "videoUrl": "https://www.youtube.com/results?search_query=Bread%20Albania%20recipe"
+      },
+      {
+        "name": "Yogurt",
+        "wikipediaTitle": "Yogurt",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Yogurt",
+        "summary": "Yogurt is a food produced by bacterial fermentation of milk. The bacteria ferment the sugars in the milk and produce lactic acid, which acts on milk protein to give yogurt its texture and characteristic tart flavor. Yogurt is most commonly made from cow's milk, but milk from water buffalo, goats, ewes, mares, camels, and yaks can also be used.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Salc%C3%AB_kosi_me_ullinj.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rrezjaediellit / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Yogurt",
+        "videoUrl": "https://www.youtube.com/results?search_query=Yogurt%20Albania%20recipe"
+      },
+      {
+        "name": "Milk",
+        "wikipediaTitle": "Milk",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Milk",
+        "summary": "Milk is usually a white liquid food produced by the mammary glands of lactating mammals. It is the primary source of nutrition for young mammals before they are able to digest solid food. Milk contains many nutrients, including calcium and protein, as well as lactose and saturated fat; the enzyme lactase is needed to break down lactose. Immune factors and immune-modulating components in milk contribute to milk immunity. The first milk, which is called colostrum, contains antibodies and immune-modulating components that strengthen the immune system against many diseases.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/84/Ka%C3%A7imak%2C_Kelmend%2C_Mal%C3%ABsi_e_Madhe%2C_Shqip%C3%ABri_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Tizilohja25 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Milk",
+        "videoUrl": "https://www.youtube.com/results?search_query=Milk%20Albania%20recipe"
+      },
+      {
+        "name": "Tarhana",
+        "wikipediaTitle": "Tarhana",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Tarhana",
+        "summary": "Tarhana is a dried food ingredient, based on a fermented mixture of grain and yogurt or fermented milk, found in Central Asian, Southeast European, and Middle Eastern cuisines. Dry tarhana has a texture of coarse, uneven crumbs, and it is usually made into a thick soup with water, stock, or milk. As it is both acidic and low in moisture, the milk proteins keep for long periods. Tarhana is very similar to some kinds of kashk.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2a/Trahanaja_n%C3%AB_sht%C3%ABpit%C3%AB_tona.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ina Shani / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Tarhana",
+        "videoUrl": "https://www.youtube.com/results?search_query=Tarhana%20Albania%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:13:19.413Z"
+  },
+  "dz": {
+    "code": "dz",
+    "name": "Algeria",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Algerian_cuisine",
+    "dishes": [
+      {
+        "name": "Sardines as food",
+        "wikipediaTitle": "Sardines as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Sardines_as_food",
+        "summary": "Sardines are a nutrient-rich, small, oily fish widely consumed by humans and as forage fish by larger fish species, seabirds and marine mammals. Sardines are a source of omega-3 fatty acids. Sardines can be canned, pickled, smoked, or eaten fresh.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Proximate_composition_of_American_food_materials_%28IA_proximatecomposi549chat%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Chatfield, Charlotte, b. 1893\nAdams, Georgian, 1897- / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sardines_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Sardines%20as%20food%20Algeria%20recipe"
+      },
+      {
+        "name": "Shrimp and prawn as food",
+        "wikipediaTitle": "Shrimp and prawn as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Shrimp_and_prawn_as_food",
+        "summary": "Shrimps and prawns are types of crustacean seafood that are consumed worldwide. Prawns and shrimps are crustacea and are very similar in appearance with the terms often used interchangeably in commercial farming and wild fisheries. A distinction was made in 1990s Indian aquaculture literature, which increasingly uses the term \"prawn\" only for the freshwater forms of palaemonids and \"shrimp\" for the marine penaeids that belong to different suborders of Decapoda. This has not been universally accepted.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/39/Food_and_agricultural_export_bibliography%2C_1970_%28IA_foodagricultural221whit%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "White, Dennis / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Shrimp_and_prawn_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Shrimp%20and%20prawn%20as%20food%20Algeria%20recipe"
+      },
+      {
+        "name": "Octopus as food",
+        "wikipediaTitle": "Octopus as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Octopus_as_food",
+        "summary": "People of several cultures eat octopus. The arms and sometimes other body parts are prepared in various ways, often varying by species and/or geography.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/29/Science_%28IA_science401914mich%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Michels, John, 1875- edt\nAmerican Association for the Advancement of Science / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Octopus_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Octopus%20as%20food%20Algeria%20recipe"
+      },
+      {
+        "name": "Couscous",
+        "wikipediaTitle": "Couscous",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Couscous",
+        "summary": "Couscous, is a traditional North African dish of small steamed granules of rolled semolina that is often served with a stew spooned on top. Pearl millet, sorghum, bulgur, and other cereals are often cooked in much the same way in West Africa, and the resulting dishes are sometimes called couscous in English, French, and Hassaniya Arabic.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/67/Liat_Portal_for_Foodie_Disorder_-_Algerian_Couscous_with_Vegetables.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "HaJunkiyada / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Couscous",
+        "videoUrl": "https://www.youtube.com/results?search_query=Couscous%20Algeria%20recipe"
+      },
+      {
+        "name": "Beef",
+        "wikipediaTitle": "Beef",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Beef",
+        "summary": "Beef is the culinary name for meat from cattle. Beef can be prepared in various ways; cuts are often used for steak, which can be cooked to varying degrees of doneness, while trimmings are often ground or minced, as found in most hamburgers. Beef contains protein, iron, and vitamin B12. Along with other kinds of red meat, high consumption is associated with an increased risk of colorectal cancer and cardiovascular disease, especially when processed. Beef has a high environmental impact, being a primary driver of deforestation with the highest greenhouse gas emissions of any agricultural product.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Cook%27s_practical_guide_to_Algeria_and_Tunisia_%28IA_cookspracticalgu00thom%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Thomas Cook Ltd / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Beef",
+        "videoUrl": "https://www.youtube.com/results?search_query=Beef%20Algeria%20recipe"
+      },
+      {
+        "name": "Lamb and mutton",
+        "wikipediaTitle": "Lamb and mutton",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "summary": "Lamb and mutton, collectively sheep meat, is meat from the domestic sheep, Ovis aries. It is generally divided into three types: lamb, from sheep in their first year; hogget, from sheep in their second; and mutton, from older sheep.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/af/Brochettes_de_mouton_lors_de_L%27aid_el_adha_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Credits to Reda Kerbush / Wikimedia Commons / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lamb%20and%20mutton%20Algeria%20recipe"
+      },
+      {
+        "name": "Chicken as food",
+        "wikipediaTitle": "Chicken as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "summary": "Chicken is the most consumed meat in the world. Owing to the relative ease and low cost of raising chickens—in comparison to mammals such as cattle or pigs—chicken meat and chicken eggs have become prevalent in numerous cuisines.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/90/Liat_Portal_for_Foodie_Disorder_-_Turmeric_Chicken_with_Rice_and_Vegetables.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "HaJunkiyada / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20as%20food%20Algeria%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:13:31.104Z"
+  },
+  "ad": {
+    "code": "ad",
+    "name": "Andorra",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Catalan_cuisine",
+    "dishes": [
+      {
+        "name": "Pine nut",
+        "wikipediaTitle": "Pine nut",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pine_nut",
+        "summary": "Pine nuts, also called piñón, pinoli, or pignoli, are the edible seeds of pines. According to the Food and Agriculture Organization, only 29 species provide edible nuts, while 20 are traded locally or internationally owing to their seed size being large enough to be worth harvesting; in other pines, the seeds are also edible but are too small to be of notable value as human food. The biggest exporters of pine nuts are China, Russia, North Korea, and Pakistan.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Catalogue_of_Andorra_Nurseries%2C_Chestnut_Hill%2C_Philadelphia%2C_Pa._-_choice_hardy_trees%2C_shrubs%2C_plants%2C_roses%2C_and_fruit_%28IA_catalogueandorr00andov%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Andorra Nurseries / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pine_nut",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pine%20nut%20Andorra%20recipe"
+      },
+      {
+        "name": "Escalivada",
+        "wikipediaTitle": "Escalivada",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Escalivada",
+        "summary": "Escalivada, also sometimes transcribed in French as 'escalibade' and in Spanish as escalibada, is a traditional dish from Roussillon, Catalonia, València, Murcia and Aragón of smoky grilled vegetables. It typically consists of roasted eggplant and bell peppers with olive oil and sometimes onion, tomato, minced garlic, and salt.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Escalivada",
+        "videoUrl": "https://www.youtube.com/results?search_query=Escalivada%20Andorra%20recipe"
+      },
+      {
+        "name": "Escudella",
+        "wikipediaTitle": "Escudella",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Escudella",
+        "summary": "Escudella i carn d'olla, or shorter escudella, is a traditional Catalan and Valencian soup made with meat and vegetables. Francesc Eiximenis wrote in the 14th century that it was eaten every day by Catalan people.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Escudella",
+        "videoUrl": "https://www.youtube.com/results?search_query=Escudella%20Andorra%20recipe"
+      },
+      {
+        "name": "Ollada",
+        "wikipediaTitle": "Ollada",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ollada",
+        "summary": "Ollada is a stew of potatoes, beans and cabbage or turnips, considered the most typical and traditional dish of Northern Catalonia. The often-repeated saying \"l'ollada, ben porquejada\" indicates that the fundamental ingredient is pork with seasonable vegetables. In Vallespir they used to add barley. Like olla aranesa, it is eaten together, i.e. without the broth being drained off to make soup, as is usually done with escudella, and it is usually much thicker.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ollada",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ollada%20Andorra%20recipe"
+      },
+      {
+        "name": "Esqueixada",
+        "wikipediaTitle": "Esqueixada",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Esqueixada",
+        "summary": "Esqueixada is a traditional Catalan dish, a salad of shredded salt cod, tomatoes, onions, olive oil and vinegar, salt, and sometimes a garnish of olives or hard-boiled eggs. Specific recipes vary, with some including ingredients such as eggplant and bell peppers. Esqueixada is particularly popular in warm weather and is sometimes considered a summertime dish. It is often served as a tapas dish.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Esqueixada",
+        "videoUrl": "https://www.youtube.com/results?search_query=Esqueixada%20Andorra%20recipe"
+      },
+      {
+        "name": "Botifarra",
+        "wikipediaTitle": "Botifarra",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Botifarra",
+        "summary": "Botifarra is a type of sausage and one of the most important dishes of the Catalan cuisine.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Botifarra",
+        "videoUrl": "https://www.youtube.com/results?search_query=Botifarra%20Andorra%20recipe"
+      },
+      {
+        "name": "Pa amb tomàquet",
+        "wikipediaTitle": "Pa amb tomàquet",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pa_amb_tom%C3%A0quet",
+        "summary": "Pa amb tomàquet, also known as pa amb tomata or pa amb tomaca, is a traditional food of Catalan, Balearic and, to a lesser extent, Valencian and Aragonese cuisine. Pa amb tomàquet is considered a staple of Catalonia's cuisine and Catalan national identity.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pa_amb_tom%C3%A0quet",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pa%20amb%20tom%C3%A0quet%20Andorra%20recipe"
+      },
+      {
+        "name": "Escabeche",
+        "wikipediaTitle": "Escabeche",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Escabeche",
+        "summary": "Escabeche is the name for several dishes in Spanish, French, Portuguese, Italian, Filipino and Hispanic American cuisines, consisting of marinated fish, meat or vegetables, cooked or pickled in an acidic sauce, and flavored with paprika, citrus, and other spices.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Escabeche",
+        "videoUrl": "https://www.youtube.com/results?search_query=Escabeche%20Andorra%20recipe"
+      },
+      {
+        "name": "Coca (pastry)",
+        "wikipediaTitle": "Coca (pastry)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Coca_(pastry)",
+        "summary": "The coca, coc or fogassa, is a pastry typically made and consumed in Catalonia, the Aragonese Strip, most of Valencia, the Balearic Islands, Andorra and in French Catalonia.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Coca_(pastry)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Coca%20(pastry)%20Andorra%20recipe"
+      },
+      {
+        "name": "Embutido",
+        "wikipediaTitle": "Embutido",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Embutido",
+        "summary": "Embutido, enchido, and embotit (Catalan) are generic terms for cured ground meat products. The dictionary of the Royal Spanish Academy defines it as \"intestine stuffed with minced meat, mainly pork; intestine stuffed with diverse ingredients\". The term often applies to any of the many varieties of cured, dry sausages found in the cuisines of Iberia and the former Spanish and Portuguese colonies.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/de/EUD_1994-14.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / OGL 3",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Embutido",
+        "videoUrl": "https://www.youtube.com/results?search_query=Embutido%20Andorra%20recipe"
+      },
+      {
+        "name": "Pork",
+        "wikipediaTitle": "Pork",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pork",
+        "summary": "Pork is the culinary name for the meat of the pig. It is the second most commonly consumed type of meat worldwide, following poultry, with evidence of pig husbandry dating back to 8000–9000 bce.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/The_EC_market_for_U.S._agricultural_exports_-_a_share_analysis_%28IA_CAT87209133%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "McNitt, Harold A / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pork",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pork%20Andorra%20recipe"
+      },
+      {
+        "name": "Fuet",
+        "wikipediaTitle": "Fuet",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Fuet",
+        "summary": "Fuet is a Catalan thin, dry-cured, sausage of pork meat in a pork gut, covered with white, edible mould—similar to salami. The most famous is made in the comarca (county) of Osona and is also known as Vic fuet. Other places that have long tradition of making it are the city of Olot and the surrounding areas.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Fuet",
+        "videoUrl": "https://www.youtube.com/results?search_query=Fuet%20Andorra%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:13:43.171Z"
+  },
+  "ao": {
+    "code": "ao",
+    "name": "Angola",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Angolan_cuisine",
+    "dishes": [
+      {
+        "name": "Side dish",
+        "wikipediaTitle": "Side dish",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Side_dish",
+        "summary": "A side dish, sometimes referred to as a side order, side item, or simply a side, is a food item that accompanies the entrée or main course at a meal.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/07/Angola_and_the_River_Congo_%28IA_angolarivercongo02mont%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Monteiro, Joachim John / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Side_dish",
+        "videoUrl": "https://www.youtube.com/results?search_query=Side%20dish%20Angola%20recipe"
+      },
+      {
+        "name": "Funge",
+        "wikipediaTitle": "Funge",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Funge",
+        "summary": "Funge or fúngi (Angola) or mfundi is a traditional African swallow made of cassava flour whisked into boiling water. It can also be made with sorghum, maize, or millet. It can be served with textured vegetable, fish, or meat stew, as well as other vegetable, meat, and fish dishes. Funge is a staple food in African cuisine. Some richer and more flavorful versions may be made with stock, like fish stock, instead of water. It is also known as bidia.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Moamba_traditional_dish_in_Luanda.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rui Gabriel Correia / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Funge",
+        "videoUrl": "https://www.youtube.com/results?search_query=Funge%20Angola%20recipe"
+      },
+      {
+        "name": "Porridge",
+        "wikipediaTitle": "Porridge",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Porridge",
+        "summary": "Porridge is a type of semi-solid food made by soaking, poaching or boiling, in milk or water, ground, crushed or chopped starchy plants, typically grain. It is a traditional staple food of many countries.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Moamba_traditional_dish_in_Luanda.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rui Gabriel Correia / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Porridge",
+        "videoUrl": "https://www.youtube.com/results?search_query=Porridge%20Angola%20recipe"
+      },
+      {
+        "name": "Cassava",
+        "wikipediaTitle": "Cassava",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cassava",
+        "summary": "Manihot esculenta, commonly called cassava, manioc, or yuca, is a woody shrub of the spurge family, Euphorbiaceae, native to South America, from Brazil, Paraguay and parts of the Andes. Although a perennial plant, cassava is extensively cultivated in tropical and subtropical regions as an annual crop for its edible starchy tuberous root. Cassava is predominantly consumed in boiled form, but substantial quantities are processed to extract cassava starch, called tapioca, which is used for food, animal feed, and industrial purposes. The Brazilian farofa, and the related garri of West Africa, is an edible coarse flour obtained by grating cassava roots, pressing moisture off the obtained grated pulp, and finally drying and roasting it.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/07/Chikwangue_-_cooked_cassava%2C_showing_detail_of_popular_leaves_for_wrapping.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "T.K. Naliaka / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cassava",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cassava%20Angola%20recipe"
+      },
+      {
+        "name": "Polenta",
+        "wikipediaTitle": "Polenta",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Polenta",
+        "summary": "Polenta is an Italian dish of boiled cornmeal that was historically made from other grains. It may be allowed to cool and solidify into a loaf that can be baked, fried or grilled.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/03/The_book_of_the_boudoir_%28IA_bookofboudoir02morg%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Morgan, Lady (Sydney), 1783-1859\nSallie Bingham Center for Women's History and Culture. NcD / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Polenta",
+        "videoUrl": "https://www.youtube.com/results?search_query=Polenta%20Angola%20recipe"
+      },
+      {
+        "name": "Moambe chicken",
+        "wikipediaTitle": "Moambe chicken",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Moambe_chicken",
+        "summary": "Moambe chicken is a savory chicken dish popular in Central Africa and considered the national dish of Angola, the Republic of the Congo, and the Democratic Republic of the Congo. The dish itself is made by combining chicken, spices and palm butter to create a stew-like consistency. A number of local or regional variations exist across the Congo and Central Africa; the dish is also known outside the continent.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Moamba_traditional_dish_in_Luanda.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rui Gabriel Correia / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Moambe_chicken",
+        "videoUrl": "https://www.youtube.com/results?search_query=Moambe%20chicken%20Angola%20recipe"
+      },
+      {
+        "name": "Palm oil",
+        "wikipediaTitle": "Palm oil",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Palm_oil",
+        "summary": "Palm oil is an edible vegetable oil derived from the reddish mesocarp (pulp) of the fruit of the African oil palm. The oil is used in food manufacturing, in beauty products, and as biofuel. Palm oil accounted for about 36% of global oils produced from oil crops in 2017. Palm oils are easier to stabilize and maintain quality of flavor and consistency in ultra-processed foods, so they are frequently favored by food manufacturers. Globally, humans consumed an average of 7.7 kg (17 lb) of palm oil per person in 2015. Demand has also increased for other uses, such as cosmetics and biofuels, encouraging the growth of palm oil plantations in tropical countries.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/eb/West_African_production_and_export_prospects_for_palm_oil_and_palm_kernel_oil_to_1980_%28IA_westafricanprodu248lyna%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Lynam, John / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Palm_oil",
+        "videoUrl": "https://www.youtube.com/results?search_query=Palm%20oil%20Angola%20recipe"
+      },
+      {
+        "name": "National dish",
+        "wikipediaTitle": "National dish",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/National_dish",
+        "summary": "A national dish is a culinary dish that is strongly associated with a particular country. A dish can be considered a national dish for a variety of reasons:It is a staple food, made from a selection of locally available foodstuffs that can be prepared in a distinctive way, such as fruits de mer, served along the west coast of France.\nIt contains a particular ingredient that is produced locally, such as a paprika grown in the European Pyrenees.\nIt is served as a festive culinary tradition that forms part of a cultural heritage—for example, barbecues at summer camp or fondue at dinner parties—or as part of a religious practice, such as Korban Pesach or Iftar celebrations.\nIt has been promoted as a national dish, by the country itself, such as the promotion of fondue as a national dish of Switzerland by the Swiss Cheese Union in the 1930s.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/38/Food_%26_fur_breeders_of_America_.._%28IA_foodfurbreederso00food%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Food &amp; fur directory co., Fort Worth, Tex. [from old catalog] / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/National_dish",
+        "videoUrl": "https://www.youtube.com/results?search_query=National%20dish%20Angola%20recipe"
+      },
+      {
+        "name": "Rice",
+        "wikipediaTitle": "Rice",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Rice",
+        "summary": "Rice is a cereal grain and, in its domesticated form, is the staple food of over half of the world's population, particularly in Africa and Asia. Rice is the seed of the grass species Oryza sativa —or, less commonly, Oryza glaberrima. Asian rice was domesticated in China some 13,500 to 8,200 years ago; African rice was domesticated independently in West Africa about 3,000 years ago. Rice has become commonplace in many cultures worldwide; in 2023, 800 million tons were produced, placing it third after sugarcane and maize. Only some 8% of rice is traded internationally. China, India, and Indonesia are the largest consumers of rice. A substantial amount of the rice produced in developing nations is lost after harvest through factors such as poor transport and storage. Rice yields can be reduced by pests including insects, rodents, and birds, as well as by weeds, and by diseases such as rice blast. Traditional rice polycultures such as rice-duck farming, and modern integrated pest management seek to control damage from pests in a sustainable way.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/10/La_photo_de_l%27entr%C3%A9_du_march%C3%A9_pour_le_concours_de_photos_wiki_loves_Africa_2025_en_Angola.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Pangou Stephane / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Rice",
+        "videoUrl": "https://www.youtube.com/results?search_query=Rice%20Angola%20recipe"
+      },
+      {
+        "name": "Shrimp and prawn as food",
+        "wikipediaTitle": "Shrimp and prawn as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Shrimp_and_prawn_as_food",
+        "summary": "Shrimps and prawns are types of crustacean seafood that are consumed worldwide. Prawns and shrimps are crustacea and are very similar in appearance with the terms often used interchangeably in commercial farming and wild fisheries. A distinction was made in 1990s Indian aquaculture literature, which increasingly uses the term \"prawn\" only for the freshwater forms of palaemonids and \"shrimp\" for the marine penaeids that belong to different suborders of Decapoda. This has not been universally accepted.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Shrimp_and_prawn_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Shrimp%20and%20prawn%20as%20food%20Angola%20recipe"
+      },
+      {
+        "name": "Squid as food",
+        "wikipediaTitle": "Squid as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Squid_as_food",
+        "summary": "Squid is eaten in many cuisines; in English, the culinary name calamari is often used for squid dishes. There are many ways to prepare and cook squid. Fried squid is common in the Mediterranean. In New Zealand, Australia, the United States, Canada, and South Africa, it is sold in fish and chip shops and in steakhouses. In Britain, it can be found in Mediterranean \"calamari\" or Asian \"salt and pepper fried squid\" forms in various establishments, often served as a bar snack, street food, or starter.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Squid_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Squid%20as%20food%20Angola%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:13:58.595Z"
+  },
+  "ag": {
+    "code": "ag",
+    "name": "Antigua and Barbuda",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Antigua_and_Barbuda_cuisine",
+    "dishes": [
+      {
+        "name": "Eggs as food",
+        "wikipediaTitle": "Eggs as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Eggs_as_food",
+        "summary": "Humans and other hominids have consumed eggs for millions of years. The most widely consumed eggs are those of fowl, especially chickens. People in Southeast Asia began harvesting chicken eggs for food around 1500 BCE. Eggs of other birds, such as ducks and ostriches, are eaten regularly but much less commonly than those of chickens. People may also eat the eggs of reptiles, amphibians, and fish. Fish eggs consumed as food are known as roe or caviar.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Tree_map_export_2009_Antigua_and_Barbuda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "R Haussmann, Cesar Hidalgo, et. al. / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Eggs_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Eggs%20as%20food%20Antigua%20and%20Barbuda%20recipe"
+      },
+      {
+        "name": "Lettuce",
+        "wikipediaTitle": "Lettuce",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lettuce",
+        "summary": "Lettuce is an annual plant of the family Asteraceae mostly grown as a leaf vegetable. The leaves are most often used raw in green salads, although lettuce is also seen in other kinds of food, such as sandwiches, wraps and soups; it can also be grilled. Its stem and seeds are sometimes used; celtuce is one variety grown for its stems, which are eaten either raw or cooked. In addition to its main use as a leafy green, it has also gathered religious and medicinal significance over centuries of human consumption. Europe and North America originally dominated the market for lettuce, but by the late 20th century the consumption of lettuce had spread throughout the world. In 2023, world production of lettuce was 28 million tonnes, led by China with 53% of the total.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/41/Seeds_and_Plants_Imported_During_the_Period_From_July_1_to_September_30%2C_1909_-_Inventory_No._20%3B_Nos._25718_to_26047_%28IA_seedsplantsimpor176unit%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Department of Agriculture\nUnited States. Bureau of Plant Industry / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lettuce",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lettuce%20Antigua%20and%20Barbuda%20recipe"
+      },
+      {
+        "name": "Pasta",
+        "wikipediaTitle": "Pasta",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pasta",
+        "summary": "Pasta is a type of food typically made from an unleavened dough of wheat flour mixed with water or eggs, and formed into sheets or other shapes, then cooked by boiling or baking. Pasta was originally only made with durum, although the definition has been expanded to include alternatives for a gluten-free diet, such as rice flour, or legumes such as beans or lentils. Pasta is a staple food of Italian cuisine, and many historians believe that pasta in a form recognizable today was introduced to Italy through Sicily in the Middle Ages as a result of Mediterranean trade networks.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f5/TBT_agreement_activities_of_the_National_Institute_of_Standards_and_Technology%2C_1998_%28IA_tbtagreementacti6363over%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Overman, JoAnne R.\nLay, A. Diane / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pasta",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pasta%20Antigua%20and%20Barbuda%20recipe"
+      },
+      {
+        "name": "Vegetable",
+        "wikipediaTitle": "Vegetable",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Vegetable",
+        "summary": "Vegetables are edible parts of plants that are consumed by humans or other animals as food. This original meaning is still commonly used, and is applied to plants collectively to refer to all edible plant matter, including flowers, fruits, stems, leaves, roots, and seeds. An alternative definition is applied somewhat arbitrarily, often by culinary and cultural tradition; it may include savoury fruits such as tomatoes and squash, flowers such as broccoli, and seeds such as pulses, but exclude foods derived from some plants that are fruits, flowers, nuts, and cereal grains.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Tree_map_export_2009_Antigua_and_Barbuda.svg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "R Haussmann, Cesar Hidalgo, et. al. / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Vegetable",
+        "videoUrl": "https://www.youtube.com/results?search_query=Vegetable%20Antigua%20and%20Barbuda%20recipe"
+      },
+      {
+        "name": "Antigua black pineapple",
+        "wikipediaTitle": "Antigua black pineapple",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Antigua_black_pineapple",
+        "summary": "The Antigua black pineapple is a variety of pineapple that is grown on the island of Antigua, in the West Indies. It is known for its sweet and juicy flesh, which is said to have a unique flavor compared to other varieties of pineapple. It is a popular local fruit and is used in a variety of traditional dishes and desserts on the island.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6f/A_guide_to_the_West_Indies_and_Bermudas_%28IA_guidetowestindie00ober%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ober, Frederick A. (Frederick Albion), 1849-1913 / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Antigua_black_pineapple",
+        "videoUrl": "https://www.youtube.com/results?search_query=Antigua%20black%20pineapple%20Antigua%20and%20Barbuda%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:44:41.886Z"
+  },
+  "ar": {
+    "code": "ar",
+    "name": "Argentina",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Argentine_cuisine",
+    "listPage": "https://en.wikipedia.org/wiki/List_of_Argentine_dishes",
+    "dishes": [
+      {
+        "name": "Chipa",
+        "wikipediaTitle": "Chipa",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chipa",
+        "summary": "Chipa is a type of small, baked, cheese-flavored roll, a popular snack and breakfast food in Paraguay. The recipe has existed since the 18th century and its origins lie with the Guaraní people of Asunción.\nIt is inexpensive and often sold from streetside stands and on buses by vendors carrying a large basket with the warm chipa wrapped in a cloth.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Chipa_Paraguay.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ekem at English Wikipedia / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chipa",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chipa%20Argentina%20recipe"
+      },
+      {
+        "name": "Empanada",
+        "wikipediaTitle": "Empanada",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Empanada",
+        "summary": "An empanada is a type of baked or fried turnover consisting of pastry and filling, common in Spain, Portugal, other Southern Europe countries, North Africa countries, West African countries, South Asian countries, Latin America countries, and the Philippines. The name comes from the Spanish empanar, and translates as 'breaded', that is, wrapped or coated in bread. They are made by folding dough over a filling, which may consist of meat, cheese, tomato, corn, or other ingredients, and then cooking the resulting turnover, either by baking or frying.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/23/Empanada_%28versi%C3%B3n_argentina%29_de_carne_dulce.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ezarate / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Empanada",
+        "videoUrl": "https://www.youtube.com/results?search_query=Empanada%20Argentina%20recipe"
+      },
+      {
+        "name": "Deviled egg",
+        "wikipediaTitle": "Deviled egg",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Deviled_egg",
+        "summary": "Deviled eggs in American English, devilled eggs in Commonwealth English, also known as stuffed eggs, curried eggs, dressed eggs or angel eggs, are hard-boiled eggs that have been peeled, cut in half, with the yolk scooped out, then refilled after being mixed with other ingredients such as mayonnaise and mustard and sprinkled with paprika, cinnamon or curry powder. They are generally served cold as a side dish, appetizer or a main course during gatherings or parties. The dish is popular in Europe, North America and Australia.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Notices_of_judgment_under_the_Federal_food%2C_drug_and_cosmetic_act._Foods_%28IA_CAT11088279024%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Food and Drug Administration / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Deviled_egg",
+        "videoUrl": "https://www.youtube.com/results?search_query=Deviled%20egg%20Argentina%20recipe"
+      },
+      {
+        "name": "Hors d'oeuvre",
+        "wikipediaTitle": "Hors d'oeuvre",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Hors_d'oeuvre",
+        "summary": "An hors d'oeuvre, entrée, appetiser, appetizer or starter is a small dish served before a meal in European cuisine. Some hors d'oeuvres are served cold, others hot. Hors d'oeuvres may be served at the dinner table as a part of the meal, or they may be served before seating, such as at a reception or cocktail party. Formerly, hors d'oeuvres were also served between courses.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/49/Avis_sur_les_disettes_des_grains_et_farines_-_d%C3%A9di%C3%A9_%C3%A0_MM._les_d%C3%A9put%C3%A9s_des_communes_de_la_ville%2C_pr%C3%A9v%C3%B4t%C3%A9_%26_vicomt%C3%A9_de_Paris_-_%28IA_avissurlesdisett00cito%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Citoyen, négociant.\nCitoyen, négociant / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Hors_d'oeuvre",
+        "videoUrl": "https://www.youtube.com/results?search_query=Hors%20d'oeuvre%20Argentina%20recipe"
+      },
+      {
+        "name": "Curing (food preservation)",
+        "wikipediaTitle": "Curing (food preservation)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Curing_(food_preservation)",
+        "summary": "Curing is any of various food preservation and flavoring processes of foods such as meat, fish and vegetables, by the addition of salt, with the aim of drawing moisture out of the food by the process of osmosis. Because curing increases the solute concentration in the food and hence decreases its water potential, the food becomes inhospitable for the microbe growth that causes food spoilage. Curing can be traced back to antiquity, and was the primary method of preserving meat and fish until the late 19th century. Dehydration was the earliest form of food curing. Many curing processes also involve smoking, spicing, cooking, or the addition of combinations of sugar, nitrate, and nitrite.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/39/Foods_for_shelter_storage_-_a_literature_review_%28IA_CAT10933355%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Georgia Experiment Station / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Curing_(food_preservation)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Curing%20(food%20preservation)%20Argentina%20recipe"
+      },
+      {
+        "name": "Sausage",
+        "wikipediaTitle": "Sausage",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Sausage",
+        "summary": "A sausage is a type of meat product usually made from ground meat—often pork, beef, or poultry—along with salt, spices and other flavourings. Other ingredients, such as grains or breadcrumbs, may be included as fillers or extenders.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/60/Hot_dogs_with_Savora_%28argentine_mustard%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Horacio Cambeiro / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sausage",
+        "videoUrl": "https://www.youtube.com/results?search_query=Sausage%20Argentina%20recipe"
+      },
+      {
+        "name": "Ham",
+        "wikipediaTitle": "Ham",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ham",
+        "summary": "Ham is pork from a leg cut that has been preserved by wet or dry curing, with or without smoking. As a processed meat, the term ham includes both whole cuts of meat and ones that have been mechanically formed.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Morfi01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Hoodmimir / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ham",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ham%20Argentina%20recipe"
+      },
+      {
+        "name": "Salami",
+        "wikipediaTitle": "Salami",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Salami",
+        "summary": "Salami is a salume consisting of fermented and air-dried meat, typically pork. Historically, salami was popular among Southern, Eastern, and Central European peasants because it could be stored at room temperature for a period of time once cut, supplementing a potentially meager or inconsistent supply of fresh meat. Countries and regions across Europe make their own traditional varieties of salami.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/55/Food_news_for_consumers_%28IA_CAT82764316013%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Food Safety and Quality Service\nUnited States. Food Safety and Inspection Service / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Salami",
+        "videoUrl": "https://www.youtube.com/results?search_query=Salami%20Argentina%20recipe"
+      },
+      {
+        "name": "Brine",
+        "wikipediaTitle": "Brine",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Brine",
+        "summary": "Brine is a high-concentration solution of salt in water. In diverse contexts, brine may refer to the salt solutions ranging from about 3.5% up to about 26%. Brine forms naturally due to evaporation of ground saline water but it is also generated in the mining of sodium chloride. Brine is used for food processing and cooking, for de-icing of roads and other structures, and in a number of technological processes. It is also a by-product of many industrial processes, such as desalination, so it requires wastewater treatment for proper disposal or further utilization.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/df/U.S._Bureau_of_Foreign_Commerce_-_Refrigerators_and_Food_Preservation_in_Foreign_Countries_%281890%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States Bureau of Foreign Commerce / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Brine",
+        "videoUrl": "https://www.youtube.com/results?search_query=Brine%20Argentina%20recipe"
+      },
+      {
+        "name": "Pickling",
+        "wikipediaTitle": "Pickling",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pickling",
+        "summary": "Pickling is the process of preserving or extending the shelf life of food by either anaerobic fermentation in brine or immersion in vinegar. The pickling procedure typically affects the food's texture and flavor. The resulting food is called a pickle, or, if named, the name is prefaced with the word \"pickled\". Foods that are pickled include vegetables, fruits, mushrooms, meats, fish, dairy and eggs.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/66/Ensaladas_de_Argentina_%28Pickles_variados%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Horacio Cambeiro / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pickling",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pickling%20Argentina%20recipe"
+      },
+      {
+        "name": "Potato chips",
+        "wikipediaTitle": "Potato chips",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Potato_chips",
+        "summary": "Potato chips or crisps are thin slices of potato that have been deep-fried, baked, or air-fried until crunchy. They are commonly served as a snack, appetizer or side dish. Basic potato chips are cooked and salted; additional varieties are manufactured using various seasonings, flavorings and ingredients including herbs, spices, cheeses, other natural flavors, artificial flavors, and additives.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/64/The_potato-breeding_program%2C_USA%2C_1973_%28IA_CAT78702330002%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Plant Genetics and Germplasm Institute. Vegetable Laboratory / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Potato_chips",
+        "videoUrl": "https://www.youtube.com/results?search_query=Potato%20chips%20Argentina%20recipe"
+      },
+      {
+        "name": "Choripán",
+        "wikipediaTitle": "Choripán",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chorip%C3%A1n",
+        "summary": "Choripán is a type of asado sandwich with grilled chorizo. It is popular in Argentina, Chile, Uruguay, Paraguay, Peru, Ecuador, Bolivia and Venezuela. The name comes from the combination of the names of its ingredients: a grilled chorizo sausage and a crusty bread such as a pan batido, baguette, or francés.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/27/Chorip%C3%A1n_mariposa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "David / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chorip%C3%A1n",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chorip%C3%A1n%20Argentina%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:44:56.162Z"
+  },
+  "am": {
+    "code": "am",
+    "name": "Armenia",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Armenian_cuisine",
+    "listPage": "https://en.wikipedia.org/wiki/List_of_Armenian_dishes",
+    "dishes": [
+      {
+        "name": "Stuffing",
+        "wikipediaTitle": "Stuffing",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Stuffing",
+        "summary": "Stuffing, filling, or dressing is an edible mixture, often composed of herbs and a starch such as bread, used to fill a cavity in the preparation of another food item. Many foods may be stuffed, including poultry, seafood, and vegetables. As a cooking technique, stuffing helps retain moisture, while the mixture itself augments and absorbs flavors.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/97/Roasted_Chicken_with_Rice_Stuffing.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Narek75 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Stuffing",
+        "videoUrl": "https://www.youtube.com/results?search_query=Stuffing%20Armenia%20recipe"
+      },
+      {
+        "name": "Purée",
+        "wikipediaTitle": "Purée",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pur%C3%A9e",
+        "summary": "A purée is cooked food, usually vegetables, fruits or legumes, that has been ground, pressed, blended or sieved to the consistency of a creamy paste or liquid. Purées of specific foods are often known by specific names, e.g., apple sauce or hummus. The term is of French origin, where it meant in Old French purified or refined.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Notices_of_judgment_under_the_food_and_drug_act_%28IA_CAT11088278002%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Food and Drug Administration\nUnited States. Food, Drug, and Insecticide Administration\nUnited States. Board of Food and Drug Inspection\nUnited States. Department of Agriculture\nUnited States. Bureau of Chemistry\nUnited States. Bureau of Chemistry. Supplements to Service and regulatory announcements / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pur%C3%A9e",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pur%C3%A9e%20Armenia%20recipe"
+      },
+      {
+        "name": "Lavash",
+        "wikipediaTitle": "Lavash",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lavash",
+        "summary": "Lavash is a thin flatbread made of leavened or unleavened wheat dough, baked in a tandoor or on a saj griddle. Some forms are sourdough fermented with dough from previous batches. Lavash cooks very quickly in a tandoor, being placed on the sides using a cushion. It is large and thin, though there are many variations in size and shape. It is soft when fresh but is often dried. Lavash is common to the cuisines of South Caucasus and West Asia. It is a staple food in Armenia, eastern Georgia, and parts of Iran.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/28/Lavash_arm%C3%A9nien.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Combrian / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lavash",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lavash%20Armenia%20recipe"
+      },
+      {
+        "name": "Herb",
+        "wikipediaTitle": "Herb",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Herb",
+        "summary": "Herbs are a widely distributed and widespread group of plants, excluding vegetables, with savory or aromatic properties that are used for flavoring and garnishing food, for medicinal purposes, or for fragrances. Culinary use typically distinguishes herbs from spices. Herbs generally refers to the leafy green or flowering parts of a plant, while spices are usually dried and produced from other parts of the plant, including seeds, bark, roots and fruits.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/93/Armenia_-_Terrestrial_Paradise%3F_%282907197535%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rita Willaert from 9890 Gavere, Belgium / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Herb",
+        "videoUrl": "https://www.youtube.com/results?search_query=Herb%20Armenia%20recipe"
+      },
+      {
+        "name": "Farina (food)",
+        "wikipediaTitle": "Farina (food)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Farina_(food)",
+        "summary": "Farina is a form of milled wheat popular in the United States. It is often cooked as a hot breakfast cereal, or porridge. The word farina comes from the Latin word for 'meal' or 'flour'. Farina is milled from hard red wheat. In commercially available farina, the bran and most of the germ are removed. Cream of Wheat, Malt-O-Meal, and Farina Mills are popular brand names of breakfast cereal.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Adulterations_detected%3B_or%2C_Plain_instructions_for_the_discovery_of_frauds_in_food_and_medicine_%28IA_b21527520%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Hassall, Arthur Hill, 1817-1894\nUniversity of Leeds. Library / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Farina_(food)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Farina%20(food)%20Armenia%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:45:09.546Z"
+  },
+  "au": {
+    "code": "au",
+    "name": "Australia",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Australian_cuisine",
+    "listPage": "https://en.wikipedia.org/wiki/List_of_Australian_dishes",
+    "dishes": [
+      {
+        "name": "Avocado toast",
+        "wikipediaTitle": "Avocado toast",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Avocado_toast",
+        "summary": "Avocado toast is an open sandwich consisting of toasted bread topped with mashed avocado, plus any of a variety of spices and flavorful ingredients; the most popular include salt and black pepper, lemon juice, or other citrus flavors, olive oil, hummus, vinegar, red pepper, feta, duqqa, and tomato.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d8/Lettuce_B_Frank.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Mx. Granger / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Avocado_toast",
+        "videoUrl": "https://www.youtube.com/results?search_query=Avocado%20toast%20Australia%20recipe"
+      },
+      {
+        "name": "Eggs Benedict",
+        "wikipediaTitle": "Eggs Benedict",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Eggs_Benedict",
+        "summary": "Eggs Benedict is a common American breakfast or brunch dish, consisting of two halves of an English muffin, each topped with Canadian bacon or sliced ham, a poached egg, and hollandaise sauce. The dish is believed to have originated in New York City, although a number of different origin stories exist.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/95/Eggs_Benedict_at_Cairns_Colonial_Club_Resort%2C_2025%2C_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Chris Olszewski / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Eggs_Benedict",
+        "videoUrl": "https://www.youtube.com/results?search_query=Eggs%20Benedict%20Australia%20recipe"
+      },
+      {
+        "name": "Vegemite",
+        "wikipediaTitle": "Vegemite",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Vegemite",
+        "summary": "Vegemite is a brand of a thick, dark brown Australian food spread made from leftover brewers' yeast extract with various vegetable and spice additives. It was developed by Cyril Callister in Melbourne, Victoria, for the Fred Walker Company in 1922 and was first sold in stores on 25 October 1923.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Vegemite_jars_timeline.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "fir0002  flagstaffotos [at] gmail.com\n\t\tCanon 20D + Tamron 28-75mm f/2.8 / GFDL 1.2",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Vegemite",
+        "videoUrl": "https://www.youtube.com/results?search_query=Vegemite%20Australia%20recipe"
+      },
+      {
+        "name": "Marmite (New Zealand)",
+        "wikipediaTitle": "Marmite (New Zealand)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Marmite_(New_Zealand)",
+        "summary": "Marmite is a food spread produced in New Zealand by Sanitarium Health and Wellbeing Company and distributed in Australia and the Pacific. Marmite is made from yeast extract, a by-product of beer brewing. It is similar to British Marmite, but the two products are made by different companies; the UK version is made by Unilever.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b3/Nzmarmite.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "The original uploader was WillMcC at English Wikipedia. / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Marmite_(New_Zealand)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Marmite%20(New%20Zealand)%20Australia%20recipe"
+      },
+      {
+        "name": "Weet-Bix",
+        "wikipediaTitle": "Weet-Bix",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Weet-Bix",
+        "summary": "Weet-Bix is a whole-grain wheat breakfast cereal created and manufactured in Australia and New Zealand by the Sanitarium Health Food Company, and in South Africa by Bokomo.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c7/The_New_York_Times_1925-02-02-_Vol_74_Iss_24481_%28IA_per_new-york-times-magazine_the-new-york-times_1925-02-02_74_24481%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Weet-Bix",
+        "videoUrl": "https://www.youtube.com/results?search_query=Weet-Bix%20Australia%20recipe"
+      },
+      {
+        "name": "Cheese slaw",
+        "wikipediaTitle": "Cheese slaw",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cheese_slaw",
+        "summary": "Cheese slaw is a side dish consisting of cheddar cheese, carrot, mayonnaise, and sometimes cabbage. Other cheeses such as blue and Swiss are occasionally used in its preparation, and additional vegetable ingredients are sometimes used. Its origins can be traced to Townsville in north Queensland, Australia, and to Broken Hill, New South Wales, Australia. It is a common and popular dish in Broken Hill restaurants and households. Cheese slaw is also consumed in some areas of the United States.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Food_views_in_the_news%3B_a_weekly_service_for_food_editors_of_western_dailies_%28IA_foodviewsinnews1944unit_0%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. War Food Administration. Office of Distribution\nUnited States. Office of Marketing Services\nUnited States. Department of Agriculture. Production and Marketing Administration / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cheese_slaw",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cheese%20slaw%20Australia%20recipe"
+      },
+      {
+        "name": "Kiwi onion dip",
+        "wikipediaTitle": "Kiwi onion dip",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kiwi_onion_dip",
+        "summary": "Kiwi onion dip is a type of dipping sauce eaten in New Zealand. Often referred to as 'kiwi dip', 'onion dip' or 'original kiwi dip', it consists of a packet of powdered onion soup stirred into a can of reduced cream, sometimes with lemon juice or malt vinegar added, which is then left to refrigerate and thicken. \"Kiwi\" refers to this being a New Zealand dish, as opposed to the dip containing kiwifruit or kiwi (bird) products. Served alongside potato chips, crackers, or chopped vegetables, the dip is a popular dish at parties, barbeques, and other social occasions.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9f/U.S._agricultural_trade_update_%28IA_CAT91947380061%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kiwi_onion_dip",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kiwi%20onion%20dip%20Australia%20recipe"
+      },
+      {
+        "name": "Cheese and bacon roll",
+        "wikipediaTitle": "Cheese and bacon roll",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cheese_and_bacon_roll",
+        "summary": "Cheese and bacon rolls are popular bread snacks originating in Australia. Although similar to other bread dishes they are fairly simple to make and usually a dough topped with cheese and bacon then baked. Some regional varieties include tomato or barbeque sauce as a topping or stuffed cheese, and they can be eaten with soup.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Australian_enquiry_book_of_household_and_general_information.djvu?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Lance Rawson, Mrs., 1851-1933 / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cheese_and_bacon_roll",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cheese%20and%20bacon%20roll%20Australia%20recipe"
+      },
+      {
+        "name": "Damper (food)",
+        "wikipediaTitle": "Damper (food)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Damper_(food)",
+        "summary": "Damper is a thick home-made bread traditionally prepared by early European settlers in Australia. It is a bread made from wheat-based dough. Flour, salt and water, with some butter if available, is kneaded and baked in the coals of a campfire, either directly or within a camp oven.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Damper_%28food%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Nachoman-au / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Damper_(food)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Damper%20(food)%20Australia%20recipe"
+      },
+      {
+        "name": "Scone",
+        "wikipediaTitle": "Scone",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Scone",
+        "summary": "A scone is a traditional British and Irish baked good, popular in the United Kingdom, Ireland, Canada, Australia and New Zealand. In the US, scones are a different baked product from the rest of the world, usually sweeter, triangular in shape and served on their own. Scones are usually made of either wheat flour or oatmeal, with baking powder as a leavening agent, and baked on sheet pans, or fried in a frying pan. A scone can be either lightly sweetened or savoury, and can be occasionally glazed with egg wash. The sweetened scone is a basic component of the cream tea, and the afternoon tea. It differs from teacakes and other types of sweet breads that are made with yeast. Scones were chosen as Ireland's representative for Café Europe during the Austrian presidency of the European Union in 2006.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Pumpkin_Scones.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Finbar.concaig / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Scone",
+        "videoUrl": "https://www.youtube.com/results?search_query=Scone%20Australia%20recipe"
+      },
+      {
+        "name": "Rēwena bread",
+        "wikipediaTitle": "Rēwena bread",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/R%C4%93wena_bread",
+        "summary": "Rēwena bread or Māori bread is a type of sourdough bread from New Zealand. The bread is leavened with a fermented potato starter. It originated amongst the Māori people and is closely associated with Māori cuisine.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/R%C4%93wena_bread",
+        "videoUrl": "https://www.youtube.com/results?search_query=R%C4%93wena%20bread%20Australia%20recipe"
+      },
+      {
+        "name": "Cheesymite scroll",
+        "wikipediaTitle": "Cheesymite scroll",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cheesymite_scroll",
+        "summary": "A cheesymite scroll is a savoury Australian baked food commonly found at Bakers Delight and Brumby's bakeries, as well as at Australian supermarkets. It consists of a spiral of baked bread with Vegemite and butter inside and with melted cheese, usually cheddar or Colby, on top. Cheesymite scrolls recipes are also to be found for home baking. The cheesymite scroll was first invented in 1994 by Bakers Delight.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/79/Cheesymite_2014-05-26_17-09.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "User:Tshay93 / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cheesymite_scroll",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cheesymite%20scroll%20Australia%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:45:23.674Z"
+  },
+  "at": {
+    "code": "at",
+    "name": "Austria",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Austrian_cuisine",
+    "dishes": [
+      {
+        "name": "Broth",
+        "wikipediaTitle": "Broth",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Broth",
+        "summary": "Broth, also known as bouillon, is a savory liquid made of water in which meat, fish, or vegetables have been simmered for a period of time. It can be eaten alone, but it is most commonly used to prepare other dishes, such as soups, gravies, and sauces.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Austria-Hungary-_the_polyglot_empire_%28IA_austriahungarypo01schi%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Schierbrand, Wolf von, 1851-1920 / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Broth",
+        "videoUrl": "https://www.youtube.com/results?search_query=Broth%20Austria%20recipe"
+      },
+      {
+        "name": "Goulash",
+        "wikipediaTitle": "Goulash",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Goulash",
+        "summary": "Goulash is a meal made of meat and vegetables seasoned with paprika and other spices. Originating in Hungary, goulash is a common meal predominantly eaten in Central Europe but also in other parts of Europe. It is one of the national dishes of Hungary and a symbol of the country.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Vienna_Goulash_%26_Austrian_Wine.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Manfred&amp;Barbara Aulbach / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Goulash",
+        "videoUrl": "https://www.youtube.com/results?search_query=Goulash%20Austria%20recipe"
+      },
+      {
+        "name": "Semmelknödel",
+        "wikipediaTitle": "Semmelknödel",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Semmelkn%C3%B6del",
+        "summary": "Semmelknödel is a kind of bread dumplings made from dried wheat bread rolls like Kaiser rolls, milk, and eggs. The name derives from southern Germany, where semmel means bread rolls and knödel refers to something that has been kneaded. Semmelknödel are a food specialty in southern Germany, Austria, Slovenia and the Czech Republic, as well as northern Italy.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Kalbsbeuschel_mit_Semmelkn%C3%B6del.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Kritzolina / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Semmelkn%C3%B6del",
+        "videoUrl": "https://www.youtube.com/results?search_query=Semmelkn%C3%B6del%20Austria%20recipe"
+      },
+      {
+        "name": "Beuschel",
+        "wikipediaTitle": "Beuschel",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Beuschel",
+        "summary": "Beuschel is a dish that is typically a ragout made from lungs and other organs, such as heart, kidneys, spleen, and tongue, from calf, beef, pork, or game. It is often served with a sour cream sauce and bread dumplings. It is a dish of Viennese cuisine but is widespread in all of Austria, Bavaria, and Bohemia.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Kalbsbeuschel_mit_Semmelkn%C3%B6del.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Kritzolina / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Beuschel",
+        "videoUrl": "https://www.youtube.com/results?search_query=Beuschel%20Austria%20recipe"
+      },
+      {
+        "name": "Ragout",
+        "wikipediaTitle": "Ragout",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ragout",
+        "summary": "Ragout is a stew served as a main dish.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Kalbsbeuschel_mit_Semmelkn%C3%B6del.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Kritzolina / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ragout",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ragout%20Austria%20recipe"
+      },
+      {
+        "name": "Liptauer",
+        "wikipediaTitle": "Liptauer",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Liptauer",
+        "summary": "Liptauer is a spicy cheese spread from Slovak, Austrian and Hungarian cuisine. Liptauer is made with sheep milk cheese, goat cheese, quark, or cottage cheese.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Liptauer_on_bread_in_Austria.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "FakirNL / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Liptauer",
+        "videoUrl": "https://www.youtube.com/results?search_query=Liptauer%20Austria%20recipe"
+      },
+      {
+        "name": "Apple strudel",
+        "wikipediaTitle": "Apple strudel",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Apple_strudel",
+        "summary": "Apple strudel is a traditional Viennese strudel, a popular pastry in Austria, Switzerland, Bavaria, the Czech Republic, Slovakia, Northern Italy, Slovenia, Croatia, Bosnia-Herzegovina and other countries in Europe that once belonged to the Austro-Hungarian Empire (1867–1918).",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Wiener_Apfelstrudel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Burkhard Mücke / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Apple_strudel",
+        "videoUrl": "https://www.youtube.com/results?search_query=Apple%20strudel%20Austria%20recipe"
+      },
+      {
+        "name": "Strudel",
+        "wikipediaTitle": "Strudel",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Strudel",
+        "summary": "Strudel is a type of layered baked good made with pastry, with a filling that is usually sweet, but savoury fillings are also common. It became popular in the 18th century throughout the Austrian Empire. Strudel is part of Austrian cuisine and German cuisine but is also common in other Central European cuisines. In Italy it is recognized as a prodotto agroalimentare tradizionale (PAT) of South Tyrol.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Wiener_Apfelstrudel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Burkhard Mücke / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Strudel",
+        "videoUrl": "https://www.youtube.com/results?search_query=Strudel%20Austria%20recipe"
+      },
+      {
+        "name": "Milk-cream strudel",
+        "wikipediaTitle": "Milk-cream strudel",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Milk-cream_strudel",
+        "summary": "The milk-cream strudel is a traditional Viennese strudel and a popular pastry in Austria and many countries in Europe that once belonged to the Austro-Hungarian Empire (1867–1918). It is an oven-baked pastry dough stuffed with a filling made from diced, milk-soaked bread rolls, egg yolk, powdered sugar, butter, quark, vanilla, lemon zest, raisins and cream and is served in the pan with hot vanilla sauce.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Milk-cream_strudel",
+        "videoUrl": "https://www.youtube.com/results?search_query=Milk-cream%20strudel%20Austria%20recipe"
+      },
+      {
+        "name": "Palatschinke",
+        "wikipediaTitle": "Palatschinke",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Palatschinke",
+        "summary": "Palatschinke is a thin crêpe-like variety of pancake of Greco-Roman origin. The dessert is common in Central, Eastern and Southeastern Europe.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Palatschinke",
+        "videoUrl": "https://www.youtube.com/results?search_query=Palatschinke%20Austria%20recipe"
+      },
+      {
+        "name": "Crêpe",
+        "wikipediaTitle": "Crêpe",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cr%C3%AApe",
+        "summary": "A crêpe is a dish made from unleavened batter or dough that is cooked on a frying pan or a griddle. Crêpes are usually one of two varieties: sweet crêpes or savoury crêpes. They are often served with a wide variety of fillings such as cheese, fruit, vegetables, meats, and a variety of spreads. Crêpes can also be flambéed, such as in Crêpes Suzette.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/16/Food_views_in_the_news%3B_a_weekly_service_for_food_editors_of_western_dailies_%28IA_foodviewsinnews1947unit_1%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. War Food Administration. Office of Distribution\nUnited States. Office of Marketing Services\nUnited States. Department of Agriculture. Production and Marketing Administration / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cr%C3%AApe",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cr%C3%AApe%20Austria%20recipe"
+      },
+      {
+        "name": "Kaiserschmarrn",
+        "wikipediaTitle": "Kaiserschmarrn",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kaiserschmarrn",
+        "summary": "Kaiserschmarrn or Kaiserschmarren is a lightly sweetened pancake that takes its name from the Austrian emperor Franz Joseph I, who was fond of this fluffy shredded pancake. It is served as a dessert or as a light lunch.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/Kaiserschmarrn_und_Apfelmus.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ich / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kaiserschmarrn",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kaiserschmarrn%20Austria%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-06T21:45:38.876Z"
+  }
+}

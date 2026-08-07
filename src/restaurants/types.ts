@@ -10,6 +10,8 @@ export type Restaurant = {
   ratings?: RestaurantRatings;
   website?: string;
   mapsUrl: string;
+  photoUrl?: string;
+  photoAttribution?: string;
   location?: {
     lat: number;
     lng: number;

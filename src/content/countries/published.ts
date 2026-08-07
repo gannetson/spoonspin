@@ -1,4 +1,4 @@
-import type { Country } from "@/types/content";
+import type { AuthoredCountry } from "@/types/content";
 import { nlCountry } from "./nl";
 import { bgCountry } from "./bg";
 import { geCountry } from "./ge";
@@ -29,7 +29,11 @@ import { arCountry } from "./ar";
 import { ngCountry } from "./ng";
 import { egCountry } from "./eg";
 import { phCountry } from "./ph";
-export const publishedCountries: Country[] = [
+import { gbCountry } from "./gb";
+import { plCountry } from "./pl";
+
+/** Countries with hand-authored Cook menus. */
+export const authoredCountries: AuthoredCountry[] = [
   nlCountry,
   bgCountry,
   geCountry,
@@ -60,4 +64,9 @@ export const publishedCountries: Country[] = [
   ngCountry,
   egCountry,
   phCountry,
+  gbCountry,
+  plCountry,
 ];
+
+/** @deprecated Use authoredCountries — kept for older imports. */
+export const publishedCountries = authoredCountries;

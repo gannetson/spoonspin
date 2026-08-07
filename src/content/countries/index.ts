@@ -1,35 +1,47 @@
 import type { Country, Recipe } from "@/types/content";
 import { countryCatalog, CATALOG_SIZE } from "./catalog";
-import { publishedCountries } from "./published";
+import { authoredCountries, publishedCountries } from "./published";
+import { allCountries, getCookReadyCountries } from "./buildCountries";
 import { getCountryRecipes } from "./menuAccessors";
 
-const publishedByCode = new Map(
-  publishedCountries.map((country) => [country.code, country]),
+const byCode = new Map(
+  allCountries.map((country) => [country.code, country]),
 );
 
+/** All catalog countries (worldwide), ready to spin. */
 export function getPublishedCountries(): Country[] {
-  return publishedCountries;
+  return allCountries;
 }
 
 export function getCountryByCode(code: string): Country | undefined {
-  return publishedByCode.get(code.toLowerCase());
+  return byCode.get(code.toLowerCase());
 }
 
 export function getRecipeFromCountry(
   country: Country,
   recipeId: string,
 ): Recipe | undefined {
+  if (!country.menu) return undefined;
   return getCountryRecipes(country).find((recipe) => recipe.id === recipeId);
 }
 
 export function isPublishedCatalogConsistent(): boolean {
-  return publishedCountries.every((country) => {
-    const entry = countryCatalog.find((item) => item.code === country.code);
-    return entry?.status === "published";
-  });
+  return (
+    allCountries.length === countryCatalog.length &&
+    getCookReadyCountries().every((country) =>
+      authoredCountries.some((item) => item.code === country.code),
+    )
+  );
 }
 
-export { countryCatalog, CATALOG_SIZE, publishedCountries };
+export {
+  countryCatalog,
+  CATALOG_SIZE,
+  allCountries,
+  authoredCountries,
+  publishedCountries,
+  getCookReadyCountries,
+};
 export {
   getCountryRecipes,
   getCountryDrinks,

@@ -1,18 +1,18 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: "Fraunces", "Palatino Linotype", Palatino, serif;
-  --font-body: "Source Sans 3", "Segoe UI", sans-serif;
-  --color-parchment: #f3ead8;
-  --color-parchment-deep: #e8d9bc;
-  --color-ink: #3b1f3a;
-  --color-ink-soft: #5a3a57;
-  --color-tomato: #c0392b;
-  --color-tomato-deep: #9b2c20;
-  --color-saffron: #d4a017;
-  --color-saffron-soft: #f0d78c;
-  --color-cream: #fff8ec;
-  --color-stamp: #7a4e6d;
+  --font-display: "Bricolage Grotesque", "Arial Narrow", Impact, sans-serif;
+  --font-body: "DM Sans", "Segoe UI", sans-serif;
+  --color-parchment: #eef1ee;
+  --color-parchment-deep: #dde3df;
+  --color-ink: #14201c;
+  --color-ink-soft: #3d4f48;
+  --color-tomato: #e03e2f;
+  --color-tomato-deep: #b82e22;
+  --color-saffron: #e8a317;
+  --color-saffron-soft: #f5d48a;
+  --color-cream: #f8faf8;
+  --color-stamp: #2a6b5a;
 }
 
 @layer base {
@@ -31,9 +31,9 @@
     min-width: 320px;
     min-height: 100vh;
     background:
-      radial-gradient(circle at 12% 8%, rgba(212, 160, 23, 0.18), transparent 42%),
-      radial-gradient(circle at 88% 0%, rgba(192, 57, 43, 0.12), transparent 36%),
-      linear-gradient(180deg, #f7efdf 0%, var(--color-parchment) 48%, #eadcbd 100%);
+      radial-gradient(ellipse at 8% 0%, rgba(42, 107, 90, 0.14), transparent 45%),
+      radial-gradient(ellipse at 92% 12%, rgba(224, 62, 47, 0.1), transparent 40%),
+      linear-gradient(180deg, #f4f7f5 0%, var(--color-parchment) 55%, #e4ebe7 100%);
   }
 
   #root {
@@ -45,8 +45,9 @@
   h3,
   .font-display {
     font-family: var(--font-display);
-    font-weight: 650;
-    letter-spacing: -0.02em;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 0.95;
   }
 
   :focus-visible {
@@ -69,9 +70,9 @@
 @layer utilities {
   .passport-grid {
     background-image:
-      linear-gradient(rgba(59, 31, 58, 0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(59, 31, 58, 0.04) 1px, transparent 1px);
-    background-size: 28px 28px;
+      linear-gradient(rgba(20, 32, 28, 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20, 32, 28, 0.035) 1px, transparent 1px);
+    background-size: 32px 32px;
   }
 
   .stamp-border {
@@ -83,7 +84,7 @@
       transform: rotate(0deg);
     }
     to {
-      transform: rotate(720deg);
+      transform: rotate(360deg);
     }
   }
 
@@ -97,11 +98,61 @@
     }
   }
 
+  @keyframes hero-drift {
+    from {
+      transform: scale(1.08) translate3d(0, 0, 0);
+    }
+    to {
+      transform: scale(1.14) translate3d(-1.5%, 1%, 0);
+    }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   .animate-spoon-spin {
-    animation: spoon-spin 0.85s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+    animation: spoon-spin 0.7s linear infinite;
+    transform-origin: center;
   }
 
   .animate-wiggle {
     animation: wiggle 0.35s ease-in-out infinite;
+  }
+
+  .animate-hero-drift {
+    animation: hero-drift 22s ease-in-out alternate infinite;
+  }
+
+  .animate-rise-in {
+    animation: rise-in 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.9s ease both;
+  }
+
+  .animate-rise-in-delay {
+    animation: rise-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+
+  .animate-rise-in-delay-2 {
+    animation: rise-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
   }
 }

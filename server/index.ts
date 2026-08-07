@@ -15,6 +15,8 @@ import {
 import { createGooglePlacesProvider } from "./providers/googlePlaces.ts";
 import { createMapboxProvider } from "./providers/mapbox.ts";
 import type { LiveRestaurantProvider } from "./providers/types.ts";
+import { registerSuggestionRoutes } from "./routes/suggestions.ts";
+import { isOpenAiConfigured } from "./openai/suggest.ts";
 
 const PORT = Number(process.env.API_PORT ?? 3001);
 const GOOGLE_API_KEY = process.env.GOOGLE_PLACES_API_KEY?.trim();
@@ -44,14 +46,18 @@ const cache = new Map<string, CacheEntry>();
 
 const app = express();
 app.use(cors({ origin: true }));
-app.use(express.json({ limit: "32kb" }));
+app.use(express.json({ limit: "64kb" }));
 
 app.get("/api/health", (_req, res) => {
   res.json({
     ok: true,
     provider: resolveProvider()?.id ?? null,
+    openaiConfigured: isOpenAiConfigured(),
+    adminConfigured: Boolean(process.env.ADMIN_TOKEN?.trim()),
   });
 });
+
+registerSuggestionRoutes(app);
 
 app.post("/api/restaurants", async (req, res) => {
   const parsed = searchBodySchema.safeParse(req.body);
@@ -204,6 +210,8 @@ function toApiRestaurant(
     authenticityRating: row.authenticityRating ?? undefined,
     authenticityNotes: row.authenticityNotes ?? undefined,
     reviewed: row.reviewed,
+    photoUrl: row.photoUrl ?? undefined,
+    photoAttribution: row.photoAttribution ?? undefined,
   };
 }
 
@@ -224,6 +232,16 @@ const server = app.listen(PORT, () => {
   const provider = resolveProvider();
   console.log(`Spoon Spin API listening on http://localhost:${PORT}`);
   console.log("Local SQLite prefers reviewed restaurants with authenticity ratings.");
+  console.log(
+    isOpenAiConfigured()
+      ? "OpenAI suggestions: configured"
+      : "OpenAI suggestions: set OPENAI_API_KEY to enable Look up & confirm",
+  );
+  console.log(
+    process.env.ADMIN_TOKEN?.trim()
+      ? "Admin review: /admin (ADMIN_TOKEN required)"
+      : "Admin review: set ADMIN_TOKEN to unlock /admin",
+  );
   if (!provider) {
     console.log(
       "No live restaurant provider configured — set MAPBOX_ACCESS_TOKEN or GOOGLE_PLACES_API_KEY for fallback.",

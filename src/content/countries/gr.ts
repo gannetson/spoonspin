@@ -1,4 +1,4 @@
-import type { Country, Recipe } from "@/types/content";
+import type { AuthoredCountry, Recipe } from "@/types/content";
 const r = (
   id: string,
   name: string,
@@ -21,7 +21,7 @@ const r = (
   ingredients,
   steps,
 });
-export const grCountry: Country = {
+export const grCountry: AuthoredCountry = {
   code: "gr",
   slug: "greece",
   name: "Greece",

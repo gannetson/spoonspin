@@ -1,7 +1,7 @@
 type SpinSpoonButtonProps = {
   spinning: boolean;
   onClick: () => void;
-  size?: "lg" | "sm";
+  size?: "lg" | "sm" | "tile";
 };
 
 export function SpinSpoonButton({
@@ -10,6 +10,7 @@ export function SpinSpoonButton({
   size = "lg",
 }: SpinSpoonButtonProps) {
   const large = size === "lg";
+  const tile = size === "tile";
 
   return (
     <button
@@ -17,6 +18,7 @@ export function SpinSpoonButton({
       onClick={onClick}
       disabled={spinning}
       aria-busy={spinning}
+      aria-label={spinning ? "Spinning" : "Spin the spoon"}
       className={[
         "group relative inline-flex flex-col items-center justify-center",
         "border-4 border-ink/15 bg-tomato text-cream",
@@ -33,44 +35,60 @@ export function SpinSpoonButton({
               "active:shadow-[0_4px_0_#7a1f18,0_10px_20px_rgba(192,57,43,0.3)]",
               "disabled:hover:shadow-[0_12px_0_#7a1f18,0_22px_40px_rgba(192,57,43,0.35)]",
             ].join(" ")
-          : [
-              "gap-1.5 rounded-[1.75rem] px-5 py-4",
-              "shadow-[0_8px_0_#7a1f18,0_14px_28px_rgba(192,57,43,0.3)]",
-              "hover:shadow-[0_10px_0_#7a1f18,0_18px_32px_rgba(192,57,43,0.35)]",
-              "active:shadow-[0_3px_0_#7a1f18,0_8px_16px_rgba(192,57,43,0.28)]",
-              "disabled:hover:shadow-[0_8px_0_#7a1f18,0_14px_28px_rgba(192,57,43,0.3)]",
-            ].join(" "),
-        spinning ? "motion-safe:animate-wiggle" : "",
+          : tile
+            ? [
+                "size-28 shrink-0 gap-1 rounded-3xl px-2 py-2 sm:size-36",
+                "shadow-[0_8px_0_#7a1f18,0_14px_28px_rgba(192,57,43,0.3)]",
+                "hover:shadow-[0_10px_0_#7a1f18,0_18px_32px_rgba(192,57,43,0.35)]",
+                "active:shadow-[0_3px_0_#7a1f18,0_8px_16px_rgba(192,57,43,0.28)]",
+                "disabled:hover:shadow-[0_8px_0_#7a1f18,0_14px_28px_rgba(192,57,43,0.3)]",
+              ].join(" ")
+            : [
+                "gap-1.5 rounded-[1.75rem] px-5 py-4",
+                "shadow-[0_8px_0_#7a1f18,0_14px_28px_rgba(192,57,43,0.3)]",
+                "hover:shadow-[0_10px_0_#7a1f18,0_18px_32px_rgba(192,57,43,0.35)]",
+                "active:shadow-[0_3px_0_#7a1f18,0_8px_16px_rgba(192,57,43,0.28)]",
+                "disabled:hover:shadow-[0_8px_0_#7a1f18,0_14px_28px_rgba(192,57,43,0.3)]",
+              ].join(" "),
+        spinning ? "animate-wiggle" : "",
       ].join(" ")}
     >
       <span
         className={[
-          "flex items-center justify-center rounded-full bg-white/25 leading-none",
-          large ? "size-24 text-6xl sm:size-28 sm:text-7xl" : "size-12 text-3xl",
-          spinning
-            ? "motion-safe:animate-spoon-spin"
-            : "transition group-hover:rotate-12",
+          "inline-flex items-center justify-center rounded-full bg-white/25 leading-none",
+          large
+            ? "size-24 text-6xl sm:size-28 sm:text-7xl"
+            : tile
+              ? "size-12 text-3xl sm:size-16 sm:text-5xl"
+              : "size-12 text-3xl",
+          spinning ? "animate-spoon-spin" : "transition group-hover:rotate-12",
         ].join(" ")}
         aria-hidden="true"
       >
         🥄
       </span>
-      <span
-        className={[
-          "font-display leading-none tracking-tight",
-          large ? "text-3xl sm:text-4xl" : "text-xl",
-        ].join(" ")}
-      >
-        {spinning ? "Spinning…" : "Spin the spoon!"}
-      </span>
       {large ? (
-        <span className="text-sm font-semibold uppercase tracking-[0.18em] text-cream/85">
-          {spinning ? "Hold onto your forks" : "Give it a whirl"}
+        <>
+          <span className="font-display text-3xl leading-none tracking-tight sm:text-4xl">
+            {spinning ? "Spinning…" : "Spin the spoon!"}
+          </span>
+          <span className="text-sm font-semibold uppercase tracking-[0.18em] text-cream/85">
+            {spinning ? "Hold onto your forks" : "Give it a whirl"}
+          </span>
+        </>
+      ) : tile ? (
+        <span className="max-w-full px-1 text-center font-display text-xs leading-tight sm:text-sm">
+          {spinning ? "Spinning…" : "Spin the spoon!"}
         </span>
       ) : (
-        <span className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-cream/85">
-          {spinning ? "Again…" : "Try another"}
-        </span>
+        <>
+          <span className="font-display text-xl leading-none tracking-tight">
+            {spinning ? "Spinning…" : "Spin the spoon!"}
+          </span>
+          <span className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-cream/85">
+            {spinning ? "Again…" : "Try another"}
+          </span>
+        </>
       )}
     </button>
   );

@@ -48,7 +48,10 @@ npm run dev
 | `npm run typecheck`        | TypeScript project build check         |
 | `npm test`                 | Unit / component tests                 |
 | `npm run test:e2e`         | Playwright main journey                |
-| `npm run validate:content` | Zod validation for published countries |
+| `npm run validate:content` | Zod validation for country content |
+| `npm run content:wikipedia` | Refresh Wikipedia cuisine summaries for the catalog |
+| `npm run agent:recipes` | Enrich recipes with photos, source links, and video links |
+| `npm run agent:restaurant-photos` | Enrich restaurants with photos (Google if keyed, else Wikimedia) |
 | `npm run agent:restaurants`| One-shot OSM harvest for chosen hubs/cuisines |
 | `npm run agent:gather`     | Incremental gather over time (resumable batches) |
 | `npm run agent:curate`     | Import reviewed restaurants + authenticity ratings |
@@ -63,12 +66,22 @@ Copy `.env.example` to `.env`:
 | `MAPBOX_ACCESS_TOKEN`   | No (live fallback)           | Server-only Mapbox access token         |
 | `GOOGLE_PLACES_API_KEY` | No (ratings + live fallback) | Google Places key for rating enrichment |
 | `TRIPADVISOR_API_KEY`   | No                           | Tripadvisor Content API key (optional)  |
+| `OPENAI_API_KEY`        | No (suggestions)             | Confirms community recipe/restaurant suggestions |
+| `OPENAI_MODEL`          | No                           | Defaults to `gpt-4o-mini`               |
+| `ADMIN_TOKEN`           | No (admin UI)                | Shared secret for `/admin` review       |
 | `RESTAURANT_PROVIDER`   | No                           | `auto` (default), `mapbox`, or `google` |
 | `RESTAURANT_LIVE_FALLBACK` | No                        | Set `1` to allow Mapbox/Google when curated DB has no match (off by default) |
 | `RESTAURANTS_DB_PATH`   | No                           | Defaults to `data/restaurants.sqlite`   |
 | `API_PORT`              | No                           | Defaults to `3001`                      |
 
 Never put provider secrets in Vite `VITE_*` variables or client code.
+
+## Community suggestions
+
+On Cook and Dine, **Suggest a recipe/restaurant** opens a modal. Enter a name or short description, then **Look up & confirm** (OpenAI). Confirmed items are added immediately and queued for review.
+
+- Public app: pending + approved stay visible; rejected items are hidden
+- Admin: open [http://localhost:5173/admin](http://localhost:5173/admin), unlock with `ADMIN_TOKEN`, then approve or reject
 
 ## Local restaurant database (primary)
 
@@ -93,6 +106,17 @@ npm run agent:curate
 ```
 
 The agent upserts each entry as `reviewed` with an authenticity rating and notes, then prints coverage gaps for published countries. Add real restaurants only — never invent names.
+
+### Proef de Wereld research guide
+
+Edition 0.9 (Afghanistan–Mauritius) can be bulk-imported into `curated.json`:
+
+```bash
+npm run agent:proef -- ~/Downloads/Proef_de_Wereld_onderzoekeditie_0.9.docx
+npm run agent:curate
+```
+
+The importer keeps Netherlands venues with known cuisine tags (evidence A–C), skips shops, abroad/travel fallbacks, and duplicates, and maps authenticity scores from /10 to the 1–5 scale.
 
 ### Incremental gather agent (more restaurants over time)
 
@@ -185,22 +209,31 @@ Live provider responses are cached in memory for 24 hours.
 
 Overpass/OSM harvesting is free. Mapbox and Google Places can incur cost after free allowances. Restrict tokens/keys and set budget alerts.
 
-## How to add another country
+## How to add cook-ready recipes for a country
+
+All 197 catalog countries are already spinable (with a Wikipedia cuisine summary when available). To add a full Cook menu:
 
 1. Copy the documented template in `src/content/countries/template.ts`.
-2. Create `src/content/countries/<code>.ts` with a complete `Country` object and `status: "published"`.
-3. Export it from `src/content/countries/published.ts`.
-4. Set the matching catalog entry in `src/content/countries/catalog.ts` to `status: "published"`.
-5. Run `npm run validate:content`.
+2. Create `src/content/countries/<code>.ts` with a complete `AuthoredCountry` object and `status: "published"`.
+3. Export it from `src/content/countries/published.ts` (`authoredCountries`).
+4. Run `npm run validate:content`.
+
+Refresh cuisine summaries from Wikipedia with:
+
+```bash
+npm run content:wikipedia
+```
+
+Summaries are stored in `src/content/countries/wikipediaCuisines.json` (CC BY-SA) and shown on the country card with a link back to Wikipedia.
 
 ### Content-quality guidelines
 
-- Only publish complete records (dish, drink, full menu, recipes, cuisine aliases).
+- Only mark cook-ready when dish, drink, full menu, recipes, and cuisine aliases are complete.
 - Prefer wording such as “iconic”, “widely considered”, or “best-known” — avoid claiming contested dishes are official national dishes.
 - Write original recipe instructions; do not paste website recipes.
 - Mark alcoholic vs non-alcoholic drinks clearly.
 - Include Dutch-friendly substitutions for hard-to-find ingredients.
-- Never ship empty recipes or “coming soon” fields on published countries.
+- Never ship empty recipes on cook-ready countries.
 
 ## Testing and production build
 
@@ -214,11 +247,13 @@ npx playwright install chromium   # first time only
 npm run test:e2e
 ```
 
-## Published MVP countries (30)
+## Country coverage
 
-Netherlands, Bulgaria, Georgia, Italy, Spain, Greece, Turkey, Lebanon, Morocco, Ethiopia, Senegal, South Africa, India, Indonesia, Vietnam, Japan, Mexico, Peru, Brazil, Jamaica, France, Germany, Thailand, South Korea, China, Portugal, Argentina, Nigeria, Egypt, Philippines.
+**Spinable worldwide:** 197 catalog entries (193 UN members + Palestine, Vatican City, Kosovo, Taiwan).
 
-The catalog lists 197 entries (193 UN members + Palestine, Vatican City, Kosovo, Taiwan). Draft entries are never selectable.
+**Cook-ready menus (32):** Netherlands, Bulgaria, Georgia, Italy, Spain, Greece, Turkey, Lebanon, Morocco, Ethiopia, Senegal, South Africa, India, Indonesia, Vietnam, Japan, Mexico, Peru, Brazil, Jamaica, France, Germany, Thailand, South Korea, China, Portugal, Argentina, Nigeria, Egypt, Philippines, United Kingdom, Poland.
+
+Other countries show a Wikipedia cuisine overview (when found) and support Dine; Cook shows “recipes coming soon” until a full menu is authored.
 
 ## Limitations
 
@@ -227,4 +262,4 @@ The catalog lists 197 entries (193 UN members + Palestine, Vatican City, Kosovo,
 - The SQLite file is local (`data/restaurants.sqlite`) and not committed; run `npm run agent:curate` (and optionally `npm run agent:restaurants`) on each machine.
 - In-memory live-provider cache resets when the API process restarts.
 - Production hosting should run the Express API alongside the static Vite build (or put the API behind the same origin `/api` proxy).
-- Catalog coverage beyond the 20 published countries is intentional scaffolding for later content work.
+- A few small countries lack a dedicated Wikipedia cuisine article; those still spin with a short fallback blurb.

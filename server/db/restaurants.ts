@@ -41,6 +41,8 @@ export type StoredRestaurant = {
   userRating: number | null;
   reviewCount: number | null;
   ratings: RestaurantRatings | null;
+  photoUrl: string | null;
+  photoAttribution: string | null;
 };
 
 export type RestaurantUpsert = {
@@ -66,6 +68,8 @@ export type RestaurantUpsert = {
   userRating?: number | null;
   reviewCount?: number | null;
   ratings?: RestaurantRatings | null;
+  photoUrl?: string | null;
+  photoAttribution?: string | null;
 };
 
 let dbInstance: Database.Database | null = null;
@@ -142,6 +146,8 @@ function migrate(db: Database.Database) {
   addColumn("user_rating", "user_rating REAL");
   addColumn("review_count", "review_count INTEGER");
   addColumn("ratings_json", "ratings_json TEXT");
+  addColumn("photo_url", "photo_url TEXT");
+  addColumn("photo_attribution", "photo_attribution TEXT");
 
   db.exec(`
     CREATE INDEX IF NOT EXISTS idx_restaurants_reviewed
@@ -211,6 +217,9 @@ function rowToStored(row: Record<string, unknown>): StoredRestaurant {
         ? row.review_count
         : (aggregated.reviewCount ?? null),
     ratings,
+    photoUrl: row.photo_url == null ? null : String(row.photo_url),
+    photoAttribution:
+      row.photo_attribution == null ? null : String(row.photo_attribution),
   };
 }
 
@@ -260,7 +269,9 @@ export function upsertRestaurant(restaurant: RestaurantUpsert, db = getDb()) {
         review_source = ?,
         user_rating = ?,
         review_count = ?,
-        ratings_json = ?
+        ratings_json = ?,
+        photo_url = ?,
+        photo_attribution = ?
       WHERE osm_id = ?`,
     ).run(
       restaurant.name,
@@ -284,6 +295,8 @@ export function upsertRestaurant(restaurant: RestaurantUpsert, db = getDb()) {
       userRating,
       reviewCount,
       ratings ? JSON.stringify(ratings) : null,
+      restaurant.photoUrl ?? current.photoUrl,
+      restaurant.photoAttribution ?? current.photoAttribution,
       restaurant.osmId,
     );
     return;
@@ -297,8 +310,8 @@ export function upsertRestaurant(restaurant: RestaurantUpsert, db = getDb()) {
       id, name, address, city, postcode, lat, lng,
       cuisine_codes, cuisine_tags, website, phone, source, osm_id, maps_url, updated_at,
       reviewed, authenticity_rating, authenticity_notes, reviewed_at, review_source,
-      user_rating, review_count, ratings_json
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      user_rating, review_count, ratings_json, photo_url, photo_attribution
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   ).run(
     restaurant.id,
     restaurant.name,
@@ -323,6 +336,8 @@ export function upsertRestaurant(restaurant: RestaurantUpsert, db = getDb()) {
     restaurant.userRating ?? aggregated.rating ?? null,
     restaurant.reviewCount ?? aggregated.reviewCount ?? null,
     ratings ? JSON.stringify(ratings) : null,
+    restaurant.photoUrl ?? null,
+    restaurant.photoAttribution ?? null,
   );
 }
 
@@ -381,8 +396,10 @@ export function searchLocalRestaurants(
   const matched = rows
     .map(rowToStored)
     .filter((restaurant) => restaurant.cuisineCodes.includes(code))
-    .filter((restaurant) =>
-      hasPrimaryCuisineMatch(code, restaurant.cuisineTags),
+    .filter(
+      (restaurant) =>
+        restaurant.source === "user-suggestion" ||
+        hasPrimaryCuisineMatch(code, restaurant.cuisineTags),
     )
     .filter((restaurant) => (reviewedOnly ? restaurant.reviewed : true))
     .map((restaurant) => {

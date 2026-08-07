@@ -1,7 +1,7 @@
-import type { Country } from "@/types/content";
+import type { AuthoredCountry } from "@/types/content";
 import { drink, recipe as r } from "./content-helpers";
 
-export const gbCountry: Country = {
+export const gbCountry: AuthoredCountry = {
   code: "gb",
   slug: "united-kingdom",
   name: "United Kingdom",

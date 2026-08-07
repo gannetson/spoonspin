@@ -1,6 +1,6 @@
-import type { Country } from "@/types/content";
+import type { AuthoredCountry } from "@/types/content";
 
-export const deCountry: Country = {
+export const deCountry: AuthoredCountry = {
   code: "de",
   slug: "germany",
   name: "Germany",

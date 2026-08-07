@@ -1516,5 +1516,1803 @@
         "fetchedAt": "2026-08-06T19:44:09.931Z"
       }
     }
+  },
+  {
+    "id": "curated:proef-af-sarban-den-haag",
+    "name": "Sarban",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "af"
+    ],
+    "cuisineTags": [
+      "afghan"
+    ],
+    "website": "https://sarban.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtst bij Leiden én sterkste totaalervaring. Warm, verzorgd en gericht op Afghaanse gastvrijheid. Try: Kabuli palaw, mantu, ashak en een gedeeld verrassingsmenu.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-af-luna-restaurant-den-haag",
+    "name": "Luna Restaurant",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "af"
+    ],
+    "cuisineTags": [
+      "afghan"
+    ],
+    "website": "https://lunarestaurant.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Laagdrempelig alternatief en lunchadres. Informeel familierestaurant. Try: Palaw, mantu, bolani en grillgerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-af-grill-n-rice-den-haag",
+    "name": "Grill-n-Rice",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "af"
+    ],
+    "cuisineTags": [
+      "afghan"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (C): Alternatief met nadruk op grill en rijst. Casual en centraal gelegen. Try: Afghaanse rijstschotels, kebab en driegangenmenu.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-al-rufus-amsterdam",
+    "name": "Rufus",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "al"
+    ],
+    "cuisineTags": [
+      "albanian"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde herkenbare Albanese signatuur in Nederland. Knus Italiaans-Albanees restaurant met persoonlijk verhaal. Try: Vraag naar Albanese specials en Albanese wijn; het vaste aanbod is nadrukkelijk fusion.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-dz-rainarai-amsterdam",
+    "name": "Raïnaraï",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "dz"
+    ],
+    "cuisineTags": [
+      "algerian"
+    ],
+    "website": "https://www.rainarai.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste totaalervaring. Kleurrijk, nomadisch en zeer ervaringsgericht. Try: Laat je leiden door het deelmenu; zoek couscous, groentegerechten, lam en Algerijns gebak.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-dz-rue-d-alger-amsterdam",
+    "name": "Rue d’Alger",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "dz"
+    ],
+    "cuisineTags": [
+      "algerian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke, hedendaagse huiskamerstijl. Klein, warm en zonder star vast menu; gerechten volgen seizoen en inspiratie. Try: Couscous, tajine, gestoofde kip, aubergine en wisselende groenteschalen.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-dz-rue-la-bastille-amsterdam",
+    "name": "Rue La Bastille",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "dz"
+    ],
+    "cuisineTags": [
+      "algerian"
+    ],
+    "website": "https://www.ruelabastille.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste prijs-kwaliteit en veel vegetarische keuze. Informeel eethuis/take-away met uitgesproken Algerijnse ziel. Try: Chekchouka, seizoensgroenten, vis of vlees en huisgemaakte baklava.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ar-el-gaucho-leiden",
+    "name": "El Gaucho",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ar"
+    ],
+    "cuisineTags": [
+      "argentinian"
+    ],
+    "website": "https://www.gaucholeiden.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtst bij Leiden. Klassiek grillrestaurant in de binnenstad. Try: Bife de chorizo, ossenhaas van de houtskoolgrill en Argentijnse wijn.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ar-saint-morris-amsterdam",
+    "name": "Saint Morris",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ar"
+    ],
+    "cuisineTags": [
+      "argentinian"
+    ],
+    "website": "https://saint-morris.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste hedendaagse parrilla-ervaring. Verzorgd steakhouse aan de gracht, gebouwd rond houtvuur, wijn en lang tafelen. Try: Empanadas salteñas, ojo de bife, mix grill en Malbec.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ar-tio-bigotes-den-haag",
+    "name": "Tío Bigotes",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ar"
+    ],
+    "cuisineTags": [
+      "argentinian"
+    ],
+    "website": "https://tiobigotes.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke streetfood-specialist. Kleine, informele empanadazaak met een persoonlijk familieverhaal. Try: Verschillende Argentijnse empanadas en alfajores.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-am-noah-lieven-amsterdam",
+    "name": "NOAH Lieven",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "am"
+    ],
+    "cuisineTags": [
+      "armenian"
+    ],
+    "website": "https://noah.restaurant/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste restaurant en dichtstbijzijnde volwaardige keuze. Ruim, modern en familiair met open vuur. Try: Arishta, dolma, Armeense grillgerechten en Jermuk; let op dat een deel van de kaart Georgisch is.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-am-restaurant-shirak-tiel",
+    "name": "Restaurant Shirak",
+    "address": "Tiel",
+    "city": "Tiel",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "am"
+    ],
+    "cuisineTags": [
+      "armenian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (C): Fallback met Armeense hapjes en arrangementen. Sfeervol en laagdrempelig; actuele reguliere opening is beperkt verifieerbaar. Try: Armeense hapjes, barbecue en proeverijen wanneer aangeboden.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-au-little-collins-amsterdam",
+    "name": "Little Collins",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "au"
+    ],
+    "cuisineTags": [
+      "australian"
+    ],
+    "website": "https://www.littlecollins.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke Melbourne-brunchervaring. Compact, levendig en koffiegericht. Try: Eieren, ricotta-achtige brunchgerechten, toast en goede koffie; aanbod wisselt.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-au-drovers-dog-amsterdam",
+    "name": "Drovers Dog",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "au"
+    ],
+    "cuisineTags": [
+      "australian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Laagdrempelige Aussie caféfallback. Ontspannen buurtcafé met Australische bieren en brunchsfeer. Try: Ricotta pancakes, baked eggs, avocado toast en meat pie indien beschikbaar.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-az-sumakh-roses-amsterdam",
+    "name": "Sumakh & Roses",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "az"
+    ],
+    "cuisineTags": [
+      "azerbaijani"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbij, beste én meest authentieke keuze. Warm, modern en kleinschalig met Azerbeidzjaanse gastvrijheid. Try: Şah plov, dolma, qutab, choban salad en fisincan; kaart wisselt.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-az-azeri-veendam",
+    "name": "Azeri",
+    "address": "Veendam",
+    "city": "Veendam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "az"
+    ],
+    "cuisineTags": [
+      "azerbaijani"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Proef de Wereld 0.9 (C): Verre en gemengde Turks-Azerbeidzjaanse fallback. Casual eetgelegenheid. Try: Vraag expliciet welke gerechten Azerbeidzjaans zijn; openbare categorisering is deels Turks.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-az-noah-lieven-amsterdam",
+    "name": "NOAH Lieven",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "az"
+    ],
+    "cuisineTags": [
+      "azerbaijani"
+    ],
+    "website": "https://noah.restaurant/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Regionale Kaukasusfallback, niet Azerbeidzjaans. Modern restaurant met open grill. Try: Kaukasische grill, dolma en kruiden; de positionering is Armeens-Georgisch, niet Azerbeidzjaans.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-bd-bengal-bites-amsterdam",
+    "name": "Bengal Bites",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "bd"
+    ],
+    "cuisineTags": [
+      "bangladeshi"
+    ],
+    "website": "https://bengalbites.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste en meest authentieke gespecialiseerde keuze. Informeel comfortfoodrestaurant. Try: Biryani, khichuri, dal, curries en dagspecials; vraag naar bhorta of vis.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-bd-deshi-taste-amsterdam",
+    "name": "Deshi Taste",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "bd"
+    ],
+    "cuisineTags": [
+      "bangladeshi"
+    ],
+    "website": "https://deshitaste.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Sterk alternatief met thuiskeukensignatuur. Laagdrempelig Zuid-Aziatisch eethuis. Try: Traditionele rijst-, vlees- en currygerechten; actuele Bengaalse specials navragen.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-bd-sher-bangla-haren",
+    "name": "Sher & Bangla",
+    "address": "Haren",
+    "city": "Haren",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "bd"
+    ],
+    "cuisineTags": [
+      "bangladeshi"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Lang bestaand alternatief buiten de Randstad. Klassiek en familiair. Try: Kruidige curries en rijstgerechten; vraag expliciet naar Bangladeshi specialiteiten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-be-belgisch-biercafe-olivier-utrecht",
+    "name": "Belgisch Biercafé Olivier",
+    "address": "Utrecht",
+    "city": "Utrecht",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "be"
+    ],
+    "cuisineTags": [
+      "belgian"
+    ],
+    "website": "https://utrecht.cafe-olivier.be/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde herkenbare Belgische café-ervaring in Nederland. Monumentaal, druk en biergericht. Try: Stoofvlees, mosselen wanneer in seizoen, friet en Belgische bierproeverij.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-bo-latinmoodfood-el-rincon-boliviano-deventer",
+    "name": "Latinmoodfood",
+    "address": "El Rincón Boliviano - Deventer",
+    "city": "El Rincón Boliviano - Deventer",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "bo"
+    ],
+    "cuisineTags": [
+      "bolivian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Meest authentieke Nederlandse vertegenwoordiging. Kleinschalige bakker/cateraar met Boliviaanse roots. Try: Salteñas, cuñapés, pan de arroz, empanadas en alfajores.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-bo-tio-bigotes-den-haag",
+    "name": "Tío Bigotes",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "bo"
+    ],
+    "cuisineTags": [
+      "bolivian"
+    ],
+    "website": "https://tiobigotes.nl/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde salteña-achtige vergelijking. Informele Argentijnse empanadazaak. Try: Empanadas; let op: een Argentijnse empanada is geen Boliviaanse salteña.",
+    "reviewSource": "proef-de-wereld-0.9",
+    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCVN-79W_CGZf86tJqVR2QljiU_uVBVNsnL_V0AfSJL53qAmspqxfwCtvVapakUOG4W6yugvLShmjpxTxqR92G0a-nDbFseYRrKqgtXypg8B8zm2b4sgWsyGKk22vmOVHbjg71ymyvp612QeNHKDH3i=s4800-h800",
+    "photoAttribution": "Photo: Tio Bigotes via Google"
+  },
+  {
+    "id": "curated:proef-ba-balkan-deli-rotterdam",
+    "name": "Balkan Deli",
+    "address": "Rotterdam",
+    "city": "Rotterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ba"
+    ],
+    "cuisineTags": [
+      "bosnian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtst bij Leiden en sterke diaspora-deli. Informele deli en eethuis. Try: Ćevapi, burek en dagspecials.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ba-restaurant-sarajevo-amsterdam",
+    "name": "Restaurant Sarajevo",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ba"
+    ],
+    "cuisineTags": [
+      "bosnian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Meest expliciet Bosnische restaurantkeuze. Warm en traditioneel. Try: Ćevapi, burek, dolma en Bosnische koffie.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ba-mostar-grill-helmond",
+    "name": "Mostar Grill",
+    "address": "Helmond",
+    "city": "Helmond",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ba"
+    ],
+    "cuisineTags": [
+      "bosnian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Sterke regionale fallback. Familiair grillrestaurant. Try: Mostar-stijl grill, somun en kajmak.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-br-rodizio-rotterdam-rotterdam",
+    "name": "Rodizio Rotterdam",
+    "address": "Rotterdam",
+    "city": "Rotterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "br"
+    ],
+    "cuisineTags": [
+      "brazilian"
+    ],
+    "website": "https://www.rodizio.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtst bij Leiden. Feestelijke klassieke churrascaria. Try: Picanha, verschillende spiesen en buffet/farofa.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-br-samba-kitchen-amsterdam",
+    "name": "Samba Kitchen",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "br"
+    ],
+    "cuisineTags": [
+      "brazilian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke rodízio-ervaring. Braziliaans, muzikaal en levendig. Try: Picanha en volledige rodízio.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-bg-zest-amsterdam",
+    "name": "Zest",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "bg"
+    ],
+    "cuisineTags": [
+      "bulgarian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste en meest expliciete Bulgaarse keuken. Craft beer, burgers en Bulgaarse klassiekers. Try: Shopska, grill, banitsa/specials en Bulgaars bier.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-bg-restaurant-dubrovnik-amsterdam",
+    "name": "Restaurant Dubrovnik",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "bg"
+    ],
+    "cuisineTags": [
+      "bulgarian"
+    ],
+    "website": "https://www.restaurantdubrovnik.nl/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Brede Balkanfallback. Klassiek Balkanrestaurant sinds 1983. Try: Grill en shopska-achtige salade; geen exclusief Bulgaarse kaart.",
+    "reviewSource": "proef-de-wereld-0.9",
+    "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e7/The_New_York_Times_1916-05-18-_Vol_65_Iss_21299_%28IA_per_new-york-times-magazine_the-new-york-times_1916-05-18_65_21299%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "photoAttribution": "Wikimedia Commons / Public domain"
+  },
+  {
+    "id": "curated:proef-ca-ellis-meerdere-nederlandse-steden",
+    "name": "Ellis",
+    "address": "meerdere Nederlandse steden",
+    "city": "meerdere Nederlandse steden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ca"
+    ],
+    "cuisineTags": [
+      "canadian"
+    ],
+    "website": "https://ellis.be/en-nl/products/poutine/",
+    "authenticityRating": 3,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde poutine-optie. Informeel en gastvrij. Try: Poutine; controleer of echte cheese curds worden gebruikt.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cl-tio-bigotes-den-haag",
+    "name": "Tío Bigotes",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cl"
+    ],
+    "cuisineTags": [
+      "chilean"
+    ],
+    "website": "https://tiobigotes.nl/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde empanadafallback. Informeel en gastvrij. Try: Argentijnse empanadas; niet Chileens.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cn-sichuan-food-amsterdam",
+    "name": "Sichuan Food",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cn"
+    ],
+    "cuisineTags": [
+      "chinese"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste specialistische kwaliteit. Informeel en gastvrij. Try: Mapo tofu, vis in chili-olie en Sichuan-specials.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cn-oriental-city-amsterdam",
+    "name": "Oriental City",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cn"
+    ],
+    "cuisineTags": [
+      "chinese"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke Cantonese dim sum. Informeel en gastvrij. Try: Har gow, siu mai, cheung fun en geroosterd vlees.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cn-sea-palace-amsterdam",
+    "name": "Sea Palace",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cn"
+    ],
+    "cuisineTags": [
+      "chinese"
+    ],
+    "website": "https://seapalace.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste brede Chinese totaalervaring. Informeel en gastvrij. Try: Dim sum, Peking duck en Cantonese gerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-co-tropico-latin-flavors-amsterdam",
+    "name": "Tropico Latin Flavors",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "co"
+    ],
+    "cuisineTags": [
+      "colombian"
+    ],
+    "website": "https://www.tropicolatinflavors.com/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste brede Colombiaanse ervaring. Informeel en gastvrij. Try: Bandeja paisa, arepas, sancocho en cocktails.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-co-salento-latino-amsterdam",
+    "name": "Salento Latino",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "co"
+    ],
+    "cuisineTags": [
+      "colombian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke traditionele keuze. Informeel en gastvrij. Try: Traditionele dagschotels, arepas en vlees.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-co-cartagena-amsterdam",
+    "name": "Cartagena",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "co"
+    ],
+    "cuisineTags": [
+      "colombian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste hedendaagse kwaliteit. Informeel en gastvrij. Try: Caribisch-Colombiaanse gerechten en cocktails.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-hr-restaurant-dubrovnik-amsterdam",
+    "name": "Restaurant Dubrovnik",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "hr"
+    ],
+    "cuisineTags": [
+      "croatian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest gevestigde Kroatisch-Balkan keuze. Informeel en gastvrij. Try: Peka-achtige grill, vis en Balkanklassiekers.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-hr-balkan-deli-rotterdam",
+    "name": "Balkan Deli",
+    "address": "Rotterdam",
+    "city": "Rotterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "hr"
+    ],
+    "cuisineTags": [
+      "croatian"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde informele fallback. Informeel en gastvrij. Try: Ćevapi, burek en Balkan-specialiteiten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cu-havana-den-haag",
+    "name": "Havana",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cu"
+    ],
+    "cuisineTags": [
+      "cuban"
+    ],
+    "website": null,
+    "authenticityRating": 3,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde Cuba-concept. Informeel en gastvrij. Try: Ropa vieja, Cubaanse snacks en cocktails.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cy-mlt-bakery-amsterdam",
+    "name": "MLT Bakery",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cy"
+    ],
+    "cuisineTags": [
+      "cypriot"
+    ],
+    "website": "https://mltbakery.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke Cypriotische specialist. Informeel en gastvrij. Try: Pilavuna, halloumibrood, tahinibroodjes en preserves.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cy-cypriotische-community-meze-randstad",
+    "name": "Cypriotische community-meze",
+    "address": "Randstad",
+    "city": "Randstad",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cy"
+    ],
+    "cuisineTags": [
+      "cypriot"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Beste volledige-maaltijdfallback. Informeel en gastvrij. Try: Souvla, sheftalia en koupepia.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-cy-mythos-greek-amsterdam",
+    "name": "Mythos Greek",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cy"
+    ],
+    "cuisineTags": [
+      "cypriot"
+    ],
+    "website": "https://mythosgreek.nl/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Regionale restaurantfallback. Informeel en gastvrij. Try: Griekse mezze en grill; niet specifiek Cypriotisch.",
+    "reviewSource": "proef-de-wereld-0.9",
+    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjD8KJLRy3vCuuLvO57-NZ6iNPFIM6vBIqX0KlMoTaNzTzWDr2HKdV8pt5qM0rqxb-2y_76VX9XCX9KBN0eg6NMecgPhPR6VENWCHfqbkEnesGMVX69T8y4SwtrOLraH94ItvZ_JSm6gIWV8KEgU1eAC7w=s4800-h800",
+    "photoAttribution": "Photo: Mythos Greek via Google"
+  },
+  {
+    "id": "curated:proef-cz-cesko-slovensky-czech-bar-amsterdam",
+    "name": "Česko-Slovenský / Czech Bar",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "cz"
+    ],
+    "cuisineTags": [
+      "czech"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Meest directe nationale keuze. Informeel en gastvrij. Try: Tsjechische dagschotels, bier en sterke drank.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-do-la-bandera-dominican-food-rotterdam",
+    "name": "La Bandera Dominican Food",
+    "address": "Rotterdam",
+    "city": "Rotterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "do"
+    ],
+    "cuisineTags": [
+      "dominican"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste en meest authentieke specialist. Informeel en gastvrij. Try: Tostones, rijst met bonen, stoofgerechten en mangú.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-do-casa-del-mofongo-rotterdam",
+    "name": "Casa del Mofongo",
+    "address": "Rotterdam",
+    "city": "Rotterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "do"
+    ],
+    "cuisineTags": [
+      "dominican"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke gespecialiseerde alternatiefkeuze. Informeel en gastvrij. Try: Mofongo, sancocho en Dominicaanse schotels.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-eg-hawawshi-amsterdam",
+    "name": "HAWAWSHI",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "eg"
+    ],
+    "cuisineTags": [
+      "egyptian"
+    ],
+    "website": "https://www.hawawshi.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste gespecialiseerde streetfoodkeuze. Informeel en gastvrij. Try: Hawawshi, Egyptisch menu en dessert.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-eg-abu-amr-koshari-amsterdam",
+    "name": "Abu Amr Koshari",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "eg"
+    ],
+    "cuisineTags": [
+      "egyptian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke koshari-specialist. Informeel en gastvrij. Try: Koshari; vegan en grotendeels biologisch.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-er-oost-afrikaans-eethuis-djebena-leiden",
+    "name": "Oost-Afrikaans Eethuis Djebena",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "er"
+    ],
+    "cuisineTags": [
+      "eritrean"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde én sterke authentieke keuze. Informeel en gastvrij. Try: Eritrese proefschaal, zigni, groenten en koffie.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-er-habesha-savanna-den-haag",
+    "name": "Habesha Savanna",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "er"
+    ],
+    "cuisineTags": [
+      "eritrean"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke diaspora-keuze. Informeel en gastvrij. Try: Injera, zigni en vegetarische stoofgerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-er-hdmona-groningen",
+    "name": "Hdmona",
+    "address": "Groningen",
+    "city": "Groningen",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "er"
+    ],
+    "cuisineTags": [
+      "eritrean"
+    ],
+    "website": "https://www.hdmonarestaurant.com/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste noordelijke specialist. Informeel en gastvrij. Try: Eritrese en Ethiopische shared plates.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-et-queen-of-sheba-amsterdam",
+    "name": "Queen of Sheba",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "et"
+    ],
+    "cuisineTags": [
+      "ethiopian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest geroemde authentieke keuze. Informeel en gastvrij. Try: Doro wat, kitfo en vegetarische proefschaal.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-et-djebena-leiden",
+    "name": "Djebena",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "et"
+    ],
+    "cuisineTags": [
+      "ethiopian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde Hoorn-van-Afrika keuze. Informeel en gastvrij. Try: Injera en stoofgerechten; primair Eritrees.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-et-taste-of-ethiopia-den-haag",
+    "name": "Taste of Ethiopia",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "et"
+    ],
+    "cuisineTags": [
+      "ethiopian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke gespecialiseerde alternatiefkeuze. Informeel en gastvrij. Try: Beyaynetu, doro wat en koffieceremonie.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-fr-de-librije-zwolle",
+    "name": "De Librije",
+    "address": "Zwolle",
+    "city": "Zwolle",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "fr"
+    ],
+    "cuisineTags": [
+      "french"
+    ],
+    "website": "https://www.librije.com/",
+    "authenticityRating": 3,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste Frans-technische topkwaliteit. Informeel en gastvrij. Try: Chefsmenu; geen nationale brasserie.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-fr-cafe-caron-amsterdam",
+    "name": "Café Caron",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "fr"
+    ],
+    "cuisineTags": [
+      "french"
+    ],
+    "website": "https://cafecaron.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke authentieke bistrosfeer. Informeel en gastvrij. Try: Franse bistroklassiekers en wijn.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ge-restaurant-kavkaz-leiden",
+    "name": "Restaurant Kavkaz",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ge"
+    ],
+    "cuisineTags": [
+      "georgian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde Kaukasische keuze. Informeel en gastvrij. Try: Khinkali, khachapuri en grill.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ge-batoni-khinkali-amsterdam",
+    "name": "Batoni Khinkali",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ge"
+    ],
+    "cuisineTags": [
+      "georgian"
+    ],
+    "website": "https://batonikhinkali.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest gespecialiseerde Georgische keuze. Informeel en gastvrij. Try: Khinkali, khachapuri en lobio.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-de-stadscafe-van-der-werff-leiden",
+    "name": "Stadscafé Van der Werff",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "de"
+    ],
+    "cuisineTags": [
+      "german"
+    ],
+    "website": "https://www.stadscafevanderwerff.nl/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde Duitse seizoensfallback. Informeel en gastvrij. Try: Vraag naar schnitzel en seizoensgerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-gh-the-african-granary-den-haag",
+    "name": "The African Granary",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "gh"
+    ],
+    "cuisineTags": [
+      "ghanaian"
+    ],
+    "website": "https://theafricangranary.nl/",
+    "authenticityRating": 3,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde brede West-Afrikaanse keuze. Informeel en gastvrij. Try: Jollof, pindasaus en shared dishes.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-gh-motherland-amsterdam",
+    "name": "Motherland",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "gh"
+    ],
+    "cuisineTags": [
+      "ghanaian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Sterke Ghanese/Afrikaanse diaspora-keuze. Informeel en gastvrij. Try: Waakye, fufu en jollof.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-gr-olympia-leiden",
+    "name": "Olympia",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "gr"
+    ],
+    "cuisineTags": [
+      "greek"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde Griekse keuze. Informeel en gastvrij. Try: Mezze, vis en grill.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-gr-mythos-greek-amsterdam",
+    "name": "Mythos Greek",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "gr"
+    ],
+    "cuisineTags": [
+      "greek"
+    ],
+    "website": "https://mythosgreek.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke traditionele specialist. Informeel en gastvrij. Try: Gyros, vis en mezze.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-gr-kaia-amsterdam",
+    "name": "KAIA",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "gr"
+    ],
+    "cuisineTags": [
+      "greek"
+    ],
+    "website": "https://kaia-amsterdam.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste hedendaagse kwaliteit. Informeel en gastvrij. Try: Modern-Griekse shared dining.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-hu-csarda-amsterdam",
+    "name": "Csárda",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "hu"
+    ],
+    "cuisineTags": [
+      "hungarian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Gespecialiseerde keuze; status controleren. Informeel en gastvrij. Try: Goulash, schnitzel en Hongaarse wijn.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-in-roti-mahal-leiden",
+    "name": "Roti Mahal",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "in"
+    ],
+    "cuisineTags": [
+      "indian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde Indiase keuze. Informeel en gastvrij. Try: Curries, tandoor en biryani.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-in-de-lindehof-nuenen",
+    "name": "De Lindehof",
+    "address": "Nuenen",
+    "city": "Nuenen",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "in"
+    ],
+    "cuisineTags": [
+      "indian"
+    ],
+    "website": "https://restaurantdelindehof.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste Indiaas-Nederlandse topgastronomie. Informeel en gastvrij. Try: Surinaams-Hindoestaanse en Indiase smaaktechniek.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-in-madras-diaries-amsterdam",
+    "name": "Madras Diaries",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "in"
+    ],
+    "cuisineTags": [
+      "indian"
+    ],
+    "website": "https://madrasdiaries.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke Zuid-Indiase specialist. Informeel en gastvrij. Try: Dosa, idli en Zuid-Indiase gerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-id-surakarta-leiden",
+    "name": "Surakarta",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "id"
+    ],
+    "cuisineTags": [
+      "indonesian"
+    ],
+    "website": "https://restaurantsurakarta.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde volwaardige Indonesische keuze. Informeel en gastvrij. Try: Rijsttafel, rendang en saté.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-id-aneka-rasa-amsterdam",
+    "name": "Aneka Rasa",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "id"
+    ],
+    "cuisineTags": [
+      "indonesian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke traditionele keuze. Informeel en gastvrij. Try: Regionale Indonesische gerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ir-kavkaz-leiden",
+    "name": "Kavkaz",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ir"
+    ],
+    "cuisineTags": [
+      "iranian"
+    ],
+    "website": null,
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde regionale fallback. Informeel en gastvrij. Try: Kaukasische keuken; niet Perzisch.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ir-de-aardige-pers-amsterdam",
+    "name": "De Aardige Pers",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ir"
+    ],
+    "cuisineTags": [
+      "iranian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke Perzische grillkeuze. Informeel en gastvrij. Try: Kebab, saffraanrijst en Perzische gerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ir-shiraz-amsterdam",
+    "name": "Shiraz",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ir"
+    ],
+    "cuisineTags": [
+      "iranian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest volledige Perzische ervaring. Informeel en gastvrij. Try: Ghormeh sabzi, fesenjan en chelo kebab.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-iq-iraakse-community-restaurants-den-haag",
+    "name": "Iraakse community-restaurants",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "iq"
+    ],
+    "cuisineTags": [
+      "iraqi"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde diaspora-keuze. Informeel en gastvrij. Try: Quzi, kubba en dolma.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-iq-ninive-amsterdam",
+    "name": "Ninive",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "iq"
+    ],
+    "cuisineTags": [
+      "iraqi"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Mesopotamische kwaliteitskeuze. Informeel en gastvrij. Try: Iraaks/Koerdische gerechten; herkomst navragen.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ie-north-end-english-pub-leiden",
+    "name": "North End English Pub",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ie"
+    ],
+    "cuisineTags": [
+      "irish"
+    ],
+    "website": "https://northendleiden.nl/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde pubfallback. Informeel en gastvrij. Try: Pubgerechten en stout; niet exclusief Iers.",
+    "reviewSource": "proef-de-wereld-0.9",
+    "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b2/Abendpost_1891-05-18-_Iss_117_%28IA_sim_abendpost-sonntagpost_1891-05-18_117%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "photoAttribution": "Wikimedia Commons / Public domain"
+  },
+  {
+    "id": "curated:proef-ie-mulligans-irish-music-bar-amsterdam",
+    "name": "Mulligans Irish Music Bar",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ie"
+    ],
+    "cuisineTags": [
+      "irish"
+    ],
+    "website": "https://mulligans.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Meest Ierse pubsfeer. Informeel en gastvrij. Try: Irish stew en pubgerechten; menu controleren.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-il-hummus-bistro-d-a-amsterdam",
+    "name": "Hummus Bistro d&a",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "il"
+    ],
+    "cuisineTags": [
+      "israeli"
+    ],
+    "website": "https://www.hummusbistro.com/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Sterke informele keuze. Informeel en gastvrij. Try: Hummus, shakshuka en shared dishes.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-il-bar-bachrach-amsterdam",
+    "name": "Bar Bachrach",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "il"
+    ],
+    "cuisineTags": [
+      "israeli"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste hedendaagse kwaliteit. Informeel en gastvrij. Try: Levantijns-Israëlische shared dining.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-it-pianeta-terra-amsterdam",
+    "name": "Pianeta Terra",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "it"
+    ],
+    "cuisineTags": [
+      "italian"
+    ],
+    "website": "https://pianetaterra.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste moderne Italiaanse kwaliteit. Informeel en gastvrij. Try: Italiaans chefsmenu met regionale producten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-it-nnea-amsterdam",
+    "name": "nNea",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "it"
+    ],
+    "cuisineTags": [
+      "italian"
+    ],
+    "website": "https://nnea.nl/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Topkeuze pizza napoletana. Informeel en gastvrij. Try: Napolitaanse pizza.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-jm-reggae-rita-s-amsterdam",
+    "name": "Reggae Rita’s",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "jm"
+    ],
+    "cuisineTags": [
+      "jamaican"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Informele Jamaicaanse specialist. Informeel en gastvrij. Try: Jerk, curry goat en patties.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-jp-yuki-sushi-leiden",
+    "name": "Yuki Sushi",
+    "address": "Leiden",
+    "city": "Leiden",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "jp"
+    ],
+    "cuisineTags": [
+      "japanese"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde Japanse keuze. Informeel en gastvrij. Try: Sushi en Japanse gerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-jp-yamazato-amsterdam",
+    "name": "Yamazato",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "jp"
+    ],
+    "cuisineTags": [
+      "japanese"
+    ],
+    "website": "https://www.okura.nl/yamazato/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste klassieke Japanse topkwaliteit. Informeel en gastvrij. Try: Kaiseki.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-jp-hakata-senpachi-amsterdam",
+    "name": "Hakata Senpachi",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "jp"
+    ],
+    "cuisineTags": [
+      "japanese"
+    ],
+    "website": "https://hakatasenpachi.com/",
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest authentieke izakaya-keuze. Informeel en gastvrij. Try: Yakitori, ramen en izakaya-specials.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-ke-the-african-granary-den-haag",
+    "name": "The African Granary",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "ke"
+    ],
+    "cuisineTags": [
+      "kenyan"
+    ],
+    "website": "https://theafricangranary.nl/",
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde regionale keuze. Informeel en gastvrij. Try: Oost-Afrikaanse gerechten; vraag naar Keniaanse specials.",
+    "reviewSource": "proef-de-wereld-0.9",
+    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjB0THj9QjvIDxrDLTZXL_1E8cJBRug4D-URBLq4Nh5uVBBvWv6wmVeX1kIWHw3g_GlXdc9pRvBQX7DsII4Lv0QTAEM6eTNbKduSviXVpVPP1Xyxxr0qzhZO54hmVnkJWr08RN9FzWbdLZm3-sRuEaZGHA=s4800-h800",
+    "photoAttribution": "Photo: The African Granary via Google"
+  },
+  {
+    "id": "curated:proef-la-soi-35-den-haag",
+    "name": "Soi 35",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "la"
+    ],
+    "cuisineTags": [
+      "lao"
+    ],
+    "website": null,
+    "authenticityRating": 2,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde Zuidoost-Aziatische fallback. Informeel en gastvrij. Try: Thai/Isan; verwant maar niet Laotiaans.",
+    "reviewSource": "proef-de-wereld-0.9",
+    "photoUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Catalogus_der_tentoonstelling_van_schilderijen_van_overleden_meesters_%28werkende_leden%29_-_ter_gelegenheid_van_het_50_jarig_hestaan_van_het_genootschap%2C_april_1897_%28IA_catalogusdertent00pulc%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "photoAttribution": "Pulchri Studio (Hague, Netherlands) / Public domain"
+  },
+  {
+    "id": "curated:proef-lb-beyrouth-amsterdam",
+    "name": "Beyrouth",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "lb"
+    ],
+    "cuisineTags": [
+      "lebanese"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest gevestigde authentieke keuze. Informeel en gastvrij. Try: Uitgebreide mezze en grill.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-lb-lebanese-sajeria-amsterdam",
+    "name": "Lebanese Sajeria",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "lb"
+    ],
+    "cuisineTags": [
+      "lebanese"
+    ],
+    "website": "https://lebanesesajeria.com/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Beste streetfood/lunchkeuze. Informeel en gastvrij. Try: Saj, manakish en mezze.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-lb-amier-den-haag",
+    "name": "Amier",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "lb"
+    ],
+    "cuisineTags": [
+      "lebanese"
+    ],
+    "website": "https://amierrestaurant.nl/",
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Dichtstbijzijnde volwaardige keuze. Informeel en gastvrij. Try: Mezze en Libanese grill.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-my-wau-malaysian-restaurant-amsterdam",
+    "name": "Wau Malaysian Restaurant",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "my"
+    ],
+    "cuisineTags": [
+      "malaysian"
+    ],
+    "website": null,
+    "authenticityRating": 5,
+    "authenticityNotes": "Proef de Wereld 0.9 (A): Meest gespecialiseerde keuze. Informeel en gastvrij. Try: Nasi lemak, laksa en rendang.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-my-papa-malaysian-den-haag",
+    "name": "Papa Malaysian",
+    "address": "Den Haag",
+    "city": "Den Haag",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "my"
+    ],
+    "cuisineTags": [
+      "malaysian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde specialist. Informeel en gastvrij. Try: Maleisische noedels en rijstgerechten.",
+    "reviewSource": "proef-de-wereld-0.9"
+  },
+  {
+    "id": "curated:proef-my-nyonya-malaysia-express-amsterdam",
+    "name": "Nyonya Malaysia Express",
+    "address": "Amsterdam",
+    "city": "Amsterdam",
+    "postcode": null,
+    "lat": null,
+    "lng": null,
+    "cuisineCodes": [
+      "my"
+    ],
+    "cuisineTags": [
+      "malaysian"
+    ],
+    "website": null,
+    "authenticityRating": 4,
+    "authenticityNotes": "Proef de Wereld 0.9 (B): Beste informele alternatief. Informeel en gastvrij. Try: Laksa, char kway teow en nasi lemak.",
+    "reviewSource": "proef-de-wereld-0.9"
   }
 ]

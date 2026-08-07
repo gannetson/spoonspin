@@ -81,6 +81,16 @@ export const OSM_CUISINE_BY_COUNTRY: Record<string, string[]> = {
   us: ["american"],
   uz: ["uzbek"],
   ve: ["venezuelan"],
+  by: ["belarusian"],
+  bo: ["bolivian"],
+  cy: ["cypriot"],
+  do: ["dominican"],
+  er: ["eritrean"],
+  jo: ["jordanian"],
+  la: ["lao", "laos"],
+  ly: ["libyan"],
+  mt: ["maltese"],
+  ec: ["ecuadorian"],
 };
 
 /** Tags that are too broad to assign a country by themselves. */

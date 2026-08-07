@@ -1,6 +1,7 @@
 import type { Country } from "@/types/content";
 import { CountrySelect } from "@/components/CountrySelect";
 import { SpinSpoonButton } from "@/components/SpinSpoonButton";
+import { images } from "@/lib/images";
 
 type HomeHeroProps = {
   countries: Country[];
@@ -12,36 +13,49 @@ export function HomeHero({ countries, onPick, onSelectCountry }: HomeHeroProps) 
   return (
     <section
       aria-labelledby="hero-heading"
-      className="relative overflow-hidden rounded-[2rem] border border-ink/10 bg-cream/80 px-6 py-12 shadow-[0_20px_60px_rgba(59,31,58,0.08)] sm:px-10 sm:py-16"
+      className="relative isolate min-h-[min(92vh,52rem)] overflow-hidden"
     >
+      <img
+        src={images.hero}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 size-full object-cover animate-hero-drift"
+      />
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-8 top-6 rotate-12 stamp-border rounded-full px-6 py-10 text-stamp/40"
-      >
-        VISA
-      </div>
+        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/35"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-gradient-to-r from-ink/70 via-transparent to-transparent"
+      />
 
-      <p className="font-display text-5xl leading-none text-tomato sm:text-7xl">
-        Spoon Spin
-      </p>
-      <h1
-        id="hero-heading"
-        className="mt-6 max-w-xl font-display text-3xl leading-tight text-ink sm:text-5xl"
-      >
-        Where in the world will you eat today?
-      </h1>
-      <p className="mt-4 max-w-lg text-lg text-ink-soft">
-        Spin the globe, land on a cuisine, then cook at home or dine out in the
-        Netherlands.
-      </p>
+      <div className="relative z-10 mx-auto flex min-h-[min(92vh,52rem)] w-full max-w-5xl flex-col justify-end px-4 pb-14 pt-16 sm:px-6 sm:pb-20">
+        <p className="animate-rise-in font-display text-[clamp(3.5rem,14vw,8.5rem)] leading-[0.85] text-cream">
+          Spoon Spin
+        </p>
+        <h1
+          id="hero-heading"
+          className="animate-rise-in-delay mt-5 max-w-xl font-display text-[clamp(1.75rem,4.5vw,3rem)] leading-[1.05] text-cream"
+        >
+          Where in the world will you eat today?
+        </h1>
+        <p className="animate-rise-in-delay-2 mt-4 max-w-md text-lg text-cream/85">
+          Spin the globe, land on a cuisine, then cook at home or dine out in the
+          Netherlands.
+        </p>
 
-      <div className="mt-10 flex flex-col items-center gap-8 sm:items-start">
-        <SpinSpoonButton spinning={false} onClick={onPick} size="lg" />
-        <CountrySelect
-          countries={countries}
-          onSelect={onSelectCountry}
-          id="home-country-select"
-        />
+        <div className="animate-fade-in mt-10 flex flex-col items-stretch gap-6 sm:max-w-md">
+          <SpinSpoonButton spinning={false} onClick={onPick} size="lg" />
+          <div className="rounded-2xl bg-cream/10 p-3 backdrop-blur-sm ring-1 ring-cream/20">
+            <CountrySelect
+              countries={countries}
+              onSelect={onSelectCountry}
+              id="home-country-select"
+              tone="dark"
+            />
+          </div>
+        </div>
       </div>
     </section>
   );

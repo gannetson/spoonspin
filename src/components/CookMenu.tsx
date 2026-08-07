@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Clock3, ExternalLink, Flame, MapPin, Store } from "lucide-react";
+import { Clock3, ExternalLink, Flame, MapPin, Plus, Store } from "lucide-react";
 import type { Country, Recipe, RecipeCategory } from "@/types/content";
 import {
   drinkMatchesAlcohol,
@@ -9,9 +9,14 @@ import {
   recipeMatchesCategory,
   recipeMatchesDiet,
 } from "@/content/countries/menuAccessors";
+import { recipeImageFor } from "@/lib/images";
+import { cookBannerUrl } from "@/content/countries/cuisineImages";
+import { SuggestModal } from "@/components/SuggestModal";
 
 type CookMenuProps = {
   country: Country;
+  communityRecipes: Recipe[];
+  onCommunityRecipesChange: (recipes: Recipe[]) => void;
   onOpenRecipe: (recipe: Recipe) => void;
 };
 
@@ -48,14 +53,31 @@ const COURSE_LABELS: Record<RecipeCategory, string> = {
   snack: "Snack",
 };
 
-export function CookMenu({ country, onOpenRecipe }: CookMenuProps) {
+export function CookMenu({
+  country,
+  communityRecipes,
+  onCommunityRecipesChange,
+  onOpenRecipe,
+}: CookMenuProps) {
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [dietFilter, setDietFilter] = useState<DietFilter>("all");
   const [alcoholFilter, setAlcoholFilter] = useState<AlcoholFilter>("all");
+  const [suggestOpen, setSuggestOpen] = useState(false);
 
-  const recipes = useMemo(() => getCountryRecipes(country), [country]);
+  const authoredRecipes = useMemo(() => getCountryRecipes(country), [country]);
+  const recipes = useMemo(() => {
+    const seen = new Set(authoredRecipes.map((recipe) => recipe.id));
+    return [
+      ...authoredRecipes,
+      ...communityRecipes.filter((recipe) => !seen.has(recipe.id)),
+    ];
+  }, [authoredRecipes, communityRecipes]);
   const drinks = useMemo(() => getCountryDrinks(country), [country]);
   const shops = useMemo(() => getSpecialtyShops(country), [country]);
+  const communityIds = useMemo(
+    () => new Set(communityRecipes.map((recipe) => recipe.id)),
+    [communityRecipes],
+  );
 
   const filteredRecipes = useMemo(
     () =>
@@ -72,16 +94,117 @@ export function CookMenu({ country, onOpenRecipe }: CookMenuProps) {
     [drinks, alcoholFilter],
   );
 
+  const suggestButton = (
+    <button
+      type="button"
+      onClick={() => setSuggestOpen(true)}
+      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+    >
+      <Plus aria-hidden="true" className="size-4" />
+      Suggest a recipe
+    </button>
+  );
+
+  if (!country.cookReady || !country.menu) {
+    return (
+      <section
+        aria-labelledby="menu-heading"
+        className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream"
+      >
+        <div className="relative h-40 sm:h-48">
+          <img
+            src={cookBannerUrl(country)}
+            alt=""
+            className="size-full object-cover"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-t from-ink/70 to-ink/10"
+          />
+        </div>
+        <div className="space-y-4 p-6 sm:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <h2 id="menu-heading" className="font-display text-3xl text-ink sm:text-4xl">
+              Tonight&apos;s menu
+            </h2>
+            {suggestButton}
+          </div>
+          <p className="max-w-2xl text-ink-soft">
+            Full home-cooking recipes for {country.name} are still on the way.
+            Suggest a dish below
+            {country.wikipedia ? ", open the Wikipedia link," : ""} or switch to{" "}
+            <span className="font-semibold text-ink">Dine</span> to find restaurants
+            in the Netherlands.
+          </p>
+          {communityRecipes.length > 0 ? (
+            <ul className="grid gap-3 pt-2">
+              {communityRecipes.map((recipe) => (
+                <li key={recipe.id}>
+                  <button
+                    type="button"
+                    onClick={() => onOpenRecipe(recipe)}
+                    className="flex w-full overflow-hidden rounded-2xl bg-parchment text-left ring-1 ring-ink/10 hover:ring-tomato/40"
+                  >
+                    <img
+                      src={recipe.imageUrl ?? recipeImageFor(recipe.category)}
+                      alt=""
+                      className="h-24 w-24 shrink-0 object-cover"
+                    />
+                    <div className="px-4 py-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-stamp">
+                        Community suggestion
+                      </p>
+                      <p className="mt-1 font-display text-xl">{recipe.name}</p>
+                    </div>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+        <SuggestModal
+          kind="recipe"
+          country={country}
+          open={suggestOpen}
+          onClose={() => setSuggestOpen(false)}
+          onAdded={(result) => {
+            if (result.kind === "recipe") {
+              onCommunityRecipesChange([result.recipe, ...communityRecipes]);
+            }
+          }}
+        />
+      </section>
+    );
+  }
+
   return (
     <section aria-labelledby="menu-heading" className="space-y-6">
-      <div>
-        <h2 id="menu-heading" className="font-display text-3xl text-ink">
-          Tonight&apos;s menu
-        </h2>
-        <p className="mt-1 text-ink-soft">
-          {recipes.length} recipes and {drinks.length} drinks from {country.name}.
-          Filter and open any dish for the full recipe.
-        </p>
+      <div className="relative overflow-hidden rounded-[2rem]">
+        <img
+          src={cookBannerUrl(country)}
+          alt=""
+          className="h-40 w-full object-cover sm:h-52"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/55 to-ink/20"
+        />
+        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+          <h2
+            id="menu-heading"
+            className="font-display text-3xl text-cream sm:text-5xl"
+          >
+            Tonight&apos;s menu
+          </h2>
+          <p className="mt-2 max-w-lg text-cream/85">
+            {recipes.length} recipes and {drinks.length} drinks from {country.name}.
+            Filter and open any dish for the full recipe.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {suggestButton}
       </div>
 
       <div className="space-y-3 rounded-2xl bg-cream p-4 ring-1 ring-ink/10">
@@ -103,49 +226,58 @@ export function CookMenu({ country, onOpenRecipe }: CookMenuProps) {
       <ul className="grid gap-3">
         {filteredRecipes.map((recipe) => {
           const isNational = recipe.id === country.nationalDishId;
+          const isCommunity = communityIds.has(recipe.id);
           return (
             <li key={recipe.id}>
               <button
                 type="button"
                 onClick={() => onOpenRecipe(recipe)}
-                className={`flex w-full flex-col gap-2 rounded-2xl px-5 py-4 text-left transition sm:flex-row sm:items-center sm:justify-between ${
+                className={`flex w-full overflow-hidden rounded-2xl text-left transition ${
                   isNational
                     ? "bg-ink text-cream shadow-lg shadow-ink/20 ring-2 ring-saffron"
                     : "bg-cream text-ink ring-1 ring-ink/10 hover:ring-tomato/40"
                 }`}
               >
-                <div>
-                  <p
-                    className={`text-xs font-semibold uppercase tracking-[0.16em] ${
-                      isNational ? "text-saffron-soft" : "text-stamp"
-                    }`}
-                  >
-                    {COURSE_LABELS[recipe.category]}
-                    {isNational ? " · iconic national dish" : ""}
-                    {recipe.dietaryLabels.length > 0
-                      ? ` · ${recipe.dietaryLabels.join(", ")}`
-                      : ""}
-                  </p>
-                  <p className="mt-1 font-display text-2xl">{recipe.name}</p>
-                  {recipe.localName ? (
+                <img
+                  src={recipe.imageUrl ?? recipeImageFor(recipe.category)}
+                  alt=""
+                  className="h-28 w-28 shrink-0 object-cover sm:h-32 sm:w-36"
+                />
+                <div className="flex flex-1 flex-col justify-center gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                  <div>
                     <p
-                      className={`text-sm ${isNational ? "text-cream/80" : "text-ink-soft"}`}
+                      className={`text-xs font-semibold uppercase tracking-[0.16em] ${
+                        isNational ? "text-saffron-soft" : "text-stamp"
+                      }`}
                     >
-                      {recipe.localName}
+                      {COURSE_LABELS[recipe.category]}
+                      {isNational ? " · iconic national dish" : ""}
+                      {isCommunity ? " · community" : ""}
+                      {recipe.dietaryLabels.length > 0
+                        ? ` · ${recipe.dietaryLabels.join(", ")}`
+                        : ""}
                     </p>
-                  ) : null}
-                </div>
-                <div
-                  className={`flex gap-4 text-sm ${isNational ? "text-cream/80" : "text-ink-soft"}`}
-                >
-                  <span className="inline-flex items-center gap-1">
-                    <Clock3 aria-hidden="true" className="size-4" />
-                    {recipe.prepMinutes + recipe.cookMinutes} min
-                  </span>
-                  <span className="inline-flex items-center gap-1 capitalize">
-                    <Flame aria-hidden="true" className="size-4" />
-                    {recipe.difficulty}
-                  </span>
+                    <p className="mt-1 font-display text-2xl">{recipe.name}</p>
+                    {recipe.localName ? (
+                      <p
+                        className={`text-sm ${isNational ? "text-cream/80" : "text-ink-soft"}`}
+                      >
+                        {recipe.localName}
+                      </p>
+                    ) : null}
+                  </div>
+                  <div
+                    className={`flex gap-4 text-sm ${isNational ? "text-cream/80" : "text-ink-soft"}`}
+                  >
+                    <span className="inline-flex items-center gap-1">
+                      <Clock3 aria-hidden="true" className="size-4" />
+                      {recipe.prepMinutes + recipe.cookMinutes} min
+                    </span>
+                    <span className="inline-flex items-center gap-1 capitalize">
+                      <Flame aria-hidden="true" className="size-4" />
+                      {recipe.difficulty}
+                    </span>
+                  </div>
                 </div>
               </button>
             </li>
@@ -266,6 +398,18 @@ export function CookMenu({ country, onOpenRecipe }: CookMenuProps) {
           </ul>
         </div>
       ) : null}
+
+      <SuggestModal
+        kind="recipe"
+        country={country}
+        open={suggestOpen}
+        onClose={() => setSuggestOpen(false)}
+        onAdded={(result) => {
+          if (result.kind === "recipe") {
+            onCommunityRecipesChange([result.recipe, ...communityRecipes]);
+          }
+        }}
+      />
     </section>
   );
 }

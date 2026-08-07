@@ -1,6 +1,6 @@
-import type { Country } from "@/types/content";
+import type { AuthoredCountry } from "@/types/content";
 
-export const ngCountry: Country = {
+export const ngCountry: AuthoredCountry = {
   code: "ng",
   slug: "nigeria",
   name: "Nigeria",
