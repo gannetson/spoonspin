@@ -8,6 +8,7 @@ import {
   MoreVertical,
   Star,
   Trash2,
+  UtensilsCrossed,
 } from "lucide-react";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -16,12 +17,15 @@ export type AdminItemAction =
   | "replace-image"
   | "replace-text"
   | "find-menu"
-  | "find-scores";
+  | "find-scores"
+  | "select-for-dinner";
 
 type AdminItemMenuProps = {
   label: string;
   /** Hide replace-image for items without photos (e.g. specialty shops). */
   showReplaceImage?: boolean;
+  /** Recipe-only: set this dish as the Dinner course for its category. */
+  showSelectForDinner?: boolean;
   /** Restaurant-only enrichment actions. */
   showRestaurantResearch?: boolean;
   replaceImageHintKey?: string;
@@ -41,6 +45,7 @@ type MenuPosition = {
 export function AdminItemMenu({
   label,
   showReplaceImage = true,
+  showSelectForDinner = false,
   showRestaurantResearch = false,
   replaceImageHintKey = "admin.item.replaceImage.hint",
   busy = false,
@@ -207,6 +212,24 @@ export function AdminItemMenu({
                 </span>
               </span>
             </button>
+            {showSelectForDinner ? (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => run("select-for-dinner")}
+                className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
+              >
+                <UtensilsCrossed className="mt-0.5 size-4 shrink-0 text-tomato" />
+                <span>
+                  <span className="block font-semibold text-ink">
+                    {t("admin.item.selectForDinner")}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-soft">
+                    {t("admin.item.selectForDinner.hint")}
+                  </span>
+                </span>
+              </button>
+            ) : null}
             {showRestaurantResearch ? (
               <>
                 <button

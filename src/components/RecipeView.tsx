@@ -79,6 +79,7 @@ export function RecipeView({
             className="absolute right-4 top-4"
             label={recipe.name}
             tone="dark"
+            showSelectForDinner
             busy={Boolean(busy[adminKey])}
             status={status[adminKey]}
             error={error[adminKey]}

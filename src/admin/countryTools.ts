@@ -196,6 +196,16 @@ export function replaceRecipeText(code: string, recipeId: string) {
   );
 }
 
+export function selectRecipeForDinner(code: string, recipeId: string) {
+  return postAdmin<{
+    country: Country;
+    dinner?: import("@/types/content").DinnerSuggestion;
+    recipeId: string;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/recipes/${encodeURIComponent(recipeId)}/select-for-dinner`,
+  );
+}
+
 export function removeShop(code: string, shopId: string) {
   return deleteAdmin<{ country: Country | undefined }>(
     `/api/admin/countries/${encodeURIComponent(code)}/shops/${encodeURIComponent(shopId)}`,

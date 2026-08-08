@@ -706,3 +706,102 @@ export async function saveDinnerSuggestion(
   );
   return getCountryFromDb(countryCode);
 }
+
+/**
+ * Set `recipeId` as the dinner course for its category role, replacing any
+ * existing course with that role. Removes the recipe from other dinner slots.
+ */
+export async function selectRecipeForDinner(
+  countryCode: string,
+  recipeId: string,
+): Promise<Country | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country) return undefined;
+
+  const row = await getRecipeRow(countryCode, recipeId);
+  if (!row) {
+    throw new Error("Recipe not found.");
+  }
+
+  const role = row.recipe.category;
+  const base =
+    country.dinner && country.dinner.courses.length > 0
+      ? country.dinner
+      : {
+          title: `A taste of ${country.name}`,
+          description: country.introduction,
+          courses: [] as DinnerSuggestion["courses"],
+          drinks: country.dinner?.drinks ??
+            (country.menu?.drink
+              ? [
+                  {
+                    drinkName: country.menu.drink.name,
+                    note: "The pour that belongs with this table.",
+                  },
+                ]
+              : country.nationalDrink
+                ? [
+                    {
+                      drinkName: country.nationalDrink.name,
+                      note: "A classic pour with this cuisine.",
+                    },
+                  ]
+                : []),
+        };
+
+  const withoutRecipe = base.courses.filter(
+    (course) => course.recipeId !== recipeId,
+  );
+  const existingIndex = withoutRecipe.findIndex((course) => course.role === role);
+  const nextCourse = {
+    recipeId,
+    role,
+    note:
+      existingIndex >= 0
+        ? withoutRecipe[existingIndex]?.note
+        : undefined,
+  };
+
+  let courses: DinnerSuggestion["courses"];
+  if (existingIndex >= 0) {
+    courses = withoutRecipe.map((course, index) =>
+      index === existingIndex ? nextCourse : course,
+    );
+  } else if (withoutRecipe.length < 5) {
+    courses = [...withoutRecipe, nextCourse];
+  } else {
+    // At capacity: replace the last course of matching role if any, else last slot.
+    const lastSameRole = [...withoutRecipe]
+      .map((course, index) => ({ course, index }))
+      .reverse()
+      .find((item) => item.course.role === role);
+    if (lastSameRole) {
+      courses = withoutRecipe.map((course, index) =>
+        index === lastSameRole.index ? nextCourse : course,
+      );
+    } else {
+      courses = [...withoutRecipe.slice(0, 4), nextCourse];
+    }
+  }
+
+  // Keep a sensible course order: starter → main → side → dessert → snack → extra
+  const roleOrder: Record<string, number> = {
+    starter: 0,
+    main: 1,
+    side: 2,
+    dessert: 3,
+    snack: 4,
+    extra: 5,
+  };
+  courses = [...courses].sort(
+    (a, b) => (roleOrder[a.role] ?? 9) - (roleOrder[b.role] ?? 9),
+  );
+
+  const dinner: DinnerSuggestion = {
+    ...base,
+    courses,
+    composedAt: new Date().toISOString(),
+  };
+
+  return saveDinnerSuggestion(countryCode, dinner);
+}

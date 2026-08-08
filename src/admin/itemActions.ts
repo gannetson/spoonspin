@@ -12,6 +12,7 @@ import {
   findRestaurantMenu,
   findRestaurantScores,
   replaceShopText,
+  selectRecipeForDinner,
 } from "@/admin/countryTools";
 import type { AdminItemAction } from "@/components/AdminItemMenu";
 
@@ -81,14 +82,22 @@ export async function handleRecipeAdminAction(input: {
     }
     return "Image updated";
   }
-  const result = await replaceRecipeText(country.code, recipe.id);
-  if (result.country) input.onCountryUpdated(result.country);
-  if (result.recipe) {
-    input.onCommunityRecipesChange?.(
-      community.map((item) => (item.id === recipe.id ? result.recipe! : item)),
-    );
+  if (action === "select-for-dinner") {
+    const result = await selectRecipeForDinner(country.code, recipe.id);
+    if (result.country) input.onCountryUpdated(result.country);
+    return `Dinner ${recipe.category} set · story updated`;
   }
-  return "Text updated";
+  if (action === "replace-text") {
+    const result = await replaceRecipeText(country.code, recipe.id);
+    if (result.country) input.onCountryUpdated(result.country);
+    if (result.recipe) {
+      input.onCommunityRecipesChange?.(
+        community.map((item) => (item.id === recipe.id ? result.recipe! : item)),
+      );
+    }
+    return "Text updated";
+  }
+  throw new Error("Unsupported recipe action.");
 }
 
 export async function handleShopAdminAction(input: {

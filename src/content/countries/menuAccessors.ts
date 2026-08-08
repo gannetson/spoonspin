@@ -163,33 +163,12 @@ export function getDinnerSuggestion(
     title: `A taste of ${country.name}`,
     description: country.introduction,
     courses: [
-      {
-        recipeId: country.menu.starter.id,
-        role: "starter",
-        note: "Open with something bright and typical.",
-      },
-      {
-        recipeId: country.menu.main.id,
-        role: "main",
-        note: "The heart of the meal.",
-      },
-      {
-        recipeId: country.menu.side.id,
-        role: "side",
-        note: "A supporting plate that completes the main.",
-      },
-      {
-        recipeId: country.menu.dessert.id,
-        role: "dessert",
-        note: "Finish the way locals often do.",
-      },
+      { recipeId: country.menu.starter.id, role: "starter" },
+      { recipeId: country.menu.main.id, role: "main" },
+      { recipeId: country.menu.side.id, role: "side" },
+      { recipeId: country.menu.dessert.id, role: "dessert" },
     ],
-    drinks: [
-      {
-        drinkName: country.menu.drink.name,
-        note: "The pour that belongs with this table.",
-      },
-    ],
+    drinks: [{ drinkName: country.menu.drink.name }],
   };
 }
 

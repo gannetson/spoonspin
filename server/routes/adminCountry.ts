@@ -13,6 +13,7 @@ import {
   removeSpecialtyShop,
   saveCountryDrinks,
   saveDinnerSuggestion,
+  selectRecipeForDinner,
   updateCountryImage,
   updateRecipeFields,
   updateRecipeImage,
@@ -44,6 +45,7 @@ import {
   isOpenAiConfigured,
   researchRestaurantMenu,
   researchRestaurantScores,
+  rewriteDinnerNarrative,
   rewriteRecipeText,
   rewriteRestaurantText,
   rewriteShopText,
@@ -970,6 +972,101 @@ export function registerAdminCountryRoutes(
         res.status(500).json({
           message:
             error instanceof Error ? error.message : "Could not delete recipe.",
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/recipes/:recipeId/select-for-dinner",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const code = String(req.params.code ?? "");
+        const recipeId = String(req.params.recipeId ?? "");
+        const country = await getCountryFromDb(code);
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        let updated = await selectRecipeForDinner(code, recipeId);
+        if (!updated) {
+          res.status(404).json({ message: "Recipe not found." });
+          return;
+        }
+
+        // Rebuild the dinner story so the narrative matches the new courses.
+        if (isOpenAiConfigured() && updated.dinner && updated.dinner.courses.length > 0) {
+          const recipes = getCountryRecipes(updated);
+          const drinks = getCountryDrinks(updated);
+          const recipesById = new Map(recipes.map((recipe) => [recipe.id, recipe]));
+          const coursePayload = updated.dinner.courses
+            .map((course) => {
+              const recipe = recipesById.get(course.recipeId);
+              if (!recipe) return null;
+              return {
+                recipeId: course.recipeId,
+                role: course.role,
+                name: recipe.name,
+                localName: recipe.localName,
+                description: recipe.description,
+              };
+            })
+            .filter((course): course is NonNullable<typeof course> => Boolean(course));
+
+          if (coursePayload.length > 0) {
+            try {
+              const drinkPayload = updated.dinner.drinks.map((suggestion) => {
+                const drink = drinks.find(
+                  (item) =>
+                    item.name.toLowerCase() === suggestion.drinkName.toLowerCase(),
+                );
+                return {
+                  name: drink?.name ?? suggestion.drinkName,
+                  localName: drink?.localName,
+                  type: drink?.type ?? "soft-drink",
+                  alcoholic: drink?.alcoholic ?? false,
+                  description: drink?.description ?? suggestion.note ?? "",
+                  note: suggestion.note,
+                };
+              });
+              const narrative = await rewriteDinnerNarrative({
+                countryCode: updated.code,
+                countryName: updated.name,
+                introduction: updated.introduction,
+                title: updated.dinner.title,
+                courses: coursePayload,
+                drinks:
+                  drinkPayload.length > 0
+                    ? drinkPayload
+                    : drinks.slice(0, 2).map((drink) => ({
+                        name: drink.name,
+                        localName: drink.localName,
+                        type: drink.type,
+                        alcoholic: drink.alcoholic,
+                        description: drink.description,
+                      })),
+              });
+              updated =
+                (await saveDinnerSuggestion(code, narrative)) ?? updated;
+            } catch (error) {
+              console.warn("Dinner narrative rewrite failed; keeping courses", error);
+            }
+          }
+        }
+
+        res.json({
+          country: updated,
+          dinner: updated.dinner,
+          recipeId,
+        });
+      } catch (error) {
+        console.error("Select recipe for dinner failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not select recipe for dinner.",
         });
       }
     },

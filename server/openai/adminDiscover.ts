@@ -1353,7 +1353,8 @@ Rules:
 - Prefer a natural arc: starter → main → side and/or dessert (snack allowed).
 - Include 1–3 drink suggestions from the provided drink names only (exact drinkName).
 - Write a warm, specific description (why this dinner tastes like the country) — not generic tourism copy.
-- Per-course and per-drink notes should be short and practical (why it belongs / how it pairs).`,
+- Per-course notes must be 2–4 sentence story beats that flow from course to course (prose, not card blurbs).
+- Per-drink notes: short (when to pour / how it pairs).`,
     `Country: ${input.countryName} (${input.countryCode})
 Introduction: ${input.introduction ?? "n/a"}
 
@@ -1429,5 +1430,130 @@ JSON shape:
       drinks: drinks.slice(0, 4),
       composedAt: new Date().toISOString(),
     },
+  };
+}
+
+/**
+ * Rewrite title + narrative for a dinner whose courses are already chosen.
+ * Used after swapping a course so the story stays coherent.
+ */
+export async function rewriteDinnerNarrative(input: {
+  countryCode: string;
+  countryName: string;
+  introduction?: string;
+  title?: string;
+  courses: Array<{
+    recipeId: string;
+    role: string;
+    name: string;
+    localName?: string;
+    description: string;
+  }>;
+  drinks: Array<{
+    name: string;
+    localName?: string;
+    type: string;
+    alcoholic: boolean;
+    description: string;
+    note?: string;
+  }>;
+}): Promise<import("../../src/types/content.ts").DinnerSuggestion> {
+  if (input.courses.length < 1) {
+    throw new Error("Need at least one course to rewrite dinner narrative.");
+  }
+
+  const raw = await chatJson(
+    `You write a warm, logical dinner story for a home cook discovering a national cuisine.
+Reply with JSON only.
+
+Rules:
+- Keep the given course order and recipeId values exactly.
+- Keep drinkName values exactly as provided (or omit a drink only if absurd).
+- description: 2–4 sentences that open the evening — the mood of the table, not a list.
+- Each course note: 2–4 sentences that continue the story. Explain how this course follows the previous one, what it tastes like, and why it belongs. Write prose, not card blurbs or marketing bullets.
+- Drink notes: 1–2 sentences on when to pour them during the meal.
+- title: short and evocative (not “Traditional X dinner”).
+- Do not invent dishes that are not listed.`,
+    `Country: ${input.countryName} (${input.countryCode})
+Introduction: ${input.introduction ?? "n/a"}
+Previous title (optional inspiration): ${input.title ?? "n/a"}
+
+Courses in order:
+${JSON.stringify(input.courses, null, 2)}
+
+Drinks:
+${JSON.stringify(input.drinks, null, 2)}
+
+JSON shape:
+{
+  "title": string,
+  "description": string,
+  "courses": [{"recipeId": string, "role": "starter"|"main"|"side"|"dessert"|"snack"|"extra", "note": string}],
+  "drinks": [{"drinkName": string, "note": string}]
+}`,
+  );
+
+  const parsed = dinnerComposeSchema.parse(raw);
+  const courseIds = new Set(input.courses.map((course) => course.recipeId));
+  const courses = parsed.courses
+    .filter((course) => courseIds.has(course.recipeId))
+    .map((course) => {
+      const source = input.courses.find((item) => item.recipeId === course.recipeId)!;
+      return {
+        recipeId: course.recipeId,
+        role: (course.role || source.role) as
+          | "starter"
+          | "main"
+          | "side"
+          | "dessert"
+          | "snack"
+          | "extra",
+        note: course.note,
+      };
+    });
+
+  // Preserve order from the selected menu if the model shuffles.
+  const ordered = input.courses.map((source) => {
+    const rewritten = courses.find((course) => course.recipeId === source.recipeId);
+    return (
+      rewritten ?? {
+        recipeId: source.recipeId,
+        role: source.role as
+          | "starter"
+          | "main"
+          | "side"
+          | "dessert"
+          | "snack"
+          | "extra",
+        note: source.description.slice(0, 180),
+      }
+    );
+  });
+
+  const drinks = parsed.drinks
+    .map((drink) => {
+      const match = input.drinks.find(
+        (item) => item.name.toLowerCase() === drink.drinkName.toLowerCase(),
+      );
+      if (!match) return null;
+      return { drinkName: match.name, note: drink.note };
+    })
+    .filter((drink): drink is { drinkName: string; note?: string } =>
+      Boolean(drink),
+    );
+
+  if (drinks.length === 0 && input.drinks[0]) {
+    drinks.push({
+      drinkName: input.drinks[0].name,
+      note: input.drinks[0].note ?? "Pour this alongside the main course.",
+    });
+  }
+
+  return {
+    title: parsed.title,
+    description: parsed.description,
+    courses: ordered,
+    drinks: drinks.slice(0, 4),
+    composedAt: new Date().toISOString(),
   };
 }

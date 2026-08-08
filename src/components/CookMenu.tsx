@@ -316,99 +316,132 @@ export function CookMenu({
       </div>
 
       {tab === "dinner" ? (
-        <div role="tabpanel" className="space-y-5">
+        <div role="tabpanel">
           {dinner ? (
-            <>
-              <div className="rounded-[1.75rem] bg-cream p-6 ring-1 ring-ink/10 sm:p-8">
+            <article className="overflow-hidden rounded-[1.75rem] bg-cream ring-1 ring-ink/10">
+              <header className="space-y-4 px-6 pb-2 pt-6 sm:px-10 sm:pt-10">
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
                   <UtensilsCrossed aria-hidden="true" className="size-4" />
                   {t("cook.dinner.kicker")}
                 </p>
-                <h3 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+                <h3 className="max-w-3xl font-display text-4xl leading-tight text-ink sm:text-5xl">
                   {dinner.title}
                 </h3>
-                <p className="mt-3 max-w-2xl text-ink-soft">{dinner.description}</p>
-                <button
-                  type="button"
-                  onClick={() => setTab("recipes")}
-                  className="mt-5 inline-flex min-h-11 items-center rounded-full bg-tomato px-5 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                >
-                  {t("cook.dinner.showRecipes")}
-                </button>
-              </div>
+                <p className="max-w-2xl text-lg leading-relaxed text-ink-soft">
+                  {dinner.description}
+                </p>
+              </header>
 
-              <ol className="grid gap-3">
+              <div className="mt-4 divide-y divide-ink/10">
                 {dinner.courses.map((course, index) => {
                   const recipe = recipesById.get(course.recipeId);
                   if (!recipe) return null;
+                  const imageUrl = recipe.imageUrl?.trim() || null;
+                  const imageLeft = index % 2 === 0;
                   return (
-                    <li
+                    <section
                       key={`${course.recipeId}-${index}`}
-                      className="rounded-2xl bg-white/70 p-5 ring-1 ring-ink/10"
+                      className={`grid items-stretch gap-0 md:grid-cols-2 ${
+                        imageLeft ? "" : "md:[&>figure]:order-2"
+                      }`}
                     >
-                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
-                        {t(COURSE_KEYS[course.role])}
-                      </p>
-                      <p className="mt-1 font-display text-2xl text-ink">
-                        {recipe.name}
-                        {recipe.localName ? (
-                          <span className="ml-2 font-sans text-base font-normal text-ink-soft">
-                            {recipe.localName}
-                          </span>
-                        ) : null}
-                      </p>
-                      {course.note ? (
-                        <p className="mt-2 text-sm text-ink-soft">{course.note}</p>
-                      ) : (
-                        <p className="mt-2 line-clamp-2 text-sm text-ink-soft">
+                      <figure className="relative min-h-56 bg-parchment md:min-h-72">
+                        {imageUrl ? (
+                          <img
+                            src={imageUrl}
+                            alt=""
+                            className="absolute inset-0 size-full object-cover"
+                          />
+                        ) : (
+                          <MediaPlaceholder
+                            labelKey="media.placeholder.recipe"
+                            className="absolute inset-0"
+                          />
+                        )}
+                      </figure>
+                      <div className="flex flex-col justify-center space-y-3 px-6 py-8 sm:px-10">
+                        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
+                          {t("cook.dinner.courseLabel", {
+                            index: index + 1,
+                            course: t(COURSE_KEYS[course.role]),
+                          })}
+                        </p>
+                        <h4 className="font-display text-3xl text-ink">
+                          {recipe.name}
+                          {recipe.localName ? (
+                            <span className="mt-1 block font-sans text-base font-normal text-ink-soft">
+                              {recipe.localName}
+                            </span>
+                          ) : null}
+                        </h4>
+                        <p className="text-base leading-relaxed text-ink-soft">
                           {recipe.description}
                         </p>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => setTab("recipes")}
-                        className="mt-3 text-sm font-semibold text-tomato underline-offset-2 hover:underline"
-                      >
-                        {t("cook.dinner.openInRecipes")}
-                      </button>
-                    </li>
+                        <button
+                          type="button"
+                          onClick={() => onOpenRecipe(recipe)}
+                          className="self-start text-sm font-semibold text-tomato underline-offset-2 hover:underline"
+                        >
+                          {t("cook.dinner.openRecipe")}
+                        </button>
+                      </div>
+                    </section>
                   );
                 })}
-              </ol>
+              </div>
 
               {dinner.drinks.length > 0 ? (
-                <div className="space-y-3">
-                  <h4 className="font-display text-2xl text-ink">
+                <footer className="space-y-5 border-t border-ink/10 bg-ochre/40 px-6 py-8 sm:px-10">
+                  <h4 className="font-display text-3xl text-ink">
                     {t("cook.dinner.drinksHeading")}
                   </h4>
-                  <ul className="grid gap-3 sm:grid-cols-2">
+                  <div className="grid gap-6 sm:grid-cols-2">
                     {dinner.drinks.map((suggestion) => {
                       const drink = drinks.find(
                         (item) =>
                           item.name.toLowerCase() ===
                           suggestion.drinkName.toLowerCase(),
                       );
+                      const drinkImage = drink?.imageUrl?.trim() || null;
                       return (
-                        <li
+                        <div
                           key={suggestion.drinkName}
-                          className="rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4"
+                          className="flex gap-4"
                         >
-                          <p className="font-semibold text-ink">
-                            {drink?.name ?? suggestion.drinkName}
-                          </p>
-                          {suggestion.note ? (
-                            <p className="mt-2 text-sm text-ink-soft">
-                              {suggestion.note}
+                          <div className="relative h-28 w-20 shrink-0 overflow-hidden rounded-xl bg-parchment">
+                            {drinkImage ? (
+                              <img
+                                src={drinkImage}
+                                alt=""
+                                className="size-full object-cover"
+                              />
+                            ) : (
+                              <MediaPlaceholder
+                                labelKey="media.placeholder.recipe"
+                                compact
+                                className="absolute inset-0"
+                              />
+                            )}
+                          </div>
+                          <div className="min-w-0">
+                            <p className="font-display text-xl text-ink">
+                              {drink?.name ?? suggestion.drinkName}
+                              {drink?.localName ? (
+                                <span className="ml-2 font-sans text-sm font-normal text-ink-soft">
+                                  {drink.localName}
+                                </span>
+                              ) : null}
                             </p>
-                          ) : drink?.description ? (
-                            <p className="mt-2 line-clamp-3 text-sm text-ink-soft">
-                              {drink.description}
+                            <p className="mt-2 text-sm leading-relaxed text-ink-soft">
+                              {drink?.description ||
+                                suggestion.note?.trim() ||
+                                ""}
                             </p>
-                          ) : null}
-                        </li>
+                          </div>
+                        </div>
                       );
                     })}
-                  </ul>
+                  </div>
                   <button
                     type="button"
                     onClick={() => setTab("drinks")}
@@ -416,9 +449,9 @@ export function CookMenu({
                   >
                     {t("cook.dinner.openDrinks")}
                   </button>
-                </div>
+                </footer>
               ) : null}
-            </>
+            </article>
           ) : (
             <div className="rounded-2xl border border-dashed border-stamp/40 bg-cream/60 p-6 text-ink-soft">
               <p>{t("cook.dinner.empty", { name: country.name })}</p>
