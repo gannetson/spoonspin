@@ -13,8 +13,8 @@ import type {
   RestaurantMenuItem,
 } from "../../src/restaurants/types.ts";
 
-/** Default local Postgres database (already created). */
-export const DEFAULT_DATABASE_URL = "postgresql://localhost:5432/spoonspin";
+/** Default local Postgres (Unix socket / peer — no user or password). */
+export const DEFAULT_DATABASE_URL = "postgresql:///spoonspin";
 
 export type StoredRestaurant = {
   id: string;
@@ -87,13 +87,54 @@ export function getDatabaseUrl(): string {
   );
 }
 
+/**
+ * Pool config for local Postgres.
+ * - With a password in the URL: use discrete fields (password always a string for SCRAM).
+ * - Passwordless (peer/trust): pass connectionString through unchanged so pg does not
+ *   invent an undefined password. Prefer a Unix socket URL on the server, e.g.
+ *   postgresql:///spoonspin  or  postgresql://localhost/spoonspin?host=/var/run/postgresql
+ */
+function poolOptions(connectionString: string): ConstructorParameters<typeof Pool>[0] {
+  let parsed: URL;
+  try {
+    parsed = new URL(connectionString);
+  } catch {
+    throw new Error(
+      `Invalid DATABASE_URL. Expected postgresql:///DB or postgresql://USER:PASSWORD@HOST:5432/DB`,
+    );
+  }
+
+  if (!/^postgres(ql)?:$/i.test(parsed.protocol)) {
+    throw new Error(
+      `DATABASE_URL must start with postgresql:// (got ${parsed.protocol})`,
+    );
+  }
+
+  const password = decodeURIComponent(parsed.password || "");
+  if (!password) {
+    // Peer/trust / no-password setups — do not set password: undefined (SCRAM crash).
+    return { connectionString };
+  }
+
+  const user = decodeURIComponent(parsed.username || "");
+  const database = decodeURIComponent(parsed.pathname.replace(/^\//, "") || "");
+
+  return {
+    host: parsed.hostname || undefined,
+    port: parsed.port ? Number(parsed.port) : 5432,
+    database: database || "spoonspin",
+    user: user || undefined,
+    password,
+  };
+}
+
 export function getPool(connectionString = getDatabaseUrl()): Pool {
   if (pool && poolUrl === connectionString) return pool;
   if (pool) {
     void pool.end();
     pool = null;
   }
-  pool = new Pool({ connectionString });
+  pool = new Pool(poolOptions(connectionString));
   poolUrl = connectionString;
   return pool;
 }

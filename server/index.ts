@@ -1,4 +1,6 @@
-import "dotenv/config";
+import { config as loadEnv } from "dotenv";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import express from "express";
@@ -23,6 +25,12 @@ import { registerAdminCountryRoutes } from "./routes/adminCountry.ts";
 import { registerContentRoutes } from "./routes/content.ts";
 import { registerSuggestionRoutes } from "./routes/suggestions.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
+
+// Load .env from the project root even when cwd differs (e.g. supervisor).
+loadEnv({
+  path: path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../.env"),
+  override: false,
+});
 
 const PORT = Number(process.env.API_PORT ?? 3001);
 const GOOGLE_API_KEY = process.env.GOOGLE_PLACES_API_KEY?.trim();

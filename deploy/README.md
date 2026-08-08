@@ -41,7 +41,10 @@ cd spoonspin
 cp .env.example .env
 # edit .env — must include:
 #   NODE_ENV=production
-#   DATABASE_URL=postgresql://spoonspin:PASS@localhost:5432/spoonspin
+#   DATABASE_URL=postgresql:///spoonspin   # peer/trust via Unix socket (no password)
+#   # If the API runs as www-data, create a matching DB role, e.g.:
+#   #   sudo -u postgres createuser www-data
+#   #   sudo -u postgres createdb -O www-data spoonspin
 #   API_PORT=3007
 #   OPENAI_API_KEY=...
 #   GOOGLE_PLACES_API_KEY=...
