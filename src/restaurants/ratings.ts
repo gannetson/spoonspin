@@ -71,7 +71,11 @@ export function aggregateGuestRating(ratings?: RestaurantRatings | null): {
 
 export function listSourceRatings(
   ratings?: RestaurantRatings | null,
-): Array<{ source: RatingSourceId; label: string; rating: SourceRating }> {
+): Array<{
+  source: RatingSourceId;
+  label: string;
+  rating: SourceRating & { score: number };
+}> {
   if (!ratings) return [];
   const order: RatingSourceId[] = [
     "google",
@@ -79,18 +83,17 @@ export function listSourceRatings(
     "tripadvisor",
     "openTable",
   ];
-  return order
-    .filter(
-      (source) =>
-        ratings[source] != null &&
-        ratings[source]!.score != null &&
-        Number.isFinite(ratings[source]!.score),
-    )
-    .map((source) => ({
-      source,
-      label: RATING_SOURCE_LABELS[source],
-      rating: ratings[source]!,
-    }));
+  return order.flatMap((source) => {
+    const rating = ratings[source];
+    if (rating?.score == null || !Number.isFinite(rating.score)) return [];
+    return [
+      {
+        source,
+        label: RATING_SOURCE_LABELS[source],
+        rating: { ...rating, score: rating.score },
+      },
+    ];
+  });
 }
 
 /** Render price level 1–4 as €–€€€€. */
