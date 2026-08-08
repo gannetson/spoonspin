@@ -42,7 +42,7 @@ cp .env.example .env
 # edit .env — must include:
 #   NODE_ENV=production
 #   DATABASE_URL=postgresql://spoonspin:PASS@localhost:5432/spoonspin
-#   API_PORT=3001
+#   API_PORT=3007
 #   OPENAI_API_KEY=...
 #   GOOGLE_PLACES_API_KEY=...
 
