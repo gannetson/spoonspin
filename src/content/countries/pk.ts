@@ -1,0 +1,175 @@
+import type { AuthoredCountry } from "@/types/content";
+import { drink, recipe as r } from "./content-helpers";
+
+export const pkCountry: AuthoredCountry = {
+  code: "pk",
+  slug: "pakistan",
+  name: "Pakistan",
+  flag: "🇵🇰",
+  region: "Asia",
+  introduction:
+    "Pakistani cooking is aromatic and generous, built on slow-cooked curries, layered rice dishes, and fresh breads. Regional styles from Punjab to Sindh and the north share a love of spice and hospitality.",
+  cuisineAliases: [
+    "Pakistani restaurant",
+    "Pakistaans restaurant",
+    "South Asian restaurant",
+  ],
+  nationalDishId: "chicken-biryani",
+  nationalDrink: drink(
+    "Chai",
+    "چائے",
+    "tea",
+    false,
+    "Strong milky black tea simmered with sugar and often cardamom, drunk throughout the day.",
+  ),
+  menu: {
+    starter: r(
+      "samosas",
+      "Samosas",
+      "سموسے",
+      "starter",
+      [
+        { name: "plain flour", quantity: 250, unit: "g" },
+        { name: "potato", quantity: 400, unit: "g" },
+        { name: "peas", quantity: 80, unit: "g" },
+        { name: "onion", quantity: 1, unit: "piece" },
+        { name: "cumin seeds", quantity: 4, unit: "g" },
+        { name: "garam masala", quantity: 5, unit: "g" },
+        { name: "fresh coriander", quantity: 15, unit: "g" },
+        { name: "green chilli", quantity: 1, unit: "piece" },
+        { name: "oil", quantity: 1, unit: "litre", note: "for frying" },
+      ],
+      [
+        "1. Make a firm dough with flour, oil, salt, and water; rest 20 minutes.",
+        "2. Fry cumin, onion, chilli, potato, and peas with spices; cool and add coriander.",
+        "3. Roll pastry, cut into cones or triangles, fill, and seal tightly.",
+        "4. Fry at 170°C until blistered and golden; serve with chutney.",
+      ],
+      {
+        description:
+          "Crisp pastry triangles filled with spiced potato and peas.",
+        dietaryLabels: ["vegetarian", "vegan"],
+        prepMinutes: 40,
+        cookMinutes: 25,
+        difficulty: "medium",
+      },
+    ),
+    main: r(
+      "chicken-biryani",
+      "Chicken Biryani",
+      "چکن بریانی",
+      "main",
+      [
+        { name: "basmati rice", quantity: 400, unit: "g" },
+        { name: "chicken thighs", quantity: 800, unit: "g" },
+        { name: "yoghurt", quantity: 150, unit: "g" },
+        { name: "onion", quantity: 3, unit: "pieces" },
+        { name: "ginger-garlic paste", quantity: 30, unit: "g" },
+        { name: "tomatoes", quantity: 200, unit: "g" },
+        { name: "biryani masala or garam masala", quantity: 15, unit: "g" },
+        { name: "saffron", quantity: 0.2, unit: "g" },
+        { name: "milk", quantity: 40, unit: "ml" },
+        { name: "fresh coriander and mint", quantity: 30, unit: "g" },
+        { name: "ghee or oil", quantity: 60, unit: "g" },
+      ],
+      [
+        "1. Marinate chicken in yoghurt, ginger-garlic, and spices for at least 30 minutes.",
+        "2. Fry onions until deep brown; cook the chicken with tomato and half the onions until nearly done.",
+        "3. Parboil rice with whole spices until 70% cooked; drain.",
+        "4. Layer chicken and rice with herbs, fried onions, saffron milk, and ghee; steam on dum until fragrant and fully cooked.",
+      ],
+      {
+        description:
+          "Layered saffron rice and spiced chicken steamed together until aromatic.",
+        dietaryLabels: ["contains-meat", "gluten-free"],
+        prepMinutes: 40,
+        cookMinutes: 60,
+        difficulty: "challenging",
+        substitutions: [
+          "Ready biryani masala from a South Asian shop simplifies the spice mix; a pinch of turmeric colours the rice when saffron is scarce.",
+        ],
+      },
+    ),
+    side: r(
+      "raita",
+      "Cucumber Raita",
+      "رائیطة",
+      "side",
+      [
+        { name: "yoghurt", quantity: 400, unit: "g" },
+        { name: "cucumber", quantity: 250, unit: "g" },
+        { name: "cumin", quantity: 3, unit: "g" },
+        { name: "fresh mint", quantity: 10, unit: "g" },
+        { name: "salt", quantity: 4, unit: "g" },
+        { name: "chaat masala", quantity: 2, unit: "g", note: "optional" },
+      ],
+      [
+        "1. Whisk yoghurt until smooth and lightly salted.",
+        "2. Grate or finely dice cucumber and squeeze out excess water.",
+        "3. Fold cucumber, roasted cumin, and mint into the yoghurt.",
+        "4. Chill briefly and serve beside biryani or curries.",
+      ],
+      {
+        description:
+          "Cooling yoghurt side with cucumber, cumin, and mint.",
+        dietaryLabels: ["vegetarian", "gluten-free"],
+        prepMinutes: 15,
+        cookMinutes: 0,
+        difficulty: "easy",
+      },
+    ),
+    dessert: r(
+      "kheer",
+      "Kheer",
+      "کھیر",
+      "dessert",
+      [
+        { name: "basmati rice", quantity: 80, unit: "g" },
+        { name: "full-fat milk", quantity: 1.2, unit: "litre" },
+        { name: "sugar", quantity: 100, unit: "g" },
+        { name: "cardamom pods", quantity: 4, unit: "pieces" },
+        { name: "sliced almonds", quantity: 30, unit: "g" },
+        { name: "raisins", quantity: 30, unit: "g" },
+        { name: "rose water", quantity: 5, unit: "ml", note: "optional" },
+      ],
+      [
+        "1. Simmer rinsed rice in milk with cracked cardamom, stirring often so it does not catch.",
+        "2. Cook until the rice is soft and the milk is thick and creamy.",
+        "3. Stir in sugar, almonds, and raisins; cook a few minutes more.",
+        "4. Finish with rose water if using; serve warm or chilled.",
+      ],
+      {
+        description:
+          "Slow-simmered rice pudding scented with cardamom and finished with nuts.",
+        dietaryLabels: ["vegetarian", "gluten-free"],
+        prepMinutes: 10,
+        cookMinutes: 60,
+        difficulty: "easy",
+      },
+    ),
+    drink: drink(
+      "Lassi",
+      "لسی",
+      "soft-drink",
+      false,
+      "Yoghurt blended with ice into a sweet or salted drink that cools spicy meals.",
+    ),
+    moreDrinks: [
+      drink(
+        "Rooh Afza Sherbet",
+        "روح افزا",
+        "soft-drink",
+        false,
+        "Floral pink cordial diluted with cold water or milk over ice.",
+      ),
+      drink(
+        "Sugarcane Juice",
+        "گنے کا رس",
+        "soft-drink",
+        false,
+        "Fresh pressed sugarcane juice often finished with lemon and ginger.",
+      ),
+    ],
+  },
+  status: "published",
+};
