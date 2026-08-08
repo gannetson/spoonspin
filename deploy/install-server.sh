@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Run on the production host as a user with sudo.
-# Expects the app already at /var/www/soonspin/spoonspin (git clone/pull + npm ci + build).
+# Expects the app already at /var/www/spoonspin/spoonspin (git clone/pull + npm ci + build).
 set -euo pipefail
 
-APP_ROOT="${APP_ROOT:-/var/www/soonspin/spoonspin}"
+APP_ROOT="${APP_ROOT:-/var/www/spoonspin/spoonspin}"
 REPO_DEPLOY="${APP_ROOT}/deploy"
 
 if [[ ! -d "$APP_ROOT" ]]; then

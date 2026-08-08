@@ -1,6 +1,6 @@
 # Production deploy (spoonspin.nl)
 
-App path on the server: `/var/www/soonspin/spoonspin`
+App path on the server: `/var/www/spoonspin/spoonspin`
 
 ## Layout
 
@@ -32,9 +32,9 @@ DNS: `spoonspin.nl` and `www.spoonspin.nl` → this server.
 ## App setup
 
 ```bash
-sudo mkdir -p /var/www/soonspin
-sudo chown "$USER":www-data /var/www/soonspin
-cd /var/www/soonspin
+sudo mkdir -p /var/www/spoonspin
+sudo chown "$USER":www-data /var/www/spoonspin
+cd /var/www/spoonspin
 git clone git@github.com:gannetson/spoonspin.git spoonspin
 cd spoonspin
 
@@ -50,14 +50,14 @@ npm ci
 npm run build
 
 # www-data must read the tree and .env
-sudo chown -R www-data:www-data /var/www/soonspin
-sudo chmod 640 /var/www/soonspin/spoonspin/.env
+sudo chown -R www-data:www-data /var/www/spoonspin
+sudo chmod 640 /var/www/spoonspin/spoonspin/.env
 ```
 
 ## Install nginx + supervisor
 
 ```bash
-cd /var/www/soonspin/spoonspin
+cd /var/www/spoonspin/spoonspin
 chmod +x deploy/install-server.sh
 ./deploy/install-server.sh
 sudo certbot --nginx -d spoonspin.nl -d www.spoonspin.nl
@@ -66,7 +66,7 @@ sudo certbot --nginx -d spoonspin.nl -d www.spoonspin.nl
 ## Update / redeploy
 
 ```bash
-cd /var/www/soonspin/spoonspin
+cd /var/www/spoonspin/spoonspin
 sudo -u www-data git pull   # or pull as deploy user then chown
 sudo -u www-data npm ci
 sudo -u www-data npm run build
@@ -78,7 +78,7 @@ Frontend-only: `npm run build` is enough (no API restart).
 ## Smoke checks
 
 ```bash
-cd /var/www/soonspin/spoonspin
+cd /var/www/spoonspin/spoonspin
 ./deploy/smoke-check.sh              # defaults to https://spoonspin.nl
 ./deploy/smoke-check.sh http://127.0.0.1  # local via nginx before DNS/TLS
 ```
