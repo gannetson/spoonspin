@@ -13,6 +13,13 @@ export type Drink = {
   type: DrinkType;
   alcoholic: boolean;
   description: string;
+  /** Famous grape / varietal (mainly wines). */
+  grape?: string;
+  /** Dishes or cuisines this drink fits with. */
+  foodPairing?: string;
+  /** Bottle/can or label photo. */
+  imageUrl?: string;
+  imageAttribution?: string;
 };
 
 export type Ingredient = {

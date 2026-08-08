@@ -124,6 +124,15 @@ export function RecipeCard({
                   {recipe.localName}
                 </p>
               ) : null}
+              {recipe.description.trim() ? (
+                <p
+                  className={`mt-1.5 line-clamp-2 text-sm leading-snug ${
+                    isNational ? "text-cream/80" : "text-ink-soft"
+                  }`}
+                >
+                  {recipe.description.trim()}
+                </p>
+              ) : null}
             </div>
 
             {showMeta && !isSimple ? (

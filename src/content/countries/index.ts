@@ -48,4 +48,6 @@ export {
   recipeMatchesDiet,
   recipeMatchesCategory,
   drinkMatchesAlcohol,
+  groupDrinksIntoSections,
 } from "./menuAccessors";
+export type { DrinkSection, DrinkSectionId, RecipeDietFilter } from "./menuAccessors";

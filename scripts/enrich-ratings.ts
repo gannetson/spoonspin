@@ -59,6 +59,7 @@ const curatedSchema = z.array(
         google: sourceRatingSchema.optional(),
         theFork: sourceRatingSchema.optional(),
         tripadvisor: sourceRatingSchema.optional(),
+        openTable: sourceRatingSchema.optional(),
       })
       .optional(),
   }),

@@ -1,11 +1,12 @@
 import { z } from "zod";
-import type { Recipe, SpecialtyShop } from "../../src/types/content.ts";
+import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import { countryCatalog } from "../../src/content/countries/catalog.ts";
 import { OSM_CUISINE_BY_COUNTRY } from "../../src/restaurants/osmCuisineMap.ts";
 import {
   isGooglePlacesConfigured,
   lookupGoogleRestaurant,
 } from "../lib/googlePlacesLookup.ts";
+import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
 import { chatJson, isOpenAiConfigured } from "./suggest.ts";
 
 export { isOpenAiConfigured };
@@ -143,6 +144,9 @@ const drinkItemSchema = z.object({
   ]),
   alcoholic: z.boolean(),
   description: z.string().min(20),
+  grape: optionalString,
+  foodPairing: optionalString,
+  imageSearchQueries: optionalStringArray,
 });
 
 const drinksDiscoverSchema = z.object({
@@ -631,19 +635,29 @@ export async function discoverCountryDrinks(input: {
 }): Promise<{ notes: string; drinks: Drink[] }> {
   const focus = input.query?.trim()
     ? `Focus on: ${input.query.trim()}`
-    : "Include classic soft drinks, spirits, tea/coffee, and especially local wines and beers.";
+    : "Cover all four sections below with authentic picks.";
 
   const raw = await chatJson(
     `You are a drinks editor for Spoon Spin. Reply with JSON only.
-Propose authentic drinks from the given country that pair with its cuisine.
-Always include several local wines and local beers when the country produces them.
-Avoid duplicates of existing drink names.`,
+Propose authentic drinks from the given country, grouped conceptually into:
+1) Beers — well-known brand names (bottles/cans people recognise), not vague "local lager".
+2) Wines — famous grape varieties / appellations from that country, with foodPairing (what food it fits).
+3) Other alcoholic — spirits, cocktails, aperitifs (not beer/wine).
+4) Non-alcoholic — soft drinks, tea, coffee, classic non-alcoholic specialities.
+
+Rules:
+- Prefer real famous brand names for beers (e.g. Heineken, Guinness, Singha).
+- For wines set grape (varietal or blend) and foodPairing (concrete dishes/cuisines).
+- For beers set imageSearchQueries to 2–4 Wikimedia-friendly queries for a bottle or can photo (brand + bottle/can).
+- For wines/spirits/soft drinks also prefer imageSearchQueries for bottle/glass photos when known.
+- Avoid duplicates of existing drink names.
+- Mark alcoholic correctly. type must match: beer, wine, spirit, cocktail, soft-drink, tea, coffee.`,
     `Country: ${input.countryName} (${input.countryCode})
 Existing drinks (do not repeat): ${input.existingNames.join("; ") || "none"}
 ${focus}
 
-Return as many distinct drinks as you can, up to 50.
-Include a mix of types, with clear representation of local wines and beers.
+Return up to 40 drinks with a healthy mix across the four sections
+(aim for several beers, several wines, a few other alcoholic, and some non-alcoholic).
 
 JSON shape:
 {
@@ -653,25 +667,132 @@ JSON shape:
     "localName": string?,
     "type": "beer"|"wine"|"spirit"|"cocktail"|"soft-drink"|"tea"|"coffee",
     "alcoholic": boolean,
-    "description": string
+    "description": string,
+    "grape": string?,
+    "foodPairing": string?,
+    "imageSearchQueries": string[]?
   }]
 }`,
   );
 
   const parsed = drinksDiscoverSchema.parse(raw);
-  return {
-    notes: parsed.notes,
-    drinks: parsed.drinks.map((drink) => ({
-      name: drink.name,
-      localName: drink.localName,
-      type: drink.type,
-      alcoholic: drink.alcoholic,
+  const drinks: Drink[] = [];
+
+  for (const item of parsed.drinks) {
+    const drink: Drink = {
+      name: item.name,
+      localName: item.localName,
+      type: item.type,
+      alcoholic: item.alcoholic,
       description:
-        drink.description.length >= 40
-          ? drink.description
-          : `${drink.description} A traditional drink from ${input.countryName}.`,
-    })),
-  };
+        item.description.length >= 40
+          ? item.description
+          : `${item.description} A traditional drink from ${input.countryName}.`,
+      grape: item.grape,
+      foodPairing: item.foodPairing,
+    };
+
+    // Bottle / glass / can photos for any drink without an image yet.
+    const wantsImage =
+      !drink.imageUrl &&
+      (item.type === "beer" ||
+        item.type === "wine" ||
+        item.type === "spirit" ||
+        item.type === "cocktail" ||
+        item.type === "soft-drink" ||
+        item.type === "tea" ||
+        item.type === "coffee" ||
+        (item.imageSearchQueries && item.imageSearchQueries.length > 0));
+    if (wantsImage) {
+      const queries =
+        item.imageSearchQueries && item.imageSearchQueries.length > 0
+          ? item.imageSearchQueries
+          : drinkImageSearchQueries(drink, input.countryName);
+      try {
+        const image = await findCuisineImageFromQueries(queries);
+        if (image) {
+          drink.imageUrl = image.url;
+          drink.imageAttribution = image.attribution;
+        }
+      } catch (error) {
+        console.warn(`Drink image lookup failed for ${item.name}`, error);
+      }
+    }
+
+    drinks.push(drink);
+  }
+
+  return { notes: parsed.notes, drinks };
+}
+
+export function drinkImageSearchQueries(
+  drink: Drink,
+  countryName: string,
+): string[] {
+  const name = drink.name;
+  switch (drink.type) {
+    case "beer":
+      return [
+        `${name} beer bottle`,
+        `${name} beer can`,
+        `${name} ${countryName} beer`,
+      ];
+    case "wine":
+      return [
+        `${name} wine bottle`,
+        `${drink.grape ?? name} wine bottle`,
+        `${name} ${countryName} wine`,
+      ];
+    case "spirit":
+      return [
+        `${name} bottle`,
+        `${name} spirit bottle`,
+        `${name} ${countryName}`,
+      ];
+    case "cocktail":
+      return [
+        `${name} cocktail`,
+        `${name} drink glass`,
+        `${name} cocktail glass`,
+      ];
+    case "tea":
+      return [`${name} tea`, `${name} tea cup`, `${name} ${countryName} tea`];
+    case "coffee":
+      return [
+        `${name} coffee`,
+        `${name} coffee cup`,
+        `${name} ${countryName} coffee`,
+      ];
+    case "soft-drink":
+    default:
+      return [
+        `${name} bottle`,
+        `${name} can`,
+        `${name} drink`,
+        `${name} ${countryName}`,
+      ];
+  }
+}
+
+export async function enrichDrinkWithImage(
+  drink: Drink,
+  countryName: string,
+): Promise<Drink> {
+  if (drink.imageUrl?.trim()) return drink;
+  try {
+    const image = await findCuisineImageFromQueries(
+      drinkImageSearchQueries(drink, countryName),
+    );
+    if (!image) return drink;
+    return {
+      ...drink,
+      imageUrl: image.url,
+      imageAttribution: image.attribution,
+    };
+  } catch (error) {
+    console.warn(`Drink image enrich failed for ${drink.name}`, error);
+    return drink;
+  }
 }
 
 export async function discoverCountryImageQueries(input: {

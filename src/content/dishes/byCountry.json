@@ -14491,5 +14491,1831 @@
     "name": "Tanzania",
     "dishes": [],
     "fetchedAt": "2026-08-08T12:16:41.560Z"
+  },
+  "th": {
+    "code": "th",
+    "name": "Thailand",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Thai_cuisine",
+    "listPage": "https://en.wikipedia.org/wiki/List_of_Thai_dishes",
+    "dishes": [
+      {
+        "name": "Congee",
+        "wikipediaTitle": "Congee",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Congee",
+        "summary": "Congee is a form of savoury rice porridge, primarily made by boiling rice in a large amount of water until the rice softens. Depending on the rice–water ratio, the thickness of congee varies from a Western oatmeal porridge to a gruel. Since the history of rice cultivation in Asia stretches back to the Baiyue-inhabited lower Yangtze circa 10,000 BC, congee is unlikely to have appeared before that date. Congee is typically served with side dishes, or it can be topped with meat, fish, and pickled vegetables.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/44/Congee_truck_behind_Chatuchak_Park%2C_Kamphaeng_Phet_3_Rd.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Phoebus 28 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Congee",
+        "videoUrl": "https://www.youtube.com/results?search_query=Congee%20Thailand%20recipe"
+      },
+      {
+        "name": "Khao kan chin",
+        "wikipediaTitle": "Khao kan chin",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Khao_kan_chin",
+        "summary": "Khao kan chin, khao ngiao (ข้าวเงี้ยว), or chin som ngiao, also known as a steamed pudding with rice, is a dish from Northern Thailand. It is rice mixed with minced pork and pork blood, flavored with salt, sugar, a little garlic, shallot, vegetable oil, and then steamed inside a banana leaf. It is commonly served with fried chopped garlic, fried dried bird chilies, and cucumber.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9d/2013_Khao_kan_chin.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Takeaway / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Khao_kan_chin",
+        "videoUrl": "https://www.youtube.com/results?search_query=Khao%20kan%20chin%20Thailand%20recipe"
+      },
+      {
+        "name": "Khao kha mu",
+        "wikipediaTitle": "Khao kha mu",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Khao_kha_mu",
+        "summary": "Khao kha mu or khao kha moo, or sometimes simply called kha mu (ขาหมู), is a popular Thai food. It is influenced by Chinese cuisine, specifically Teochew cuisine.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Khao_kha_mu_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Takeaway / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Khao_kha_mu",
+        "videoUrl": "https://www.youtube.com/results?search_query=Khao%20kha%20mu%20Thailand%20recipe"
+      },
+      {
+        "name": "Cooked rice",
+        "wikipediaTitle": "Cooked rice",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cooked_rice",
+        "summary": "Cooked rice refers to rice that has been cooked either by steaming or boiling. The terms steamed rice or boiled rice are also commonly used. Any variant of Asian rice, African rice or wild rice, glutinous or non-glutinous, long-, medium-, or short-grain, of any colour, can be used. Rice for cooking can be whole-grain or milled.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/93/Suea_rong_hai.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Takeaway / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cooked_rice",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cooked%20rice%20Thailand%20recipe"
+      },
+      {
+        "name": "Five-spice powder",
+        "wikipediaTitle": "Five-spice powder",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Five-spice_powder",
+        "summary": "Five-spice powder is a spice mixture of five or more spices—commonly star anise, cloves, Chinese cinnamon, Sichuan pepper, and fennel seeds—used predominantly in almost all branches of Chinese cuisine. The five flavors of the spices reflect the five traditional Chinese elements and flavors. The addition of eight other spices creates thirteen-spice powder (十三香), which is used less commonly.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Khao_kha_mu_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Takeaway / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Five-spice_powder",
+        "videoUrl": "https://www.youtube.com/results?search_query=Five-spice%20powder%20Thailand%20recipe"
+      },
+      {
+        "name": "Omelette",
+        "wikipediaTitle": "Omelette",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Omelette",
+        "summary": "An omelette is a dish made from eggs, fried with butter or oil in a frying pan. It is a common practice for an omelette to include fillings such as chives, vegetables, mushrooms, meat, cheese, onions or some combination of the above. Whole eggs or egg whites are often beaten with a small amount of milk, cream, or water.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6e/Crispy_pork_phat_thai_in_omelette_ball_-_Chiang_Rai_-_2017-07-03_%28002%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Iudexvivorum / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Omelette",
+        "videoUrl": "https://www.youtube.com/results?search_query=Omelette%20Thailand%20recipe"
+      },
+      {
+        "name": "Khao khluk kapi",
+        "wikipediaTitle": "Khao khluk kapi",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Khao_khluk_kapi",
+        "summary": "Khao khluk kapi is a flavorful dish in Thai cuisine that consists of the primary ingredients of fried rice mixed with shrimp paste, the latter of which is known as \"kapi\" in Thai. The dish is typically served with several side dishes or toppings, such as sliced cucumber, sliced shallot, onion or purple onion, deep-fried or fried shrimp, shredded or thinly sliced sour green mango, chili peppers, deep-fried chili peppers, sliced thin egg omelet or crêpe, sweetened roasted pork, pork belly, Chinese sausage such as kun chiang, and mackerel, among others.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c5/Khao_khluk_kapi_%2831137282118%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Vee Satayamas from Bangkok, Thailand / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Khao_khluk_kapi",
+        "videoUrl": "https://www.youtube.com/results?search_query=Khao%20khluk%20kapi%20Thailand%20recipe"
+      },
+      {
+        "name": "Shrimp paste",
+        "wikipediaTitle": "Shrimp paste",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Shrimp_paste",
+        "summary": "Shrimp paste, shrimp sauce, or prawn sauce is a fermented condiment commonly used in Southeast Asian and coastal Chinese cuisines. It is primarily made from finely crushed shrimp or krill mixed with salt, and then fermented for several weeks. Depending on the regional variations, it is sold either in its wet form or sun-dried, and either cut into blocks or sold in bulk. It is an essential ingredient in many curries, sauces and sambal. Shrimp paste can be found in many meals in Cambodia, Indonesia, Laos, Malaysia, Myanmar, the Philippines, Singapore, Thailand, and Vietnam. It is often an ingredient in dip for fish or vegetables.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1f/Fish_sauce%2C_shrimp_paste_Mon.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "咽頭べさ / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Shrimp_paste",
+        "videoUrl": "https://www.youtube.com/results?search_query=Shrimp%20paste%20Thailand%20recipe"
+      },
+      {
+        "name": "Biryani",
+        "wikipediaTitle": "Biryani",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Biryani",
+        "summary": "Biryani is a mixed rice dish traditionally made with rice, meat, seafood, or vegetables, and spices. It was present in Mughal-era India, though whether it was created there is debated. It is thought to derive from a Persian rice dish, either pilau or birinj biryan. The dish makes use of slow-cooking as in Persian pilau, combined with Persian-style yoghurt-marinated meat and a spicy Indian style of cooking; it was likely developed in the Mughal court kitchens. It is also possible that biryani was brought to South India before the Mughal era, or that pilau was brought to India and biryani was developed from it before being adopted by the Mughals.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/33/Home-made_lamb_biryani_%2815726514577%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Vee Satayamas from Bangkok, Thailand / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Biryani",
+        "videoUrl": "https://www.youtube.com/results?search_query=Biryani%20Thailand%20recipe"
+      },
+      {
+        "name": "Hainanese chicken rice",
+        "wikipediaTitle": "Hainanese chicken rice",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Hainanese_chicken_rice",
+        "summary": "Hainanese chicken rice is a dish of poached or roasted chicken with seasoned rice, served with chilli sauce and usually with cucumbers, tomato slices or cilantro garnishes. It was created by immigrants from Hainan in southern China and adapted from the Hainanese dishes of Wenchang chicken and Wenchang chicken rice.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Hainanese_Chicken_from_Thai_Restaurant_from_Public_Food_Court_in_Olympian_City.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Peachyeung316 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Hainanese_chicken_rice",
+        "videoUrl": "https://www.youtube.com/results?search_query=Hainanese%20chicken%20rice%20Thailand%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:17:05.898Z"
+  },
+  "tl": {
+    "code": "tl",
+    "name": "Timor-Leste",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Cuisine_of_Timor-Leste",
+    "dishes": [
+      {
+        "name": "Mung bean",
+        "wikipediaTitle": "Mung bean",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Mung_bean",
+        "summary": "The mung bean or green gram is a plant species in the legume family. It is mainly cultivated in East, Southeast, and in South Asia and used as an ingredient in both savoury and sweet dishes.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/Victoria_Daily_Times_%281900-12-03%29_%28IA_victoriadailytimes19001203%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Mung_bean",
+        "videoUrl": "https://www.youtube.com/results?search_query=Mung%20bean%20Timor-Leste%20recipe"
+      },
+      {
+        "name": "Tapai",
+        "wikipediaTitle": "Tapai",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Tapai",
+        "summary": "Tapai is a traditional fermented preparation of rice or other starchy foods, and is found throughout much of Southeast Asia, especially in Austronesian cultures, and parts of East Asia. It refers to both the alcoholic paste and the alcoholic beverage derived from it. It has a sweet or sour taste and can be eaten as is, as ingredients for traditional recipes, or fermented further to make rice wine. Tapai is traditionally made with white rice or glutinous rice, but can also be made from a variety of carbohydrate sources, including cassava and potatoes. Fermentation is performed by a variety of moulds including Aspergillus oryzae, Rhizopus oryzae, Amylomyces rouxii or Mucor species, and yeasts including Saccharomyces cerevisiae, and Saccharomycopsis fibuliger, Endomycopsis burtonii and others, along with bacteria.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Tapai",
+        "videoUrl": "https://www.youtube.com/results?search_query=Tapai%20Timor-Leste%20recipe"
+      },
+      {
+        "name": "Curry",
+        "wikipediaTitle": "Curry",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Curry",
+        "summary": "Curry is a dish with a spicy sauce, initially in Indian cuisine, then modified by interchange with the Portuguese, followed by the British, and eventually thoroughly internationalised. Many curries are found in the cuisines of countries in Southeast Asia and East Asia.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/35/The_Hi-o-hi_%28IA_hiohi1945ober%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Wikimedia Commons",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Curry",
+        "videoUrl": "https://www.youtube.com/results?search_query=Curry%20Timor-Leste%20recipe"
+      },
+      {
+        "name": "Feijoada",
+        "wikipediaTitle": "Feijoada",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Feijoada",
+        "summary": "Feijoada is the name for varieties of bean stew with beef or pork prepared in the Portuguese-speaking world.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a9/A_guerra_das_scatolettas-_cultura_material_e_comidas_enlatadas_entre_os_soldados_da_For%C3%A7a_Expedicion%C3%A1ria_Brasileira_na_It%C3%A1lia%2C_Anais_do_Museu_Paulista.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Frederico De Oliveira Toscano / CC BY 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Feijoada",
+        "videoUrl": "https://www.youtube.com/results?search_query=Feijoada%20Timor-Leste%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:17:13.350Z"
+  },
+  "tg": {
+    "code": "tg",
+    "name": "Togo",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Togolese_cuisine",
+    "dishes": [
+      {
+        "name": "Sauce",
+        "wikipediaTitle": "Sauce",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Sauce",
+        "summary": "In cooking, a sauce is a liquid, cream, or semi-solid food, served on or used in preparing other foods. Most sauces are not normally consumed by themselves; they add flavour, texture, and visual appeal to a dish. Sauce is a French word probably from the post-classical Latin salsa, derived from the classical salsus 'salted'. Possibly the oldest recorded European sauce is garum, the fish sauce used by the Ancient Romans, while doubanjiang, the Chinese soy bean paste, is mentioned in Rites of Zhou 20.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5d/Maf%C3%A9_S%C3%A9n%C3%A9galais.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Nicolas PHULPIN / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sauce",
+        "videoUrl": "https://www.youtube.com/results?search_query=Sauce%20Togo%20recipe"
+      },
+      {
+        "name": "Pâté",
+        "wikipediaTitle": "Pâté",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/P%C3%A2t%C3%A9",
+        "summary": "Pâté is a forcemeat. Originally, the dish was cooked in a pastry case and called pâté en croute; in more recent times it is more usually cooked without pastry in a terrine, and called pâté en terrine or simply terrine. Various ingredients are used, which may include meat from pork, poultry, fish or beef; fat; vegetables; herbs; spices; wine; and brandy.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/P%C3%A2tes_66.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Layéniba / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/P%C3%A2t%C3%A9",
+        "videoUrl": "https://www.youtube.com/results?search_query=P%C3%A2t%C3%A9%20Togo%20recipe"
+      },
+      {
+        "name": "Spinach",
+        "wikipediaTitle": "Spinach",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Spinach",
+        "summary": "Spinach is a leafy green flowering plant native to Central and Western Asia. It is of the order Caryophyllales, family Amaranthaceae, subfamily Chenopodioideae. Its leaves are a common vegetable consumed either fresh, cooked or after storage. The taste differs considerably between cooked and raw: the high oxalate content may be reduced by blanching.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Mr._Togo%2C_maid_of_all_work_%28IA_mrtogomaidofallw00irwi%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Irwin, Wallace, 1876-1959\nIrvin, Rea, 1881-1972, ill\nDuffield &amp; Company. pbl / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Spinach",
+        "videoUrl": "https://www.youtube.com/results?search_query=Spinach%20Togo%20recipe"
+      },
+      {
+        "name": "Vegetable",
+        "wikipediaTitle": "Vegetable",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Vegetable",
+        "summary": "Vegetables are edible parts of plants that are consumed by humans or other animals as food. This original meaning is still commonly used, and is applied to plants collectively to refer to all edible plant matter, including flowers, fruits, stems, leaves, roots, and seeds. An alternative definition is applied somewhat arbitrarily, often by culinary and cultural tradition; it may include savoury fruits such as tomatoes and squash, flowers such as broccoli, and seeds such as pulses, but exclude foods derived from some plants that are fruits, flowers, nuts, and cereal grains.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/73/The_State_of_Food_and_Agriculture_2021._Making_agrifood_systems_more_resilient_to_shocks_and_stresses%2C_In_brief.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Food and Agriculture Organization / CC BY-SA 3.0 igo",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Vegetable",
+        "videoUrl": "https://www.youtube.com/results?search_query=Vegetable%20Togo%20recipe"
+      },
+      {
+        "name": "Omelette",
+        "wikipediaTitle": "Omelette",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Omelette",
+        "summary": "An omelette is a dish made from eggs, fried with butter or oil in a frying pan. It is a common practice for an omelette to include fillings such as chives, vegetables, mushrooms, meat, cheese, onions or some combination of the above. Whole eggs or egg whites are often beaten with a small amount of milk, cream, or water.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/NYC-Diner-ToGo-Western-Omelette.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Evan-Amos / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Omelette",
+        "videoUrl": "https://www.youtube.com/results?search_query=Omelette%20Togo%20recipe"
+      },
+      {
+        "name": "Skewer",
+        "wikipediaTitle": "Skewer",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Skewer",
+        "summary": "A skewer is a thin metal or wood stick used to hold pieces of food together. The word may sometimes be used as a metonym, to refer to the entire food item served on a skewer, as in \"chicken skewers\". Skewers are used while grilling or roasting meats and fish, and in other culinary applications.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/36/Brochettes_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Akouete / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Skewer",
+        "videoUrl": "https://www.youtube.com/results?search_query=Skewer%20Togo%20recipe"
+      },
+      {
+        "name": "Corn on the cob",
+        "wikipediaTitle": "Corn on the cob",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Corn_on_the_cob",
+        "summary": "Corn on the cob is a culinary term for a cooked ear of sweet corn (maize) eaten directly off the cob. Variations of the corn on the cob include the Masala Bhutta in India, Yaki-tōmorokoshi in Japan and Elote in Latin American countries.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9f/The_cultivation_of_cotton_in_the_Federated_Malay_States_%28IA_cultivationcott00bota%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Botanic Gardens (Singapore) / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Corn_on_the_cob",
+        "videoUrl": "https://www.youtube.com/results?search_query=Corn%20on%20the%20cob%20Togo%20recipe"
+      },
+      {
+        "name": "Akpan (dessert)",
+        "wikipediaTitle": "Akpan (dessert)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Akpan_(dessert)",
+        "summary": "Akpan, also known as akassa, is a fermented maize yogurt. A product of Togolese and Beninese cuisine, it is considered a dessert.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Akpan_(dessert)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Akpan%20(dessert)%20Togo%20recipe"
+      },
+      {
+        "name": "Baguette",
+        "wikipediaTitle": "Baguette",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Baguette",
+        "summary": "A baguette is a long, thin type of bread of French origin that is commonly made from basic lean dough. Both the dough and the physical dimensions of the tradition baguette are defined by French law. It is distinguishable by its length and crisp crust.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d9/The_marvellous_in_modern_times_%28IA_marvellousinmode00stei%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Steiner, Lewis Henry, 1827-1892. [from old catalog] / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Baguette",
+        "videoUrl": "https://www.youtube.com/results?search_query=Baguette%20Togo%20recipe"
+      },
+      {
+        "name": "Fufu",
+        "wikipediaTitle": "Fufu",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Fufu",
+        "summary": "Fufu is a pounded meal found in West African cuisine originally made from boiled cassava, plantains, and cocoyam. Fufu's prevalence in West Africa has been noted in local literature, such as Chinua Achebe's Things Fall Apart.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Fufu_accompagn%C3%A9_d%27une_sauce_arachide_au_poulet.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Edem228 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Fufu",
+        "videoUrl": "https://www.youtube.com/results?search_query=Fufu%20Togo%20recipe"
+      },
+      {
+        "name": "Goat meat",
+        "wikipediaTitle": "Goat meat",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "summary": "Goat meat is the meat of the domestic goat. The term denotes especially the meat of older animals, while meat from young goats is called kid meat. In South Asian cuisine, goat meat is called mutton.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Alternative_futures_for_world_food_in_1985._Volume_3_%28IA_CAT87209344%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rojko, Anthony S. (Anthony Stanley), 1918- / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "videoUrl": "https://www.youtube.com/results?search_query=Goat%20meat%20Togo%20recipe"
+      },
+      {
+        "name": "Chicken as food",
+        "wikipediaTitle": "Chicken as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "summary": "Chicken is the most consumed meat in the world. Owing to the relative ease and low cost of raising chickens—in comparison to mammals such as cattle or pigs—chicken meat and chicken eggs have become prevalent in numerous cuisines.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8b/Dramette_script_%22Food_is_a_weapon%22_%28IA_CAT31069954%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Agricultural Marketing Administration\nFaught, Millard C. (Millard Clark), 1916- / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20as%20food%20Togo%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:17:27.742Z"
+  },
+  "to": {
+    "code": "to",
+    "name": "Tonga",
+    "dishes": [],
+    "fetchedAt": "2026-08-08T12:17:28.683Z"
+  },
+  "tt": {
+    "code": "tt",
+    "name": "Trinidad and Tobago",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Trinidad_and_Tobago_cuisine",
+    "dishes": [
+      {
+        "name": "Doubles (food)",
+        "wikipediaTitle": "Doubles (food)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Doubles_(food)",
+        "summary": "Doubles is a common street food originating in Trinidad and Tobago and is of Indo-Trinidadian origin. It consists of curried chickpeas served on two fried flatbreads. It is normally eaten during breakfast, but is also eaten occasionally during lunch or as a late-night snack and popular hangover food.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/81/Doubles_%28Food%29%2C_Trinidad_%26_Tobago.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Kalamazadkhan / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Doubles_(food)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Doubles%20(food)%20Trinidad%20and%20Tobago%20recipe"
+      },
+      {
+        "name": "Puri (food)",
+        "wikipediaTitle": "Puri (food)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Puri_(food)",
+        "summary": "Puri is a type of deep-fried flatbread, with an unleavened wheat dough. Puri originated from the northern Indian subcontinent, where it is one of the most common flatbreads; it is a staple food in parts of the subcontinent. It resembles chapati but is deep-fried. Similar deep-fried breads from the region include bhatura, luchi, and kachori.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Leucaena_leucocephala_%28Lam.%29_de_Wit%2C_Leguminosae_%28Mimosoideae%29_-_Leucaena%2C_tantan%2C_Legume_family_%28IA_CAT10667762%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Parrotta, John A / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Puri_(food)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Puri%20(food)%20Trinidad%20and%20Tobago%20recipe"
+      },
+      {
+        "name": "Curry",
+        "wikipediaTitle": "Curry",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Curry",
+        "summary": "Curry is a dish with a spicy sauce, initially in Indian cuisine, then modified by interchange with the Portuguese, followed by the British, and eventually thoroughly internationalised. Many curries are found in the cuisines of countries in Southeast Asia and East Asia.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/19/Curry_Powder%2C_Trinidad_and_Tobago.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Kalamazadkhan / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Curry",
+        "videoUrl": "https://www.youtube.com/results?search_query=Curry%20Trinidad%20and%20Tobago%20recipe"
+      },
+      {
+        "name": "Kuchela (relish)",
+        "wikipediaTitle": "Kuchela (relish)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kuchela_(relish)",
+        "summary": "Kuchela, also spelled kucheela, occasionally also kuchila, is a hot relish of the Trinidadian cuisine.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/89/FOOD_Kuchela.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Grueslayer / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kuchela_(relish)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kuchela%20(relish)%20Trinidad%20and%20Tobago%20recipe"
+      },
+      {
+        "name": "Chutney",
+        "wikipediaTitle": "Chutney",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chutney",
+        "summary": "A chutney is a condiment associated with cuisines of the Indian subcontinent. Chutneys are made in a wide variety of forms, some raw such as with coriander, others cooked with sugar, like mango chutney. During the British Raj, Anglo-Indian cuisine adapted Indian chutney and brought it back to Britain, where green mango chutney in particular became popular. In the Western world, chutneys may be made with local fruits and vegetables, or purchased.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/55/STAPP_066_Debe_Street_Food_Stalls_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Grueslayer / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chutney",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chutney%20Trinidad%20and%20Tobago%20recipe"
+      },
+      {
+        "name": "Baingan bharta",
+        "wikipediaTitle": "Baingan bharta",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Baingan_bharta",
+        "summary": "Baigan bharta, also spelled baingan bharta or begun bharta or baigan chokha is an Indian subcontinent dish prepared by mashing or mincing grilled brinjal with tomato, onion, herbs and spices, with variations being common from chef to chef. Traditionally, cooking the eggplant over charcoal, inside of a tandoor, barbecue grill or oven, or even directly applying flame to the outside of the fruit infuses the dish with a smoky flavour; the blackened skin is then easily peeled and the eggplant may be further prepared.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Baingan_bharta",
+        "videoUrl": "https://www.youtube.com/results?search_query=Baingan%20bharta%20Trinidad%20and%20Tobago%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:17:39.868Z"
+  },
+  "tn": {
+    "code": "tn",
+    "name": "Tunisia",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Tunisian_cuisine",
+    "dishes": [
+      {
+        "name": "Börek",
+        "wikipediaTitle": "Börek",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/B%C3%B6rek",
+        "summary": "Börek or burek or byrek is a family of pastries or pies made in West Asia and Southeast Europe. The pastry is made of a thin flaky dough such as filo with a variety of fillings, such as meat, cheese, spinach, or potatoes. A borek may be prepared in a large pan and cut into portions after baking, or as individual pastries. They are usually baked but some varieties can be fried. Borek is sometimes sprinkled with sesame or nigella seeds, and it can be served hot or cold.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%B6rek",
+        "videoUrl": "https://www.youtube.com/results?search_query=B%C3%B6rek%20Tunisia%20recipe"
+      },
+      {
+        "name": "Asida",
+        "wikipediaTitle": "Asida",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Asida",
+        "summary": "Asida, a common dish in the Arab world, is a lump of dough made by stirring wheat flour into boiling water, sometimes with added butter or honey. Similar in texture to fufu, it is eaten mainly in Middle East and African countries. It is considered one of the best-known desserts and traditional dishes in many Arab countries.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/15/Tunisian_Assida_2018_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "MedaliKaouaja / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Asida",
+        "videoUrl": "https://www.youtube.com/results?search_query=Asida%20Tunisia%20recipe"
+      },
+      {
+        "name": "Assidat zgougou",
+        "wikipediaTitle": "Assidat zgougou",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Assidat_zgougou",
+        "summary": "Assidat zgougou, literally Aleppo nut cream, is a Tunisian dessert often adorned with decorative patterns of pine nuts, pistachios and hazelnuts. It is prepared to celebrate the Mawlid and is made out of Aleppo pine powder, flour, milk, concentrated milk, and sugar.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Assidat_Zgougou.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "CarthageMapleSyrup / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Assidat_zgougou",
+        "videoUrl": "https://www.youtube.com/results?search_query=Assidat%20zgougou%20Tunisia%20recipe"
+      },
+      {
+        "name": "Baklava",
+        "wikipediaTitle": "Baklava",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Baklava",
+        "summary": "Baklava is a layered pastry dessert made of filo pastry, filled with chopped nuts, and sweetened with either syrup or honey.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/29/Baklawas.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Souad Anane Lesina / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Baklava",
+        "videoUrl": "https://www.youtube.com/results?search_query=Baklava%20Tunisia%20recipe"
+      },
+      {
+        "name": "Bambalouni",
+        "wikipediaTitle": "Bambalouni",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Bambalouni",
+        "summary": "Bambalouni, also referred to as bambaloni, is a sweet Tunisian donut. It can be made at home or bought from fast food shops. It is prepared with a flour dough fried in oil. The bambaloni is eaten sprinkled with sugar or soaked in honey. It can be eaten at any time of day. It has come to be associated with Sidi Bou Said, where bambalouni is abundantly sold to Tunisians and visitors alike.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/20/Bambalouni_01.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Yamen / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bambalouni",
+        "videoUrl": "https://www.youtube.com/results?search_query=Bambalouni%20Tunisia%20recipe"
+      },
+      {
+        "name": "Brik",
+        "wikipediaTitle": "Brik",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Brik",
+        "summary": "Brik or burek is the North African version of borek, a stuffed malsouka pastry which is commonly deep fried. The best-known version is the egg brik, a whole egg in a triangular pastry pocket with chopped onion, tuna, harissa and parsley. With a slightly different shape, but with identical ingredients and method of preparation, the brik is known in Algeria and Libya as bourek (بوراك). It is often filled with a raw egg and herbs or tuna, harissa and olives and is sometimes served in a pita. This is also known as a boreeka. It is also widespread in Eastern Algeria in the cities of Annaba and Costantina.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Brik_Edennouni.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Souad Anane Lesina / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Brik",
+        "videoUrl": "https://www.youtube.com/results?search_query=Brik%20Tunisia%20recipe"
+      },
+      {
+        "name": "Bsisa",
+        "wikipediaTitle": "Bsisa",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Bsisa",
+        "summary": "Bsisa (Arabic: بسيسة, Berber aḍemmin, also known as bsissa, is a fine powder made from roasted barley and legumes, typical in North African cuisine, prepared and served either as a paste or drink. It dates back to Pharos times. Its history goes back a long way, and travellers and nomads used to take bsisa with them on their journeys since it was both full of nutritional value and easy to carry in its ground powder form.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bsisa",
+        "videoUrl": "https://www.youtube.com/results?search_query=Bsisa%20Tunisia%20recipe"
+      },
+      {
+        "name": "Caponata",
+        "wikipediaTitle": "Caponata",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Caponata",
+        "summary": "Caponata is a Sicilian dish consisting of chopped, fried eggplant and other vegetables, seasoned with olive oil, tomato sauce, celery, olives, and capers, in an agrodolce sauce.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Caponata",
+        "videoUrl": "https://www.youtube.com/results?search_query=Caponata%20Tunisia%20recipe"
+      },
+      {
+        "name": "Shakshouka",
+        "wikipediaTitle": "Shakshouka",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Shakshouka",
+        "summary": "Shakshouka is a Maghrebi dish of eggs poached in a sauce of tomatoes, olive oil, peppers, onion, and garlic, commonly spiced with cumin, paprika, and cayenne pepper. Shakshouka is a popular dish throughout North Africa and the Middle East.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Hiboun%2C_Mahdia_Governorate%2C_Tunisia_January_2024_-_Eggplant_shakshouka.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Sharon Hahn Darlin / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Shakshouka",
+        "videoUrl": "https://www.youtube.com/results?search_query=Shakshouka%20Tunisia%20recipe"
+      },
+      {
+        "name": "Ratatouille",
+        "wikipediaTitle": "Ratatouille",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ratatouille",
+        "summary": "Ratatouille is a traditional French vegetable dish originating in the Provence region of southern France, particularly associated with Nice and its surrounding region. It developed within the context of rural Provençal cuisine, where seasonal vegetables were stewed together as a practical means of putting surplus summer produce to use. The dish consists of a stew or saute of seasonal summer vegetables cooked in olive oil and is sometimes referred to as ratatouille niçoise.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ratatouille",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ratatouille%20Tunisia%20recipe"
+      },
+      {
+        "name": "Chorba",
+        "wikipediaTitle": "Chorba",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chorba",
+        "summary": "Chorba, shorwa, shurba, shurpa, shurbah or shorba is a broad class of stews or rich soups found in national cuisines across North Africa, The Middle East, Iran, Turkey, Southeast Europe, Central Asia, East Africa and South Asia. It is often prepared with added ingredients but is also served alone as a broth or with bread.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/99/Chorba_in_Tunisia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Shoestring / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chorba",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chorba%20Tunisia%20recipe"
+      },
+      {
+        "name": "Stuffed peppers",
+        "wikipediaTitle": "Stuffed peppers",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Stuffed_peppers",
+        "summary": "Stuffed peppers is a dish common in many cuisines. It consists of hollowed or halved bell peppers filled with any of a variety of fillings, often including meat, vegetables, cheese, rice, or sauce. The dish is usually assembled by filling the cavities of the peppers and then cooking.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Poivrons_farcis_au_couscous.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Yamen / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Stuffed_peppers",
+        "videoUrl": "https://www.youtube.com/results?search_query=Stuffed%20peppers%20Tunisia%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:17:53.319Z"
+  },
+  "tr": {
+    "code": "tr",
+    "name": "Turkey",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Turkish_cuisine",
+    "listPage": "https://en.wikipedia.org/wiki/List_of_Turkish_dishes",
+    "dishes": [
+      {
+        "name": "Börek",
+        "wikipediaTitle": "Börek",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/B%C3%B6rek",
+        "summary": "Börek or burek or byrek is a family of pastries or pies made in West Asia and Southeast Europe. The pastry is made of a thin flaky dough such as filo with a variety of fillings, such as meat, cheese, spinach, or potatoes. A borek may be prepared in a large pan and cut into portions after baking, or as individual pastries. They are usually baked but some varieties can be fried. Borek is sometimes sprinkled with sesame or nigella seeds, and it can be served hot or cold.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f7/B%C3%B6rek_in_Turkey.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "E4024 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%B6rek",
+        "videoUrl": "https://www.youtube.com/results?search_query=B%C3%B6rek%20Turkey%20recipe"
+      },
+      {
+        "name": "Doner kebab",
+        "wikipediaTitle": "Doner kebab",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Doner_kebab",
+        "summary": "Doner kebab or döner kebab is a Turkish dish made of meat cooked on a vertical rotisserie. Seasoned meat stacked in the shape of an inverted cone is turned slowly on the rotisserie, next to a vertical cooking element. The operator uses a knife to slice thin shavings from the outer layer of the meat as it cooks. The vertical rotisserie was invented in the 19th-century Ottoman Empire, and dishes such as the Arab shawarma, Greek gyros, Greek-Canadian donair, and Mexican al pastor are derived from the rotisserie technique of this dish.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Doner_kebab%2C_Istanbul%2C_Turkey.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "User: (WT-shared) Shoestring at  wts wikivoyage / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Doner_kebab",
+        "videoUrl": "https://www.youtube.com/results?search_query=Doner%20kebab%20Turkey%20recipe"
+      },
+      {
+        "name": "Knafeh",
+        "wikipediaTitle": "Knafeh",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Knafeh",
+        "summary": "Knafeh is a traditional Arab dessert made with kadayif layered with cheese and soaked in a sweet, sugar-based syrup called attar. Knafeh is popular throughout the Arab world, especially Egypt and the Levant. Knafeh is often served on special occasions, holidays and Ramadan. The most common variant in Jordan and Palestine, Knafeh Nabulseyeh, originated in the Palestinian city of Nablus.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Knafeh",
+        "videoUrl": "https://www.youtube.com/results?search_query=Knafeh%20Turkey%20recipe"
+      },
+      {
+        "name": "Stuffed leaves",
+        "wikipediaTitle": "Stuffed leaves",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Stuffed_leaves",
+        "summary": "Stuffed leaves—more commonly known by its sub-types stuffed grape leaves,  stuffed vine leaves, or stuffed cabbage leaves—are a food made of leaves rolled around a filling of minced meat, grains such as rice, or both. It is occasionally known in the English-speaking world by its Turkish name, sarma, which, as a dish of the Ottoman Empire, is also used in Armenian and some Eastern European languages. Since the Ottoman Empire's dissolution, its popularity persists in Turkish, Persian, Greek, Romanian, Iraqi, Levantine, Egyptian, former Yugoslav constituent states, and Armenian cuisines.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/A_serving_of_various_dolmas.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "E4024 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Stuffed_leaves",
+        "videoUrl": "https://www.youtube.com/results?search_query=Stuffed%20leaves%20Turkey%20recipe"
+      },
+      {
+        "name": "Baklava",
+        "wikipediaTitle": "Baklava",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Baklava",
+        "summary": "Baklava is a layered pastry dessert made of filo pastry, filled with chopped nuts, and sweetened with either syrup or honey.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/15/Baklava_in_Bodrum%2C_Turkey_%285653812987%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Michal Osmenda from Brussels, Belgium / CC BY-SA 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Baklava",
+        "videoUrl": "https://www.youtube.com/results?search_query=Baklava%20Turkey%20recipe"
+      },
+      {
+        "name": "Sujuk",
+        "wikipediaTitle": "Sujuk",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Sujuk",
+        "summary": "Sujuk, sugou or sucuk (/suːˈd͡ʒʊk/) is a dry, spicy and fermented sausage which is consumed in several Anatolian, Balkan, Middle Eastern and Central Asian cuisines. Sujuk mainly consists of ground meat and animal fat usually obtained from beef or lamb, but beef is mainly used in Turkey, Egypt, Sudan, Armenia, Azerbaijan, Bosnia and Herzegovina, Albania, Georgia, Bulgaria, Kazakhstan, and Kyrgyzstan.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/19/Use_of_fruit_as_food_%28IA_CAT87202295%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Langworthy, C. F. / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sujuk",
+        "videoUrl": "https://www.youtube.com/results?search_query=Sujuk%20Turkey%20recipe"
+      },
+      {
+        "name": "Menemen (food)",
+        "wikipediaTitle": "Menemen (food)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Menemen_(food)",
+        "summary": "Menemen is a popular traditional Turkish dish that includes eggs, tomato, green peppers, and spices such as ground black and red pepper cooked in olive oil. Menemen is commonly eaten for breakfast and served with bread. Its name originates from a small town in İzmir Province. Menemen may be made with onions, but the addition of onions is often debated and is more common when the dish is eaten as a main dish, rather than at breakfast.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Turkish_egg_dish_Menemen.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "E4024 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Menemen_(food)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Menemen%20(food)%20Turkey%20recipe"
+      },
+      {
+        "name": "Tzatziki",
+        "wikipediaTitle": "Tzatziki",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Tzatziki",
+        "summary": "Tzatziki, also known as cacık or tarator, is a class of dip, soup, or sauce found in the cuisines of Southeastern Europe and West Asia. It is made of salted strained yogurt or diluted yogurt mixed with cucumbers, garlic, salt, olive oil, red wine vinegar, sometimes with lemon juice, and herbs such as dill, mint, parsley and thyme. It is served as a cold appetiser (meze), a side dish, and as a sauce for souvlaki and gyros sandwiches and other foods.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Tzatziki",
+        "videoUrl": "https://www.youtube.com/results?search_query=Tzatziki%20Turkey%20recipe"
+      },
+      {
+        "name": "Lahmacun",
+        "wikipediaTitle": "Lahmacun",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lahmacun",
+        "summary": "Lahmacun, lahmajun, or lahmajo is a Middle Eastern flatbread topped with minced meat, minced vegetables, and herbs such as onions, garlic, tomatoes, red peppers, and parsley, flavored with spices such as chili pepper and paprika, then baked. Lahmacun is often wrapped around vegetables, including pickled vegetables, tomatoes, peppers, onions, lettuce, parsley, and roasted eggplant.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/44/Sebzeli_Lahmacun_with_quartered_lemon.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rumana22 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lahmacun",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lahmacun%20Turkey%20recipe"
+      },
+      {
+        "name": "Çiğ köfte",
+        "wikipediaTitle": "Çiğ köfte",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/%C3%87i%C4%9F_k%C3%B6fte",
+        "summary": "Çiğ köfte or chee kofta is a kofta dish that is a regional specialty of southeastern Turkey in Urfa. The dish is served as an appetizer or meze.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b0/%C3%87i%C4%9F_k%C3%B6fte_-_Ankara.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "E4024 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/%C3%87i%C4%9F_k%C3%B6fte",
+        "videoUrl": "https://www.youtube.com/results?search_query=%C3%87i%C4%9F%20k%C3%B6fte%20Turkey%20recipe"
+      },
+      {
+        "name": "Turkish diaspora",
+        "wikipediaTitle": "Turkish diaspora",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Turkish_diaspora",
+        "summary": "The Turkish diaspora refers to ethnic Turkish people who have migrated from, or are the descendants of migrants from, the Republic of Turkey, Northern Cyprus or other modern nation-states that were once part of the former Ottoman Empire. Therefore, the Turkish diaspora is not only formed by people with roots from mainland Anatolia and Eastern Thrace ; rather, it is also formed of Turkish communities which have also left traditional areas of Turkish settlements in the Balkans, the island of Cyprus, the region of Meskhetia in Georgia, and the Arab world.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Turkish_Delight_in_London_Southbank.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Garry Knight / CC BY-SA 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Turkish_diaspora",
+        "videoUrl": "https://www.youtube.com/results?search_query=Turkish%20diaspora%20Turkey%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:18:10.351Z"
+  },
+  "tm": {
+    "code": "tm",
+    "name": "Turkmenistan",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Turkmen_cuisine",
+    "dishes": [
+      {
+        "name": "Shashlik",
+        "wikipediaTitle": "Shashlik",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Shashlik",
+        "summary": "Shashlik, or shashlyck, is a dish of skewered and grilled cubes of meat, similar to or synonymous with shish kebab. It is known traditionally by various other names in the Caucasus, Eastern Europe and Central Asia, and from the 19th century became popular as shashlik across much of the Russian Empire and nowadays in former Soviet Union republics.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Shashlik",
+        "videoUrl": "https://www.youtube.com/results?search_query=Shashlik%20Turkmenistan%20recipe"
+      },
+      {
+        "name": "Lamb and mutton",
+        "wikipediaTitle": "Lamb and mutton",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "summary": "Lamb and mutton, collectively sheep meat, is meat from the domestic sheep, Ovis aries. It is generally divided into three types: lamb, from sheep in their first year; hogget, from sheep in their second; and mutton, from older sheep.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/36/Foreign_crops_and_markets_%28IA_foreigncropsmark2315unit%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Foreign Agricultural Service\nUnited States. Bureau of Agricultural Economics\nUnited States. Office of Foreign Agricultural Relations / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lamb%20and%20mutton%20Turkmenistan%20recipe"
+      },
+      {
+        "name": "Chicken as food",
+        "wikipediaTitle": "Chicken as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "summary": "Chicken is the most consumed meat in the world. Owing to the relative ease and low cost of raising chickens—in comparison to mammals such as cattle or pigs—chicken meat and chicken eggs have become prevalent in numerous cuisines.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/World_Food_and_Agriculture_-_Statistical_Yearbook_2023.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Food and Agriculture Organization / CC BY-SA 3.0 igo",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20as%20food%20Turkmenistan%20recipe"
+      },
+      {
+        "name": "Fish as food",
+        "wikipediaTitle": "Fish as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Fish_as_food",
+        "summary": "Many species of fish are caught by humans and consumed as food in virtually all regions around the world. Their meat has been an important dietary source of protein and other nutrients in the human diet.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/World_Food_and_Agriculture_-_Statistical_Yearbook_2023.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Food and Agriculture Organization / CC BY-SA 3.0 igo",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Fish_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Fish%20as%20food%20Turkmenistan%20recipe"
+      },
+      {
+        "name": "Charcoal",
+        "wikipediaTitle": "Charcoal",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Charcoal",
+        "summary": "Charcoal is a lightweight black residue made of carbon that is produced by strongly heating wood in minimal oxygen to remove all water and volatile constituents. In the traditional version of this pyrolysis process, called charcoal burning, often by forming a charcoal kiln, the heat is supplied by burning part of the starting material itself, with a limited supply of oxygen. The material can also be heated in a closed retort. Modern charcoal briquettes used for outdoor cooking may contain many other additives, e.g. coal.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0b/OJ_L_143_of_2013_-_EN_English.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Publications Office of the European Union / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Charcoal",
+        "videoUrl": "https://www.youtube.com/results?search_query=Charcoal%20Turkmenistan%20recipe"
+      },
+      {
+        "name": "Kebab",
+        "wikipediaTitle": "Kebab",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kebab",
+        "summary": "Kebab, kebap, kabob, kebob, or kabab (Kashmiri) is a variety of roasted meat dishes that originated in the Middle East.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kebab",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kebab%20Turkmenistan%20recipe"
+      },
+      {
+        "name": "Tandoor",
+        "wikipediaTitle": "Tandoor",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Tandoor",
+        "summary": "A tandoor is a large vase-shaped oven, usually made of clay. Since antiquity, tandoors have been used to bake unleavened flatbreads, such as roti and traditional lavash, as well as leavened ones, such as naan and tandoor bread or matnakash. It is also used to roast meat and vegetables. Tandoors are predominantly used in South Asia, Western Asia, Central Asia, and the Horn of Africa.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Tandoor",
+        "videoUrl": "https://www.youtube.com/results?search_query=Tandoor%20Turkmenistan%20recipe"
+      },
+      {
+        "name": "Jerky",
+        "wikipediaTitle": "Jerky",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Jerky",
+        "summary": "Jerky is lean trimmed meat strips which are dehydrated to prevent spoilage and seasoned to varying degrees. Normally, this drying includes the addition of salt to prevent microbial growth through osmosis. The word \"jerky\" derives from the Quechua word ch'arki which means \"dried, salted meat\".",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Agricultural_trade_highlights_%28IA_CAT10401061049%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Foreign Agricultural Service / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Jerky",
+        "videoUrl": "https://www.youtube.com/results?search_query=Jerky%20Turkmenistan%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:18:18.700Z"
+  },
+  "tv": {
+    "code": "tv",
+    "name": "Tuvalu",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Tuvaluan_cuisine",
+    "dishes": [
+      {
+        "name": "Taro",
+        "wikipediaTitle": "Taro",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Taro",
+        "summary": "Taro is a root vegetable. It is the most widely cultivated species of several plants in the family Araceae that are used as vegetables for their corms, leaves, stems and petioles. Taro corms are a food staple in African, Caribbean, Oceanian, East Asian, Southeast Asian and South Asian cultures.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/1999-576-EC-_Council_Decision_of_29_June_1999_on_the_signing_and_notification_of_the_provisional_application_of_the_Food_Aid_Convention_1999_on_behalf_of_the_European_Community_%28EUD_1999-576%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / OGL 3",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Taro",
+        "videoUrl": "https://www.youtube.com/results?search_query=Taro%20Tuvalu%20recipe"
+      },
+      {
+        "name": "Food and Agriculture Organization",
+        "wikipediaTitle": "Food and Agriculture Organization",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Food_and_Agriculture_Organization",
+        "summary": "The Food and Agriculture Organization of the United Nations (FAO) is a specialized agency of the United Nations that leads international efforts to defeat hunger and improve nutrition and food security. Its Latin motto, fiat panis, translates to \"let there be bread\". It was founded on 16 October 1945 in Quebec City, Canada.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/eb/Tuvalu_Country_Statement_to_the_FAO_Regional_Conference_for_Asia_and_the_Pacific%2C_3_September_2020.webm?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Food and Agriculture Organization of the United Nations / CC BY 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Food_and_Agriculture_Organization",
+        "videoUrl": "https://www.youtube.com/results?search_query=Food%20and%20Agriculture%20Organization%20Tuvalu%20recipe"
+      },
+      {
+        "name": "Banana",
+        "wikipediaTitle": "Banana",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Banana",
+        "summary": "A banana is an elongated, edible fruit that is botanically a berry produced by several kinds of large treelike herbaceous flowering plants in the genus Musa. In some countries, cooking bananas are called plantains, distinguishing them from dessert bananas. The fruit is variable in size, color and firmness, but is usually elongated and curved, with soft flesh rich in starch covered with a peel, which may have a variety of colors when ripe. It grows upward in clusters near the top of the plant. Almost all modern edible seedless (parthenocarp) cultivated bananas come from two wild species – Musa acuminata and Musa balbisiana, or their hybrids.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Foreign_agricultural_trade_of_the_United_States_Calendar_year_2000_supplement_-_United_States_Department_of_Agriculture%2C_Economic_Research_Service_%28IA_CAT92965553017%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Banana",
+        "videoUrl": "https://www.youtube.com/results?search_query=Banana%20Tuvalu%20recipe"
+      },
+      {
+        "name": "Breadfruit",
+        "wikipediaTitle": "Breadfruit",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Breadfruit",
+        "summary": "Breadfruit is a species of flowering tree in the mulberry and jackfruit family (Moraceae). Its name is derived from the texture of the moderately ripe fruit when cooked, similar to freshly baked bread and having a potato-like flavor.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a7/ProfileOfTokelau2011.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Statistics New Zealand / CC BY 3.0 nz",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Breadfruit",
+        "videoUrl": "https://www.youtube.com/results?search_query=Breadfruit%20Tuvalu%20recipe"
+      },
+      {
+        "name": "Music of Tuvalu",
+        "wikipediaTitle": "Music of Tuvalu",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Music_of_Tuvalu",
+        "summary": "The traditional music of Tuvalu consists of dances, including fatele, fakanau and fakaseasea. The influence of the Samoan missionaries sent to Tuvalu by the London Missionary Society from the 1860s resulted in the suppression of songs about the traditional religions or magic and many songs were lost. As the influence of the missionaries diminished in the 20th century the traditional dances were revived and the siva dance tradition from Samoa also became popular.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/27October2006.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikinews contributors / CC BY 2.5",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Music_of_Tuvalu",
+        "videoUrl": "https://www.youtube.com/results?search_query=Music%20of%20Tuvalu%20Tuvalu%20recipe"
+      },
+      {
+        "name": "Earth oven",
+        "wikipediaTitle": "Earth oven",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Earth_oven",
+        "summary": "An earth oven, ground oven or cooking pit is one of the simplest and most ancient cooking structures. The earliest known earth oven was discovered in Central Europe and dated to 29,000 BC. At its most basic, an earth oven is a pit in the ground used to trap heat and bake, smoke, or steam food. Earth ovens have been used in many places and cultures in the past, and the presence of such cooking pits is a key sign of human settlement often sought by archaeologists. Earth ovens remain a common tool for cooking large quantities of food where no equipment is available. They have been used in various civilizations around the world and are still commonly found in the Pacific region to date.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Earth_oven",
+        "videoUrl": "https://www.youtube.com/results?search_query=Earth%20oven%20Tuvalu%20recipe"
+      },
+      {
+        "name": "Coconut milk",
+        "wikipediaTitle": "Coconut milk",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Coconut_milk",
+        "summary": "Coconut milk is a plant milk extracted from the grated pulp of mature coconuts. The opacity and rich taste of the milky-white liquid are due to its high oil content, most of which is saturated fat. Coconut milk is a traditional food ingredient used in Southeast Asia, Oceania, South Asia, and East Africa. It is also used for cooking in the Caribbean, Central America, northern parts of South America and West Africa, where coconuts were introduced during the colonial era.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/The_EC_market_for_U.S._agricultural_exports_-_a_share_analysis_%28IA_CAT87209133%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "McNitt, Harold A / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Coconut_milk",
+        "videoUrl": "https://www.youtube.com/results?search_query=Coconut%20milk%20Tuvalu%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:18:31.153Z"
+  },
+  "ug": {
+    "code": "ug",
+    "name": "Uganda",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Ugandan_cuisine",
+    "dishes": [
+      {
+        "name": "Sauce",
+        "wikipediaTitle": "Sauce",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Sauce",
+        "summary": "In cooking, a sauce is a liquid, cream, or semi-solid food, served on or used in preparing other foods. Most sauces are not normally consumed by themselves; they add flavour, texture, and visual appeal to a dish. Sauce is a French word probably from the post-classical Latin salsa, derived from the classical salsus 'salted'. Possibly the oldest recorded European sauce is garum, the fish sauce used by the Ancient Romans, while doubanjiang, the Chinese soy bean paste, is mentioned in Rites of Zhou 20.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Ugandan_food_with_peas_as_sauce.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rebeccananonof / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sauce",
+        "videoUrl": "https://www.youtube.com/results?search_query=Sauce%20Uganda%20recipe"
+      },
+      {
+        "name": "Ugali",
+        "wikipediaTitle": "Ugali",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ugali",
+        "summary": "Ugali, also known as posho, nsima, papa, pap, bogobe, sadza, isitshwala, akume, amawe, ewokple, akple, and other names, is a type of corn meal made from maize or corn or mahindi flour in several African countries: Kenya, Uganda, South Sudan, Tanzania, Zimbabwe, Zambia, Lesotho, Eswatini, Angola, Mozambique, Namibia, Democratic Republic of the Congo, Rwanda, Malawi, Botswana and South Africa, and in West Africa by the Ewes of Togo, Ghana, Benin, Nigeria and Ivory Coast. It is cooked in boiling water or milk until it reaches a stiff or firm dough-like consistency. In 2017, the dish was added to the UNESCO Representative List of the Intangible Cultural Heritage of Humanity, one of a few foods on the list.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/66/Ugali_Posho.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "safaritravelplus / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ugali",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ugali%20Uganda%20recipe"
+      },
+      {
+        "name": "Matoke",
+        "wikipediaTitle": "Matoke",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Matoke",
+        "summary": "Matoke, locally also known as matooke, amatooke in Buganda, ekitookye in southwestern Uganda, ekitooke in western Uganda, kamatore in Lugisu, ebitooke in northwestern Tanzania, igitoki in Rwanda, Burundi and by the cultivar name East African Highland banana, are a group of starchy triploid banana cultivars, originating from the African Great Lakes. The fruit is harvested green, carefully peeled, and then cooked and often mashed or pounded into a meal. In Uganda and Rwanda, the fruit is steam-cooked, and the mashed meal is considered a national dish in both countries.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7d/Matoke_market_in_kampala_uganda.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Moongateclimber / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Matoke",
+        "videoUrl": "https://www.youtube.com/results?search_query=Matoke%20Uganda%20recipe"
+      },
+      {
+        "name": "Ugali",
+        "wikipediaTitle": "Ugali",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ugali",
+        "summary": "Ugali, also known as posho, nsima, papa, pap, bogobe, sadza, isitshwala, akume, amawe, ewokple, akple, and other names, is a type of corn meal made from maize or corn or mahindi flour in several African countries: Kenya, Uganda, South Sudan, Tanzania, Zimbabwe, Zambia, Lesotho, Eswatini, Angola, Mozambique, Namibia, Democratic Republic of the Congo, Rwanda, Malawi, Botswana and South Africa, and in West Africa by the Ewes of Togo, Ghana, Benin, Nigeria and Ivory Coast. It is cooked in boiling water or milk until it reaches a stiff or firm dough-like consistency. In 2017, the dish was added to the UNESCO Representative List of the Intangible Cultural Heritage of Humanity, one of a few foods on the list.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/66/Ugali_Posho.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "safaritravelplus / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ugali",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ugali%20Uganda%20recipe"
+      },
+      {
+        "name": "Millet",
+        "wikipediaTitle": "Millet",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Millet",
+        "summary": "Millets are a highly varied group of small-seeded grasses, widely grown around the world as cereal crops or grains for fodder and human food. Most millets belong to the tribe Paniceae.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Kalo_%28African_Millet_Bread%29_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ssemmanda will / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Millet",
+        "videoUrl": "https://www.youtube.com/results?search_query=Millet%20Uganda%20recipe"
+      },
+      {
+        "name": "Sweet potato",
+        "wikipediaTitle": "Sweet potato",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Sweet_potato",
+        "summary": "The sweet potato or sweetpotato is a dicotyledonous plant in the morning glory family, Convolvulaceae. Its sizeable, starchy, sweet-tasting tuberous roots are used as a root vegetable, which is a staple food in parts of the world. Cultivars of the sweet potato have been bred to bear tubers with flesh and skin of various colors. Moreover, the young shoots and leaves are occasionally eaten as greens. The sweet potato and the potato are only distantly related, both being in the order Solanales. Although darker sweet potatoes are often known as yams in parts of North America, they are even more distant from actual yams, which are monocots in the order Dioscoreales.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Farmers_in_a_sweet_potato_garden.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Emmanuel Ssekaggo / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sweet_potato",
+        "videoUrl": "https://www.youtube.com/results?search_query=Sweet%20potato%20Uganda%20recipe"
+      },
+      {
+        "name": "Chapati",
+        "wikipediaTitle": "Chapati",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chapati",
+        "summary": "Chapati is an unleavened flatbread originating from the Indian subcontinent. Chapatis are made of whole-wheat flour known as atta, mixed into dough with water. It is cooked on an iron griddle known as a tava, then puffed up over direct heat. Another version, in East African cuisine, is instead fried. Chapati is a form of roti, and the two are sometimes conflated. It is common in South Asia—even in areas where rice is the typical staple—as well as in most East African countries. It is also eaten by the South Asian diaspora.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Chapati_in_uganda.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "MBABALI DENIS JORUM / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chapati",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chapati%20Uganda%20recipe"
+      },
+      {
+        "name": "Cornmeal",
+        "wikipediaTitle": "Cornmeal",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cornmeal",
+        "summary": "Cornmeal is a meal ground from dried maize. It is a common staple food and is ground to coarse, medium, and fine consistencies, but it is not as fine as wheat flour can be. In Mexico and Louisiana, very finely ground cornmeal is referred to as corn flour. When fine cornmeal is made from maize that has been soaked in an alkaline solution, e.g., limewater, it is called masa harina, which is used for making arepas, tamales, and tortillas. Boiled cornmeal is called polenta in Italy and is also a traditional dish and bread substitute in Romania.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8d/Northern_Uganda_Conflict_Displace_Camps_%26_Human_Dignity_for_the_Acholi_Ethnic_group.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Papito Francis Ojok / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cornmeal",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cornmeal%20Uganda%20recipe"
+      },
+      {
+        "name": "Dough",
+        "wikipediaTitle": "Dough",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Dough",
+        "summary": "Dough is a malleable, sometimes elastic paste most commonly made from flour or meal. Dough is typically made by mixing flour with a small amount of water or other liquid, and sometimes includes yeast, other leavening agents, or ingredients such as fats or flavourings.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/98/Chapati_6.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ssemmanda will / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Dough",
+        "videoUrl": "https://www.youtube.com/results?search_query=Dough%20Uganda%20recipe"
+      },
+      {
+        "name": "Grits",
+        "wikipediaTitle": "Grits",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Grits",
+        "summary": "Grits is a type of porridge made from coarsely ground dried corn (maize) or hominy, the latter being maize that has been treated with an alkali in a process called nixtamalization, with the pericarp removed. It is eaten primarily in the United States. Grits are cooked in warm salted water or milk. They are often served with flavorings as a breakfast dish, though it is also served as a lunch or supper dish, particularly with meat. Grits can be savory or sweet, with savory seasonings being more common. Grits are similar to other thick maize-based porridges from around the world, such as polenta, mieliepap, and mămăligă. Italian-Americans living in the delta of Arkansas and Mississippi recognized this and have substituted grits for traditional polenta dishes. The dish originated in the Southern United States but is now available nationwide. Grits are part of the dinner main dish shrimp and grits, served primarily in the Southern United States.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/33/Proceedings_of_Conference_on_Soybean_Products_for_Protein_in_Human_Foods_%28IA_CAT10507709%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Conference on Soybean Products for Protein in Human Foods (1961 : Peoria, Ill.)\nUnited States. Agricultural Research Service. Northern Utilization Research and Development Division / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Grits",
+        "videoUrl": "https://www.youtube.com/results?search_query=Grits%20Uganda%20recipe"
+      },
+      {
+        "name": "Condiment",
+        "wikipediaTitle": "Condiment",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Condiment",
+        "summary": "A condiment is a preparation that is added to food, typically after cooking, to enhance the flavor, to complement the dish, or to impart a specific flavor. Such specific flavors generally add sweetness or pungency, or sharp or piquant flavors. The seasonings and spices common in many different cuisine arise from global introductions of foreign trade. Condiments include those added to cooking to impart flavor, such as barbecue sauce and soy sauce; those added before serving, such as mayonnaise in a sandwich; and those added tableside to taste, such as ketchup with fast food. Condiments can also provide other health benefits to diets that lack micronutrients.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/16/My_Research_Article%2C_on_Food_Hygiene.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Mugisa Godfrey / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Condiment",
+        "videoUrl": "https://www.youtube.com/results?search_query=Condiment%20Uganda%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:18:44.740Z"
+  },
+  "ua": {
+    "code": "ua",
+    "name": "Ukraine",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Ukrainian_cuisine",
+    "dishes": [
+      {
+        "name": "Borscht",
+        "wikipediaTitle": "Borscht",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Borscht",
+        "summary": "Borscht is a sour soup, made with meat stock, vegetables and seasonings, common in Eastern Europe, Central Europe and Northern Asia. In English, the word borscht, borrowed via Yiddish, is most often associated with the variant of the soup originating in Ukraine, made with red beetroots as one of the main ingredients, which give the dish its distinctive red color. The same name, however, is also used for a wide selection of sour-tasting soups without beetroots, such as sorrel-based green borscht, rye-based white borscht, and cabbage borscht.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/17/Borscht_with_bread.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Juerg Vollmer from Zürich, Schweiz / CC BY-SA 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Borscht",
+        "videoUrl": "https://www.youtube.com/results?search_query=Borscht%20Ukraine%20recipe"
+      },
+      {
+        "name": "Chebureki",
+        "wikipediaTitle": "Chebureki",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chebureki",
+        "summary": "Chebureki are deep-fried turnovers with a filling of ground or minced meat and onions. A popular street dish, they are made with a single round piece of dough folded over the filling in a crescent shape. They have become widespread in Eastern Europe in the 20th century.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chebureki",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chebureki%20Ukraine%20recipe"
+      },
+      {
+        "name": "Yantiq",
+        "wikipediaTitle": "Yantiq",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Yantiq",
+        "summary": "Yantiq or yantyk is a Crimean Tatar turnover. Unlike a cheburek, a yantiq is grilled without oil, not deep-fried.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Yantiq",
+        "videoUrl": "https://www.youtube.com/results?search_query=Yantiq%20Ukraine%20recipe"
+      },
+      {
+        "name": "Kibinai",
+        "wikipediaTitle": "Kibinai",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kibinai",
+        "summary": "Kibinai, kybyn, or kibin are traditional pastries filled with mutton and onion, popular with the Karaite ethnic minority in Lithuania. As everything Karaite in Lithuania, they are mostly associated with the city of Trakai. English-language travel guides compare them to Cornish pasties.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kibinai",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kibinai%20Ukraine%20recipe"
+      },
+      {
+        "name": "Cabbage roll",
+        "wikipediaTitle": "Cabbage roll",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cabbage_roll",
+        "summary": "A cabbage roll is a dish consisting of cooked cabbage leaves wrapped around a variety of fillings. It is common to the cuisines of Central, Eastern and Southeastern Europe and much of Western Asia, Northern China, and parts of North Africa.\nMeat fillings are traditional in Europe, and include beef, lamb, or pork seasoned with garlic, onion, and spices. Grains such as rice and barley, mushrooms, and vegetables are often included as well. Fermented cabbage leaves are used for wrapping, particularly in southeastern Europe. In Asia, seafood, tofu, and shiitake mushrooms may also be used. Chinese cabbage is often used as a wrapping.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Stuffed_Cabbage_Golomki.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Steven Depolo from Grand Rapids, MI, USA / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cabbage_roll",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cabbage%20roll%20Ukraine%20recipe"
+      },
+      {
+        "name": "Hutsul sheep bryndzya",
+        "wikipediaTitle": "Hutsul sheep bryndzya",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Hutsul_sheep_bryndzya",
+        "summary": "Hutsul sheep bryndzya is a traditional table cheese made of sheep's milk in the Ukrainian Carpathians. This cheese is associated with the culture of the Hutsuls and is an important symbol of regional identity and heritage.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Hutsul_sheep_bryndzya",
+        "videoUrl": "https://www.youtube.com/results?search_query=Hutsul%20sheep%20bryndzya%20Ukraine%20recipe"
+      },
+      {
+        "name": "Fruit butter",
+        "wikipediaTitle": "Fruit butter",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Fruit_butter",
+        "summary": "A fruit butter, or lekvar, is a sweet spread made of fruit cooked to a paste, then lightly sweetened. It falls into the same category as jelly and jam, but is differentiated by its completely smooth texture. Apple butter and plum butter are common examples, but fruit butters can be made from any firm fruit. Fruits with a higher water content may also be used if given longer cooking times. Other commonly used fruits are pears, peaches, cherries, nectarines, berries, squashes, and apricots. Fruit pastes, such as quince cheese are popular in Latin American countries, are similar but more highly sweetened and jelled. They are sold in shallow tins or as wrapped bricks, while fruit butters usually come in wide-mouthed jars and are more common in Central and Eastern Europe.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Food_news_for_consumers_%28IA_CAT82764316048%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Food Safety and Quality Service\nUnited States. Food Safety and Inspection Service / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Fruit_butter",
+        "videoUrl": "https://www.youtube.com/results?search_query=Fruit%20butter%20Ukraine%20recipe"
+      },
+      {
+        "name": "Banitsa",
+        "wikipediaTitle": "Banitsa",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Banitsa",
+        "summary": "Banitsa, also transliterated as banica and banitza, is a traditional pie made in Bulgaria. It is also made in Budjak, where it is known as milina by Ukrainian Bulgarians; North Macedonia; and southeastern Serbia. In southeastern Serbia, it may also be known as gibanica. Banitsa is prepared by layering a mixture of whisked eggs, plain yogurt, and pieces of white brined cheese between filo pastry and then baking it in an oven.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Banitsa",
+        "videoUrl": "https://www.youtube.com/results?search_query=Banitsa%20Ukraine%20recipe"
+      },
+      {
+        "name": "Plăcintă",
+        "wikipediaTitle": "Plăcintă",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pl%C4%83cint%C4%83",
+        "summary": "Plăcintă is a Romanian and Moldovan traditional pastry resembling a thin, small round or square-shaped cake, usually filled with apples or a soft cheese such as Urdă.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pl%C4%83cint%C4%83",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pl%C4%83cint%C4%83%20Ukraine%20recipe"
+      },
+      {
+        "name": "Yavoriv pie",
+        "wikipediaTitle": "Yavoriv pie",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Yavoriv_pie",
+        "summary": "Yavoriv pie is a Ukrainian savoury pie and traditional dish in Yavoriv Raion and Galicia in general, included in the National List of Elements of the Intangible Cultural Heritage of Ukraine. It is widespread in Galicia and sometimes referred to simply as \"pyrih\".",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Yavoriv_pie",
+        "videoUrl": "https://www.youtube.com/results?search_query=Yavoriv%20pie%20Ukraine%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:18:57.737Z"
+  },
+  "ae": {
+    "code": "ae",
+    "name": "United Arab Emirates",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Emirati_cuisine",
+    "dishes": [
+      {
+        "name": "Lamb and mutton",
+        "wikipediaTitle": "Lamb and mutton",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "summary": "Lamb and mutton, collectively sheep meat, is meat from the domestic sheep, Ovis aries. It is generally divided into three types: lamb, from sheep in their first year; hogget, from sheep in their second; and mutton, from older sheep.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/67/Food_import_demand_of_eight_OPEC_countries_%28IA_CAT83798240%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Coyle, James R / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lamb%20and%20mutton%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Goat meat",
+        "wikipediaTitle": "Goat meat",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "summary": "Goat meat is the meat of the domestic goat. The term denotes especially the meat of older animals, while meat from young goats is called kid meat. In South Asian cuisine, goat meat is called mutton.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/67/Food_import_demand_of_eight_OPEC_countries_%28IA_CAT83798240%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Coyle, James R / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "videoUrl": "https://www.youtube.com/results?search_query=Goat%20meat%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Camel",
+        "wikipediaTitle": "Camel",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Camel",
+        "summary": "A camel is an even-toed ungulate in the genus Camelus that bears distinctive fatty deposits known as \"humps\" on its back. Camels have long been domesticated and, as livestock, they provide food and textiles. Camels are working animals especially suited to their desert habitat and are a vital means of transport for passengers and cargo. There are three surviving species of camel. The one-humped dromedary makes up 94% of the world's camel population, and the two-humped Bactrian camel makes up 6%. The wild Bactrian camel is a distinct species that is not ancestral to the domestic Bactrian camel, and is now critically endangered, with fewer than 1,000 individuals.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6d/MCIA-UnitedArabEmiratesHandbook.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "USMC / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Camel",
+        "videoUrl": "https://www.youtube.com/results?search_query=Camel%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Saffron",
+        "wikipediaTitle": "Saffron",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Saffron",
+        "summary": "Saffron is a spice derived from the flower of Crocus sativus, commonly known as the \"saffron crocus\". The vivid crimson stigma and styles, called threads, are collected and dried for use mainly as a seasoning and colouring agent in food. Saffron crocus was slowly propagated throughout much of Eurasia and later brought to parts of North Africa, North America, and Oceania.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Iran%2C_agricultural_production_and_trade_%28IA_iranagricultural357kurt%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Kurtzig, Michael E / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Saffron",
+        "videoUrl": "https://www.youtube.com/results?search_query=Saffron%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Alcohol (drug)",
+        "wikipediaTitle": "Alcohol (drug)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Alcohol_(drug)",
+        "summary": "Alcohol, sometimes referred to by the chemical name ethanol, is the active ingredient in alcoholic drinks such as beer, wine, and distilled spirits. Alcohol is a central nervous system (CNS) depressant, decreasing electrical activity of neurons in the brain, which causes the characteristic effects of alcohol intoxication (\"drunkenness\"). Among other effects, alcohol produces euphoria, decreased anxiety, increased sociability, sedation, and impairment of cognitive, memory, motor, and sensory function.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6d/MCIA-UnitedArabEmiratesHandbook.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "USMC / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Alcohol_(drug)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Alcohol%20(drug)%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Asida",
+        "wikipediaTitle": "Asida",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Asida",
+        "summary": "Asida, a common dish in the Arab world, is a lump of dough made by stirring wheat flour into boiling water, sometimes with added butter or honey. Similar in texture to fufu, it is eaten mainly in Middle East and African countries. It is considered one of the best-known desserts and traditional dishes in many Arab countries.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Asida",
+        "videoUrl": "https://www.youtube.com/results?search_query=Asida%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Balaleet",
+        "wikipediaTitle": "Balaleet",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Balaleet",
+        "summary": "Balaleet or balalit is a traditional sweet and savoury dish popular in Eastern Arabian cuisine.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Balaleet",
+        "videoUrl": "https://www.youtube.com/results?search_query=Balaleet%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Biryani",
+        "wikipediaTitle": "Biryani",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Biryani",
+        "summary": "Biryani is a mixed rice dish traditionally made with rice, meat, seafood, or vegetables, and spices. It was present in Mughal-era India, though whether it was created there is debated. It is thought to derive from a Persian rice dish, either pilau or birinj biryan. The dish makes use of slow-cooking as in Persian pilau, combined with Persian-style yoghurt-marinated meat and a spicy Indian style of cooking; it was likely developed in the Mughal court kitchens. It is also possible that biryani was brought to South India before the Mughal era, or that pilau was brought to India and biryani was developed from it before being adopted by the Mughals.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/68/Chicken_Biryani%2C_Air_Arabia%2C_2025_%2802%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Bahnfrend / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Biryani",
+        "videoUrl": "https://www.youtube.com/results?search_query=Biryani%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Harees",
+        "wikipediaTitle": "Harees",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Harees",
+        "summary": "Harees, haresa, hareesa, arizah, harise, jarish, jareesh,, harisa, or korkot is a dish of boiled, cracked, or coarsely-ground cracked wheat or bulgur, mixed with meat, spices, and butter. Its consistency varies between a porridge and a gruel. Harees is known throughout Armenia where it is served on Easter, and the Arab world, where it is commonly eaten in Arab states of the Persian Gulf in the month of Ramadan, and in Iraq, Lebanon and Bahrain during Ashura by Shia Muslims.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5b/Foreign_agricultural_trade_of_the_United_States_Calendar_year_1998_supplement_-_United_States_Department_of_Agriculture%2C_Economic_Research_Service_%28IA_CAT92965553015%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Harees",
+        "videoUrl": "https://www.youtube.com/results?search_query=Harees%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Kabsa",
+        "wikipediaTitle": "Kabsa",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kabsa",
+        "summary": "Kabsa, also known as Makboos or Machboos, is an Arab mixed rice dish that originates from Saudi Arabia or Yemen. It is commonly regarded as a national dish in all the countries of the Gulf Cooperation Council. It can also be found in regions such as southern Iran and Gaza in Palestine.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kabsa",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kabsa%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Khabees",
+        "wikipediaTitle": "Khabees",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Khabees",
+        "summary": "Khabees is a traditional sweet dish common in the Persian Gulf Arab States and Qatar, Bahrain, Kuwait, Oman, Saudi Arabia and the United Arab Emirates. It is made of flour and oil and is commonly served as a traditional dish for breakfast, especially during Eid days.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Khabees",
+        "videoUrl": "https://www.youtube.com/results?search_query=Khabees%20United%20Arab%20Emirates%20recipe"
+      },
+      {
+        "name": "Lokma",
+        "wikipediaTitle": "Lokma",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lokma",
+        "summary": "Lokma is a dessert made of leavened and deep-fried dough balls, soaked in syrup or honey, sometimes coated with cinnamon or other ingredients. The dish was described as early as the 13th century by al-Baghdadi as luqmat al-qādi, \"judge's morsels\".",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lokma",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lokma%20United%20Arab%20Emirates%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:19:09.559Z"
+  },
+  "gb": {
+    "code": "gb",
+    "name": "United Kingdom",
+    "cuisinePage": "https://en.wikipedia.org/wiki/British_cuisine",
+    "dishes": [
+      {
+        "name": "Curry in the United Kingdom",
+        "wikipediaTitle": "Curry in the United Kingdom",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Curry_in_the_United_Kingdom",
+        "summary": "Curry, a spicy dish derived from Indian cooking by way of British Raj–era Anglo-Indian cuisine, is popular in the United Kingdom. Curry recipes have been printed in Britain since 1747, when Hannah Glasse gave a recipe for a chicken \"currey the India way\". Curry powder was first advertised in 1784. In the 19th century, many more recipes appeared in the popular cookery books of the time. Curries in Britain are widely described with Indian terms, not necessarily used for the same dishes or even known in India. For example, korma is a mild sauce with almond and coconut; Madras has a hot, slightly sour sauce; phall denotes an extra hot sauce, and pasanda means a mild sauce with cream and coconut milk. One type of curry, chicken tikka masala, has become widespread enough to be described as a national dish.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Emigration_from_the_United_Kingdom_%28IA_jstor-2337910%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Curry_in_the_United_Kingdom",
+        "videoUrl": "https://www.youtube.com/results?search_query=Curry%20in%20the%20United%20Kingdom%20United%20Kingdom%20recipe"
+      },
+      {
+        "name": "Curry powder",
+        "wikipediaTitle": "Curry powder",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Curry_powder",
+        "summary": "Curry powder is any of several spice mixes for curry, adapted from garam masala in Indian cuisine. It was first sold by Indian merchants to British traders during the British Raj. The first commercial curry powder product was sold by Sorlie's Perfumery in London in 1784. Brands such as Crosse & Blackwell and Sharwood's were established in the 18th and 19th centuries.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Fish_Curry_%28965863650%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "rovingI / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Curry_powder",
+        "videoUrl": "https://www.youtube.com/results?search_query=Curry%20powder%20United%20Kingdom%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:19:14.553Z"
+  },
+  "us": {
+    "code": "us",
+    "name": "United States",
+    "cuisinePage": "https://en.wikipedia.org/wiki/American_cuisine",
+    "dishes": [
+      {
+        "name": "Shellfish",
+        "wikipediaTitle": "Shellfish",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Shellfish",
+        "summary": "Shellfish, in colloquial and fisheries usage, are exoskeleton-bearing aquatic invertebrates used as food, including various species of molluscs, crustaceans, and echinoderms. Although most kinds of shellfish are harvested from saltwater environments, some are found in freshwater. In addition, a few species of land crabs are eaten, for example Cardisoma guanhumi in the Caribbean. Shellfish are among the most common food allergens.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/39/FSIS_facts_-_United_States_Department_of_Agriculture%2C_Food_Safety_and_Inspection_Service._%28IA_CAT85809689028%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Shellfish",
+        "videoUrl": "https://www.youtube.com/results?search_query=Shellfish%20United%20States%20recipe"
+      },
+      {
+        "name": "Cod as food",
+        "wikipediaTitle": "Cod as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cod_as_food",
+        "summary": "Cod and other cod-like fish have been widely used as food through history. Other cod-like fish come from the same family (Gadidae) that cod belong to, such as haddock, pollock, and whiting.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/37/Gathering_cranberries_near_Cape_Cod%2C_Mass.%2C_photo_from_The_Encyclopedia_of_Food_by_Artemas_Ward.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Artemas Ward / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cod_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cod%20as%20food%20United%20States%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:19:22.205Z"
+  },
+  "uy": {
+    "code": "uy",
+    "name": "Uruguay",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Uruguayan_cuisine",
+    "dishes": [
+      {
+        "name": "Blood sausage",
+        "wikipediaTitle": "Blood sausage",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Blood_sausage",
+        "summary": "A blood sausage is a sausage filled with blood that is cooked or dried and mixed with a filler until it is thick enough to solidify when cooled. Most commonly, the blood of pigs, sheep, lamb, cow, chicken, or goose is used.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/03/Asado_uruguayo_familiar.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Fernando da Rosa (Fedaro) / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Blood_sausage",
+        "videoUrl": "https://www.youtube.com/results?search_query=Blood%20sausage%20Uruguay%20recipe"
+      },
+      {
+        "name": "Stuffed peppers",
+        "wikipediaTitle": "Stuffed peppers",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Stuffed_peppers",
+        "summary": "Stuffed peppers is a dish common in many cuisines. It consists of hollowed or halved bell peppers filled with any of a variety of fillings, often including meat, vegetables, cheese, rice, or sauce. The dish is usually assembled by filling the cavities of the peppers and then cooking.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1e/The_world%27s_food_resources_%28IA_cu31924032481974%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Smith, J. Russell (Joseph Russell), 1874-1966 / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Stuffed_peppers",
+        "videoUrl": "https://www.youtube.com/results?search_query=Stuffed%20peppers%20Uruguay%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:19:25.541Z"
+  },
+  "uz": {
+    "code": "uz",
+    "name": "Uzbekistan",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Uzbek_cuisine",
+    "listPage": "https://en.wikipedia.org/wiki/List_of_Uzbek_dishes",
+    "dishes": [
+      {
+        "name": "Bread",
+        "wikipediaTitle": "Bread",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Bread",
+        "summary": "Bread is a baked food product made from water, flour, and often yeast. It is a staple food across the world, particularly in Europe and the Middle East. Throughout recorded history and around the world, it has been an important part of many cultures' diets. It is one of the oldest human-made foods, having been of significance since the dawn of agriculture, and plays an essential role in both religious rituals and secular culture.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9f/Bread_vendors_in_Uzbekistan.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Seung-Jun Bae / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bread",
+        "videoUrl": "https://www.youtube.com/results?search_query=Bread%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Noodle",
+        "wikipediaTitle": "Noodle",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Noodle",
+        "summary": "Noodles are a type of food typically made from unleavened dough which is rolled flat and cut, stretched, or extruded into long strips or strings. Noodles are a staple food in many cultures and made into a variety of shapes. The most common noodles are those derived from Chinese cuisine or Italian cuisine. Italian noodles are generally referred to as pasta. In Chinese cuisine, the overarching term for noodles is 麵, which refers specifically to dough-based noodles made from wheat or other grain-based dough. Chinese noodles also include another category, called 粉 (fěn), which are not made by kneading dough but from a starch slurry, such as rice noodles, and cellophane noodles. These are not made from wheat dough, but are still regarded as noodles in English due to their physical form and culinary role.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/18/PeaceCorpsUzbek.djvu?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "U.S. Dept. of Education / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Noodle",
+        "videoUrl": "https://www.youtube.com/results?search_query=Noodle%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Uzbek plov",
+        "wikipediaTitle": "Uzbek plov",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Uzbek_plov",
+        "summary": "Uzbek plov, also known as palov or osh, is a traditional Uzbek rice dish made with meat, julienned carrots, onions, garlic, rice, cumin powder and cooked together in oil or fat. It is regarded as the national dish of Uzbekistan and is of significant importance to the country's history, tradition, and culture.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/35/Central_Asian_Plov_Centre_in_Tashkent.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Adam Harangozó / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Uzbek_plov",
+        "videoUrl": "https://www.youtube.com/results?search_query=Uzbek%20plov%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Mastava",
+        "wikipediaTitle": "Mastava",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Mastava",
+        "summary": "Māstāba, or mastava, is a traditional Uzbek and Tajik soup. Sometimes it is called \"liquid pilaf\".",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/18/PeaceCorpsUzbek.djvu?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "U.S. Dept. of Education / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Mastava",
+        "videoUrl": "https://www.youtube.com/results?search_query=Mastava%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Nisholda",
+        "wikipediaTitle": "Nisholda",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Nisholda",
+        "summary": "Nisholda, also spelled as nishallo, nishaldo, or nisholda is a sweet dish that resembles white jam, only thicker. It is popular in Afghan, Iranian, Tajik, and Uzbek cuisines. Nisholda is also a traditional dish among the Bukharan Jews.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/36/Nisholda_produced_in_Russia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "ИП Кадиров Х.Р. / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Nisholda",
+        "videoUrl": "https://www.youtube.com/results?search_query=Nisholda%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Steak tartare",
+        "wikipediaTitle": "Steak tartare",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Steak_tartare",
+        "summary": "Steak tartare, or tartar steak, is a French dish of raw ground (minced) beef. It is usually served with onions, capers, parsley or chive, salt, pepper, Worcestershire sauce and other seasonings, often presented separately, to be added to taste. It is commonly served topped with a raw egg yolk. It is similar to Piedmontese battuta al coltello, as well as Levantine kibbeh nayyeh, Ethiopian kitfo, Turkish çiğ köfte, German Mett and Korean yukhoe.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Steak_tartare",
+        "videoUrl": "https://www.youtube.com/results?search_query=Steak%20tartare%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Dimlama",
+        "wikipediaTitle": "Dimlama",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Dimlama",
+        "summary": "Dimlama or dymdama is an Uzbek stew made with various combinations of meat, potatoes, onions, vegetables, and sometimes fruits. Meat and vegetables are cut into large pieces and placed in layers in a tightly sealed pot to simmer slowly in their own juices. Vegetables for dimlama may include, in addition to potatoes and onions, carrots, cabbage, eggplants, tomatoes, sweet peppers, spiced with garlic and a variety of herbs and condiments. Dimlama is usually cooked during spring and summer when there is a wide choice of vegetables. It is served on a large plate and eaten with a spoon.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Dimlama.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Shahriyor06 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Dimlama",
+        "videoUrl": "https://www.youtube.com/results?search_query=Dimlama%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Lamb and mutton",
+        "wikipediaTitle": "Lamb and mutton",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "summary": "Lamb and mutton, collectively sheep meat, is meat from the domestic sheep, Ovis aries. It is generally divided into three types: lamb, from sheep in their first year; hogget, from sheep in their second; and mutton, from older sheep.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e6/Foreign_crops_and_markets_%28IA_foreigncropsmark1922unit%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Foreign Agricultural Service\nUnited States. Bureau of Agricultural Economics\nUnited States. Office of Foreign Agricultural Relations / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lamb%20and%20mutton%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Simmering",
+        "wikipediaTitle": "Simmering",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Simmering",
+        "summary": "Simmering is a food preparation technique by which foods are cooked in hot liquids kept just below the boiling point of water and above poaching temperature. To create a steady simmer, a liquid is brought to a boil, then its heat source is reduced to a lower, constant intensity. While simmering, a liquid will show little movement without approaching a rolling boil.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5e/U.S._PACIFIC_COMMAND_POSTURE_%28IA_gov.gpo.fdsys.CHRG-107shrg80485%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Committee on Appropriations / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Simmering",
+        "videoUrl": "https://www.youtube.com/results?search_query=Simmering%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Poultry",
+        "wikipediaTitle": "Poultry",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Poultry",
+        "summary": "Poultry are domesticated birds kept by humans for the purpose of harvesting animal products such as meat, eggs or feathers. The practice of raising poultry is known as poultry farming. These birds are most typically members of the superorder Galloanserae (fowl), especially the order Galliformes. The term also includes waterfowls of the family Anatidae but does not include wild birds hunted for food known as game or quarry.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/57/In_brief_-_The_State_of_Food_and_Agriculture_2020.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "http://www.fao.org Food and Agriculture Organization / CC BY-SA 3.0 igo",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Poultry",
+        "videoUrl": "https://www.youtube.com/results?search_query=Poultry%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Goat meat",
+        "wikipediaTitle": "Goat meat",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "summary": "Goat meat is the meat of the domestic goat. The term denotes especially the meat of older animals, while meat from young goats is called kid meat. In South Asian cuisine, goat meat is called mutton.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2b/World_agriculture_outlook_%26_situation_%28IA_CAT81764091008%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Department of Agriculture. Economic Research Service\nUnited States. World Food and Agricultural Outlook and Situation Board / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "videoUrl": "https://www.youtube.com/results?search_query=Goat%20meat%20Uzbekistan%20recipe"
+      },
+      {
+        "name": "Camel",
+        "wikipediaTitle": "Camel",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Camel",
+        "summary": "A camel is an even-toed ungulate in the genus Camelus that bears distinctive fatty deposits known as \"humps\" on its back. Camels have long been domesticated and, as livestock, they provide food and textiles. Camels are working animals especially suited to their desert habitat and are a vital means of transport for passengers and cargo. There are three surviving species of camel. The one-humped dromedary makes up 94% of the world's camel population, and the two-humped Bactrian camel makes up 6%. The wild Bactrian camel is a distinct species that is not ancestral to the domestic Bactrian camel, and is now critically endangered, with fewer than 1,000 individuals.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/78/An_account_of_the_Kingdom_of_Caubul_and_its_dependencies_in_Persia%2C_Tartary_and_India_comprising_a_view_of_the_Afghaun_nation_and_a_history_of_the_Doornaunee_Monarchy%2C_%28IA_dli.csl.7034%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Elphinstone, Mountstuart / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Camel",
+        "videoUrl": "https://www.youtube.com/results?search_query=Camel%20Uzbekistan%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:19:38.636Z"
+  },
+  "vu": {
+    "code": "vu",
+    "name": "Vanuatu",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Vanuatuan_cuisine",
+    "dishes": [
+      {
+        "name": "Kava",
+        "wikipediaTitle": "Kava",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kava",
+        "summary": "Kava or kava kava is a plant in the pepper family, native to the Pacific Islands. The name kava is from Tongan and Marquesan, meaning 'bitter'. Kava can refer to either the plant or a psychoactive beverage made from its root. The beverage is a traditional ceremonial and recreational drink from Polynesia, Micronesia, and Melanesia. Nakamals and kava bars exist in many countries. Traditional kava is made by grinding fresh or dried kava root, mixing it with water or coconut milk, and straining it into a communal bowl. Outside the South Pacific, kava is typically prepared by soaking dried root powder in water and straining it. It is consumed socially for its psychoactive effects, comparable to those produced by alcohol but without significant cognitive impairment or addiction risk. Kava also produces a numbing sensation in the mouth.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Kava-in-bottle-from-vanuatu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "No machine-readable author provided. Ib0ga assumed (based on copyright claims). / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kava",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kava%20Vanuatu%20recipe"
+      },
+      {
+        "name": "Kava",
+        "wikipediaTitle": "Kava",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Kava",
+        "summary": "Kava or kava kava is a plant in the pepper family, native to the Pacific Islands. The name kava is from Tongan and Marquesan, meaning 'bitter'. Kava can refer to either the plant or a psychoactive beverage made from its root. The beverage is a traditional ceremonial and recreational drink from Polynesia, Micronesia, and Melanesia. Nakamals and kava bars exist in many countries. Traditional kava is made by grinding fresh or dried kava root, mixing it with water or coconut milk, and straining it into a communal bowl. Outside the South Pacific, kava is typically prepared by soaking dried root powder in water and straining it. It is consumed socially for its psychoactive effects, comparable to those produced by alcohol but without significant cognitive impairment or addiction risk. Kava also produces a numbing sensation in the mouth.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f7/Kava-in-bottle-from-vanuatu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "No machine-readable author provided. Ib0ga assumed (based on copyright claims). / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Kava",
+        "videoUrl": "https://www.youtube.com/results?search_query=Kava%20Vanuatu%20recipe"
+      },
+      {
+        "name": "Nakamal",
+        "wikipediaTitle": "Nakamal",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Nakamal",
+        "summary": "A nakamal is a traditional meeting place in Vanuatu. It is used for gatherings, ceremonies and the drinking of kava.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Nakamal",
+        "videoUrl": "https://www.youtube.com/results?search_query=Nakamal%20Vanuatu%20recipe"
+      },
+      {
+        "name": "Laplap",
+        "wikipediaTitle": "Laplap",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Laplap",
+        "summary": "Laplap is the national dish of Vanuatu. Laplap is prepared by grating breadfruit, bananas, taro or yam roots into a vegetable paste. The paste is then wrapped in banana leaves and cooked in an underground stone oven, with fresh coconut cream. Meats like pork, beef, chicken or flying fox can be added.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Laplap",
+        "videoUrl": "https://www.youtube.com/results?search_query=Laplap%20Vanuatu%20recipe"
+      },
+      {
+        "name": "Earth oven",
+        "wikipediaTitle": "Earth oven",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Earth_oven",
+        "summary": "An earth oven, ground oven or cooking pit is one of the simplest and most ancient cooking structures. The earliest known earth oven was discovered in Central Europe and dated to 29,000 BC. At its most basic, an earth oven is a pit in the ground used to trap heat and bake, smoke, or steam food. Earth ovens have been used in many places and cultures in the past, and the presence of such cooking pits is a key sign of human settlement often sought by archaeologists. Earth ovens remain a common tool for cooking large quantities of food where no equipment is available. They have been used in various civilizations around the world and are still commonly found in the Pacific region to date.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6d/Bible_illustrations_from_the_New_Hebrides_-_with_notices_of_the_progress_of_the_Mission_%28IA_bibleillustratio00ingliala%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Inglis, John, missionary to Aneityum / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Earth_oven",
+        "videoUrl": "https://www.youtube.com/results?search_query=Earth%20oven%20Vanuatu%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:19:52.392Z"
+  },
+  "va": {
+    "code": "va",
+    "name": "Vatican City",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Roman_cuisine",
+    "dishes": [
+      {
+        "name": "Abbacchio",
+        "wikipediaTitle": "Abbacchio",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Abbacchio",
+        "summary": "Abbacchio is an Italian preparation of lamb typical of the Roman cuisine. It is consumed throughout central Italy as an Easter and Christmas dish. Abbacchio is a product protected by the European Union with the PGI mark.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Abbacchio",
+        "videoUrl": "https://www.youtube.com/results?search_query=Abbacchio%20Vatican%20City%20recipe"
+      },
+      {
+        "name": "Lamb and mutton",
+        "wikipediaTitle": "Lamb and mutton",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "summary": "Lamb and mutton, collectively sheep meat, is meat from the domestic sheep, Ovis aries. It is generally divided into three types: lamb, from sheep in their first year; hogget, from sheep in their second; and mutton, from older sheep.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/21/The_works_of_Charles_Lamb_%28IA_worksofcharlesla02lamb%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Lamb, Charles, 1775-1834 / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lamb%20and%20mutton%20Vatican%20City%20recipe"
+      },
+      {
+        "name": "Sauce",
+        "wikipediaTitle": "Sauce",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Sauce",
+        "summary": "In cooking, a sauce is a liquid, cream, or semi-solid food, served on or used in preparing other foods. Most sauces are not normally consumed by themselves; they add flavour, texture, and visual appeal to a dish. Sauce is a French word probably from the post-classical Latin salsa, derived from the classical salsus 'salted'. Possibly the oldest recorded European sauce is garum, the fish sauce used by the Ancient Romans, while doubanjiang, the Chinese soy bean paste, is mentioned in Rites of Zhou 20.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/46/The_chieftains_of_Champlain_%28microform%29_-_a_story_of_adventure_in_the_New_World_%28IA_cihm_00607%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Sauce",
+        "videoUrl": "https://www.youtube.com/results?search_query=Sauce%20Vatican%20City%20recipe"
+      },
+      {
+        "name": "Guanciale",
+        "wikipediaTitle": "Guanciale",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Guanciale",
+        "summary": "Guanciale is an Italian salt-cured meat product prepared from pork jowl or cheeks. Its name is derived from guancia, meaning 'cheek'. Its rendered fat gives flavour to and thickens the sauce of pasta dishes.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Guanciale",
+        "videoUrl": "https://www.youtube.com/results?search_query=Guanciale%20Vatican%20City%20recipe"
+      },
+      {
+        "name": "Amatrice",
+        "wikipediaTitle": "Amatrice",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Amatrice",
+        "summary": "Amatrice is a town and comune (municipality) in the province of Rieti, in the Italian region of Lazio, and the center of the food-agricultural area of Gran Sasso e Monti della Laga National Park. The town was devastated by a powerful earthquake on 24 August 2016. It was one of I Borghi più belli d'Italia.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Amatrice",
+        "videoUrl": "https://www.youtube.com/results?search_query=Amatrice%20Vatican%20City%20recipe"
+      },
+      {
+        "name": "Bruschetta",
+        "wikipediaTitle": "Bruschetta",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Bruschetta",
+        "summary": "Bruschetta is an Italian appetizer (antipasto) consisting of grilled bread topped with garlic, olive oil, and salt. Most commonly it is served with toppings of tomatoes, vegetables, beans, cured meat or cheese. In Italy, bruschetta is often prepared using a brustolina grill.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bruschetta",
+        "videoUrl": "https://www.youtube.com/results?search_query=Bruschetta%20Vatican%20City%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:20:04.253Z"
+  },
+  "ve": {
+    "code": "ve",
+    "name": "Venezuela",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Venezuelan_cuisine",
+    "dishes": [
+      {
+        "name": "Arepa",
+        "wikipediaTitle": "Arepa",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Arepa",
+        "summary": "An arepa is a type of flatbread made of ground maize dough that may be stuffed with a filling, eaten in northern parts of South America since pre-Columbian times, and notable primarily in the cuisine of Colombia and Venezuela, but also present in Bolivia, Ecuador, and Central America.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/2f/Arepas_de_pl%C3%A1tano_maduro.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "katiebordner / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Arepa",
+        "videoUrl": "https://www.youtube.com/results?search_query=Arepa%20Venezuela%20recipe"
+      },
+      {
+        "name": "Burén",
+        "wikipediaTitle": "Burén",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Bur%C3%A9n",
+        "summary": "Burén, also known as a budare or a budali, is a cooking utensil in Puerto Rican cuisine, that originated in Taino cuisine throughout the Greater Antilles. It is a thick metal plate, and similar in structure to a griddle. During the Taino period, most buréns were ceramic. It was used by the Tainos to cook over a fire.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/54/A_compilation_of_the_messages_and_papers_of_the_presidents_%28IA_compilationofmes14unit%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. President\nRichardson, James D. (James Daniel), 1843-1914\nUnited States. Congress. Joint Committee on Printing / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bur%C3%A9n",
+        "videoUrl": "https://www.youtube.com/results?search_query=Bur%C3%A9n%20Venezuela%20recipe"
+      },
+      {
+        "name": "Comal (cookware)",
+        "wikipediaTitle": "Comal (cookware)",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Comal_(cookware)",
+        "summary": "A comal is a smooth, flat griddle typically used in Mexico, Central America, and parts of South America, to cook tortillas and arepas, toast spices and nuts, sear meat, and generally prepare food. Similar cookware is called a budare in Venezuela. Some comals are concave and made of barro (clay). These are still made and used by the indigenous peoples of Mexico and Central America. Comals are similar to the American griddle or the Indian tawa, and are often used and named interchangeably with these.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Comal_(cookware)",
+        "videoUrl": "https://www.youtube.com/results?search_query=Comal%20(cookware)%20Venezuela%20recipe"
+      },
+      {
+        "name": "Cachapa",
+        "wikipediaTitle": "Cachapa",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cachapa",
+        "summary": "Cachapa is a traditional dish made from maize flour from Venezuela. Like arepas, they are popular at roadside stands. They can be made like pancakes of fresh corn dough, or wrapped in dry corn leaves and boiled. The most common varieties are made with fresh ground corn mixed into a thick batter and cooked on a budare, like pancakes; the cachapa is slightly thicker and lumpier because of the pieces from corn kernels.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Cachapa_.2022.12.03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rjcastillo / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cachapa",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cachapa%20Venezuela%20recipe"
+      },
+      {
+        "name": "Cachito",
+        "wikipediaTitle": "Cachito",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Cachito",
+        "summary": "The cachito, also known as cachito de jamón, is a Venezuelan pastry similar to the croissant that is often filled with ham and cheese.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Cachitos_close-up_%283175160347%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wladimir Labeikovsky / CC BY-SA 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Cachito",
+        "videoUrl": "https://www.youtube.com/results?search_query=Cachito%20Venezuela%20recipe"
+      },
+      {
+        "name": "Croissant",
+        "wikipediaTitle": "Croissant",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Croissant",
+        "summary": "A croissant is a Viennoiserie in a crescent shape made from a laminated yeast dough that sits between a bread and a puff pastry.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8f/Commission_Regulation_%28EEC%29_No_1230-93_of_19_May_1993_on_the_supply_of_milk_products_as_food_aid_%28EUR_1993-1230%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / OGL 3",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Croissant",
+        "videoUrl": "https://www.youtube.com/results?search_query=Croissant%20Venezuela%20recipe"
+      },
+      {
+        "name": "Ham",
+        "wikipediaTitle": "Ham",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ham",
+        "summary": "Ham is pork from a leg cut that has been preserved by wet or dry curing, with or without smoking. As a processed meat, the term ham includes both whole cuts of meat and ones that have been mechanically formed.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/35/Arepas_filled_with_ham_and_cheese.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ajsm712 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ham",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ham%20Venezuela%20recipe"
+      },
+      {
+        "name": "Frijoles negros",
+        "wikipediaTitle": "Frijoles negros",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Frijoles_negros",
+        "summary": "Frijoles negros is a Latin American dish made with black beans, prepared in Guatemala, Cuba, Venezuela, Puerto Rico, Mexico, and other nations in Latin America. The black bean, a legume of the species Phaseolus vulgaris, is usually purchased in either canned or dried form. One cup of dried black beans yields approximately 2+1⁄2 cups of cooked beans. Black bean soup is another commonly prepared Cuban favorite.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Visual_Education_and_the_St._Louis_School_Museum._Bulletin_1924%2C_No._39_%28IA_visualeducations00rath%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rathmann Carl G. / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Frijoles_negros",
+        "videoUrl": "https://www.youtube.com/results?search_query=Frijoles%20negros%20Venezuela%20recipe"
+      },
+      {
+        "name": "Pabellón criollo",
+        "wikipediaTitle": "Pabellón criollo",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pabell%C3%B3n_criollo",
+        "summary": "Pabellón criollo is a traditional Venezuelan dish that is considered the national dish. It mixes elements from the three different cultures that intermixed during Spanish colonial times: Native Americans, Spanish and Africans. It is a plate of rice, shredded beef in stew and stewed black beans. In 2019, the Venezuelan government declared pabellón to be intangible heritage.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9a/Pabell%C3%B3n_criollo_venezolano.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Ajsm712 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pabell%C3%B3n_criollo",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pabell%C3%B3n%20criollo%20Venezuela%20recipe"
+      },
+      {
+        "name": "Casabe",
+        "wikipediaTitle": "Casabe",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Casabe",
+        "summary": "Casabe or cassava bread is a flatbread made of cassava, eaten across the Caribbean Basin and the Amazon. It is usually made of bitter cassava, which is toxic before processing. Some cultures use mashed, fermented cassava, while others use cassava starch (tapioca), and additional ingredients may be used for flavor. It bakes for a few minutes on a flat surface known as a budare. Casabe is thin and crispy. When dried, it lasts several months. It may be eaten with various dishes or sweets. It is high in fiber and does not contain fat or gluten.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bb/Casabe_con_Mucha_Experiencia.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Enzo861 / CC BY-SA 3.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Casabe",
+        "videoUrl": "https://www.youtube.com/results?search_query=Casabe%20Venezuela%20recipe"
+      },
+      {
+        "name": "Chicharrón",
+        "wikipediaTitle": "Chicharrón",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chicharr%C3%B3n",
+        "summary": "Chicharrón is a dish generally consisting of fried pork belly or fried pork rinds. Chicharrón may also be made from chicken, mutton, or beef.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Pan_American_Union_Bulletin_1895-06-_Vol_2_Iss_12_%28IA_sim_bulletin-of-the-pan-american-union_1895-06_2_12%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chicharr%C3%B3n",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chicharr%C3%B3n%20Venezuela%20recipe"
+      },
+      {
+        "name": "Chupe andino",
+        "wikipediaTitle": "Chupe andino",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chupe_andino",
+        "summary": "Chupe andino refers to various stews and soups that are prepared in the Andes mountains region in South America. Chupe Andino may be prepared by Andean people, those that live in the region. It is sometimes prepared in large portions to feed many people at marketplaces and events. Chupe Andino is sometimes served with wine as an accompaniment. Soups and stews play a significant part in Andean cuisine, because the cold weather in the region demands nutritious, fatty foods that are warming.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chupe_andino",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chupe%20andino%20Venezuela%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:20:18.517Z"
+  },
+  "vn": {
+    "code": "vn",
+    "name": "Vietnam",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Vietnamese_cuisine",
+    "listPage": "https://en.wikipedia.org/wiki/List_of_Vietnamese_dishes",
+    "dishes": [
+      {
+        "name": "Bánh canh",
+        "wikipediaTitle": "Bánh canh",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/B%C3%A1nh_canh",
+        "summary": "Bánh canh are thick Vietnamese noodles that can be made from tapioca flour or a mixture of rice and tapioca flour.Bánh canh cua – a rich, thick crab soup, often with the addition of quail eggs.\nBánh canh bột lọc – a more translucent and chewy version of the noodle.\nBánh canh chả cá – the dish includes fish cake and is popular in South Central Vietnam.\nBánh canh giò heo tôm thịt – includes pork knuckles and shrimp.\nBánh canh Trảng Bàng – bánh canh made in the southeastern Vietnamese town of Trảng Bàng, served with boiled pork, tapioca noodles, and local herbs.\nBánh canh tôm – a shrimp-flavoured broth that is also mixed with coconut milk.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4f/B%C3%A1nh_Canh_Cua.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "bánh canh cu / CC0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%A1nh_canh",
+        "videoUrl": "https://www.youtube.com/results?search_query=B%C3%A1nh%20canh%20Vietnam%20recipe"
+      },
+      {
+        "name": "Bánh hỏi",
+        "wikipediaTitle": "Bánh hỏi",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/B%C3%A1nh_h%E1%BB%8Fi",
+        "summary": "Bánh hỏi is a Vietnamese dish consisting of rice vermicelli woven into intricate bundles and often topped with chopped scallions or garlic chives sauteed in oil, served with a complementary meat dish. The strings of noodles are usually only as thin as a toothpick; the texture is firm enough so the noodles do not fall apart but is not at all sticky to keep the dish light.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f2/Queue_-_Banh_Uot_hawker.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "avlxyz / CC BY-SA 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%A1nh_h%E1%BB%8Fi",
+        "videoUrl": "https://www.youtube.com/results?search_query=B%C3%A1nh%20h%E1%BB%8Fi%20Vietnam%20recipe"
+      },
+      {
+        "name": "Chicken curry",
+        "wikipediaTitle": "Chicken curry",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chicken_curry",
+        "summary": "Chicken curry or curry/curried chicken is an Indian dish originating from South Asia. It is common in the cuisine of the Indian subcontinent, Caribbean, Southeast Asia, Great Britain, and South Africa. A typical curry from the Indian subcontinent consists of chicken stewed in an onion- and tomato-based sauce, flavoured with ginger, garlic, tomato puree, chilli peppers and a variety of spices, often including turmeric, cumin, coriander, cinnamon, and cardamom. Outside of South Asia, chicken curry is often made with a pre-made spice mixture known as curry powder.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Food_and_nutrition_%28IA_CAT71342262074%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Food and Nutrition Service / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chicken_curry",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20curry%20Vietnam%20recipe"
+      },
+      {
+        "name": "Bún bò Huế",
+        "wikipediaTitle": "Bún bò Huế",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/B%C3%BAn_b%C3%B2_Hu%E1%BA%BF",
+        "summary": "Bún bò Huế or bún bò is a Vietnamese rice noodle dish with sliced beef, chả lụa, and sometimes pork knuckles. The dish originates from Huế, a city in central Vietnam associated with the cooking style of the former royal court. The dish has a mix of spicy, salty, and savory flavors. The predominant flavors are those of lemongrass and shrimp paste. Compared to phở or bún riêu, the noodles are thicker and cylindrical.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/40/B%C3%BAn_b%C3%B2_Hu%E1%BA%BF.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Alpha from Melbourne, Australia / CC BY-SA 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%BAn_b%C3%B2_Hu%E1%BA%BF",
+        "videoUrl": "https://www.youtube.com/results?search_query=B%C3%BAn%20b%C3%B2%20Hu%E1%BA%BF%20Vietnam%20recipe"
+      },
+      {
+        "name": "Chạo tôm",
+        "wikipediaTitle": "Chạo tôm",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ch%E1%BA%A1o_t%C3%B4m",
+        "summary": "Chạo tôm is a traditional Vietnamese dish that comes from the Huế region of Central Vietnam. It consists of shrimp surimi grilled on a sugar cane stick. It is often presented as a dish during large banquets prepared for weddings, holidays, or similar special events.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/90/Vietnam_Magazine_Vol._VII%2C_N%C2%BA_3_1974.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Vietnam Council on Foreign Relations / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ch%E1%BA%A1o_t%C3%B4m",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ch%E1%BA%A1o%20t%C3%B4m%20Vietnam%20recipe"
+      },
+      {
+        "name": "Bun cha",
+        "wikipediaTitle": "Bun cha",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Bun_cha",
+        "summary": "Bún chả is a Vietnamese dish of grilled pork and noodles, which is thought to have originated from Hanoi, Vietnam. Bún chả is served with grilled fatty pork (chả) over a plate of white rice noodles (bún) and herbs with a side dish of dipping sauce. The dish was described in 1959 by Vietnamese food writer Vũ Bằng (1913–1984), who described Hanoi as a town \"transfixed by bún chả\". Hanoi's first bún chả restaurant was on Gia Ngư, Hoàn Kiếm District, in Hanoi's Old Quarter.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/B%C3%BAn_ch%E1%BA%A3_with_chili_peppers_and_fresh_garlic.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Kiraface / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Bun_cha",
+        "videoUrl": "https://www.youtube.com/results?search_query=Bun%20cha%20Vietnam%20recipe"
+      },
+      {
+        "name": "Bún mắm",
+        "wikipediaTitle": "Bún mắm",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/B%C3%BAn_m%E1%BA%AFm",
+        "summary": "Bún mắm is a Vietnamese vermicelli soup made from fermented fish called mắm, sometimes called \"Vietnamese gumbo\".",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/1c/B%C3%BAn_Ch%E1%BA%A3_H%C3%A0_N%E1%BB%99i%2C_Vi%E1%BB%87t_Nam.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Hong.linh27061994 / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%BAn_m%E1%BA%AFm",
+        "videoUrl": "https://www.youtube.com/results?search_query=B%C3%BAn%20m%E1%BA%AFm%20Vietnam%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:20:29.083Z"
+  },
+  "ye": {
+    "code": "ye",
+    "name": "Yemen",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Yemeni_cuisine",
+    "dishes": [
+      {
+        "name": "Tandoor",
+        "wikipediaTitle": "Tandoor",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Tandoor",
+        "summary": "A tandoor is a large vase-shaped oven, usually made of clay. Since antiquity, tandoors have been used to bake unleavened flatbreads, such as roti and traditional lavash, as well as leavened ones, such as naan and tandoor bread or matnakash. It is also used to roast meat and vegetables. Tandoors are predominantly used in South Asia, Western Asia, Central Asia, and the Horn of Africa.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Yemeni_food_-_Mandi_-_2011.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Evan Bench / CC BY 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Tandoor",
+        "videoUrl": "https://www.youtube.com/results?search_query=Tandoor%20Yemen%20recipe"
+      },
+      {
+        "name": "Clay pot cooking",
+        "wikipediaTitle": "Clay pot cooking",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Clay_pot_cooking",
+        "summary": "Clay pot cooking is a process of cooking food in a ceramic pot.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/55/On_the_cerealia_of_Western_Africa_%28IA_b28708830%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Daniell, William F. (William Freeman), 1818-1865 / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Clay_pot_cooking",
+        "videoUrl": "https://www.youtube.com/results?search_query=Clay%20pot%20cooking%20Yemen%20recipe"
+      },
+      {
+        "name": "Chicken as food",
+        "wikipediaTitle": "Chicken as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "summary": "Chicken is the most consumed meat in the world. Owing to the relative ease and low cost of raising chickens—in comparison to mammals such as cattle or pigs—chicken meat and chicken eggs have become prevalent in numerous cuisines.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Chicken_with_Yemeni_mandi_spices_over_rice_and_knafeh.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikiroro123 / CC BY 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chicken_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20as%20food%20Yemen%20recipe"
+      },
+      {
+        "name": "Goat meat",
+        "wikipediaTitle": "Goat meat",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "summary": "Goat meat is the meat of the domestic goat. The term denotes especially the meat of older animals, while meat from young goats is called kid meat. In South Asian cuisine, goat meat is called mutton.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Alternative_futures_for_world_food_in_1985._Volume_3_%28IA_CAT87209344%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rojko, Anthony S. (Anthony Stanley), 1918- / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Goat_meat",
+        "videoUrl": "https://www.youtube.com/results?search_query=Goat%20meat%20Yemen%20recipe"
+      },
+      {
+        "name": "Lamb and mutton",
+        "wikipediaTitle": "Lamb and mutton",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "summary": "Lamb and mutton, collectively sheep meat, is meat from the domestic sheep, Ovis aries. It is generally divided into three types: lamb, from sheep in their first year; hogget, from sheep in their second; and mutton, from older sheep.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Alternative_futures_for_world_food_in_1985._Volume_3_%28IA_CAT87209344%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rojko, Anthony S. (Anthony Stanley), 1918- / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Lamb_and_mutton",
+        "videoUrl": "https://www.youtube.com/results?search_query=Lamb%20and%20mutton%20Yemen%20recipe"
+      },
+      {
+        "name": "Fish as food",
+        "wikipediaTitle": "Fish as food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Fish_as_food",
+        "summary": "Many species of fish are caught by humans and consumed as food in virtually all regions around the world. Their meat has been an important dietary source of protein and other nutrients in the human diet.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/23/Fish_Auction%2C_Yemen_%2810530102713%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Rod Waddington from Kergunyah, Australia / CC BY-SA 2.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Fish_as_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Fish%20as%20food%20Yemen%20recipe"
+      },
+      {
+        "name": "Dairy product",
+        "wikipediaTitle": "Dairy product",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Dairy_product",
+        "summary": "Dairy products or milk products are food products made from milk. The most common dairy animals are cattle, water buffalo, goat, and sheep. Dairy products consumed around the world include yogurt, cheese, milk, and butter. A facility that produces dairy products is a dairy. Dairy products are consumed worldwide to varying degrees. Some people avoid some or all dairy products because of lactose intolerance, veganism, environmental concerns, or other reasons or beliefs.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/57/In_brief_-_The_State_of_Food_and_Agriculture_2020.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "http://www.fao.org Food and Agriculture Organization / CC BY-SA 3.0 igo",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Dairy_product",
+        "videoUrl": "https://www.youtube.com/results?search_query=Dairy%20product%20Yemen%20recipe"
+      },
+      {
+        "name": "Fat",
+        "wikipediaTitle": "Fat",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Fat",
+        "summary": "In nutrition, biology, and chemistry, fat usually means any ester of fatty acids, or a mixture of such compounds, most commonly those that occur in living beings or in food.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/69/Commission_Regulation_%28EEC%29_No_2572-76_of_22_October_1976_on_an_invitation_to_tender_for_the_supply_of_butteroil_as_food_aid_to_the_Arab_Republic_of_Yemen_%28EUR_1976-2572%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / OGL 3",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Fat",
+        "videoUrl": "https://www.youtube.com/results?search_query=Fat%20Yemen%20recipe"
+      },
+      {
+        "name": "Vegetable oil",
+        "wikipediaTitle": "Vegetable oil",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Vegetable_oil",
+        "summary": "Vegetable oils, or vegetable fats, are oils extracted from seeds or from other parts of edible plants. Like animal fats, vegetable fats are mixtures of triglycerides. Soybean oil, canola oil, grapeseed oil, and cocoa butter are examples of seed oils, or fats from seeds. Olive oil, palm oil, and rice bran oil are examples of fats from other parts of plants. In common usage, vegetable oil may refer exclusively to vegetable fats which are liquid at room temperature. Vegetable oils are usually edible and are generally recognized as safe (GRAS) by the United States Food and Drug Administration (FDA). There is no evidence that seed oils are unhealthy.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/18/COMMISSION_REGULATION_%28EC%29_No_1612-97_of_11_August_1997_on_the_supply_of_vegetable_oil_as_food_aid_%28EUR_1997-1612%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / OGL 3",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Vegetable_oil",
+        "videoUrl": "https://www.youtube.com/results?search_query=Vegetable%20oil%20Yemen%20recipe"
+      },
+      {
+        "name": "Smen",
+        "wikipediaTitle": "Smen",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Smen",
+        "summary": "Smen is a salted, fermented butter native to North African cuisine, as well as a traditional Yemeni dish. In countries like Jordan and Lebanon, samneh is a type of butter similar to clarified butter, while north African smen is a type of fermented butter similar to ghee.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Smen",
+        "videoUrl": "https://www.youtube.com/results?search_query=Smen%20Yemen%20recipe"
+      },
+      {
+        "name": "Pastry",
+        "wikipediaTitle": "Pastry",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Pastry",
+        "summary": "Pastry is various unleavened doughs, often enriched with fat or eggs. The dough may be called pastry dough. Common pastry dishes include börek, pies, tarts, and turnovers.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d3/Final_report_-_improving_the_nutritive_value_of_wheat_foods_%28IA_CAT82770066%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Agency for International Development\nUnited States. Western Regional Research Center / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Pastry",
+        "videoUrl": "https://www.youtube.com/results?search_query=Pastry%20Yemen%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:20:42.553Z"
+  },
+  "zm": {
+    "code": "zm",
+    "name": "Zambia",
+    "cuisinePage": "https://en.wikipedia.org/wiki/Zambian_cuisine",
+    "dishes": [
+      {
+        "name": "Staple food",
+        "wikipediaTitle": "Staple food",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Staple_food",
+        "summary": "A staple food, food staple, or simply staple, is a food that is eaten often and in such quantities that it constitutes a dominant portion of a standard diet for an individual or a population group, supplying a large fraction of energy needs and generally forming a significant proportion of the intake of other nutrients as well. For humans, a staple food of a specific society may be eaten as often as every day or every meal, and most people live on a diet based on just a small variety of food staples. Specific staples vary from place to place, but typically are inexpensive or readily available foods that supply one or more of the macronutrients and micronutrients needed for survival and health: carbohydrates, proteins, fats, minerals, and vitamins. Typical examples include grains, seeds, nuts, and root vegetables. Among them, cereals, legumes, and tubers account for about 90% of the world's food calorie intake.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/In_brief_-_The_State_of_Food_and_Agriculture_2017.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "http://www.fao.org Food and Agriculture Organization / CC BY-SA 3.0 igo",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Staple_food",
+        "videoUrl": "https://www.youtube.com/results?search_query=Staple%20food%20Zambia%20recipe"
+      },
+      {
+        "name": "Ugali",
+        "wikipediaTitle": "Ugali",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ugali",
+        "summary": "Ugali, also known as posho, nsima, papa, pap, bogobe, sadza, isitshwala, akume, amawe, ewokple, akple, and other names, is a type of corn meal made from maize or corn or mahindi flour in several African countries: Kenya, Uganda, South Sudan, Tanzania, Zimbabwe, Zambia, Lesotho, Eswatini, Angola, Mozambique, Namibia, Democratic Republic of the Congo, Rwanda, Malawi, Botswana and South Africa, and in West Africa by the Ewes of Togo, Ghana, Benin, Nigeria and Ivory Coast. It is cooked in boiling water or milk until it reaches a stiff or firm dough-like consistency. In 2017, the dish was added to the UNESCO Representative List of the Intangible Cultural Heritage of Humanity, one of a few foods on the list.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ugali",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ugali%20Zambia%20recipe"
+      },
+      {
+        "name": "Banana",
+        "wikipediaTitle": "Banana",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Banana",
+        "summary": "A banana is an elongated, edible fruit that is botanically a berry produced by several kinds of large treelike herbaceous flowering plants in the genus Musa. In some countries, cooking bananas are called plantains, distinguishing them from dessert bananas. The fruit is variable in size, color and firmness, but is usually elongated and curved, with soft flesh rich in starch covered with a peel, which may have a variety of colors when ripe. It grows upward in clusters near the top of the plant. Almost all modern edible seedless (parthenocarp) cultivated bananas come from two wild species – Musa acuminata and Musa balbisiana, or their hybrids.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7a/Zambia_-Bananas_on_sale.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Thatlowdownwoman / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Banana",
+        "videoUrl": "https://www.youtube.com/results?search_query=Banana%20Zambia%20recipe"
+      },
+      {
+        "name": "Ifisashi",
+        "wikipediaTitle": "Ifisashi",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Ifisashi",
+        "summary": "Ifisashi or visashi is a traditional Zambian dish prepared with greens and peanuts. Ifisashi is most often eaten with nshima. It is considered a vegetarian dish, but meat can be added if desired. Ifisashi is a dish best enjoyed hot and is often served as a main course. In Zambia, ifisashi is accompanied by cereals such as millet, sorghum, rice, cassava, or yam when nshima is not available.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/58/Dried_Vegetables_in_Zambia.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Jack Gusha Dumingu / CC BY-SA 4.0",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Ifisashi",
+        "videoUrl": "https://www.youtube.com/results?search_query=Ifisashi%20Zambia%20recipe"
+      },
+      {
+        "name": "Vegetarianism",
+        "wikipediaTitle": "Vegetarianism",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Vegetarianism",
+        "summary": "Vegetarianism is the practice of abstaining from the consumption of meat. It may also include abstaining from eating all by-products of animal slaughter. A person who practices vegetarianism is known as a vegetarian.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Vegetarianism",
+        "videoUrl": "https://www.youtube.com/results?search_query=Vegetarianism%20Zambia%20recipe"
+      },
+      {
+        "name": "Samp",
+        "wikipediaTitle": "Samp",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Samp",
+        "summary": "Samp is a food made from dried corn kernels that have been pounded and chopped until broken, but not as finely ground as mealie-meal or mielie rice. The coating around the kernel loosens and is removed during the pounding and stamping process. It is eaten across Southern Africa and by the Lozi and Tonga people of Zambia with sugar and sour milk. It can also be served with gravy and various additives. It is cooked with beans in the Xhosa variant of umngqusho and sometimes eaten with chakalaka. It can also be served with beef, lamb, poultry and in stuffings.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Federal_Register_1964-10-31-_Vol_29_Iss_214_%28IA_sim_federal-register-find_1964-10-31_29_214%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Wikimedia Commons / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Samp",
+        "videoUrl": "https://www.youtube.com/results?search_query=Samp%20Zambia%20recipe"
+      },
+      {
+        "name": "Gizzard",
+        "wikipediaTitle": "Gizzard",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Gizzard",
+        "summary": "The gizzard, also referred to as the ventriculus, gastric mill, and gigerium, is an organ found in the digestive tract of some animals, including archosaurs, earthworms, some gastropods, some fish, and some crustaceans. This specialized stomach constructed of thick muscular walls is used for grinding up food, often aided by particles of stone or grit. In certain insects and molluscs, the gizzard features chitinous plates or teeth.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Aardvark.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "Joachim Knöthig (Feel free to contact me: joachim_knoethig(at)web.de) / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Gizzard",
+        "videoUrl": "https://www.youtube.com/results?search_query=Gizzard%20Zambia%20recipe"
+      },
+      {
+        "name": "Samosa",
+        "wikipediaTitle": "Samosa",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Samosa",
+        "summary": "A samosa is a fried Indian subcontinent turnover with a savoury filling that mostly consists of vegetables like spiced potatoes, onions, and peas, but can include cheese such as paneer, meat or even fish. Its name originates from the Middle Persian word sambosag (سنبوسگ). It is made in different shapes, including a triangle, a cone, or a crescent, depending on the region. Samosas are often accompanied by chutney and have origins in the Middle Ages or earlier. Sweet versions containing traditional Indian flavours, or even chocolate, are also made. Samosas are popular snacks in South Asia and within the Indian diaspora across the world.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Samosa",
+        "videoUrl": "https://www.youtube.com/results?search_query=Samosa%20Zambia%20recipe"
+      },
+      {
+        "name": "Puff-puff",
+        "wikipediaTitle": "Puff-puff",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Puff-puff",
+        "summary": "Puff-puff is a traditional snack made of fried dough and eaten across West Africa. The name \"puff-puff\" is from Nigeria; as listed below, many other names and varieties of the pastry exist.",
+        "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b7/Foreign_agriculture_-weekly_magazine_of_the_United_States_Department_of_Agriculture%2C_Foreign_Agricultural_Service%2C_U.S._Department_of_Agriculture_%28IA_CAT10252662504%29.pdf?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+        "imageAttribution": "United States. Foreign Agricultural Service / Public domain",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Puff-puff",
+        "videoUrl": "https://www.youtube.com/results?search_query=Puff-puff%20Zambia%20recipe"
+      },
+      {
+        "name": "Chikanda",
+        "wikipediaTitle": "Chikanda",
+        "wikipediaUrl": "https://en.wikipedia.org/wiki/Chikanda",
+        "summary": "Chikanda is a Zambian dish made from the boiled root tubers of terrestrial orchids also called chikanda. The dish is often called \"African polony\" because it has a texture that resembles bologna. Chikanda can be eaten as a snack, dessert, or an accompaniment to nshima, a maize flour porridge.",
+        "sourceUrl": "https://en.wikipedia.org/wiki/Chikanda",
+        "videoUrl": "https://www.youtube.com/results?search_query=Chikanda%20Zambia%20recipe"
+      }
+    ],
+    "fetchedAt": "2026-08-08T12:20:54.496Z"
+  },
+  "zw": {
+    "code": "zw",
+    "name": "Zimbabwe",
+    "dishes": [],
+    "fetchedAt": "2026-08-08T12:20:55.528Z"
   }
 }

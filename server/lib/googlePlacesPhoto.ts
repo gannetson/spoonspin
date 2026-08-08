@@ -3,6 +3,8 @@
  * Requires GOOGLE_PLACES_API_KEY.
  */
 
+import { sameImageUrl, shuffleInPlace } from "./wikimedia.ts";
+
 function normalizeName(value: string): string {
   return value
     .toLowerCase()
@@ -37,6 +39,7 @@ export async function fetchGoogleRestaurantPhoto(place: {
   name: string;
   city: string;
   address?: string | null;
+  excludeUrls?: Array<string | null | undefined>;
 }): Promise<{ url: string; attribution: string; query: string } | null> {
   const apiKey = getGooglePlacesApiKey();
   if (!apiKey) return null;
@@ -90,22 +93,53 @@ export async function fetchGoogleRestaurantPhoto(place: {
       namesLikelyMatch(place.name, candidate.displayName?.text ?? ""),
     ) ?? places[0];
 
-  const photoName = match?.photos?.[0]?.name;
-  if (!photoName) return null;
+  const photos = shuffleInPlace([...(match?.photos ?? [])]).filter(
+    (photo) => photo.name,
+  );
+  if (photos.length === 0) return null;
 
+  for (const photo of photos) {
+    const photoName = photo.name!;
+    const media = await fetch(
+      `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=800&skipHttpRedirect=true`,
+      { headers: { "X-Goog-Api-Key": apiKey } },
+    );
+    if (!media.ok) continue;
+    const payload = (await media.json()) as { photoUri?: string };
+    if (!payload.photoUri) continue;
+
+    if (
+      place.excludeUrls?.some(
+        (excluded) =>
+          typeof excluded === "string" &&
+          excluded.trim() &&
+          sameImageUrl(payload.photoUri!, excluded.trim()),
+      )
+    ) {
+      continue;
+    }
+
+    const credit =
+      photo.authorAttributions?.[0]?.displayName ?? "Google";
+    return {
+      url: payload.photoUri,
+      attribution: `Photo: ${credit} via Google`,
+      query: textQuery,
+    };
+  }
+
+  // If every photo matched the exclude list, fall back to a random one
+  // so replace-image still returns something when only one photo exists.
+  const fallback = photos[Math.floor(Math.random() * photos.length)]!;
   const media = await fetch(
-    `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=800&skipHttpRedirect=true`,
+    `https://places.googleapis.com/v1/${fallback.name}/media?maxHeightPx=800&skipHttpRedirect=true`,
     { headers: { "X-Goog-Api-Key": apiKey } },
   );
-  if (!media.ok) {
-    const body = await media.text();
-    throw new Error(`Google photo ${media.status}: ${body.slice(0, 200)}`);
-  }
+  if (!media.ok) return null;
   const payload = (await media.json()) as { photoUri?: string };
   if (!payload.photoUri) return null;
-
   const credit =
-    match?.photos?.[0]?.authorAttributions?.[0]?.displayName ?? "Google";
+    fallback.authorAttributions?.[0]?.displayName ?? "Google";
   return {
     url: payload.photoUri,
     attribution: `Photo: ${credit} via Google`,

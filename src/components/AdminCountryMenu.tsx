@@ -5,6 +5,7 @@ import {
   ClipboardList,
   GlassWater,
   ImagePlus,
+  Images,
   LayoutGrid,
   LoaderCircle,
   Store,
@@ -12,7 +13,7 @@ import {
   Warehouse,
 } from "lucide-react";
 import type { Country } from "@/types/content";
-import { replaceCountryImage } from "@/admin/countryTools";
+import { findDrinkImages, replaceCountryImage } from "@/admin/countryTools";
 import {
   AdminDiscoverModal,
   type AdminDiscoverKind,
@@ -40,9 +41,11 @@ export function AdminCountryMenu({
     null,
   );
   const [imageBusy, setImageBusy] = useState(false);
+  const [drinkImagesBusy, setDrinkImagesBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const hasCountry = Boolean(country);
+  const menuBusy = imageBusy || drinkImagesBusy;
 
   useEffect(() => {
     if (!open) return;
@@ -83,6 +86,33 @@ export function AdminCountryMenu({
     }
   }
 
+  async function onFindDrinkImages() {
+    if (!country || !onCountryUpdated) return;
+    setOpen(false);
+    setDrinkImagesBusy(true);
+    setError(null);
+    setStatus(null);
+    try {
+      const result = await findDrinkImages(country.code);
+      onCountryUpdated(result.country);
+      setStatus(
+        t("admin.country.drinkImagesUpdated", {
+          updated: result.updated,
+          skipped: result.skipped,
+          missing: result.missing,
+        }),
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : t("admin.country.drinkImagesError"),
+      );
+    } finally {
+      setDrinkImagesBusy(false);
+    }
+  }
+
   function openDiscover(kind: AdminDiscoverKind) {
     if (!country) return;
     setOpen(false);
@@ -112,12 +142,14 @@ export function AdminCountryMenu({
         />
       </button>
 
-      {imageBusy || status || error ? (
+      {menuBusy || status || error ? (
         <div className="absolute right-0 top-full z-20 mt-1 w-max max-w-[16rem] rounded-lg border border-ink/10 bg-cream px-3 py-2 text-sm text-ink shadow-md">
-          {imageBusy ? (
+          {menuBusy ? (
             <span className="inline-flex items-center gap-2 text-ink-soft">
               <LoaderCircle className="size-4 animate-spin" />
-              {t("admin.country.findingImage")}
+              {drinkImagesBusy
+                ? t("admin.country.findingDrinkImages")
+                : t("admin.country.findingImage")}
             </span>
           ) : null}
           {status ? (
@@ -192,6 +224,23 @@ export function AdminCountryMenu({
                   </span>
                   <span className="mt-0.5 block text-xs text-ink-soft">
                     {t("admin.country.replaceImage.hint")}
+                  </span>
+                </span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                disabled={drinkImagesBusy}
+                onClick={() => void onFindDrinkImages()}
+                className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment disabled:opacity-60"
+              >
+                <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
+                <span>
+                  <span className="block font-semibold text-ink">
+                    {t("admin.country.findDrinkImages")}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-soft">
+                    {t("admin.country.findDrinkImages.hint")}
                   </span>
                 </span>
               </button>

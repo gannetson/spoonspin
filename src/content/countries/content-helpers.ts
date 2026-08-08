@@ -66,4 +66,20 @@ export const drink = (
   type: Drink["type"],
   alcoholic: boolean,
   description: string,
-): Drink => ({ name, localName, type, alcoholic, description });
+  extras?: {
+    grape?: string;
+    foodPairing?: string;
+    imageUrl?: string;
+    imageAttribution?: string;
+  },
+): Drink => ({
+  name,
+  localName,
+  type,
+  alcoholic,
+  description,
+  grape: extras?.grape,
+  foodPairing: extras?.foodPairing,
+  imageUrl: extras?.imageUrl,
+  imageAttribution: extras?.imageAttribution,
+});

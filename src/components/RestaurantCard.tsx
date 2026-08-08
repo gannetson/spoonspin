@@ -2,6 +2,7 @@ import { ExternalLink, MapPin, Star } from "lucide-react";
 import type { Restaurant } from "@/restaurants/types";
 import {
   formatPriceLevel,
+  listReviewLinks,
   listSourceRatings,
   normalizeToFive,
 } from "@/restaurants/ratings";
@@ -34,7 +35,9 @@ export function RestaurantCard({
   const cuisineFlags = cuisineFlagsFor(restaurant.cuisineCodes);
   const priceLabel = formatPriceLevel(restaurant.priceLevel);
   const sourceRatings = listSourceRatings(restaurant.ratings).slice(0, 2);
+  const reviewLinks = listReviewLinks(restaurant);
   const photoUrl = restaurant.photoUrl?.trim() || null;
+  const hasWebsite = Boolean(restaurant.website?.trim());
 
   return (
     <li>
@@ -160,28 +163,51 @@ export function RestaurantCard({
           </button>
 
           <div className="flex flex-wrap gap-2 pt-0.5">
-            <a
-              href={restaurant.mapsUrl}
-              target="_blank"
-              rel="noreferrer"
-              onClick={(event) => event.stopPropagation()}
-              className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-tomato px-3.5 text-sm font-semibold text-cream hover:bg-tomato-deep"
-            >
-              {t("dine.openInGoogleMaps")}
-              <ExternalLink aria-hidden="true" className="size-3.5" />
-            </a>
-            {restaurant.website ? (
+            {hasWebsite ? (
               <a
                 href={restaurant.website}
                 target="_blank"
                 rel="noreferrer"
                 onClick={(event) => event.stopPropagation()}
-                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-ink/15 px-3.5 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-tomato px-3.5 text-sm font-semibold text-cream hover:bg-tomato-deep"
               >
                 {t("dine.website")}
                 <ExternalLink aria-hidden="true" className="size-3.5" />
               </a>
             ) : null}
+            <a
+              href={restaurant.mapsUrl}
+              target="_blank"
+              rel="noreferrer"
+              onClick={(event) => event.stopPropagation()}
+              className={
+                hasWebsite
+                  ? "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-ink/15 px-3.5 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                  : "inline-flex min-h-9 items-center gap-1.5 rounded-full bg-tomato px-3.5 text-sm font-semibold text-cream hover:bg-tomato-deep"
+              }
+            >
+              {t("dine.openInGoogleMaps")}
+              <ExternalLink aria-hidden="true" className="size-3.5" />
+            </a>
+            {reviewLinks.map((link) => (
+              <a
+                key={link.source}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                onClick={(event) => event.stopPropagation()}
+                className="inline-flex min-h-9 items-center gap-1.5 rounded-full border border-ink/10 bg-white px-3 text-sm font-semibold text-ink-soft hover:border-tomato hover:text-tomato"
+              >
+                {link.source === "google"
+                  ? t("dine.reviews.google")
+                  : link.source === "tripadvisor"
+                    ? t("dine.reviews.tripadvisor")
+                    : link.source === "theFork"
+                      ? t("dine.reviews.theFork")
+                      : t("dine.reviews.openTable")}
+                <ExternalLink aria-hidden="true" className="size-3.5" />
+              </a>
+            ))}
           </div>
         </div>
 

@@ -653,3 +653,30 @@ export async function appendMoreDrinks(
   );
   return getCountryFromDb(countryCode);
 }
+
+/** Persist national / menu / more drinks JSONB for a country. */
+export async function saveCountryDrinks(
+  countryCode: string,
+  input: {
+    nationalDrink?: Drink | null;
+    menuDrink?: Drink | null;
+    moreDrinks: Drink[];
+  },
+): Promise<Country | undefined> {
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE countries
+     SET national_drink = $2::jsonb,
+         menu_drink = $3::jsonb,
+         more_drinks = $4::jsonb,
+         updated_at = NOW()
+     WHERE code = $1`,
+    [
+      countryCode.toLowerCase(),
+      input.nationalDrink ? JSON.stringify(input.nationalDrink) : null,
+      input.menuDrink ? JSON.stringify(input.menuDrink) : null,
+      JSON.stringify(input.moreDrinks),
+    ],
+  );
+  return getCountryFromDb(countryCode);
+}

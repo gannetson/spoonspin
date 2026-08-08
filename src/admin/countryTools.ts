@@ -135,6 +135,18 @@ export function addDrinks(code: string, drinks: Drink[]) {
   );
 }
 
+export function findDrinkImages(code: string) {
+  return postAdmin<{
+    country: Country;
+    updated: number;
+    skipped: number;
+    missing: number;
+    notes: string;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/find-drink-images`,
+  );
+}
+
 async function deleteAdmin<T>(path: string): Promise<T> {
   const response = await fetch(path, {
     method: "DELETE",

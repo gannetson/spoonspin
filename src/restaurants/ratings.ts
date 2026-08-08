@@ -1,8 +1,12 @@
-export type RatingSourceId = "google" | "theFork" | "tripadvisor";
+export type RatingSourceId =
+  | "google"
+  | "theFork"
+  | "tripadvisor"
+  | "openTable";
 
 export type SourceRating = {
   /** Raw score on the source's scale (default 5; The Fork often uses 10). */
-  score: number;
+  score?: number;
   count?: number;
   scale?: 5 | 10;
   url?: string;
@@ -17,12 +21,15 @@ export const RATING_SOURCE_LABELS: Record<RatingSourceId, string> = {
   google: "Google",
   theFork: "The Fork",
   tripadvisor: "Tripadvisor",
+  openTable: "OpenTable",
 };
 
 export function normalizeToFive(rating: SourceRating): number {
+  const score = rating.score;
+  if (score == null || !Number.isFinite(score)) return 0;
   const scale = rating.scale ?? 5;
   if (scale <= 0) return 0;
-  return (rating.score / scale) * 5;
+  return (score / scale) * 5;
 }
 
 /** Weight by log review volume so large samples count more, without drowning small ones. */
@@ -37,7 +44,9 @@ export function aggregateGuestRating(ratings?: RestaurantRatings | null): {
   if (!ratings) return {};
   const entries = (
     Object.entries(ratings) as Array<[RatingSourceId, SourceRating]>
-  ).filter(([, value]) => value != null && Number.isFinite(value.score));
+  ).filter(
+    ([, value]) => value != null && value.score != null && Number.isFinite(value.score),
+  );
 
   if (entries.length === 0) return {};
 
@@ -64,9 +73,19 @@ export function listSourceRatings(
   ratings?: RestaurantRatings | null,
 ): Array<{ source: RatingSourceId; label: string; rating: SourceRating }> {
   if (!ratings) return [];
-  const order: RatingSourceId[] = ["google", "theFork", "tripadvisor"];
+  const order: RatingSourceId[] = [
+    "google",
+    "theFork",
+    "tripadvisor",
+    "openTable",
+  ];
   return order
-    .filter((source) => ratings[source] != null)
+    .filter(
+      (source) =>
+        ratings[source] != null &&
+        ratings[source]!.score != null &&
+        Number.isFinite(ratings[source]!.score),
+    )
     .map((source) => ({
       source,
       label: RATING_SOURCE_LABELS[source],
@@ -81,3 +100,8 @@ export function formatPriceLevel(
   if (level == null || level < 1 || level > 4) return null;
   return "€".repeat(level);
 }
+
+export {
+  listReviewLinks,
+  type ReviewLink,
+} from "./reviewLinks";

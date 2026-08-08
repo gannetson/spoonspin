@@ -11,6 +11,7 @@ import {
   getRecipeRow,
   listRecipeIdsForCountry,
   removeSpecialtyShop,
+  saveCountryDrinks,
   updateCountryImage,
   updateRecipeFields,
   updateRecipeImage,
@@ -37,6 +38,7 @@ import {
   discoverCountryRestaurants,
   discoverCountryShops,
   discoverItemImageQueries,
+  enrichDrinkWithImage,
   expandDishCandidates,
   isOpenAiConfigured,
   researchRestaurantMenu,
@@ -45,7 +47,7 @@ import {
   rewriteRestaurantText,
   rewriteShopText,
 } from "../openai/adminDiscover.ts";
-import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
+import { findCuisineImageFromQueries, sameImageUrl } from "../lib/wikimedia.ts";
 import {
   fetchGoogleRestaurantPhoto,
   isGooglePlacesConfigured,
@@ -133,6 +135,10 @@ const drinkSchema = z.object({
   ]),
   alcoholic: z.boolean(),
   description: z.string().min(20),
+  grape: z.string().nullish(),
+  foodPairing: z.string().nullish(),
+  imageUrl: z.string().nullish(),
+  imageAttribution: z.string().nullish(),
 });
 
 const dishCandidateSchema = z.object({
@@ -258,7 +264,9 @@ export function registerAdminCountryRoutes(
           `${country.name} traditional food`,
         ];
 
-        const image = await findCuisineImageFromQueries(queries);
+        const image = await findCuisineImageFromQueries(queries, {
+          excludeUrls: [country.imageUrl],
+        });
         if (!image) {
           res.status(404).json({
             message: "Could not find a suitable Wikimedia image.",
@@ -715,6 +723,10 @@ export function registerAdminCountryRoutes(
           type: drink.type,
           alcoholic: drink.alcoholic,
           description: drink.description,
+          grape: drink.grape ?? undefined,
+          foodPairing: drink.foodPairing ?? undefined,
+          imageUrl: drink.imageUrl ?? undefined,
+          imageAttribution: drink.imageAttribution ?? undefined,
         }));
         const updated = await appendMoreDrinks(country.code, drinks);
         res.json({ country: updated, added: drinks.length });
@@ -722,6 +734,75 @@ export function registerAdminCountryRoutes(
         console.error("Add drinks failed", error);
         res.status(500).json({
           message: publicErrorMessage(error, "Could not add drinks."),
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/find-drink-images",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const country = await getCountryFromDb(String(req.params.code ?? ""));
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+
+        let updatedCount = 0;
+        let skipped = 0;
+        let missing = 0;
+
+        const enrich = async (drink: Drink | undefined | null) => {
+          if (!drink) return drink ?? null;
+          if (drink.imageUrl?.trim()) {
+            skipped += 1;
+            return drink;
+          }
+          const enriched = await enrichDrinkWithImage(drink, country.name);
+          if (enriched.imageUrl && enriched.imageUrl !== drink.imageUrl) {
+            updatedCount += 1;
+          } else {
+            missing += 1;
+          }
+          return enriched;
+        };
+
+        const nationalDrink = await enrich(country.nationalDrink ?? null);
+        const menuDrink = await enrich(country.menu?.drink ?? null);
+        const existingMore =
+          country.menu?.moreDrinks ?? country.moreDrinks ?? [];
+        const moreDrinks: Drink[] = [];
+        for (const drink of existingMore) {
+          moreDrinks.push((await enrich(drink))!);
+        }
+
+        const updated = await saveCountryDrinks(country.code, {
+          nationalDrink,
+          menuDrink,
+          moreDrinks,
+        });
+
+        res.json({
+          country: updated,
+          updated: updatedCount,
+          skipped,
+          missing,
+          notes:
+            updatedCount > 0
+              ? `Added images for ${updatedCount} drink(s).`
+              : missing > 0
+                ? "No new images found on Wikimedia Commons."
+                : "All drinks already had images.",
+        });
+      } catch (error) {
+        console.error("Find drink images failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(
+            error,
+            "Could not find drink images.",
+          ),
         });
       }
     },
@@ -798,7 +879,9 @@ export function registerAdminCountryRoutes(
           `${recipe.name} ${country.name}`,
           `${recipe.localName ?? recipe.name} dish`,
         ];
-        const image = await findCuisineImageFromQueries(queries);
+        const image = await findCuisineImageFromQueries(queries, {
+          excludeUrls: [recipe.imageUrl],
+        });
         if (!image) {
           res.status(404).json({
             message: "Could not find a suitable Wikimedia image.",
@@ -1037,6 +1120,7 @@ export function registerAdminCountryRoutes(
             name: restaurant.name,
             city: restaurant.city,
             address: restaurant.address,
+            excludeUrls: [restaurant.photoUrl],
           });
         } catch (error) {
           console.warn("Google restaurant photo failed", error);
@@ -1052,7 +1136,9 @@ export function registerAdminCountryRoutes(
             `${restaurant.name} restaurant Netherlands`,
             `${restaurant.name} ${countryName} restaurant`,
           ];
-          const commons = await findCuisineImageFromQueries(queries);
+          const commons = await findCuisineImageFromQueries(queries, {
+            excludeUrls: [restaurant.photoUrl],
+          });
           if (commons) {
             image = {
               url: commons.url,
@@ -1060,6 +1146,15 @@ export function registerAdminCountryRoutes(
               query: commons.query,
             };
           }
+        }
+
+        if (
+          image &&
+          restaurant.photoUrl &&
+          sameImageUrl(image.url, restaurant.photoUrl)
+        ) {
+          // Last resort already fell back to the only available photo.
+          notes = `${notes} (only one photo available; could not pick a different one.)`;
         }
 
         if (!image) {

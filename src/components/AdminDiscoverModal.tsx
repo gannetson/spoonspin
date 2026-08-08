@@ -400,22 +400,42 @@ export function AdminDiscoverModal({
                           ) : null}
                           {entry.kind === "drinks" ? (
                             <>
-                              <span className="block font-semibold text-ink">
-                                {entry.item.name}
-                                {entry.item.localName ? (
-                                  <span className="font-normal text-ink-soft">
-                                    {" "}
-                                    · {entry.item.localName}
-                                  </span>
+                              <span className="flex gap-3">
+                                {entry.item.imageUrl ? (
+                                  <img
+                                    src={entry.item.imageUrl}
+                                    alt=""
+                                    className="h-14 w-10 shrink-0 rounded object-cover"
+                                  />
                                 ) : null}
-                              </span>
-                              <span className="mt-1 block text-sm text-ink-soft">
-                                {entry.item.type}
-                                {entry.item.alcoholic
-                                  ? ` · ${t("admin.discover.drinks.alcoholic")}`
-                                  : ` · ${t("admin.discover.drinks.nonAlcoholic")}`}
-                                {" · "}
-                                {entry.item.description}
+                                <span className="min-w-0">
+                                  <span className="block font-semibold text-ink">
+                                    {entry.item.name}
+                                    {entry.item.localName ? (
+                                      <span className="font-normal text-ink-soft">
+                                        {" "}
+                                        · {entry.item.localName}
+                                      </span>
+                                    ) : null}
+                                  </span>
+                                  <span className="mt-1 block text-sm text-ink-soft">
+                                    {entry.item.type}
+                                    {entry.item.alcoholic
+                                      ? ` · ${t("admin.discover.drinks.alcoholic")}`
+                                      : ` · ${t("admin.discover.drinks.nonAlcoholic")}`}
+                                    {entry.item.grape
+                                      ? ` · ${t("admin.discover.drinks.grape")}: ${entry.item.grape}`
+                                      : null}
+                                    {" · "}
+                                    {entry.item.description}
+                                  </span>
+                                  {entry.item.foodPairing ? (
+                                    <span className="mt-1 block text-sm text-ink-soft">
+                                      {t("admin.discover.drinks.foodPairing")}:{" "}
+                                      {entry.item.foodPairing}
+                                    </span>
+                                  ) : null}
+                                </span>
                               </span>
                             </>
                           ) : null}

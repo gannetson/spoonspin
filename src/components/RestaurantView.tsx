@@ -8,6 +8,7 @@ import {
 } from "@/restaurants/cuisineFlags";
 import {
   formatPriceLevel,
+  listReviewLinks,
   listSourceRatings,
   normalizeToFive,
 } from "@/restaurants/ratings";
@@ -310,7 +311,7 @@ export function RestaurantView({
               href={restaurant.website}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
             >
               {t("dine.website")}
               <ExternalLink aria-hidden="true" className="size-4" />
@@ -320,11 +321,33 @@ export function RestaurantView({
             href={restaurant.mapsUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
+            className={
+              restaurant.website
+                ? "inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                : "inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
+            }
           >
             {t("dine.openInGoogleMaps")}
             <ExternalLink aria-hidden="true" className="size-4" />
           </a>
+          {listReviewLinks(restaurant).map((link) => (
+            <a
+              key={link.source}
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/10 bg-white px-4 text-sm font-semibold text-ink-soft hover:border-tomato hover:text-tomato"
+            >
+              {link.source === "google"
+                ? t("dine.reviews.google")
+                : link.source === "tripadvisor"
+                  ? t("dine.reviews.tripadvisor")
+                  : link.source === "theFork"
+                    ? t("dine.reviews.theFork")
+                    : t("dine.reviews.openTable")}
+              <ExternalLink aria-hidden="true" className="size-4" />
+            </a>
+          ))}
         </div>
 
         <section aria-labelledby="restaurant-menu-heading" className="space-y-4">

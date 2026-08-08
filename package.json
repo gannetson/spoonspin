@@ -29,6 +29,7 @@
     "agent:curate": "tsx --tsconfig tsconfig.app.json scripts/curate-restaurants.ts",
     "agent:proef": "tsx --tsconfig tsconfig.app.json scripts/import-proef-de-wereld.ts",
     "agent:ratings": "tsx --tsconfig tsconfig.app.json scripts/enrich-ratings.ts",
+    "agent:review-links": "tsx --tsconfig tsconfig.app.json scripts/enrich-review-links.ts",
     "db:rebuild-cuisines": "tsx --tsconfig tsconfig.app.json scripts/rebuild-cuisine-codes.ts",
     "db:seed-content": "tsx --tsconfig tsconfig.app.json scripts/seed-content.ts"
   },

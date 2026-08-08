@@ -59,15 +59,21 @@ export function getSpecialtyShops(country: Country): SpecialtyShop[] {
   return specialtyShopsFor(country.code);
 }
 
+export type RecipeDietFilter = "all" | "vegan" | "vegetarian" | "meat";
+
 export function recipeMatchesDiet(
   recipe: Recipe,
-  diet: "all" | "vegetarian" | "meat",
+  diet: RecipeDietFilter,
 ): boolean {
   if (diet === "all") return true;
   const labels = recipe.dietaryLabels.map((label) => label.toLowerCase());
-  const vegetarian = labels.some((label) =>
-    ["vegetarian", "vegan", "plant-based"].includes(label),
+  const vegan = labels.some((label) =>
+    ["vegan", "plant-based"].includes(label),
   );
+  const vegetarian =
+    vegan ||
+    labels.some((label) => label === "vegetarian" || label === "veggie");
+  if (diet === "vegan") return vegan;
   if (diet === "vegetarian") return vegetarian;
   return !vegetarian;
 }
@@ -80,11 +86,64 @@ export function recipeMatchesCategory(
   return recipe.category === category;
 }
 
+export type DrinkAlcoholFilter =
+  | "all"
+  | "other-alcoholic"
+  | "non-alcoholic"
+  | "beer"
+  | "wine";
+
 export function drinkMatchesAlcohol(
   drink: Drink,
-  filter: "all" | "alcoholic" | "non-alcoholic",
+  filter: DrinkAlcoholFilter,
 ): boolean {
   if (filter === "all") return true;
-  if (filter === "alcoholic") return drink.alcoholic;
+  if (filter === "beer") return drink.type === "beer";
+  if (filter === "wine") return drink.type === "wine";
+  if (filter === "other-alcoholic") {
+    return drink.alcoholic && drink.type !== "beer" && drink.type !== "wine";
+  }
   return !drink.alcoholic;
+}
+
+export type DrinkSectionId =
+  | "beers"
+  | "wines"
+  | "alcoholicOther"
+  | "nonAlcoholic";
+
+export type DrinkSection = {
+  id: DrinkSectionId;
+  drinks: Drink[];
+};
+
+/** Group drinks into beers, wines, other alcoholic, and non-alcoholic. */
+export function groupDrinksIntoSections(drinks: Drink[]): DrinkSection[] {
+  const beers: Drink[] = [];
+  const wines: Drink[] = [];
+  const alcoholicOther: Drink[] = [];
+  const nonAlcoholic: Drink[] = [];
+
+  for (const item of drinks) {
+    if (!item.alcoholic) {
+      nonAlcoholic.push(item);
+      continue;
+    }
+    if (item.type === "beer") {
+      beers.push(item);
+      continue;
+    }
+    if (item.type === "wine") {
+      wines.push(item);
+      continue;
+    }
+    alcoholicOther.push(item);
+  }
+
+  return [
+    { id: "nonAlcoholic", drinks: nonAlcoholic },
+    { id: "beers", drinks: beers },
+    { id: "wines", drinks: wines },
+    { id: "alcoholicOther", drinks: alcoholicOther },
+  ];
 }

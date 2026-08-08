@@ -78,10 +78,13 @@ export const nl: Messages = {
   "cook.filter.course.dessert": "Nagerecht",
   "cook.filter.course.snack": "Snack",
   "cook.filter.diet.all": "Elk dieet",
+  "cook.filter.diet.vegan": "Vegan",
   "cook.filter.diet.vegetarian": "Vegetarisch",
   "cook.filter.diet.meat": "Vlees",
   "cook.filter.alcohol.all": "Alle dranken",
-  "cook.filter.alcohol.alcoholic": "Alcoholisch",
+  "cook.filter.alcohol.beer": "Bier",
+  "cook.filter.alcohol.wine": "Wijn",
+  "cook.filter.alcohol.otherAlcoholic": "Overig alcoholisch",
   "cook.filter.alcohol.nonAlcoholic": "Alcoholvrij",
   "cook.course.starter": "Voorgerecht",
   "cook.course.main": "Hoofdgerecht",
@@ -94,10 +97,16 @@ export const nl: Messages = {
   "cook.empty.recipes":
     "Geen recepten passen bij deze filters. Probeer een andere gang of dieet.",
   "cook.drinks.heading": "Dranken",
-  "cook.drinks.subtitle": "Nationale dranken, bier, wijn en frisdrank.",
+  "cook.drinks.subtitle":
+    "Bieren, wijnen, overige alcoholische dranken en non-alcoholisch.",
   "cook.drinks.empty": "Geen dranken passen bij dit filter.",
+  "cook.drinks.section.beers": "Bieren",
+  "cook.drinks.section.wines": "Wijnen",
+  "cook.drinks.section.alcoholicOther": "Alcoholisch (overig)",
+  "cook.drinks.section.nonAlcoholic": "Non-alcoholisch",
   "cook.drink.alcoholic": "Alcoholisch",
   "cook.drink.nonAlcoholic": "Alcoholvrij",
+  "cook.drink.foodPairing": "Past bij",
   "cook.shops.heading": "Speciaalzaken",
   "cook.shops.subtitle":
     "Winkels in Nederland met ingrediënten voor de keuken van {name}.",
@@ -160,8 +169,12 @@ export const nl: Messages = {
     "Redactionele authenticiteitsbeoordeling voor deze keuken",
   "dine.sourceRatingTitle": "Gastbeoordeling {label}",
   "dine.website": "Website",
-  "dine.openInGoogleMaps": "Open in Google Maps",
+  "dine.openInGoogleMaps": "Google Maps",
   "dine.openGoogleMapsSearch": "Open Google Maps-zoekopdracht",
+  "dine.reviews.google": "Google-reviews",
+  "dine.reviews.tripadvisor": "Tripadvisor",
+  "dine.reviews.theFork": "The Fork",
+  "dine.reviews.openTable": "OpenTable",
   "dine.idleHint":
     "Voer een plaats of postcode in, of gebruik je locatie om te zoeken.",
   "dine.openRestaurantAria": "Open {name}",
@@ -307,12 +320,19 @@ export const nl: Messages = {
   "admin.country.replaceImage": "Afbeelding vervangen",
   "admin.country.replaceImage.hint":
     "Laat OpenAI een gerecht kiezen en haal een Wikimedia-foto op",
+  "admin.country.findDrinkImages": "Drankfoto’s zoeken",
+  "admin.country.findDrinkImages.hint":
+    "Zoek op Wikimedia fles-/glasfoto’s voor dranken zonder afbeelding",
+  "admin.country.findingDrinkImages": "Drankfoto’s zoeken…",
+  "admin.country.drinkImagesUpdated":
+    "Drankfoto’s: {updated} toegevoegd, {skipped} behouden, {missing} niet gevonden",
+  "admin.country.drinkImagesError": "Kon drankfoto’s niet vinden.",
   "admin.country.findRecipes": "Recepten zoeken",
   "admin.country.findRecipes.hint":
     "Zoek nationale gerechten en voeg geselecteerde recepten toe",
   "admin.country.findDrinks": "Dranken zoeken",
   "admin.country.findDrinks.hint":
-    "Zoek nationale dranken, inclusief lokale wijnen en bieren",
+    "Bieren met merken/foto’s, wijnen met druiven & pairing, plus andere dranken",
   "admin.country.findRestaurants": "Restaurants zoeken",
   "admin.country.findRestaurants.hint":
     "Zoek authentieke specialisten (geverifieerd), verrijk daarna menu/tekst/scores/beeld",
@@ -364,13 +384,15 @@ export const nl: Messages = {
     "Geen winkels teruggekregen. Probeer een andere focus.",
   "admin.discover.drinks.title": "Dranken zoeken",
   "admin.discover.drinks.hint":
-    "Zoek nationale dranken — vooral lokale wijnen en bieren — en kies welke je toevoegt.",
+    "Zoek bieren (bekende merken + flesfoto’s), wijnen (druiven + foodpairing), overige alcoholisch en non-alcoholisch.",
   "admin.discover.drinks.placeholder":
-    "bijv. streekwijnen, ambachtelijke bieren, alcoholvrije klassiekers",
+    "bijv. bekende biermerken, klassieke druiven, aperitieven",
   "admin.discover.drinks.empty":
     "Geen dranken teruggekregen. Probeer een andere focus.",
   "admin.discover.drinks.alcoholic": "alcoholisch",
   "admin.discover.drinks.nonAlcoholic": "alcoholvrij",
+  "admin.discover.drinks.grape": "Druif",
+  "admin.discover.drinks.foodPairing": "Past bij",
   "admin.discover.closeAria": "Sluiten",
   "admin.discover.close": "Sluiten",
   "admin.discover.query": "Zoeken",

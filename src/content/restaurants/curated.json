@@ -26,6 +26,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5345439687933108293&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:16.540Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/maison-marani-cuisine-georgienne-et-italienne-r726786",
+        "fetchedAt": "2026-08-08T12:33:46.184Z"
       }
     }
   },
@@ -56,6 +60,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=17119369453749737737&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:17.040Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d33964753-Reviews-Tiflis-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:37:13.041Z"
       }
     }
   },
@@ -86,6 +94,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=8056502086023185382&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:17.513Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.be/Restaurant_Review-g188633-d6938326-Reviews-Restaurant_Suhumi-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:37:33.894Z"
       }
     }
   },
@@ -116,6 +128,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5078264859358343290&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:17.957Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188626-d24889437-Reviews-Restobar_K_Family-Delft_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:37:51.897Z"
       }
     }
   },
@@ -146,6 +162,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=9367576434075455628&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:18.416Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/blue-nile-restaurant-r716469",
+        "fetchedAt": "2026-08-08T12:38:13.778Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d23795406-Reviews-Blue_Nile_Ethiopian_Restaurant-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:38:13.778Z"
       }
     }
   },
@@ -176,6 +200,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=11629836425717192962&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:18.891Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/aregash-ethiopisch-r825150",
+        "fetchedAt": "2026-08-08T12:38:30.860Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.be/Restaurant_Review-g188633-d28024277-Reviews-Aregash_Ethiopisch_Restaurant-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:38:30.860Z"
       }
     }
   },
@@ -236,6 +268,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15587690166361293122&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:19.940Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/casa-ramon-r267571",
+        "fetchedAt": "2026-08-08T12:39:07.600Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d10588327-Reviews-Casa_Ramon-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:39:07.600Z"
       }
     }
   },
@@ -266,6 +306,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15760131831350838101&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:20.457Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.ca/Restaurant_Review-g188630-d3191351-Reviews-La_Plancha-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:39:25.115Z"
       }
     }
   },
@@ -296,6 +340,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=1808994450995845804&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:20.930Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/mount-everest-tandoori-r245209",
+        "fetchedAt": "2026-08-08T12:39:44.070Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d1644108-Reviews-Everest_Tandoori_Restaurant-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:39:44.070Z"
       }
     }
   },
@@ -326,6 +378,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=1665959599856393898&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:21.409Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/india-way-r854470",
+        "fetchedAt": "2026-08-08T12:40:02.583Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d952606-Reviews-India_Way_Tandoori_Restaurant-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:40:02.582Z"
       }
     }
   },
@@ -356,6 +416,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=4842286598702980925&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:22.094Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.com/restaurant/darbaar-royal-indian-cuisine-r588541",
+        "fetchedAt": "2026-08-08T12:40:22.801Z"
       }
     }
   },
@@ -386,6 +450,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=18102961043815207559&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:22.565Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d25261674-Reviews-Dining_Tokyo-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:40:42.947Z"
       }
     }
   },
@@ -409,7 +477,12 @@
     "reviewSource": "editorial-curation",
     "userRating": 4.3,
     "reviewCount": 205,
-    "ratings": {}
+    "ratings": {
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.co.za/Restaurant_Review-g188630-d15278542-Reviews-Fujiyama_55_Leiden-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:41:02.207Z"
+      }
+    }
   },
   {
     "id": "curated:jp-ilovesushi-leiden",
@@ -439,6 +512,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=6079077829670028087&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:23.603Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.tripadvisor.thefork.com/restaurant/yuki-sushi-r277479",
+        "fetchedAt": "2026-08-08T12:41:20.379Z"
       }
     }
   },
@@ -470,6 +547,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=6490471167075063293&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:24.052Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.fr/restaurant/aji-ichiban-r19212",
+        "fetchedAt": "2026-08-08T12:43:17.316Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.ca/Restaurant_Review-g188630-d780372-Reviews-Ichi_Ban-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:43:17.316Z"
       }
     }
   },
@@ -590,6 +675,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=7478158825048583855&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:25.893Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d7938116-Reviews-Aperitivo_Leiden-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:44:34.467Z"
       }
     }
   },
@@ -620,6 +709,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15754815544264698197&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:26.330Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/bocconi-r43594",
+        "fetchedAt": "2026-08-08T12:44:52.199Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d3641172-Reviews-Bocconi-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:44:52.199Z"
       }
     }
   },
@@ -650,6 +747,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=16404545821000892387&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:26.771Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/farina-r369667",
+        "fetchedAt": "2026-08-08T12:45:13.912Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d18590212-Reviews-Farina_Pizza-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:45:13.912Z"
       }
     }
   },
@@ -680,6 +785,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=87947086843288424&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:27.233Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d2278025-Reviews-Fratelli_Leiden-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:45:34.175Z"
       }
     }
   },
@@ -710,6 +819,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13902794636286856159&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:27.681Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.ca/Restaurant_Review-g188630-d28106715-Reviews-Anna_Et_Fred-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:45:54.445Z"
       }
     }
   },
@@ -740,6 +853,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15360147454661064321&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:28.113Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d2698939-Reviews-Bistro_Bord_o-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:46:13.855Z"
       }
     }
   },
@@ -763,7 +880,12 @@
     "reviewSource": "editorial-curation",
     "userRating": 4.5,
     "reviewCount": 260,
-    "ratings": {}
+    "ratings": {
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d1625569-Reviews-Restaurant_In_den_Doofpot-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:46:37.387Z"
+      }
+    }
   },
   {
     "id": "curated:ma-catootje-leiden",
@@ -792,6 +914,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=1796836015634551833&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:29.038Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d8518932-Reviews-Catootje_aan_de_Markt_Restaurant_Leiden-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:46:57.823Z"
       }
     }
   },
@@ -822,6 +948,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=1045107623356096844&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:29.486Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d23929097-Reviews-Tempo_Doeloe_Traiteur-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:47:18.772Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/tempo-doeloe-amsterdam",
+        "fetchedAt": "2026-08-08T12:47:18.772Z"
       }
     }
   },
@@ -852,6 +986,18 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=10810799535682388201&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:29.982Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.fr/restaurant/restaurant-blauw-amsterdam-r845777",
+        "fetchedAt": "2026-08-08T12:47:37.037Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d1986573-Reviews-Restaurant_Blauw_Amsterdam-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:47:37.037Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/restaurant-blauw-amsterdam",
+        "fetchedAt": "2026-08-08T12:47:37.037Z"
       }
     }
   },
@@ -882,6 +1028,18 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5158916063863294215&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:30.480Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/club-birdies-r861692",
+        "fetchedAt": "2026-08-08T12:47:56.666Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d6600036-Reviews-Thaise_Snackbar_Bird-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:47:56.666Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/bird-thai-restaurant-amsterdam",
+        "fetchedAt": "2026-08-08T12:47:56.666Z"
       }
     }
   },
@@ -912,6 +1070,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=1999469256057524407&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:30.942Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.in/Restaurant_Review-g188630-d15611364-Reviews-Vina_s_noodles_more-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:48:13.169Z"
       }
     }
   },
@@ -942,6 +1104,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=869599228496318056&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:31.386Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/luc-utrecht-r256857",
+        "fetchedAt": "2026-08-08T12:48:33.828Z"
       }
     }
   },
@@ -972,6 +1138,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=14532516811019995663&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:31.845Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d28988268-Reviews-Taratoer-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:48:54.482Z"
       }
     }
   },
@@ -1006,7 +1176,9 @@
       "tripadvisor": {
         "score": 4,
         "count": 200,
-        "scale": 5
+        "scale": 5,
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d1063645-Reviews-Cedars_Libanees_Restaurant-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:49:14.933Z"
       }
     }
   },
@@ -1041,7 +1213,9 @@
       "tripadvisor": {
         "score": 4.4,
         "count": 150,
-        "scale": 5
+        "scale": 5,
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d6521845-Reviews-Kua_Mexican_Kitchen-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:49:32.872Z"
       }
     }
   },
@@ -1072,6 +1246,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=11880062277562087390&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:33.260Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.ca/Restaurant_Review-g188633-d14768234-Reviews-Queru_Cantina_Mexicana-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:49:50.314Z"
       }
     }
   },
@@ -1102,6 +1280,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=18044932303670834675&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:33.713Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/callao-cevicheria-peruana-by-jaime-pesaque-r502251",
+        "fetchedAt": "2026-08-08T12:50:11.565Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.be/Restaurant_Review-g188633-d17605326-Reviews-Callao-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:50:11.565Z"
       }
     }
   },
@@ -1132,6 +1318,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=9855728392881655339&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:34.171Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.be/nl/restaurant/callao-cevicheria-peruana-by-jaime-pesaque-r502251",
+        "fetchedAt": "2026-08-08T12:50:30.332Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d8427826-Reviews-Somos_Peru-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:50:30.332Z"
       }
     }
   },
@@ -1162,6 +1356,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=18389188570525926011&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:34.683Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/rodizio-den-haag-r240405",
+        "fetchedAt": "2026-08-08T12:50:50.734Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g668848-d1053857-Reviews-Rodizio-Scheveningen_The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:50:50.734Z"
       }
     }
   },
@@ -1192,6 +1394,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=9782857564672545876&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:35.165Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/hongdae-r808118",
+        "fetchedAt": "2026-08-08T12:51:10.721Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d24168559-Reviews-Hongdae-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:51:10.721Z"
       }
     }
   },
@@ -1222,6 +1432,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15588704174101576140&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:35.684Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188632-d26854624-Reviews-Samalain-Rotterdam_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:51:36.234Z"
       }
     }
   },
@@ -1252,6 +1466,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=8867248297289565000&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:36.186Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d14174464-Reviews-M_Noodle_Bar-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:51:54.858Z"
       }
     }
   },
@@ -1282,6 +1500,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=7397777801905593297&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:36.651Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d10791577-Reviews-Hang_Yee-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:52:12.245Z"
       }
     }
   },
@@ -1312,6 +1534,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=16434772265827695728&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:37.099Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d20960676-Reviews-Portugalia_Tasca-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:52:30.531Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.com/r/portugalia-amsterdam?lang=es",
+        "fetchedAt": "2026-08-08T12:52:30.531Z"
       }
     }
   },
@@ -1342,6 +1572,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=8160303756693884539&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:37.531Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/tapisco-r745711",
+        "fetchedAt": "2026-08-08T12:52:47.576Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d13936356-Reviews-Restaurant_Tapisco-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:52:47.576Z"
       }
     }
   },
@@ -1365,7 +1603,12 @@
     "reviewSource": "editorial-curation",
     "userRating": 4.3,
     "reviewCount": 205,
-    "ratings": {}
+    "ratings": {
+      "tripadvisor": {
+        "url": "https://fr.tripadvisor.be/Restaurant_Review-g652365-d23599162-Reviews-Baibun_Thai_Restaurant-Voorschoten_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:54:02.796Z"
+      }
+    }
   },
   {
     "id": "curated:ng-pac-afro-denhaag",
@@ -1424,6 +1667,18 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5146178745320317956&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:38.912Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/amigo-grill-prinsengracht-r265119",
+        "fetchedAt": "2026-08-08T12:54:37.701Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d10376830-Reviews-Amigo_Grill-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:54:37.701Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/amigo-grill-restaurant-amsterdam",
+        "fetchedAt": "2026-08-08T12:54:37.701Z"
       }
     }
   },
@@ -1454,6 +1709,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=7619337895146824276&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:39.356Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/wurst-schnitzelhaus-zuidas-wush-r626601",
+        "fetchedAt": "2026-08-08T12:54:57.085Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/wurst-and-schnitzelhaus-amsterdam",
+        "fetchedAt": "2026-08-08T12:54:57.085Z"
       }
     }
   },
@@ -1484,6 +1747,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=12641820579426276011&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:40.114Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.be/nl/restaurant/reggae-rita-s-r835170",
+        "fetchedAt": "2026-08-08T12:55:14.910Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d12291891-Reviews-Reggae_Rita_s-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:55:14.910Z"
       }
     }
   },
@@ -1514,6 +1785,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=8149889978093646085&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:40.712Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/rainarai-westerpark-r827794",
+        "fetchedAt": "2026-08-08T12:55:32.759Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d12412791-Reviews-Braai_Westerpark-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:55:32.759Z"
       }
     }
   },
@@ -1544,6 +1823,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5191825002181279789&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:41.238Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/sarban-afghaans-restaurant-tilburg-r243957",
+        "fetchedAt": "2026-08-08T12:55:49.888Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d25416873-Reviews-Sarban_Afghaans_Restaurant_Den_Haag-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:55:49.888Z"
       }
     }
   },
@@ -1574,6 +1861,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=7094901965838196694&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:41.761Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d26258242-Reviews-Luna_Restaurant-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:56:10.590Z"
       }
     }
   },
@@ -1595,7 +1886,16 @@
     "authenticityRating": 4,
     "authenticityNotes": "Proef de Wereld 0.9 (C): Alternatief met nadruk op grill en rijst. Casual en centraal gelegen. Try: Afghaanse rijstschotels, kebab en driegangenmenu.",
     "reviewSource": "proef-de-wereld-0.9",
-    "ratings": {}
+    "ratings": {
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/rice-n-spice-r826676",
+        "fetchedAt": "2026-08-08T12:56:30.447Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.be/Restaurant_Review-g188633-d26833318-Reviews-Grill_N_Rice-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:56:30.447Z"
+      }
+    }
   },
   {
     "id": "curated:proef-al-rufus-amsterdam",
@@ -1624,6 +1924,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13052256891342572427&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:42.681Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/rufus-r851430",
+        "fetchedAt": "2026-08-08T12:56:48.480Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d28472515-Reviews-Rufus-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:56:48.480Z"
       }
     }
   },
@@ -1654,6 +1962,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13902086499653314396&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:43.147Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/rainarai-westerpark-r827794",
+        "fetchedAt": "2026-08-08T12:57:08.532Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d875450-Reviews-Rainarai_Prinsengracht-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:57:08.532Z"
       }
     }
   },
@@ -1744,6 +2060,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=8284667716026968316&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:44.574Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/el-gaucho-rotterdam-r220611",
+        "fetchedAt": "2026-08-08T12:58:21.367Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.be/Restaurant_Review-g188630-d749151-Reviews-El_Gaucho-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:58:21.367Z"
       }
     }
   },
@@ -1774,6 +2098,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=31707049849888345&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:45.170Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/saint-morris-r244121",
+        "fetchedAt": "2026-08-08T12:58:44.357Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d3589386-Reviews-Saint_Morris_Argentijns_Restaurant-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:58:44.357Z"
       }
     }
   },
@@ -1804,6 +2136,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13339040457836888389&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:45.622Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g188633-d33100009-Reviews-Tio_Bigotes-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:59:01.182Z"
       }
     }
   },
@@ -1834,6 +2170,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=10921788417868935107&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:46.065Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d25228004-Reviews-Restaurant_Noah_Lieven-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:59:23.987Z"
       }
     }
   },
@@ -1855,7 +2195,12 @@
     "authenticityRating": 4,
     "authenticityNotes": "Proef de Wereld 0.9 (C): Fallback met Armeense hapjes en arrangementen. Sfeervol en laagdrempelig; actuele reguliere opening is beperkt verifieerbaar. Try: Armeense hapjes, barbecue en proeverijen wanneer aangeboden.",
     "reviewSource": "proef-de-wereld-0.9",
-    "ratings": {}
+    "ratings": {
+      "tripadvisor": {
+        "url": "https://en.tripadvisor.com.hk/Restaurant_Review-g941692-d24097532-Reviews-Shirak_By_Night-Tiel_Gelderland_Province.html",
+        "fetchedAt": "2026-08-08T12:59:40.422Z"
+      }
+    }
   },
   {
     "id": "curated:proef-au-little-collins-amsterdam",
@@ -1884,6 +2229,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=11148560321910305161&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:46.987Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d3175544-Reviews-Little_Collins-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T12:59:58.849Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/little-collins-amsterdam",
+        "fetchedAt": "2026-08-08T12:59:58.849Z"
       }
     }
   },
@@ -1914,6 +2267,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=14626913248682720632&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:47.439Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d4548400-Reviews-Drovers_Dog_1-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:00:17.967Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/drovers-dog-amsterdam",
+        "fetchedAt": "2026-08-08T13:00:17.967Z"
       }
     }
   },
@@ -1974,6 +2335,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=2335958883318253187&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:48.370Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g652247-d27483497-Reviews-Azeri_Veendam-Veendam.html",
+        "fetchedAt": "2026-08-08T13:01:00.349Z"
       }
     }
   },
@@ -2004,6 +2369,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=10921788417868935107&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:48.782Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d25228004-Reviews-Restaurant_Noah_Lieven-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:01:07.476Z"
       }
     }
   },
@@ -2025,7 +2394,12 @@
     "authenticityRating": 5,
     "authenticityNotes": "Proef de Wereld 0.9 (A): Beste en meest authentieke gespecialiseerde keuze. Informeel comfortfoodrestaurant. Try: Biryani, khichuri, dal, curries en dagspecials; vraag naar bhorta of vis.",
     "reviewSource": "proef-de-wereld-0.9",
-    "ratings": {}
+    "ratings": {
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/tasty-indian-bites-r731257",
+        "fetchedAt": "2026-08-08T13:01:28.538Z"
+      }
+    }
   },
   {
     "id": "curated:proef-bd-deshi-taste-amsterdam",
@@ -2045,7 +2419,12 @@
     "authenticityRating": 4,
     "authenticityNotes": "Proef de Wereld 0.9 (B): Sterk alternatief met thuiskeukensignatuur. Laagdrempelig Zuid-Aziatisch eethuis. Try: Traditionele rijst-, vlees- en currygerechten; actuele Bengaalse specials navragen.",
     "reviewSource": "proef-de-wereld-0.9",
-    "ratings": {}
+    "ratings": {
+      "theFork": {
+        "url": "https://www.thefork.com/restaurant/atlas-taste-r751868",
+        "fetchedAt": "2026-08-08T13:01:48.103Z"
+      }
+    }
   },
   {
     "id": "curated:proef-bd-sher-bangla-haren",
@@ -2074,6 +2453,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=9304298364186428956&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:50.176Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g3340737-d3799879-Reviews-Sher_Bangla-Haren.html",
+        "fetchedAt": "2026-08-08T13:02:04.503Z"
       }
     }
   },
@@ -2154,6 +2537,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13339040457836888389&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:51.517Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g188633-d33100009-Reviews-Tio_Bigotes-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:02:48.265Z"
       }
     }
   },
@@ -2184,6 +2571,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15453687273715204265&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:51.961Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/balkan-deli-r804587",
+        "fetchedAt": "2026-08-08T13:03:06.960Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188632-d25557496-Reviews-Balkan_Deli-Rotterdam_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:03:06.960Z"
       }
     }
   },
@@ -2234,6 +2629,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15830327014790955246&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:52.826Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g652283-d7134901-Reviews-Mostar_Grill-Helmond_North_Brabant_Province.html",
+        "fetchedAt": "2026-08-08T13:03:43.206Z"
       }
     }
   },
@@ -2264,6 +2663,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5146675905691847702&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:53.298Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/rodizio-rotterdam-r385815",
+        "fetchedAt": "2026-08-08T13:04:02.680Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188632-d14156268-Reviews-Rodizio_Rotterdam-Rotterdam_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:04:02.680Z"
       }
     }
   },
@@ -2294,6 +2701,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=12258394084695796826&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:53.740Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.co.uk/restaurant/samba-kitchen-r236341",
+        "fetchedAt": "2026-08-08T13:04:20.169Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d1971828-Reviews-Samba_Kitchen_Churrascaria_rodizio-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:04:20.169Z"
       }
     }
   },
@@ -2324,6 +2739,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15996879418364693375&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:54.220Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d4268556-Reviews-Zest_Craft_Beer_Food-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:04:38.890Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/brouwerij-zest-amsterdam",
+        "fetchedAt": "2026-08-08T13:04:38.890Z"
       }
     }
   },
@@ -2414,6 +2837,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13339040457836888389&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:55.800Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.com/Restaurant_Review-g188633-d33100009-Reviews-Tio_Bigotes-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:05:32.661Z"
       }
     }
   },
@@ -2444,6 +2871,18 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=916303654120577110&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:56.511Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/sichuan-food-r219403",
+        "fetchedAt": "2026-08-08T13:05:47.678Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.in/Restaurant_Review-g188590-d697016-Reviews-Sichuan_Food-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:05:47.678Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/sichuan-food-amsterdam",
+        "fetchedAt": "2026-08-08T13:05:47.678Z"
       }
     }
   },
@@ -2474,6 +2913,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5290041317848159979&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:56.974Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d1076655-Reviews-Oriental_City-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:06:10.872Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/oriental-city-amsterdam",
+        "fetchedAt": "2026-08-08T13:06:10.872Z"
       }
     }
   },
@@ -2504,6 +2951,18 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=9218000867956680226&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:57.444Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/sea-palace-r842658",
+        "fetchedAt": "2026-08-08T13:06:25.761Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d697011-Reviews-Sea_Palace-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:06:25.761Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/sea-palace-amsterdam",
+        "fetchedAt": "2026-08-08T13:06:25.761Z"
       }
     }
   },
@@ -2534,6 +2993,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13070568016441555546&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:58.032Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.ca/Restaurant_Review-g188590-d8609413-Reviews-Tropico_Latin_Flavors-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:06:45.722Z"
       }
     }
   },
@@ -2564,6 +3027,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=14870751415938802978&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:58.598Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/salento-latino-colombian-traditional-food-r813526",
+        "fetchedAt": "2026-08-08T13:07:04.815Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d25523512-Reviews-Salento_Latino_Colombian_Traditional_Food-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:07:04.815Z"
       }
     }
   },
@@ -2594,6 +3065,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=5443719171791551512&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:48:59.247Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/cartagena-r826556",
+        "fetchedAt": "2026-08-08T13:07:23.278Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d28121868-Reviews-Cartagena_Restaurant_Bar-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:07:23.278Z"
       }
     }
   },
@@ -2654,6 +3133,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15453687273715204265&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:00.316Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/balkan-deli-r804587",
+        "fetchedAt": "2026-08-08T13:07:38.809Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188632-d25557496-Reviews-Balkan_Deli-Rotterdam_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:07:38.809Z"
       }
     }
   },
@@ -2684,6 +3171,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=16377653822331173500&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:00.815Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d4308520-Reviews-Havana_Den_Haag-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:10:10.284Z"
       }
     }
   },
@@ -2764,6 +3255,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=14811912578179588519&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:02.396Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d3335553-Reviews-Mythos_Greek_Restaurant_In_Amsterdam-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:11:17.054Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/mythos-greek-restaurant-r248151",
+        "fetchedAt": "2026-08-08T13:11:17.055Z"
       }
     }
   },
@@ -2844,6 +3343,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=11016928649787370566&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:04.099Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188632-d24107711-Reviews-Casa_Del_Mofongo-Rotterdam_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:12:15.476Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/casa-del-mofongo-r830817",
+        "fetchedAt": "2026-08-08T13:12:15.476Z"
       }
     }
   },
@@ -2874,6 +3381,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=16144848336250007245&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:04.528Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d26245314-Reviews-HAWAWSHI-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:12:34.610Z"
       }
     }
   },
@@ -2964,6 +3475,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=4071857760385761199&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:05.864Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d24139384-Reviews-Habesha_Savanna_Eetcafe-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:13:52.612Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/habesha-savanna-eetcafe-r737609",
+        "fetchedAt": "2026-08-08T13:13:52.613Z"
       }
     }
   },
@@ -2994,6 +3513,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13143098626370295002&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:06.299Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/hdmona-r500107",
+        "fetchedAt": "2026-08-08T13:14:11.325Z"
       }
     }
   },
@@ -3024,6 +3547,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13089777506422612956&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:06.951Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d2366456-Reviews-Queen_of_Sheba-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:14:44.965Z"
       }
     }
   },
@@ -3054,6 +3581,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15848455991558849084&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:07.349Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d749145-Reviews-Djebena-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:15:03.887Z"
       }
     }
   },
@@ -3084,6 +3615,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=6698983963263608608&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:07.978Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d33713071-Reviews-Taste_of_Ethiopia-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:15:22.384Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/taste-of-ethiopia-r848136",
+        "fetchedAt": "2026-08-08T13:15:22.384Z"
       }
     }
   },
@@ -3114,6 +3653,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=2533018148294979042&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:08.423Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188611-d748025-Reviews-De_Librije-Zwolle_Overijssel_Province.html",
+        "fetchedAt": "2026-08-08T13:15:40.016Z"
       }
     }
   },
@@ -3144,6 +3687,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=10808014070706652792&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:08.881Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d12705642-Reviews-Cafe_Caron-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:15:58.359Z"
       }
     }
   },
@@ -3204,6 +3751,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=11382311979960209220&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:09.895Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d8833719-Reviews-Batoni_Khinkali-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:16:37.279Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/batoni-khinkali-r713092",
+        "fetchedAt": "2026-08-08T13:16:37.279Z"
       }
     }
   },
@@ -3234,6 +3789,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=15305583437366095213&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:10.359Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d2253112-Reviews-Stadscafe_van_der_Werff-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:16:57.049Z"
       }
     }
   },
@@ -3264,6 +3823,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=13579023030177091713&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:10.800Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188633-d33007021-Reviews-The_African_Granary-The_Hague_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:17:17.340Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/the-african-granary-r836699",
+        "fetchedAt": "2026-08-08T13:17:17.340Z"
       }
     }
   },
@@ -3314,6 +3881,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=2636754250006605341&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:11.842Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d3844271-Reviews-Grieks_Restaurant_Olympia-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:17:55.810Z"
       }
     }
   },
@@ -3344,6 +3915,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=14811912578179588519&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:12.411Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d3335553-Reviews-Mythos_Greek_Restaurant_In_Amsterdam-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:18:03.715Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/mythos-greek-restaurant-r248151",
+        "fetchedAt": "2026-08-08T13:18:03.715Z"
       }
     }
   },
@@ -3374,6 +3953,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=10475255590683320331&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:12.879Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d23797099-Reviews-Kaia_Amsterdam-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:18:31.384Z"
       }
     }
   },
@@ -3425,7 +4008,12 @@
     "authenticityRating": 4,
     "authenticityNotes": "Proef de Wereld 0.9 (B): Dichtstbijzijnde Indiase keuze. Informeel en gastvrij. Try: Curries, tandoor en biryani.",
     "reviewSource": "proef-de-wereld-0.9",
-    "ratings": {}
+    "ratings": {
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d8492839-Reviews-Roti_Huis-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:19:06.643Z"
+      }
+    }
   },
   {
     "id": "curated:proef-in-de-lindehof-nuenen",
@@ -3454,6 +4042,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=8605524240301734851&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:14.210Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g1924574-d2005546-Reviews-Restaurant_de_Lindehof-Nuenen_North_Brabant_Province.html",
+        "fetchedAt": "2026-08-08T13:19:25.137Z"
       }
     }
   },
@@ -3484,6 +4076,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=10280333652628070728&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:14.646Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d21277830-Reviews-The_Madras_Diaries-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:19:44.838Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/the-madras-diaries-r662177",
+        "fetchedAt": "2026-08-08T13:19:44.838Z"
       }
     }
   },
@@ -3514,6 +4114,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=17973435010944994199&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:15.144Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188630-d1163165-Reviews-Surakarta-Leiden_South_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:20:02.874Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/surakarta-r223113",
+        "fetchedAt": "2026-08-08T13:20:02.874Z"
       }
     }
   },
@@ -3544,6 +4152,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=7122136853579034984&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:15.629Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d753075-Reviews-Aneka_Rasa-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:20:23.745Z"
+      },
+      "openTable": {
+        "url": "https://www.opentable.nl/r/aneka-rasa-amsterdam",
+        "fetchedAt": "2026-08-08T13:20:23.745Z"
       }
     }
   },
@@ -3604,6 +4220,10 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=798645951352684701&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:16.529Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d3733368-Reviews-De_Aardige_Pers-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:21:00.799Z"
       }
     }
   },
@@ -3634,6 +4254,14 @@
         "scale": 5,
         "url": "https://maps.google.com/?cid=4132859561790691888&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:17.239Z"
+      },
+      "tripadvisor": {
+        "url": "https://www.tripadvisor.nl/Restaurant_Review-g188590-d13132585-Reviews-Shiraz_Jardin_des_Vins-Amsterdam_North_Holland_Province.html",
+        "fetchedAt": "2026-08-08T13:21:18.986Z"
+      },
+      "theFork": {
+        "url": "https://www.thefork.nl/restaurant/shiraz-r808763",
+        "fetchedAt": "2026-08-08T13:21:18.986Z"
       }
     }
   },
@@ -4645,6 +5273,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Austrian-leaning schnitzel house built around Wiener schnitzel craft and Austrian Weizen beers.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4,
+    "reviewCount": 69,
     "ratings": {
       "google": {
         "score": 4,
@@ -4653,11 +5283,7 @@
         "url": "https://maps.google.com/?cid=3748953386900312446&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:34.976Z"
       }
-    },
-    "userRating": 4,
-    "reviewCount": 69,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDzAkCcq5O40sbsPoGAt5paJRg6o-xNccpr8tYKSlhmGTsRdgbDifIMGAd5efaG06oNs8fZfBqXX8CPpBHxR4h5b_x-IYR5Bj1U-evL29Ziil6eilnHz8t5gHdJEIPlMF0vYjUZ2Rt8Zy5U0w=s4800-h800",
-    "photoAttribution": "Photo: Willem via Google"
+    }
   },
   {
     "id": "curated:at-tiroler-stuberl-zandvoort",
@@ -4677,6 +5303,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Long-running Tyrolean/Austrian stüberl with 20+ schnitzel variants and Alpine café atmosphere.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.6,
+    "reviewCount": 584,
     "ratings": {
       "google": {
         "score": 4.6,
@@ -4685,11 +5313,7 @@
         "url": "https://maps.google.com/?cid=13648429020174818533&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:35.437Z"
       }
-    },
-    "userRating": 4.6,
-    "reviewCount": 584,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC7lnyTZdo4obncHBP2kKKQg5OiC3FR_GWQ-9SURfeKrbnB5rVfmOZNXp6Hphu6BNiRGCW-db_8YGBbRg1xVR3KUl3DxZCLpNjSpiQlgbBn3xf0kNMO86awEbfGKjARB6hxYRqHPGvLg_V7bQ=s4800-h800",
-    "photoAttribution": "Photo: Bernd Brinkmann via Google"
+    }
   },
   {
     "id": "curated:kh-angkor-delft",
@@ -4709,6 +5333,8 @@
     "authenticityRating": 5,
     "authenticityNotes": "Cambodian chef-owner kitchen with rotating Khmer tasting menus (plus Thai); rare dedicated Cambodian specialist in NL.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.6,
+    "reviewCount": 364,
     "ratings": {
       "google": {
         "score": 4.6,
@@ -4717,11 +5343,7 @@
         "url": "https://maps.google.com/?cid=8132150938033750319&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:35.949Z"
       }
-    },
-    "userRating": 4.6,
-    "reviewCount": 364,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCZjA0h0_lC1oxveDzPa2GlBrgJqwqefPnPMQHMIDzS2m5DvZACU51qFYSI1fvojsMDDwRFL9T7t5oZz1DdlJz30drdkTVS1oGJLDypz6gCeOAotwMq_JflYd5YvwlAISLIqoTVK5w8LHDUmw=s4800-h800",
-    "photoAttribution": "Photo: Angkor Restaurant via Google"
+    }
   },
   {
     "id": "curated:np-bhatti-pasal-amsterdam",
@@ -4741,6 +5363,8 @@
     "authenticityRating": 5,
     "authenticityNotes": "Nepalese specialty restaurant focused on authentic momo and Himalayan sharing plates near Leidseplein.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.6,
+    "reviewCount": 2583,
     "ratings": {
       "google": {
         "score": 4.6,
@@ -4749,11 +5373,7 @@
         "url": "https://maps.google.com/?cid=5955174348082034253&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:36.378Z"
       }
-    },
-    "userRating": 4.6,
-    "reviewCount": 2583,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBACO_r4aOJx3pDUcOiZ2TxvhhmxInrxyDHKVLfC-RMCtYR0oi8P0zFCVAKJeWwszkecpjP24fAuJqmV4wNMrhROBHa2SejCPPHop-lVtf6VGQyxjfNMp1gW_uzPGxpHxynnghe4wR4fnzr=s4800-h800",
-    "photoAttribution": "Photo: Bhatti Pasal via Google"
+    }
   },
   {
     "id": "curated:np-mountain-nepal-amsterdam",
@@ -4773,6 +5393,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Dedicated Nepalese restaurant with clay-oven/tandoori and Himalayan curries in Oud-West.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.8,
+    "reviewCount": 121,
     "ratings": {
       "google": {
         "score": 4.8,
@@ -4781,11 +5403,7 @@
         "url": "https://maps.google.com/?cid=12525163462089879453&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:36.845Z"
       }
-    },
-    "userRating": 4.8,
-    "reviewCount": 121,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCk0MvvG9iWuAOQOygpJQR7TS2W8RoUSwEzKOCOFm7ugvmgL8-oZ_fV7aUQapv2NHwmX_QOEXfkglUcAF2A6xEXISEtb8TkRHkso3i3A6816cv3k8Li4sA9fKJcHkoNlrIJhcwGPJ1mjaB6fUc=s4800-h800",
-    "photoAttribution": "Photo: Mountain Nepal - Amsterdam via Google"
+    }
   },
   {
     "id": "curated:np-himalayan-kitchen-amsterdam",
@@ -4805,6 +5423,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Nepalese-Indian Himalayan kitchen since 2014; strong momo and Nepali curry focus in Kinkerbuurt.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.5,
+    "reviewCount": 436,
     "ratings": {
       "google": {
         "score": 4.5,
@@ -4813,11 +5433,7 @@
         "url": "https://maps.google.com/?cid=3737633784668419479&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:37.406Z"
       }
-    },
-    "userRating": 4.5,
-    "reviewCount": 436,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjChC4MMIQd3RKJNF848_muFOgKfWX2ZodszwaD5ZXbQm14taN0p0lOkAGZ9wBPSh_jEzJC9LwLaIibcTg0YopiwlPzqvdUdYviy68cvzd9Pw18sL7ymNPq6X0LCU7Sr9kc_ZcYWZ807mWlXsMQ=s4800-h800",
-    "photoAttribution": "Photo: Himalayan Kitchen Restaurant via Google"
+    }
   },
   {
     "id": "curated:np-namaste-nepali-rotterdam",
@@ -4837,6 +5453,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Nepalese and Indian specialty restaurant in Kralingen with momo and Himalayan curries.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.6,
+    "reviewCount": 319,
     "ratings": {
       "google": {
         "score": 4.6,
@@ -4845,11 +5463,7 @@
         "url": "https://maps.google.com/?cid=17364939437611674215&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:37.895Z"
       }
-    },
-    "userRating": 4.6,
-    "reviewCount": 319,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCmL-uHiLthplC9kGqyDniILQQ-Pk-ugwNKY0iu5e4iHUXraI6XPmk9h2vZYCibHPT4B0dB_CUY-wIpMxRoZdkjRf2y7O7Mm1jZkWAgsX-4ImM9_vXTh3uAhK8h5fUvxETFAh1LGMC0Pfmw1w=s4800-h342",
-    "photoAttribution": "Photo: Namaste Nepali & Indian Restaurant 🇳🇵 🇮🇳 via Google"
+    }
   },
   {
     "id": "curated:tw-slowth-brunch-amsterdam",
@@ -4869,6 +5483,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Taiwanese brunch café focused on breakfast-shop and night-market comfort food, matcha, and bubble tea.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.7,
+    "reviewCount": 690,
     "ratings": {
       "google": {
         "score": 4.7,
@@ -4877,11 +5493,7 @@
         "url": "https://maps.google.com/?cid=8611740072980092659&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:38.571Z"
       }
-    },
-    "userRating": 4.7,
-    "reviewCount": 690,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDsvsece_QtFE5Tw20_SPP7o3SHS9lpiDymKo4CQnCCvKOrsiqbfBlwY4dFvft6FsFShyTVAo4C5lACbAXhOk0w3bHokCCS-4RWNv8P35AvRaMy2cJT6uRU-W3fUXegcmEKUiA7USiSA3GQ3z0=s4800-h800",
-    "photoAttribution": "Photo: Slowth Brunch via Google"
+    }
   },
   {
     "id": "curated:tw-jiji-fried-chicken-amsterdam",
@@ -4901,9 +5513,7 @@
     "authenticityRating": 4,
     "authenticityNotes": "Specialist Taiwanese fried-chicken counter (ji pai style) near Leidseplein.",
     "reviewSource": "manual-research-2026",
-    "ratings": {},
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBR85_aRurGaY6hw1lAajjpTIUa_eot4B0_AKkQDTAFyqEgKc-CsGa3wPAgkhfFsUCETTTEDgrvchsmT6iJxfFOE0yPUCxXaNJZr-y5-4JitxG_dzw6LXVUQwRy0zqgNztA6MYMXVdOzTkBYe-zpetT-A=s4800-h800",
-    "photoAttribution": "Photo: JiJi Taiwanese Fried Chicken via Google"
+    "ratings": {}
   },
   {
     "id": "curated:tw-veggie-garden-rotterdam",
@@ -4923,9 +5533,7 @@
     "authenticityRating": 4,
     "authenticityNotes": "Taiwanese vegetarian/vegan café attached to Veggie Garden supermarket; night-market-style rice dishes and bubble tea.",
     "reviewSource": "manual-research-2026",
-    "ratings": {},
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCnEgKC_vhQuYsSN2p8q1qS4Kf59k5saZGvP3EPZQg4nkb_FHV-eg6p8BCuLLYTks1YOHJrAMos6Mw9euq8Wjr2hbb_j6OXLD9TAmqclVwcG5X6YnA4oWyVGAkOo23t2RadEZB3L9NW5TNbMoE=s4800-h800",
-    "photoAttribution": "Photo: BACKYARD via Google"
+    "ratings": {}
   },
   {
     "id": "curated:sy-sham-west-amsterdam",
@@ -4945,6 +5553,8 @@
     "authenticityRating": 5,
     "authenticityNotes": "Dedicated Syrian restaurant (part of Amsterdam Sham group) with Syrian chefs and Levantine specialty dishes.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.7,
+    "reviewCount": 1321,
     "ratings": {
       "google": {
         "score": 4.7,
@@ -4953,11 +5563,7 @@
         "url": "https://maps.google.com/?cid=9434771664467552199&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:40.417Z"
       }
-    },
-    "userRating": 4.7,
-    "reviewCount": 1321,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjCXsu2voU_iZDlBtUo5sdH6T0uyLmhwobHIcaLqc2toHkgMxxf7V1c-MWcEp_H_ZXOoU1aUyVddOIvzFgQBl-EGJLQXSzJaJJ2rPzKF8wPiQHtnPizFoSRMtgGpOu-yFP-hokqOTIATG10_aEE=s4800-h800",
-    "photoAttribution": "Photo: Sham West via Google"
+    }
   },
   {
     "id": "curated:sy-palmyra-amsterdam",
@@ -4977,6 +5583,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Syrian specialty restaurant in the centre with sharing mezze and grilled dishes from a Syrian kitchen.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.1,
+    "reviewCount": 1512,
     "ratings": {
       "google": {
         "score": 4.1,
@@ -4985,11 +5593,7 @@
         "url": "https://maps.google.com/?cid=6769520979775219612&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:40.889Z"
       }
-    },
-    "userRating": 4.1,
-    "reviewCount": 1512,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjA0jRUIlVIDhcQv3_MkQfMk8s5a9XFPAzwa2qJoIVqibVTTG_eOymUcTCBLz3wx2zz8--LhRJvFyvfP9kPbqHnACwGHtHdlL56nuaqsZJoOKdh_gITvsVJIXiyodlQNvb5KfQBFC81Q0qUegg=s4800-h398",
-    "photoAttribution": "Photo: Palmyra Restaurant via Google"
+    }
   },
   {
     "id": "curated:sy-hummus-habibis-amsterdam",
@@ -5009,6 +5613,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Syrian family restaurant and catering kitchen focused on shared mezze and home-style Syrian cooking.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.5,
+    "reviewCount": 404,
     "ratings": {
       "google": {
         "score": 4.5,
@@ -5017,11 +5623,7 @@
         "url": "https://maps.google.com/?cid=13081889312735129174&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:41.411Z"
       }
-    },
-    "userRating": 4.5,
-    "reviewCount": 404,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBwf36yJQ1O0-HL26qtJaJIOVU6CBDWN764z3EjhFik_ErG5L4upXXijKpFhT6K7xooELjPDLnKDSRQhdeAcrvpBjdM0jvvZPc3j20eTnrVhWCIrgYEUepQ7-ei6FOg8ioJQJQIOrhfRHg8Js9SYowl=s4800-h800",
-    "photoAttribution": "Photo: dennis smit via Google"
+    }
   },
   {
     "id": "curated:sy-nour-al-sham-rotterdam",
@@ -5041,6 +5643,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Syrian bakery-café in Delfshaven with Levantine pastries, meats, and everyday Syrian staples.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.6,
+    "reviewCount": 1404,
     "ratings": {
       "google": {
         "score": 4.6,
@@ -5049,11 +5653,7 @@
         "url": "https://maps.google.com/?cid=5160910636347047339&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:41.884Z"
       }
-    },
-    "userRating": 4.6,
-    "reviewCount": 1404,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBr6KFVxQ_Kzf1qBTKX7hn6BzyItxCAdNk5gvmfFpuR1ecNs3nnxcfhx-JpkIcEnZNIcWoRnuNdSwy7r1ekK9pFAjIEWxmpU-TX01-PZG1MMTMLByAxTD5fuQXk6qzgcNAkz_uZu8dSUNLOHfY=s4800-h800",
-    "photoAttribution": "Photo: Nour Al Sham via Google"
+    }
   },
   {
     "id": "curated:ua-sonya-denhaag",
@@ -5073,6 +5673,8 @@
     "authenticityRating": 5,
     "authenticityNotes": "Ukrainian restaurant in Scheveningen run by Ukrainian cooks; Odessa-leaning classics like borscht and herring pâté.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.7,
+    "reviewCount": 781,
     "ratings": {
       "google": {
         "score": 4.7,
@@ -5081,11 +5683,7 @@
         "url": "https://maps.google.com/?cid=659731502053907592&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:42.364Z"
       }
-    },
-    "userRating": 4.7,
-    "reviewCount": 781,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjB1l014W12K8PUGDnhn7vzMqFvHNI42If_XPABPCC0WSm1_kJ1BheZ5H9f50OrUjwVNxsz0oHq10PSQ6thr4ldX-HjOSdmbvVDtVqY-Gugpd4AqZ5E_t5l54ebR-g_I4lIPYkfqK1ptQkd8prKa2euvWA=s4800-h800",
-    "photoAttribution": "Photo: Yuliya Dankova via Google"
+    }
   },
   {
     "id": "curated:ua-saen-rotterdam",
@@ -5105,6 +5703,8 @@
     "authenticityRating": 5,
     "authenticityNotes": "Ukrainian-focused Eastern European kitchen with borscht, chicken Kyiv, dumplings, and Medovik.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.8,
+    "reviewCount": 289,
     "ratings": {
       "google": {
         "score": 4.8,
@@ -5113,11 +5713,7 @@
         "url": "https://maps.google.com/?cid=5786203834808302065&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:42.838Z"
       }
-    },
-    "userRating": 4.8,
-    "reviewCount": 289,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBYww_SL_DMklii7AKxKufP0pHt1gxH3CAsi7KKZAozT_aRBwWFYTfeebdQxDSM5dCdWB5QbAb_XcTfHC8YYEIEvzA9mF0UuWmhZyypfTXr9wVqrHXgXfs0dErNtH_-AzVKkvRwslETOz7bMB8=s4800-h800",
-    "photoAttribution": "Photo: Saen Food via Google"
+    }
   },
   {
     "id": "curated:ua-smak-denhaag",
@@ -5137,6 +5733,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Ukrainian grocery café serving borscht, varenyky, pelmeni, and syrnyky alongside Eastern European products.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.3,
+    "reviewCount": 465,
     "ratings": {
       "google": {
         "score": 4.3,
@@ -5145,11 +5743,7 @@
         "url": "https://maps.google.com/?cid=2931026077656971122&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:43.383Z"
       }
-    },
-    "userRating": 4.3,
-    "reviewCount": 465,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDUNlJ3pqxn84fC27OLjLjPx1AJ33jIwGy8zXNNP-cSjNZ-MDHYmicFQQe3h5X2Lp3SBm1MD0vcJVzTXdIxZ8r2vC3SdGthWRORJ0fzxRwGFOATbpKB4eJU1pzFPhdy7hq6LCVikZIdns3v3A=s4800-h800",
-    "photoAttribution": "Photo: Hermes van Amstel via Google"
+    }
   },
   {
     "id": "curated:ro-casa-romaneasca-sintoedenrode",
@@ -5169,6 +5763,8 @@
     "authenticityRating": 5,
     "authenticityNotes": "Romanian specialty restaurant with sarmale, grilled mici/sausages, and meat-forward traditional dishes.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.7,
+    "reviewCount": 261,
     "ratings": {
       "google": {
         "score": 4.7,
@@ -5177,11 +5773,7 @@
         "url": "https://maps.google.com/?cid=7290035997509524984&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:43.923Z"
       }
-    },
-    "userRating": 4.7,
-    "reviewCount": 261,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBSq8OtRa5AH-55punfzREqQwMsUbEtI7cPEm9haQvVYg9g3QiWtYZfvJLhNrxZQlB_UxKJyYCngXRL1jztuFWQ9UKFcoYKuomKjqs7fJjgKSclp0ywxvLYVD7JIlWgRKS9IHEYeYJqdrgzN9A=s4800-h800",
-    "photoAttribution": "Photo: Casa Romaneasca via Google"
+    }
   },
   {
     "id": "curated:pk-zainab-roshni-mahal-rotterdam",
@@ -5201,6 +5793,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Pakistani and Indian curry/tandoori restaurant since 1999; buffet and à la carte with Pakistani-labelled specialties.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4,
+    "reviewCount": 830,
     "ratings": {
       "google": {
         "score": 4,
@@ -5209,11 +5803,7 @@
         "url": "https://maps.google.com/?cid=1225302861233972407&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:44.370Z"
       }
-    },
-    "userRating": 4,
-    "reviewCount": 830,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDzbwAMtbSnza5Qz6h6SQ2RbsHfUYJOC_r4B8MMSU0AB8RA3CMctt_hcLj2UFZY5rDTVlTjEl9aT89uqmWdd3HN08mPaMKOu9WGM-1ti3_fhfdTy4TZmwrLOJkmGkuTct4Gyr58wfMCplqOiw=s4800-h800",
-    "photoAttribution": "Photo: Kimm Meulenbroek via Google"
+    }
   },
   {
     "id": "curated:pk-curry-express-amsterdam",
@@ -5233,6 +5823,8 @@
     "authenticityRating": 3,
     "authenticityNotes": "Pakistani takeaway kitchen (also Indian/Surinamese) useful as a central Amsterdam Pakistani-label option.",
     "reviewSource": "manual-research-2026",
+    "userRating": 3.7,
+    "reviewCount": 245,
     "ratings": {
       "google": {
         "score": 3.7,
@@ -5241,11 +5833,7 @@
         "url": "https://maps.google.com/?cid=15645175998605630955&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:44.864Z"
       }
-    },
-    "userRating": 3.7,
-    "reviewCount": 245,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDbW7GfQWEScSzOSlA3mShueKTIVuOtpw8yeDG4_FPeQTyhVlwC6isdPkl27k-giIZ7L1b0PS1mwzBmi186uPrOLEhTG9W65BgFEjNjG-8PNBk5S6ADJqCnZioTwSuoH2FaHCWo01ZkO28iGPg=s4800-h800",
-    "photoAttribution": "Photo: Ajen Kandy via Google"
+    }
   },
   {
     "id": "curated:pk-sangam-tandoori-rotterdam",
@@ -5265,6 +5853,8 @@
     "authenticityRating": 3,
     "authenticityNotes": "Long-running Indian and Pakistani tandoori/sweets takeaway in Delfshaven.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.4,
+    "reviewCount": 607,
     "ratings": {
       "google": {
         "score": 4.4,
@@ -5273,11 +5863,7 @@
         "url": "https://maps.google.com/?cid=15530283981260012889&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:45.418Z"
       }
-    },
-    "userRating": 4.4,
-    "reviewCount": 607,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDVnGTMPLnWZpocySPUQPE_FwNLqtrTVFGdZ-u-WrPwvMf-1OvRROH_6eMUiVBsczNlNpzCzLnXAR6OjWKWtpQcm1JpsU7BnR2u9Bda6hGASPbCPItV2Kf6JgNCl96zR2NhnYs-h1isyqtlig=s4800-h800",
-    "photoAttribution": "Photo: Tharan Sīkō sivarupan via Google"
+    }
   },
   {
     "id": "curated:lk-lanka-kitchen-utrecht",
@@ -5297,6 +5883,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Sri Lankan and Indian restaurant in Utrecht since 2020 with Sri Lankan-labelled curries and rice plates.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.6,
+    "reviewCount": 221,
     "ratings": {
       "google": {
         "score": 4.6,
@@ -5305,11 +5893,7 @@
         "url": "https://maps.google.com/?cid=16207141304658135002&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:45.868Z"
       }
-    },
-    "userRating": 4.6,
-    "reviewCount": 221,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDXQUSu-58QVGvX97HHZpNA7VMNVGCetfWdeb-hSChNRLtt_3Rol4sUagnM9Pc4NbhaT4X1E8-deIS-mk3i_qfezEEDOfRMPPWHFdChKy-PMZg9lTErTBus1-dsniJgBXeRXiezAwHvMGjCq0k=s4800-h800",
-    "photoAttribution": "Photo: Jordan Ratnavelayutham via Google"
+    }
   },
   {
     "id": "curated:lk-sense-of-lanka-eindhoven",
@@ -5329,6 +5913,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Sri Lankan-named kitchen in Eindhoven serving curry and Sri Lankan-style takeaway staples.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.6,
+    "reviewCount": 314,
     "ratings": {
       "google": {
         "score": 4.6,
@@ -5337,11 +5923,7 @@
         "url": "https://maps.google.com/?cid=5247153465645461216&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:46.309Z"
       }
-    },
-    "userRating": 4.6,
-    "reviewCount": 314,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC8B3ni7fyySRrOgnJ7Lmh3XBXxyjSa_Rjis9AxWFOnaEcByLIF6Xy-NVxzdAPhO6jKhezZyfbiMAviDNAj4d3NeunKNrY3zQnPFFR2lGuhIxP-WKrG5lRpCPhnRNdgczphl9mkcFvedhe1naks2G3Y9g=s4800-h800",
-    "photoAttribution": "Photo: Yasemin Kaya via Google"
+    }
   },
   {
     "id": "curated:lk-the-hopper-amsterdam",
@@ -5361,9 +5943,7 @@
     "authenticityRating": 4,
     "authenticityNotes": "Sri Lankan food specialist (hopper/curry focus) operating as a delivery-forward kitchen in Amsterdam.",
     "reviewSource": "manual-research-2026",
-    "ratings": {},
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjBIWYNTPkXP_qat0Wm_fnckEJc2FWTSYKxKgNW8YG0MTFyW7Onl5zzkm8MMPN1P4OkbiRQKd2GVpXjD79EgV1EWvBvJFXLKcDYJF8-udhz74zHRbk5iJDE9NcRM-t86vrcBJiK4EATi_niT=s4800-h800",
-    "photoAttribution": "Photo: Go 360 (Go-360) via Google"
+    "ratings": {}
   },
   {
     "id": "curated:ch-het-karbeel-amsterdam",
@@ -5383,6 +5963,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Cheese-fondue specialist since 1977 including classic Suisse fondue; Swiss alpine dining format rather than full Swiss à la carte.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.5,
+    "reviewCount": 2806,
     "ratings": {
       "google": {
         "score": 4.5,
@@ -5391,11 +5973,7 @@
         "url": "https://maps.google.com/?cid=1455815117437846348&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:47.251Z"
       }
-    },
-    "userRating": 4.5,
-    "reviewCount": 2806,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDVl4E0hPOqGjyiXMH3xNkjljatRy-jvRuwKdTno-CYW0FHfRsQYHogfqVcq4baxru9cmqdp4EDOsPKS_pb6Jtossr6K0PuF8LRCZwsZ_qSEn__uXy4E_cIsUCfHylJtchZkxPXOLvD0_VSXcg=s4800-h664",
-    "photoAttribution": "Photo: Het Karbeel via Google"
+    }
   },
   {
     "id": "curated:ch-smelt-amsterdam",
@@ -5415,6 +5993,8 @@
     "authenticityRating": 3,
     "authenticityNotes": "Fondue restaurant using Swiss cheeses among others; Swiss fondue format more than broad Swiss regional cuisine.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.7,
+    "reviewCount": 772,
     "ratings": {
       "google": {
         "score": 4.7,
@@ -5423,11 +6003,7 @@
         "url": "https://maps.google.com/?cid=1934010095718134453&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:47.911Z"
       }
-    },
-    "userRating": 4.7,
-    "reviewCount": 772,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDc-lMitxf00pTNkJ5y6M55_tgW7o4dJHeUP5_tH3K1jGjI5ivKzMBGE13RN11j5I1lrvg0hDJpxZb5Xn_5HvB3pygwR6xf5vrk3l7a8_K1NpD1PHNJLjR2tXgzZrcMWDDzMZ-wPphWxDzfryg=s4800-h800",
-    "photoAttribution": "Photo: Restaurant Smelt - 9 straatjes via Google"
+    }
   },
   {
     "id": "curated:se-selmas-west-amsterdam",
@@ -5447,6 +6023,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Swedish/Nordic bakery-café centred on fika classics (kanelbullar, chokladbollar) and Scandinavian open sandwiches.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.4,
+    "reviewCount": 518,
     "ratings": {
       "google": {
         "score": 4.4,
@@ -5455,11 +6033,7 @@
         "url": "https://maps.google.com/?cid=15977832536538435162&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:48.414Z"
       }
-    },
-    "userRating": 4.4,
-    "reviewCount": 518,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjC_DFnTu2il1NRGDe84xMDEx2VhW6oeXxn7v-LrSCSN3PxaZqL_OJXQZ1OOwcfPekREC4ahJscuVhsXyqDUUYUeOxrXkk4MUJwJvcEp-PItbSJJjklbP8AuaIn7cf-PZyM5YSID8jrIqIeWjg=s4800-h800",
-    "photoAttribution": "Photo: Selma's via Google"
+    }
   },
   {
     "id": "curated:se-norvolk-scheveningen",
@@ -5479,6 +6053,8 @@
     "authenticityRating": 4,
     "authenticityNotes": "Scandinavian bakery-café in Scheveningen known for Swedish pastries and fika-style lunch.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.5,
+    "reviewCount": 307,
     "ratings": {
       "google": {
         "score": 4.5,
@@ -5487,11 +6063,7 @@
         "url": "https://maps.google.com/?cid=12961923165741832235&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:48.894Z"
       }
-    },
-    "userRating": 4.5,
-    "reviewCount": 307,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDCzPx_kF-m1LbUkTNz5kUI6EPF8TSSIfA42ylTz32ECCn7Q_4wvcCFkidAlzOBcDU6zuWxor5tmRRzzmM5DaRJ2edAP-6GmWFnUU34H_tWlkU23zvbZODRM1bezzAOoqK-vIiNuT6nYpvz=s4800-h800",
-    "photoAttribution": "Photo: Pete Murphy via Google"
+    }
   },
   {
     "id": "curated:se-kafe-kontrast-amsterdam",
@@ -5511,6 +6083,8 @@
     "authenticityRating": 3,
     "authenticityNotes": "Swedish-Indonesian fusion by a Swedish chef; useful Swedish signal (meatballs, west-coast fish) but not a pure specialty kitchen.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.4,
+    "reviewCount": 289,
     "ratings": {
       "google": {
         "score": 4.4,
@@ -5519,11 +6093,7 @@
         "url": "https://maps.google.com/?cid=16890532769236576684&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:49.368Z"
       }
-    },
-    "userRating": 4.4,
-    "reviewCount": 289,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDxLQukSiSzSRygEEzPbFyrIBStAK7Oa-so5o0PqUa3QkSBBgaPTpbeD4vhE0OmkC2MlV2oPwiv1YN1pz9H2_pNoFS3zTYj0tgxJgpKkknyknGn6lvVTHwC2uKuoWGui49Ihh2XKccrfUDHjQ=s4800-h800",
-    "photoAttribution": "Photo: Kafé Kontrast via Google"
+    }
   },
   {
     "id": "curated:dk-bikke-maastricht",
@@ -5543,6 +6113,8 @@
     "authenticityRating": 3,
     "authenticityNotes": "Nordic café-restaurant with Danish smørrebrød, wienerbrød, and hotdogs plus broader Scandinavian lunch/dinner.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.7,
+    "reviewCount": 640,
     "ratings": {
       "google": {
         "score": 4.7,
@@ -5551,11 +6123,7 @@
         "url": "https://maps.google.com/?cid=5304825528389763722&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:49.835Z"
       }
-    },
-    "userRating": 4.7,
-    "reviewCount": 640,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDbqvIsx5_03mAzMZNSk5iQcEpXTLxcK6dTSAFV0AWBeVZtgQF1cIxRyDyVpxuE0ke2ZXqXngcsIxhgF6s6sVF_JH5PtWop6YzdhDkigIAYoedHxacM2SrHHF6BU0e6UBGAtmafHN6negHI=s4800-h800",
-    "photoAttribution": "Photo: BIKKE via Google"
+    }
   },
   {
     "id": "curated:se-fika-nijmegen",
@@ -5575,6 +6143,8 @@
     "authenticityRating": 3,
     "authenticityNotes": "Swedish fika lunchcafé with kanelbulle-style baking and Scandinavian smørrebrød; Nordic café more than a full Swedish dinner restaurant.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.5,
+    "reviewCount": 668,
     "ratings": {
       "google": {
         "score": 4.5,
@@ -5583,11 +6153,7 @@
         "url": "https://maps.google.com/?cid=16078890576813631245&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:50.302Z"
       }
-    },
-    "userRating": 4.5,
-    "reviewCount": 668,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjDiPlq1W-wTxp8ngRMuK11VT1CAKzKvETITIVBZ2WqOrkWNUNDsdB8wX_jIfl8oeuaa6kcVtzhNa7TSf1kHAvdU6fdfiBYg_yR6uSAfJ10P9kZ2Ucfdsk3bCEjzRjjLu0y5rWIvkyyGz1-6SQ=s4800-h800",
-    "photoAttribution": "Photo: Fika via Google"
+    }
   },
   {
     "id": "curated:no-scandinavian-embassy-amsterdam",
@@ -5607,6 +6173,8 @@
     "authenticityRating": 3,
     "authenticityNotes": "Pan-Nordic specialty-coffee café featuring Norwegian (and other Scandinavian) roasters with Nordic pastries; café signal more than full Norwegian restaurant.",
     "reviewSource": "manual-research-2026",
+    "userRating": 4.4,
+    "reviewCount": 1860,
     "ratings": {
       "google": {
         "score": 4.4,
@@ -5615,10 +6183,6 @@
         "url": "https://maps.google.com/?cid=8489887193750794617&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQQAhgEIAA",
         "fetchedAt": "2026-08-08T11:49:51.039Z"
       }
-    },
-    "userRating": 4.4,
-    "reviewCount": 1860,
-    "photoUrl": "https://lh3.googleusercontent.com/place-photos/AG9NLjAY24yoqtZzKcJ2CVAEVHO8bE16CltlCzldbGSF6mlgQ7PAiSs11qfROx8XoXPcg1lt3wWmUkCEMT-Mj61yoTsPtWCzi_XTrIof_JIK8Ci3Oc0blv6-hygxfeEuVYmLDohBnUVGJPE4rpCzNA=s4800-h800",
-    "photoAttribution": "Photo: Scandinavian Embassy via Google"
+    }
   }
 ]

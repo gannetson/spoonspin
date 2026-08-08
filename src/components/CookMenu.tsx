@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { ExternalLink, MapPin, Plus, Store } from "lucide-react";
-import type { Country, Recipe, RecipeCategory } from "@/types/content";
+import type { Country, Drink, Recipe, RecipeCategory } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import {
   drinkMatchesAlcohol,
   getCountryDrinks,
   getCountryRecipes,
   getSpecialtyShops,
+  groupDrinksIntoSections,
   recipeMatchesCategory,
   recipeMatchesDiet,
 } from "@/content/countries/menuAccessors";
@@ -31,8 +32,13 @@ type CookMenuProps = {
 };
 
 type CategoryFilter = "all" | RecipeCategory;
-type DietFilter = "all" | "vegetarian" | "meat";
-type AlcoholFilter = "all" | "alcoholic" | "non-alcoholic";
+type DietFilter = "all" | "vegan" | "vegetarian" | "meat";
+type AlcoholFilter =
+  | "all"
+  | "other-alcoholic"
+  | "non-alcoholic"
+  | "beer"
+  | "wine";
 
 const CATEGORY_FILTER_VALUES: CategoryFilter[] = [
   "all",
@@ -43,12 +49,19 @@ const CATEGORY_FILTER_VALUES: CategoryFilter[] = [
   "snack",
 ];
 
-const DIET_FILTER_VALUES: DietFilter[] = ["all", "vegetarian", "meat"];
+const DIET_FILTER_VALUES: DietFilter[] = [
+  "all",
+  "vegan",
+  "vegetarian",
+  "meat",
+];
 
 const ALCOHOL_FILTER_VALUES: AlcoholFilter[] = [
   "all",
-  "alcoholic",
   "non-alcoholic",
+  "beer",
+  "wine",
+  "other-alcoholic",
 ];
 
 const CATEGORY_FILTER_KEYS: Record<CategoryFilter, string> = {
@@ -62,13 +75,16 @@ const CATEGORY_FILTER_KEYS: Record<CategoryFilter, string> = {
 
 const DIET_FILTER_KEYS: Record<DietFilter, string> = {
   all: "cook.filter.diet.all",
+  vegan: "cook.filter.diet.vegan",
   vegetarian: "cook.filter.diet.vegetarian",
   meat: "cook.filter.diet.meat",
 };
 
 const ALCOHOL_FILTER_KEYS: Record<AlcoholFilter, string> = {
   all: "cook.filter.alcohol.all",
-  alcoholic: "cook.filter.alcohol.alcoholic",
+  beer: "cook.filter.alcohol.beer",
+  wine: "cook.filter.alcohol.wine",
+  "other-alcoholic": "cook.filter.alcohol.otherAlcoholic",
   "non-alcoholic": "cook.filter.alcohol.nonAlcoholic",
 };
 
@@ -117,6 +133,13 @@ export function CookMenu({
   const filteredDrinks = useMemo(
     () => drinks.filter((drink) => drinkMatchesAlcohol(drink, alcoholFilter)),
     [drinks, alcoholFilter],
+  );
+  const drinkSections = useMemo(
+    () =>
+      groupDrinksIntoSections(filteredDrinks).filter(
+        (section) => section.drinks.length > 0,
+      ),
+    [filteredDrinks],
   );
 
   const categoryFilters = CATEGORY_FILTER_VALUES.map((value) => ({
@@ -359,7 +382,7 @@ export function CookMenu({
         </p>
       ) : null}
 
-      <div className="space-y-3">
+      <div className="space-y-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h3 className="font-display text-2xl text-ink">{t("cook.drinks.heading")}</h3>
@@ -374,31 +397,22 @@ export function CookMenu({
             onChange={setAlcoholFilter}
           />
         </div>
-        <ul className="grid gap-3 sm:grid-cols-2">
-          {filteredDrinks.map((item) => (
-            <li
-              key={`${item.name}-${item.type}`}
-              className="rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-5"
-            >
-              <p className="font-semibold text-ink">
-                {item.name}
-                {item.localName ? (
-                  <span className="font-normal text-ink-soft">
-                    {" "}
-                    · {item.localName}
-                  </span>
-                ) : null}
-              </p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                {item.alcoholic
-                  ? t("cook.drink.alcoholic")
-                  : t("cook.drink.nonAlcoholic")}{" "}
-                · {item.type}
-              </p>
-              <p className="mt-2 text-sm text-ink-soft">{item.description}</p>
-            </li>
-          ))}
-        </ul>
+
+        {drinkSections.map((section) => (
+          <div key={section.id} className="space-y-3">
+            <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
+              {t(`cook.drinks.section.${section.id}` as const)}
+            </h4>
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {section.drinks.map((item) => (
+                <li key={`${section.id}-${item.name}-${item.type}`}>
+                  <DrinkCard drink={item} />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
         {filteredDrinks.length === 0 ? (
           <p className="text-sm text-ink-soft">{t("cook.drinks.empty")}</p>
         ) : null}
@@ -502,6 +516,57 @@ export function CookMenu({
         }}
       />
     </section>
+  );
+}
+
+function DrinkCard({ drink }: { drink: Drink }) {
+  const t = useT();
+
+  return (
+    <article className="flex gap-3 rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4">
+      {drink.imageUrl ? (
+        <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-lg bg-parchment">
+          <img
+            src={drink.imageUrl}
+            alt=""
+            className="size-full object-cover"
+            loading="lazy"
+          />
+        </div>
+      ) : null}
+      <div className="min-w-0 flex-1">
+        <p className="font-semibold text-ink">
+          {drink.name}
+          {drink.localName ? (
+            <span className="font-normal text-ink-soft">
+              {" "}
+              · {drink.localName}
+            </span>
+          ) : null}
+        </p>
+        <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+          {drink.alcoholic
+            ? t("cook.drink.alcoholic")
+            : t("cook.drink.nonAlcoholic")}{" "}
+          · {drink.type}
+          {drink.grape ? ` · ${drink.grape}` : null}
+        </p>
+        <p className="mt-2 text-sm text-ink-soft">{drink.description}</p>
+        {drink.foodPairing ? (
+          <p className="mt-2 text-sm text-ink">
+            <span className="font-semibold">
+              {t("cook.drink.foodPairing")}:{" "}
+            </span>
+            {drink.foodPairing}
+          </p>
+        ) : null}
+        {drink.imageAttribution ? (
+          <p className="mt-1 text-[0.65rem] text-ink-soft">
+            {drink.imageAttribution}
+          </p>
+        ) : null}
+      </div>
+    </article>
   );
 }
 

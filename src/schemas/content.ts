@@ -14,6 +14,10 @@ export const drinkSchema = z.object({
   ]),
   alcoholic: z.boolean(),
   description: z.string().min(20),
+  grape: z.string().min(2).optional(),
+  foodPairing: z.string().min(8).optional(),
+  imageUrl: z.string().url().optional(),
+  imageAttribution: z.string().min(2).optional(),
 });
 
 export const ingredientSchema = z.object({
