@@ -178,17 +178,38 @@ export function getPool(connectionString = getDatabaseUrl()): Pool {
     pool = null;
   }
   const options = poolOptions(connectionString);
+  const osUser =
+    typeof process.getuid === "function" && process.getuid() === 0
+      ? "root"
+      : (process.env.USER ?? process.env.LOGNAME ?? "unknown");
+  const usingSocket =
+    typeof options?.host === "string" && options.host.startsWith("/");
+  const usingPassword =
+    Boolean(options && "password" in options && options.password);
+
+  // Peer auth maps OS user → DB role. Root has no DB role on a normal install.
+  if (usingSocket && !usingPassword && osUser === "root") {
+    throw new Error(
+      'Peer auth cannot connect as OS user "root". ' +
+        "Run the API as www-data (supervisor user=www-data), not root. " +
+        "Check: sudo supervisorctl stop spoonspin; " +
+        "grep user= /etc/supervisor/conf.d/spoonspin.conf; " +
+        "sudo supervisorctl start spoonspin",
+    );
+  }
+
   console.info(
     "[db] connecting",
     JSON.stringify({
+      osUser,
       host: options?.host ?? null,
-      port: "port" in (options ?? {}) ? (options as { port?: number }).port ?? null : null,
+      port:
+        "port" in (options ?? {})
+          ? ((options as { port?: number }).port ?? null)
+          : null,
       database: options?.database ?? null,
-      user: options?.user ?? "(os user)",
-      password:
-        options && "password" in options && (options as { password?: string }).password
-          ? "(set)"
-          : "(none)",
+      user: options?.user ?? `(os:${osUser})`,
+      password: usingPassword ? "(set)" : "(none)",
     }),
   );
   pool = new Pool(options);

@@ -86,8 +86,8 @@ export function AdminPage() {
     <div className="passport-grid min-h-screen">
       <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link to="/" className="text-sm font-semibold text-tomato hover:underline">
-            {t("admin.back")}
+          <Link to="/admin" className="text-sm font-semibold text-tomato hover:underline">
+            {t("admin.review.backToOverview")}
           </Link>
         </div>
         <h1 className="mt-4 font-display text-5xl text-ink">{t("admin.title")}</h1>
@@ -104,7 +104,7 @@ export function AdminPage() {
           <div className="mt-8 rounded-2xl bg-cream p-5 ring-1 ring-ink/10">
             <p className="text-ink-soft">{t("admin.signInPrompt")}</p>
             <Link
-              to="/login?next=/admin"
+              to="/login?next=/admin/review"
               className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-5 font-semibold text-cream"
             >
               <LogIn className="size-4" aria-hidden="true" />

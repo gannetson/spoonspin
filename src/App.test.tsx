@@ -6,6 +6,20 @@ import App from "@/App";
 import { AuthProvider } from "@/auth/AuthContext";
 import { LocaleProvider } from "@/i18n/LocaleContext";
 
+const memoryStore = new Map<string, string>();
+vi.stubGlobal("localStorage", {
+  getItem: (key: string) => memoryStore.get(key) ?? null,
+  setItem: (key: string, value: string) => {
+    memoryStore.set(key, value);
+  },
+  removeItem: (key: string) => {
+    memoryStore.delete(key);
+  },
+  clear: () => {
+    memoryStore.clear();
+  },
+});
+
 vi.stubGlobal(
   "fetch",
   vi.fn(async (input: RequestInfo | URL) => {
@@ -48,6 +62,12 @@ describe("URL state", () => {
     expect(screen.getByRole("heading", { name: /Tonight's menu/i })).toBeInTheDocument();
   });
 
+  it("defaults to cook mode when a country URL has no mode", () => {
+    renderAt("/?country=bg");
+    expect(screen.getByRole("heading", { name: "Bulgaria" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Tonight's menu/i })).toBeInTheDocument();
+  });
+
   it("fails gracefully for invalid country codes", () => {
     renderAt("/?country=zz");
     expect(screen.getByText(/could not find a published country/i)).toBeInTheDocument();
@@ -71,5 +91,6 @@ describe("URL state", () => {
     await user.type(combobox, "Bulgaria");
     await user.click(screen.getByRole("option", { name: /bulgaria/i }));
     expect(screen.getByRole("heading", { name: "Bulgaria" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Tonight's menu/i })).toBeInTheDocument();
   });
 });

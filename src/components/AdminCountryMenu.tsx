@@ -5,6 +5,7 @@ import {
   ClipboardList,
   GlassWater,
   ImagePlus,
+  LayoutGrid,
   LoaderCircle,
   Store,
   UtensilsCrossed,
@@ -143,6 +144,22 @@ export function AdminCountryMenu({
             role="menuitem"
             onClick={() => setOpen(false)}
             className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
+          >
+            <LayoutGrid className="mt-0.5 size-4 shrink-0 text-tomato" />
+            <span>
+              <span className="block font-semibold text-ink">
+                {t("admin.country.overview")}
+              </span>
+              <span className="mt-0.5 block text-xs text-ink-soft">
+                {t("admin.country.overview.hint")}
+              </span>
+            </span>
+          </Link>
+          <Link
+            to="/admin/review"
+            role="menuitem"
+            onClick={() => setOpen(false)}
+            className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
           >
             <ClipboardList className="mt-0.5 size-4 shrink-0 text-tomato" />
             <span>

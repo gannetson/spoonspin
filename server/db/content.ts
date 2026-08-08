@@ -6,7 +6,12 @@ import type {
   SpecialtyShop,
   WikipediaCuisine,
 } from "../../src/types/content.ts";
-import { ensureDb } from "./restaurants.ts";
+import {
+  getCountryDrinks,
+  getCountryRecipes,
+  getSpecialtyShops,
+} from "../../src/content/countries/menuAccessors.ts";
+import { countByCuisineCode, ensureDb } from "./restaurants.ts";
 
 export type MenuSlot = "starter" | "main" | "side" | "dessert" | "more";
 
@@ -289,6 +294,43 @@ export async function countContentRows(): Promise<{
     countries: Number(countries.rows[0]?.n ?? 0),
     recipes: Number(recipes.rows[0]?.n ?? 0),
   };
+}
+
+export type AdminCountryOverviewRow = {
+  code: string;
+  name: string;
+  flag: string;
+  region: string;
+  status: Country["status"];
+  cookReady: boolean;
+  recipes: number;
+  drinks: number;
+  shops: number;
+  restaurants: number;
+};
+
+export async function getAdminCountryOverview(): Promise<
+  AdminCountryOverviewRow[]
+> {
+  const [countries, restaurantCounts] = await Promise.all([
+    listCountriesFromDb(),
+    countByCuisineCode(),
+  ]);
+
+  return countries
+    .map((country) => ({
+      code: country.code,
+      name: country.name,
+      flag: country.flag,
+      region: country.region,
+      status: country.status,
+      cookReady: country.cookReady,
+      recipes: getCountryRecipes(country).length,
+      drinks: getCountryDrinks(country).length,
+      shops: getSpecialtyShops(country).length,
+      restaurants: restaurantCounts[country.code] ?? 0,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export async function updateCountryImage(

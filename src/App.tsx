@@ -37,7 +37,8 @@ const FALLBACK_DRINK: Drink = {
 
 function parseMode(value: string | null): AppMode {
   if (value === "cook" || value === "dine") return value;
-  return "choose";
+  // Country pages default to Cook when no mode was chosen yet.
+  return "cook";
 }
 
 function findCountry(
@@ -189,9 +190,10 @@ export default function App() {
             const params = new URLSearchParams();
             params.set("country", picked.code);
             const keptMode = prev.get("mode");
-            if (keptMode === "cook" || keptMode === "dine") {
-              params.set("mode", keptMode);
-            }
+            params.set(
+              "mode",
+              keptMode === "cook" || keptMode === "dine" ? keptMode : "cook",
+            );
             return params;
           },
           { replace: false },
@@ -213,9 +215,10 @@ export default function App() {
           const params = new URLSearchParams();
           params.set("country", country.code);
           const keptMode = prev.get("mode");
-          if (keptMode === "cook" || keptMode === "dine") {
-            params.set("mode", keptMode);
-          }
+          params.set(
+            "mode",
+            keptMode === "cook" || keptMode === "dine" ? keptMode : "cook",
+          );
           return params;
         },
         { replace: false },

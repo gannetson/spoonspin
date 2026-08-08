@@ -21,6 +21,7 @@ export const recipe = (
   localName: string,
   category: RecipeCategory,
   ingredients: Recipe["ingredients"],
+  steps: string[],
   descriptionOrOptions?: string | RecipeOptions,
 ): Recipe => {
   const options: RecipeOptions =
@@ -46,11 +47,7 @@ export const recipe = (
     difficulty: options.difficulty ?? "medium",
     dietaryLabels: options.dietaryLabels ?? [],
     ingredients,
-    steps: [
-      "1. Prepare and season the ingredients in the order listed.",
-      "2. Cook gently until the central ingredients are tender and flavours are integrated.",
-      "3. Taste, adjust seasoning, and serve while hot or at its intended temperature.",
-    ],
+    steps,
     substitutions: options.substitutions ?? [
       "Dutch supermarkets stock many staples; use a specialist grocer for regional ingredients and choose the closest listed fresh alternative.",
     ],

@@ -247,7 +247,7 @@ async function main() {
   );
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
   await closeDb();
   process.exit(1);

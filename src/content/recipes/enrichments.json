@@ -1041,5 +1041,911 @@
     "fetchedAt": "2026-08-06T21:29:43.425Z",
     "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9c/2017-12-12_Dried_Piri-piri_peppers%2C_Albufeira.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
     "imageAttribution": "Kolforn (Kolforn)\nI'd appreciate if you could mail me (Kolforn@gmail.com) if you want to use this picture out of the Wikimedia project scope.\n\n\n\n This file is licensed under the Creative Commons Attribution-Share Alike 4.0 International license.\nYou are free:\nto share – to copy, distribute and transmit the work\nto remix – to adapt the work\nUnder the following conditions:\nattribution – You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use.\nshare alike – If you remix, transform, or build upon the material, you must distribute your contributions under the same or compatible license as the original.https://creativecommons.org/licenses/by-sa/4.0CC BY-SA 4.0 Creative Commons Attribution-Share Alike 4.0 truetrue / Wikimedia Commons"
+  },
+  "bg:tarator": {
+    "sourceUrl": "https://www.google.com/search?q=Cold%20Yogurt%20Cucumber%20Soup%20Bulgaria%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Cold%20Yogurt%20Cucumber%20Soup%20Bulgaria%20recipe",
+    "fetchedAt": "2026-08-08T11:30:18.537Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/95/%D0%91%D1%83%D0%BD%D0%B0%D1%80%2C_%D1%88%D0%BE%D0%BF%D1%81%D0%BA%D0%B0_%D0%B8_%D1%82%D0%B0%D1%80%D0%B0%D1%82%D0%BE%D1%80.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Merima Sara Ebip / CC BY-SA 4.0"
+  },
+  "bg:sarmi": {
+    "sourceUrl": "https://www.google.com/search?q=Stuffed%20Cabbage%20Leaves%20Bulgaria%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Stuffed%20Cabbage%20Leaves%20Bulgaria%20recipe",
+    "fetchedAt": "2026-08-08T11:30:22.779Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/43/Postna_sarma_%28vegetarian_sarma%2C_Cuisine_of_Serbia%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Petar Milošević / CC BY-SA 4.0"
+  },
+  "bg:mekitsi": {
+    "sourceUrl": "https://www.google.com/search?q=Fried%20Yogurt%20Dough%20Bulgaria%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Fried%20Yogurt%20Dough%20Bulgaria%20recipe",
+    "fetchedAt": "2026-08-08T11:30:28.236Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/59/Mekici_and_jam.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Biso (Biser Todorov) / CC BY-SA 3.0"
+  },
+  "es:tortilla-espanola": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ATortilla_Espa%C3%B1ola",
+    "videoUrl": "https://www.youtube.com/results?search_query=Spanish%20Potato%20Omelette%20Spain%20recipe",
+    "fetchedAt": "2026-08-08T11:30:29.408Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Tortilla_de_patata_-_San_Sebasti%C3%A1n.jpg/3840px-Tortilla_de_patata_-_San_Sebasti%C3%A1n.jpg",
+    "imageAttribution": "Wikipedia / Spanish omelette"
+  },
+  "es:gazpacho": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AGazpacho",
+    "videoUrl": "https://www.youtube.com/results?search_query=Andalusian%20Gazpacho%20Spain%20recipe",
+    "fetchedAt": "2026-08-08T11:30:30.470Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/99/Gazpacho_Malague%C3%B1o_con_su_%E2%80%9Cpica%C3%ADto%E2%80%9D_-_Moreno%2C_Playa_Burriana_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Gazpacho"
+  },
+  "es:churros": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AChurros_I",
+    "videoUrl": "https://www.youtube.com/results?search_query=Churros%20with%20Chocolate%20Spain%20recipe",
+    "fetchedAt": "2026-08-08T11:30:30.894Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Chocolate_con_churros_%2827343655726%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Churro"
+  },
+  "gr:spanakopita": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Savory_spinach_pie",
+    "videoUrl": "https://www.youtube.com/results?search_query=Spinach%20Pie%20Greece%20recipe",
+    "fetchedAt": "2026-08-08T11:30:32.586Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/37/Spanakopita.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Savory spinach pie"
+  },
+  "gr:souvlaki": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Souvlaki",
+    "videoUrl": "https://www.youtube.com/results?search_query=Pork%20Souvlaki%20Greece%20recipe",
+    "fetchedAt": "2026-08-08T11:30:34.777Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cd/%CE%95%CE%BB%CE%BB%CE%B7%CE%BD%CE%B9%CE%BA%CF%8C_%CE%A3%CE%BF%CF%85%CE%B2%CE%BB%CE%AC%CE%BA%CE%B9_-_panoramio.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Souvlaki"
+  },
+  "gr:baklava": {
+    "sourceUrl": "https://www.google.com/search?q=Honey%20Nut%20Baklava%20Greece%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Honey%20Nut%20Baklava%20Greece%20recipe",
+    "fetchedAt": "2026-08-08T11:45:25.187Z"
+  },
+  "tr:lahmacun": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Lahmacun",
+    "videoUrl": "https://www.youtube.com/results?search_query=Turkish%20Flatbread%20Pizza%20Turkey%20recipe",
+    "fetchedAt": "2026-08-08T11:30:43.235Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Lahmacun.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Lahmacun"
+  },
+  "tr:imam-bayildi": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/%C4%B0mam_bay%C4%B1ld%C4%B1",
+    "videoUrl": "https://www.youtube.com/results?search_query=Stuffed%20Eggplant%20Turkey%20recipe",
+    "fetchedAt": "2026-08-08T11:30:44.359Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/%C4%B0mam_bay%C4%B1ld%C4%B1_AvL.JPG/3840px-%C4%B0mam_bay%C4%B1ld%C4%B1_AvL.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / İmam bayıldı"
+  },
+  "tr:baklava-tr": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ABaklava",
+    "videoUrl": "https://www.youtube.com/results?search_query=Gaziantep%20Baklava%20Turkey%20recipe",
+    "fetchedAt": "2026-08-08T11:30:45.006Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Baklava%281%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Baklava"
+  },
+  "lb:tabbouleh": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Tabbouleh",
+    "videoUrl": "https://www.youtube.com/results?search_query=Parsley%20Tabbouleh%20Lebanon%20recipe",
+    "fetchedAt": "2026-08-08T11:30:46.731Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Tabouleh_1.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Tabbouleh"
+  },
+  "lb:shawarma": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Shawarma",
+    "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20Shawarma%20Lebanon%20recipe",
+    "fetchedAt": "2026-08-08T11:30:48.663Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/00/Shawarma_2.jpg/1920px-Shawarma_2.jpg",
+    "imageAttribution": "Wikipedia / Shawarma"
+  },
+  "lb:maamoul": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Ma'amoul",
+    "videoUrl": "https://www.youtube.com/results?search_query=Date-Filled%20Cookies%20Lebanon%20recipe",
+    "fetchedAt": "2026-08-08T11:30:49.885Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9e/Mamoul_biscotti_libanesi.jpg",
+    "imageAttribution": "Wikipedia / Ma'amoul"
+  },
+  "ma:harira": {
+    "sourceUrl": "https://www.google.com/search?q=Harira%20Soup%20Morocco%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Harira%20Soup%20Morocco%20recipe",
+    "fetchedAt": "2026-08-08T11:30:52.110Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/51/Liat_Portal_for_Foodie_Disorder_-_Harira_soup_prepared_at_home.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "HaJunkiyada / CC BY-SA 4.0"
+  },
+  "ma:couscous-tfaya": {
+    "sourceUrl": "https://www.google.com/search?q=Couscous%20with%20Tfaya%20Morocco%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Couscous%20with%20Tfaya%20Morocco%20recipe",
+    "fetchedAt": "2026-08-08T11:30:55.515Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Moroccan_Tfaya_couscous.png?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Ghizlane hadji / CC BY-SA 4.0"
+  },
+  "ma:chebakia": {
+    "sourceUrl": "https://www.google.com/search?q=Sesame%20Honey%20Pastries%20Morocco%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Sesame%20Honey%20Pastries%20Morocco%20recipe",
+    "fetchedAt": "2026-08-08T11:30:58.438Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Chebbakiyya_of_Morocco.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "مصطفى ملو / CC BY-SA 4.0"
+  },
+  "et:tibs": {
+    "sourceUrl": "https://www.google.com/search?q=Saut%C3%A9ed%20Beef%20Tibs%20Ethiopia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Saut%C3%A9ed%20Beef%20Tibs%20Ethiopia%20recipe",
+    "fetchedAt": "2026-08-08T11:31:03.527Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0d/Wien_20150820_121835.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "eugrus / CC BY-SA 3.0"
+  },
+  "et:shiro": {
+    "sourceUrl": "https://www.google.com/search?q=Chickpea%20Shiro%20Stew%20Ethiopia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Chickpea%20Shiro%20Stew%20Ethiopia%20recipe",
+    "fetchedAt": "2026-08-08T11:31:06.854Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5f/Shiro_wet.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Yonihahasis / CC BY-SA 4.0"
+  },
+  "et:genfo": {
+    "sourceUrl": "https://www.google.com/search?q=Barley%20Porridge%20Ethiopia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Barley%20Porridge%20Ethiopia%20recipe",
+    "fetchedAt": "2026-08-08T11:31:10.092Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/61/Lemon_Barley_Pilaf.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "CityMama --Stefania Pomponi Butler / CC BY-SA 2.0"
+  },
+  "sn:yassa-poulet": {
+    "sourceUrl": "https://www.google.com/search?q=Chicken%20Yassa%20Senegal%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20Yassa%20Senegal%20recipe",
+    "fetchedAt": "2026-08-08T11:31:13.360Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/45/Poulet_Yassa_Chicken_rice_with_onion_sauce.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "T.K. Naliaka / CC BY-SA 4.0"
+  },
+  "sn:maafe": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Peanut_stew",
+    "videoUrl": "https://www.youtube.com/results?search_query=Peanut%20Stew%20Senegal%20recipe",
+    "fetchedAt": "2026-08-08T11:31:15.270Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/31/Mafe.malien.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Peanut stew"
+  },
+  "sn:fataya": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Fatayer",
+    "videoUrl": "https://www.youtube.com/results?search_query=Fish%20Pastries%20Senegal%20recipe",
+    "fetchedAt": "2026-08-08T11:31:16.240Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Fatayer.jpg/3840px-Fatayer.jpg",
+    "imageAttribution": "Wikipedia / Fatayer"
+  },
+  "za:boerewors": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ABoerewors_(South_African_Sausage)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Boerewors%20Sausage%20South%20Africa%20recipe",
+    "fetchedAt": "2026-08-08T11:31:17.206Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Boerewors_raw.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Boerewors"
+  },
+  "za:potjiekos": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Potjiekos",
+    "videoUrl": "https://www.youtube.com/results?search_query=Potjie%20Stew%20South%20Africa%20recipe",
+    "fetchedAt": "2026-08-08T11:31:18.042Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Beef_Potjie_Kos.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Potjiekos"
+  },
+  "za:koeksisters": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AKoeksisters_(Fried_Braided_Pastry_in_Syrup)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Syrup%20Twists%20South%20Africa%20recipe",
+    "fetchedAt": "2026-08-08T11:31:20.923Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/31/Roshogolla_with_a_Twist.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Sanghita b / CC BY-SA 4.0"
+  },
+  "in:palak-paneer": {
+    "sourceUrl": "https://www.google.com/search?q=Spinach%20Paneer%20Curry%20India%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Spinach%20Paneer%20Curry%20India%20recipe",
+    "fetchedAt": "2026-08-08T11:31:24.573Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Cottage_cheese_in_spinach_gravy%28palak_paneer%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Radhikamprabhu82 / CC BY-SA 4.0"
+  },
+  "in:masala-dosa": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AMasala_Dosa",
+    "videoUrl": "https://www.youtube.com/results?search_query=Masala%20Dosa%20India%20recipe",
+    "fetchedAt": "2026-08-08T11:31:26.811Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/Masala_Dosa_2023.jpg/3840px-Masala_Dosa_2023.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Masala dosa"
+  },
+  "in:jalebi": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AJalebi_(Fritters_in_Syrup)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Jalebi%20India%20recipe",
+    "fetchedAt": "2026-08-08T11:31:29.506Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/91/Jalebi-_Kolkata_-_West_Bengal_-_DSC_0011.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "TAPAS KUMAR HALDER / CC BY-SA 4.0"
+  },
+  "vn:banh-mi": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%A1nh_m%C3%AC",
+    "videoUrl": "https://www.youtube.com/results?search_query=Vietnamese%20Banh%20Mi%20Vietnam%20recipe",
+    "fetchedAt": "2026-08-08T11:31:31.443Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0c/B%C3%A1nh_m%C3%AC_th%E1%BB%8Bt_n%C6%B0%E1%BB%9Bng.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Bánh mì"
+  },
+  "vn:bun-cha": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Bun_cha",
+    "videoUrl": "https://www.youtube.com/results?search_query=Hanoi%20Bun%20Cha%20Vietnam%20recipe",
+    "fetchedAt": "2026-08-08T11:31:32.480Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4d/B%C3%BAn_ch%E1%BA%A3_Vietnamese_food.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Bun cha"
+  },
+  "vn:banh-xeo": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/B%C3%A1nh_x%C3%A8o",
+    "videoUrl": "https://www.youtube.com/results?search_query=Sizzling%20Crepes%20Vietnam%20recipe",
+    "fetchedAt": "2026-08-08T11:31:33.493Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/59/Banh_Xeo_with_fish_sauce_and_vegetables.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Bánh xèo"
+  },
+  "ke:kachumbari": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AKachumbari",
+    "videoUrl": "https://www.youtube.com/results?search_query=Kachumbari%20Kenya%20recipe",
+    "fetchedAt": "2026-08-08T11:31:34.609Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/96/Kachumbari.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Kachumbari"
+  },
+  "ke:nyama-choma": {
+    "sourceUrl": "https://www.google.com/search?q=Nyama%20Choma%20Kenya%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Nyama%20Choma%20Kenya%20recipe",
+    "fetchedAt": "2026-08-08T11:31:36.624Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e0/Nyama_choma_in_nairobi_kenya.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Kengitau254 / CC BY-SA 4.0"
+  },
+  "ke:ugali-sukuma-wiki": {
+    "sourceUrl": "https://www.google.com/search?q=Ugali%20with%20Sukuma%20Wiki%20Kenya%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Ugali%20with%20Sukuma%20Wiki%20Kenya%20recipe",
+    "fetchedAt": "2026-08-08T11:31:39.353Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a8/Fried_Steak%2C_Ugali_and_Sukuma_Wiki_%28Embu%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Napendakukula / CC BY-SA 4.0"
+  },
+  "ke:mandazi": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Mandazi",
+    "videoUrl": "https://www.youtube.com/results?search_query=Mandazi%20Kenya%20recipe",
+    "fetchedAt": "2026-08-08T11:31:39.950Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/69/Bowl_of_mandazi.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Mandazi"
+  },
+  "ke:githeri": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AGitheri",
+    "videoUrl": "https://www.youtube.com/results?search_query=Githeri%20Kenya%20recipe",
+    "fetchedAt": "2026-08-08T11:31:40.829Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Githeri_Meal.jpg/3840px-Githeri_Meal.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Githeri"
+  },
+  "ke:chapati-ke": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AChapati",
+    "videoUrl": "https://www.youtube.com/results?search_query=Kenyan%20Chapati%20Kenya%20recipe",
+    "fetchedAt": "2026-08-08T11:31:41.618Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fe/2_Chapati_warm_and_ready_to_be_eaten.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Chapati"
+  },
+  "ke:irio": {
+    "sourceUrl": "https://www.google.com/search?q=Irio%20Mash%20Kenya%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Irio%20Mash%20Kenya%20recipe",
+    "fetchedAt": "2026-08-08T11:31:45.466Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f0/Rainbow_of_food_natural_food_colors.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Skoot13 / CC BY-SA 3.0"
+  },
+  "pe:lomo-saltado": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ALomo_Saltado_(Peruvian_Steak_Stir-fry)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Lomo%20Saltado%20Peru%20recipe",
+    "fetchedAt": "2026-08-08T11:31:46.212Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/80/Lomo_Saltado_-_Lima%2C_Peru_Miraflores_%28Tiendecita_Blanca%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Lomo saltado"
+  },
+  "pe:aji-de-gallina": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AAj%C3%AD_de_Gallina_(Peruvian_Chili_Chicken)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Aji%20de%20Gallina%20Peru%20recipe",
+    "fetchedAt": "2026-08-08T11:31:48.233Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/Aj%C3%AD_de_gallina.jpg/3840px-Aj%C3%AD_de_gallina.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Ají de gallina"
+  },
+  "pe:picarones": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Picarones",
+    "videoUrl": "https://www.youtube.com/results?search_query=Picarones%20Peru%20recipe",
+    "fetchedAt": "2026-08-08T11:31:48.954Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Picarones.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Picarones"
+  },
+  "br:coxinha": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Coxinha",
+    "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20Coxinha%20Brazil%20recipe",
+    "fetchedAt": "2026-08-08T11:31:50.123Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/%282014-11-22%29_La_Donosti_-_Agudos_-_Coxinha_de_Leitoa_Romerito_Pontes_%2815870107515%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Coxinha"
+  },
+  "br:moqueca": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Moqueca",
+    "videoUrl": "https://www.youtube.com/results?search_query=Bahian%20Fish%20Stew%20Brazil%20recipe",
+    "fetchedAt": "2026-08-08T11:31:51.225Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6b/Moqueca.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Moqueca"
+  },
+  "br:pudim": {
+    "sourceUrl": "https://www.google.com/search?q=Brazilian%20Milk%20Pudding%20Brazil%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Brazilian%20Milk%20Pudding%20Brazil%20recipe",
+    "fetchedAt": "2026-08-08T11:31:56.864Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d6/Pudim_de_leite_de_Las_vegas.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "S.Moraes Jurema Oliveira (talk) 19:23, 26 December 2008 (UTC) / CC BY-SA 3.0"
+  },
+  "jm:jerk-chicken": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Jerk_(cooking)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Jerk%20Chicken%20Jamaica%20recipe",
+    "fetchedAt": "2026-08-08T11:31:57.529Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4f/BBQJerk_Chicken.jpg",
+    "imageAttribution": "Wikipedia / Jerk (cooking)"
+  },
+  "jm:callaloo": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ACallaloo_(Caribbean_Stewed_Greens)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Callaloo%20Greens%20Jamaica%20recipe",
+    "fetchedAt": "2026-08-08T11:31:58.353Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Callaloo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Callaloo"
+  },
+  "jm:rum-cake": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Rum_cake",
+    "videoUrl": "https://www.youtube.com/results?search_query=Jamaican%20Rum%20Cake%20Jamaica%20recipe",
+    "fetchedAt": "2026-08-08T11:32:00.516Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fc/Rum_cake.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Rum cake"
+  },
+  "fr:quiche-lorraine": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Quiche_Lorraine",
+    "videoUrl": "https://www.youtube.com/results?search_query=Quiche%20Lorraine%20France%20recipe",
+    "fetchedAt": "2026-08-08T11:32:01.188Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/43/Quiche_de_Lorraine.jpg",
+    "imageAttribution": "Wikipedia / Quiche Lorraine"
+  },
+  "fr:salade-nicoise": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Salade_ni%C3%A7oise",
+    "videoUrl": "https://www.youtube.com/results?search_query=Salade%20Ni%C3%A7oise%20France%20recipe",
+    "fetchedAt": "2026-08-08T11:32:01.900Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Nizza-Salat_an_der_F_Mittelmeerk%C3%BCste.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Salade niçoise"
+  },
+  "fr:clafoutis": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Clafoutis",
+    "videoUrl": "https://www.youtube.com/results?search_query=Cherry%20Clafoutis%20France%20recipe",
+    "fetchedAt": "2026-08-08T11:32:02.996Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Clafoutis3.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Clafoutis"
+  },
+  "de:schnitzel": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Schnitzel",
+    "videoUrl": "https://www.youtube.com/results?search_query=Wiener-Style%20Schnitzel%20Germany%20recipe",
+    "fetchedAt": "2026-08-08T11:32:04.795Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/22/Breitenlesau_Krug_Br%C3%A4u_Schnitzel.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Schnitzel"
+  },
+  "de:spaetzle": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ASpaetzle",
+    "videoUrl": "https://www.youtube.com/results?search_query=Spaetzle%20Germany%20recipe",
+    "fetchedAt": "2026-08-08T11:32:06.147Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/28/Sp%C3%A4tzle-02.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Spätzle"
+  },
+  "de:apfelstrudel": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AApple_Strudel",
+    "videoUrl": "https://www.youtube.com/results?search_query=Apple%20Strudel%20Germany%20recipe",
+    "fetchedAt": "2026-08-08T11:32:09.705Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Apple_and_almond_strudel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Qwerty Binary / CC BY-SA 3.0"
+  },
+  "kr:bulgogi": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ABulgogi",
+    "videoUrl": "https://www.youtube.com/results?search_query=Bulgogi%20South%20Korea%20recipe",
+    "fetchedAt": "2026-08-08T11:32:10.910Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/ce/Bulgogi_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Bulgogi"
+  },
+  "kr:tteokbokki": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Tteokbokki",
+    "videoUrl": "https://www.youtube.com/results?search_query=Spicy%20Rice%20Cakes%20South%20Korea%20recipe",
+    "fetchedAt": "2026-08-08T11:32:12.407Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Tteokbokki.JPG/3840px-Tteokbokki.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Tteokbokki"
+  },
+  "kr:kimchi-jjigae": {
+    "sourceUrl": "https://www.google.com/search?q=Kimchi%20Stew%20South%20Korea%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Kimchi%20Stew%20South%20Korea%20recipe",
+    "fetchedAt": "2026-08-08T11:32:15.879Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a6/Budae-jjigae_1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "lazy fri13th / CC BY 2.0"
+  },
+  "cn:mapo-tofu": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AMapo_Tofu",
+    "videoUrl": "https://www.youtube.com/results?search_query=Mapo%20Tofu%20China%20recipe",
+    "fetchedAt": "2026-08-08T11:32:17.050Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Chen_Mapo_Tofu.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Mapo tofu"
+  },
+  "cn:xiaolongbao": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Xiaolongbao",
+    "videoUrl": "https://www.youtube.com/results?search_query=Soup%20Dumplings%20China%20recipe",
+    "fetchedAt": "2026-08-08T11:32:18.655Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3a/A_Xiaolongbao_from_The_Modern_Shanghai.jpg/3840px-A_Xiaolongbao_from_The_Modern_Shanghai.jpg",
+    "imageAttribution": "Wikipedia / Xiaolongbao"
+  },
+  "cn:kung-pao-chicken": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AKung_Pao_Chicken",
+    "videoUrl": "https://www.youtube.com/results?search_query=Kung%20Pao%20Chicken%20China%20recipe",
+    "fetchedAt": "2026-08-08T11:32:20.084Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Kung-pao-shanghai.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Kung Pao chicken"
+  },
+  "pt:pasteis-de-bacalhau": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Bolinhos_de_bacalhau",
+    "videoUrl": "https://www.youtube.com/results?search_query=Salt%20Cod%20Fritters%20Portugal%20recipe",
+    "fetchedAt": "2026-08-08T11:32:21.545Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Bolinho_de_bacalhau.jpg",
+    "imageAttribution": "Wikipedia / Bolinhos de bacalhau"
+  },
+  "pt:francesinha": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Francesinha",
+    "videoUrl": "https://www.youtube.com/results?search_query=Francesinha%20Portugal%20recipe",
+    "fetchedAt": "2026-08-08T11:32:22.655Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/47/Francesinha_Sandwich_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Francesinha"
+  },
+  "pt:arroz-doce": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ARice_Pudding",
+    "videoUrl": "https://www.youtube.com/results?search_query=Portuguese%20Rice%20Pudding%20Portugal%20recipe",
+    "fetchedAt": "2026-08-08T11:32:24.366Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/40/Kheer_with_condensed_milk..JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Rice pudding"
+  },
+  "ar:milanesa": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Milanesa",
+    "videoUrl": "https://www.youtube.com/results?search_query=Milanesa%20Argentina%20recipe",
+    "fetchedAt": "2026-08-08T11:32:25.032Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/18/Milanesa_con_fritas.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Milanesa"
+  },
+  "ar:locro": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Locro",
+    "videoUrl": "https://www.youtube.com/results?search_query=Locro%20Stew%20Argentina%20recipe",
+    "fetchedAt": "2026-08-08T11:32:26.111Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/22/Locro_argentino.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Locro"
+  },
+  "ar:flan-dulce-de-leche": {
+    "sourceUrl": "https://www.google.com/search?q=Dulce%20de%20Leche%20Flan%20Argentina%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Dulce%20de%20Leche%20Flan%20Argentina%20recipe",
+    "fetchedAt": "2026-08-08T11:32:28.854Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5e/Flan_con_dulce_de_leche_y_crema.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Pequeño mar / CC BY-SA 4.0"
+  },
+  "ng:egusi-soup": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Egusi",
+    "videoUrl": "https://www.youtube.com/results?search_query=Egusi%20Soup%20Nigeria%20recipe",
+    "fetchedAt": "2026-08-08T11:32:29.786Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d0/EGUSI.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Egusi"
+  },
+  "ng:suya": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Suya",
+    "videoUrl": "https://www.youtube.com/results?search_query=Suya%20Skewers%20Nigeria%20recipe",
+    "fetchedAt": "2026-08-08T11:32:30.648Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ab/SuyavarietiesTX.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Suya"
+  },
+  "ng:puff-puff": {
+    "sourceUrl": "https://www.google.com/search?q=Puff-Puff%20Nigeria%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Puff-Puff%20Nigeria%20recipe",
+    "fetchedAt": "2026-08-08T11:32:32.887Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a3/Nigerian-puff-puff-recipe_cropped.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Afrolems ; cropped by Off-shell / CC BY-SA 4.0"
+  },
+  "eg:ful-medames": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Ful_medames",
+    "videoUrl": "https://www.youtube.com/results?search_query=Ful%20Medames%20Egypt%20recipe",
+    "fetchedAt": "2026-08-08T11:32:34.496Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Ful_medames_%28arabic_meal%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Ful medames"
+  },
+  "eg:molokhia": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Mulukhiyah",
+    "videoUrl": "https://www.youtube.com/results?search_query=Molokhia%20Egypt%20recipe",
+    "fetchedAt": "2026-08-08T11:32:35.964Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/72/Molokheya_Egypt%2C_2012.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Mulukhiyah"
+  },
+  "eg:om-ali": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3APuff_Pastry_with_Nuts_and_Whipped_Cream_(Om_Ali)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Om%20Ali%20Egypt%20recipe",
+    "fetchedAt": "2026-08-08T11:32:37.947Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Umm_Ali.JPG/3840px-Umm_Ali.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Om Ali"
+  },
+  "ph:sinigang": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ASinigang_(Philippine_Sour_Soup)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Sinigang%20Philippines%20recipe",
+    "fetchedAt": "2026-08-08T11:32:38.580Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c3/The_Best_Sinigang_Cuisine.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Sinigang"
+  },
+  "ph:pancit-bihon": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Rice_vermicelli",
+    "videoUrl": "https://www.youtube.com/results?search_query=Pancit%20Bihon%20Philippines%20recipe",
+    "fetchedAt": "2026-08-08T11:32:39.281Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Rice_vermicelli.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Rice vermicelli"
+  },
+  "ph:leche-flan": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Cr%C3%A8me_caramel",
+    "videoUrl": "https://www.youtube.com/results?search_query=Leche%20Flan%20Philippines%20recipe",
+    "fetchedAt": "2026-08-08T11:32:39.871Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Cremecaramel.jpg/3840px-Cremecaramel.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Crème caramel"
+  },
+  "gb:shepherd-pie": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Shepherd's_pie",
+    "videoUrl": "https://www.youtube.com/results?search_query=Shepherd's%20Pie%20United%20Kingdom%20recipe",
+    "fetchedAt": "2026-08-08T11:32:40.799Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/52/Homerton_College_-_Shepherd%27s_pie_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Shepherd's pie"
+  },
+  "gb:sunday-roast": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Sunday_roast",
+    "videoUrl": "https://www.youtube.com/results?search_query=Sunday%20Roast%20Chicken%20United%20Kingdom%20recipe",
+    "fetchedAt": "2026-08-08T11:32:42.172Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Sunday_roast_lamb_Cock_Inn_Henham_Essex_England_01.jpg/3840px-Sunday_roast_lamb_Cock_Inn_Henham_Essex_England_01.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Sunday roast"
+  },
+  "gb:scones": {
+    "sourceUrl": "https://www.google.com/search?q=Cream%20Scones%20United%20Kingdom%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Cream%20Scones%20United%20Kingdom%20recipe",
+    "fetchedAt": "2026-08-08T11:32:44.819Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/09/Scone_with_clotted_cream_and_jam_-_Dyke_Road_Park_Cafe_2025-08-10.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Andy Li / CC0"
+  },
+  "pl:bigos": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ABigos_(Polish_Cabbage_Meat_Stew)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Hunter's%20Stew%20Poland%20recipe",
+    "fetchedAt": "2026-08-08T11:32:45.573Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Bigos_%281%29.jpg/3840px-Bigos_%281%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Bigos"
+  },
+  "pl:golabki": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Go%C5%82%C4%85bki",
+    "videoUrl": "https://www.youtube.com/results?search_query=Stuffed%20Cabbage%20Rolls%20Poland%20recipe",
+    "fetchedAt": "2026-08-08T11:32:46.529Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/df/00101_Rindfleisch_-_Kohlroulade%2C_Podkarpackie.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Gołąbki"
+  },
+  "pl:sernik": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ACheesecake",
+    "videoUrl": "https://www.youtube.com/results?search_query=Polish%20Cheesecake%20Poland%20recipe",
+    "fetchedAt": "2026-08-08T11:32:48.746Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Baked_cheesecake_with_raspberries_and_blueberries.jpg",
+    "imageAttribution": "Wikipedia / Cheesecake"
+  },
+  "il:hummus": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AHummus",
+    "videoUrl": "https://www.youtube.com/results?search_query=Hummus%20Israel%20recipe",
+    "fetchedAt": "2026-08-08T11:45:26.498Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Lebanese_style_hummus.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Hummus"
+  },
+  "il:falafel": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AFalafel",
+    "videoUrl": "https://www.youtube.com/results?search_query=Falafel%20Israel%20recipe",
+    "fetchedAt": "2026-08-08T11:45:27.539Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Falafels_2.jpg/3840px-Falafels_2.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Falafel"
+  },
+  "il:israeli-salad": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AIsraeli_Salad",
+    "videoUrl": "https://www.youtube.com/results?search_query=Israeli%20Salad%20Israel%20recipe",
+    "fetchedAt": "2026-08-08T11:45:30.073Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/04/Salad.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Israeli salad"
+  },
+  "il:malabi": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Muhallebi",
+    "videoUrl": "https://www.youtube.com/results?search_query=Malabi%20Israel%20recipe",
+    "fetchedAt": "2026-08-08T11:45:32.486Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Mhallabiyyeh_%28Arabic_milk_pudding%29.jpg/3840px-Mhallabiyyeh_%28Arabic_milk_pudding%29.jpg",
+    "imageAttribution": "Wikipedia / Muhallebi"
+  },
+  "hu:lecso": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Lecs%C3%B3",
+    "videoUrl": "https://www.youtube.com/results?search_query=Lecs%C3%B3%20Hungary%20recipe",
+    "fetchedAt": "2026-08-08T11:45:33.224Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d9/Warm_Colors-_my_Mom%27s_Hungarian_Lecs%C3%B3_cropped.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Lecsó"
+  },
+  "hu:gulyas": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AGoulash",
+    "videoUrl": "https://www.youtube.com/results?search_query=Goulash%20Hungary%20recipe",
+    "fetchedAt": "2026-08-08T11:45:36.950Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Gulyas080.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Goulash"
+  },
+  "hu:uborkasalata": {
+    "sourceUrl": "https://www.google.com/search?q=Cucumber%20Salad%20Hungary%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Cucumber%20Salad%20Hungary%20recipe",
+    "fetchedAt": "2026-08-08T11:45:40.253Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/50/Liat_Portal_for_Foodie_Disorder_-_Cucumber_salad_with_dill.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "HaJunkiyada / CC BY-SA 4.0"
+  },
+  "hu:retes": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AApple_Strudel",
+    "videoUrl": "https://www.youtube.com/results?search_query=Apple%20Strudel%20Hungary%20recipe",
+    "fetchedAt": "2026-08-08T11:45:44.470Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Wiener_Apfelstrudel.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Burkhard Mücke / CC BY-SA 4.0"
+  },
+  "cz:cesnecka": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/%C4%8Cesne%C4%8Dka",
+    "videoUrl": "https://www.youtube.com/results?search_query=Garlic%20Soup%20Czechia%20recipe",
+    "fetchedAt": "2026-08-08T11:45:45.735Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/37/%C4%8Cesne%C4%8Dka.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Česnečka"
+  },
+  "cz:svickova": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Sv%C3%AD%C4%8Dkov%C3%A1",
+    "videoUrl": "https://www.youtube.com/results?search_query=Sv%C3%AD%C4%8Dkov%C3%A1%20Czechia%20recipe",
+    "fetchedAt": "2026-08-08T11:45:46.792Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/fd/Sv%C3%AD%C4%8Dkov%C3%A1_na_smetan%C4%9B.JPG",
+    "imageAttribution": "Wikipedia / Svíčková"
+  },
+  "cz:zeli": {
+    "sourceUrl": "https://www.google.com/search?q=Braised%20Red%20Cabbage%20Czechia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Braised%20Red%20Cabbage%20Czechia%20recipe",
+    "fetchedAt": "2026-08-08T11:45:51.087Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Almost_Nose-to-Tail_Pork_-_Lake_House_Restaurant%2C_Daylesford.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "avlxyz / CC BY-SA 2.0"
+  },
+  "cz:ovocne-knedliky": {
+    "sourceUrl": "https://www.google.com/search?q=Fruit%20Dumplings%20Czechia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Fruit%20Dumplings%20Czechia%20recipe",
+    "fetchedAt": "2026-08-08T11:46:03.139Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/97/A_dish_of_Rasta_Pasta.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "LingLass / CC0"
+  },
+  "co:empanadas": {
+    "sourceUrl": "https://www.google.com/search?q=Potato%20Empanadas%20Colombia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Potato%20Empanadas%20Colombia%20recipe",
+    "fetchedAt": "2026-08-08T11:46:09.428Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/ef/Empanadas_y_aj%C3%AD.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "young shanahan / CC BY 2.0"
+  },
+  "co:ajiaco": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3APotato_and_Chicken_Stew_(Ajiaco)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Ajiaco%20Colombia%20recipe",
+    "fetchedAt": "2026-08-08T11:46:12.183Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Ajiaco.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Ajiaco"
+  },
+  "co:patacones": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Tostones",
+    "videoUrl": "https://www.youtube.com/results?search_query=Patacones%20Colombia%20recipe",
+    "fetchedAt": "2026-08-08T11:46:13.215Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/05/Tostones.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Tostones"
+  },
+  "co:arroz-con-leche": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ARice_with_Milk_(Arroz_con_Leche)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Rice%20Pudding%20Colombia%20recipe",
+    "fetchedAt": "2026-08-08T11:46:13.828Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/40/Kheer_with_condensed_milk..JPG",
+    "imageAttribution": "Wikipedia / Rice pudding"
+  },
+  "cl:empanadas-de-pino": {
+    "sourceUrl": "https://www.google.com/search?q=Beef%20Empanadas%20Chile%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Beef%20Empanadas%20Chile%20recipe",
+    "fetchedAt": "2026-08-08T11:46:17.501Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/1/14/Empanadas_fritas_de_pino.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "E4024 / CC BY-SA 4.0"
+  },
+  "cl:pastel-de-choclo": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Pastel_de_choclo",
+    "videoUrl": "https://www.youtube.com/results?search_query=Corn%20Pie%20Chile%20recipe",
+    "fetchedAt": "2026-08-08T11:46:18.630Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/a4/Pastel_de_choclo.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Pastel de choclo"
+  },
+  "cl:ensalada-chilena": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Chilean_salad",
+    "videoUrl": "https://www.youtube.com/results?search_query=Chilean%20Salad%20Chile%20recipe",
+    "fetchedAt": "2026-08-08T11:46:20.804Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/27/Ensalada_a_la_Chilena_%284769277224%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Chilean salad"
+  },
+  "cl:leche-asada": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Leche_asada",
+    "videoUrl": "https://www.youtube.com/results?search_query=Baked%20Milk%20Custard%20Chile%20recipe",
+    "fetchedAt": "2026-08-08T11:46:21.756Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/7/7a/La_leche_asada.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Leche asada"
+  },
+  "cu:tostones": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ATostones_(Fried_Plantains)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Tostones%20Cuba%20recipe",
+    "fetchedAt": "2026-08-08T11:46:22.623Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/0/05/Tostones.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Tostones"
+  },
+  "cu:ropa-vieja": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ARopa_Vieja_(Caribbean_Shredded_Beef)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Ropa%20Vieja%20Cuba%20recipe",
+    "fetchedAt": "2026-08-08T11:46:24.065Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/b1/Cubanfood.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Ropa vieja"
+  },
+  "cu:moros-y-cristianos": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ARice_with_Black_Beans_(Arroz_con_Frijoles_Negros)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Black%20Beans%20and%20Rice%20Cuba%20recipe",
+    "fetchedAt": "2026-08-08T11:46:27.836Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cd/La_Casa_Restaurant_-_Stierch_-_April_2019_03.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Missvain / CC BY 4.0"
+  },
+  "cu:flan": {
+    "sourceUrl": "https://www.google.com/search?q=Cuban%20Flan%20Cuba%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Cuban%20Flan%20Cuba%20recipe",
+    "fetchedAt": "2026-08-08T11:46:31.180Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/3d/Flan_2.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Comedora / CC BY-SA 4.0"
+  },
+  "az:qutab": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Qutab",
+    "videoUrl": "https://www.youtube.com/results?search_query=Herb%20Qutab%20Azerbaijan%20recipe",
+    "fetchedAt": "2026-08-08T11:46:32.980Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/e/e0/K%C3%BCk%C3%BC-Gutab_Azerbaijani.gif?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Qutab"
+  },
+  "az:plov": {
+    "sourceUrl": "https://www.google.com/search?q=Saffron%20Plov%20Azerbaijan%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Saffron%20Plov%20Azerbaijan%20recipe",
+    "fetchedAt": "2026-08-08T11:46:39.540Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/8e/Polu.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Mizu basyo at Japanese Wikipedia / CC BY-SA 3.0"
+  },
+  "az:choban-salati": {
+    "sourceUrl": "https://www.google.com/search?q=Shepherd%20Salad%20Azerbaijan%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Shepherd%20Salad%20Azerbaijan%20recipe",
+    "fetchedAt": "2026-08-08T11:47:01.819Z"
+  },
+  "az:pakhlava": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Baklava",
+    "videoUrl": "https://www.youtube.com/results?search_query=Pakhlava%20Azerbaijan%20recipe",
+    "fetchedAt": "2026-08-08T11:47:03.330Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c7/Baklava%281%29.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Baklava"
+  },
+  "au:pumpkin-soup": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Pumpkin_soup",
+    "videoUrl": "https://www.youtube.com/results?search_query=Roast%20Pumpkin%20Soup%20Australia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:04.467Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/K%C3%BCrbissuppe_mit_Kern%C3%B6l.JPG/3840px-K%C3%BCrbissuppe_mit_Kern%C3%B6l.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Pumpkin soup"
+  },
+  "au:roast-lamb": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ARoast_Leg_of_Lamb_with_Gravy",
+    "videoUrl": "https://www.youtube.com/results?search_query=Roast%20Lamb%20Australia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:08.340Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/f/f6/Loin_of_lamb_at_Quay.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Charles Haynes / CC BY-SA 2.0"
+  },
+  "au:damper": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ADamper_(Australian_Campfire_Bread)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Damper%20Australia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:09.887Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5c/Damper_%28food%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Nachoman-au / CC BY-SA 3.0"
+  },
+  "au:pavlova": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3APavlova",
+    "videoUrl": "https://www.youtube.com/results?search_query=Pavlova%20Australia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:11.251Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/67/Pavlova_dessert.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Pavlova"
+  },
+  "ca:pea-soup": {
+    "sourceUrl": "https://www.google.com/search?q=Yellow%20Pea%20Soup%20Canada%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Yellow%20Pea%20Soup%20Canada%20recipe",
+    "fetchedAt": "2026-08-08T11:47:18.738Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/d/d2/Liat_Portal_for_Foodie_Disorder_-_Pea_soup_with_dumplings.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "HaJunkiyada / CC BY-SA 4.0"
+  },
+  "ca:poutine": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3APoutine",
+    "videoUrl": "https://www.youtube.com/results?search_query=Poutine%20Canada%20recipe",
+    "fetchedAt": "2026-08-08T11:47:19.776Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/cc/Food_at_WIkimanian_2017_02.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Poutine"
+  },
+  "ca:maple-carrots": {
+    "sourceUrl": "https://www.google.com/search?q=Maple%20Roasted%20Carrots%20Canada%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Maple%20Roasted%20Carrots%20Canada%20recipe",
+    "fetchedAt": "2026-08-08T11:47:25.420Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/2/25/Carrot_cake.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "No machine-readable author provided. Dbenbenn assumed (based on copyright claims). / CC BY-SA 3.0"
+  },
+  "ca:butter-tarts": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Butter_tart",
+    "videoUrl": "https://www.youtube.com/results?search_query=Butter%20Tarts%20Canada%20recipe",
+    "fetchedAt": "2026-08-08T11:47:26.173Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/30/ButtertartS1360020.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Butter tart"
+  },
+  "bo:llajwa": {
+    "sourceUrl": "https://www.google.com/search?q=Llajwa%20Salsa%20Bolivia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Llajwa%20Salsa%20Bolivia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:30.352Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/b/bc/Moliendo_Llajua%2C_ingredientes%2C_bat%C3%A1n%2C_moroko%2C_locoto%2C_tomate.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Camil Mendoza / CC BY-SA 4.0"
+  },
+  "bo:saltenas": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Salte%C3%B1a",
+    "videoUrl": "https://www.youtube.com/results?search_query=Salte%C3%B1as%20Bolivia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:30.897Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Salte%C3%B1as_de_Bolivia.jpg",
+    "imageAttribution": "Wikipedia / Salteña"
+  },
+  "bo:quinoa-salad": {
+    "sourceUrl": "https://www.google.com/search?q=Quinoa%20Salad%20Bolivia%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Quinoa%20Salad%20Bolivia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:35.815Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/6/6a/Stuffed_mushrooms_with_spiced_quinoa.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "me (w:User:pfctdayelise) / CC BY-SA 2.5"
+  },
+  "bo:bunuelos": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ABu%C3%B1uelos_(Sweet_Fried_Pastry)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Bu%C3%B1uelos%20Bolivia%20recipe",
+    "fetchedAt": "2026-08-08T11:47:36.546Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/3/33/Bunyol_de_carabassa.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Buñuelo"
+  },
+  "sy:muhammara": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Muhammara",
+    "videoUrl": "https://www.youtube.com/results?search_query=Muhammara%20Syria%20recipe",
+    "fetchedAt": "2026-08-08T11:47:38.978Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4c/Tanoreen_muhammara.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Muhammara"
+  },
+  "sy:kibbeh": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AKibbeh",
+    "videoUrl": "https://www.youtube.com/results?search_query=Kibbeh%20Syria%20recipe",
+    "fetchedAt": "2026-08-08T11:47:40.121Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/8/88/Kibbeh3.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Kibbeh"
+  },
+  "sy:tabbouleh": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3ATabbouleh",
+    "videoUrl": "https://www.youtube.com/results?search_query=Tabbouleh%20Syria%20recipe",
+    "fetchedAt": "2026-08-08T11:47:40.892Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Tabouleh_1.JPG?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Tabbouleh"
+  },
+  "sy:halawet-el-jibn": {
+    "sourceUrl": "https://www.google.com/search?q=Cheese%20Rolls%20Syria%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Cheese%20Rolls%20Syria%20recipe",
+    "fetchedAt": "2026-08-08T11:47:45.411Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/9/95/Cheese_Rolls.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Ayshamarjana / CC BY-SA 4.0"
+  },
+  "pk:samosas": {
+    "sourceUrl": "https://en.wikipedia.org/wiki/Samosa",
+    "videoUrl": "https://www.youtube.com/results?search_query=Samosas%20Pakistan%20recipe",
+    "fetchedAt": "2026-08-08T11:47:46.912Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Samosas%2C_snack_food_at_Wikipedia%27s_16th_Birthday_celebration_in_Chittagong_%2801%29.jpg/3840px-Samosas%2C_snack_food_at_Wikipedia%27s_16th_Birthday_celebration_in_Chittagong_%2801%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Samosa"
+  },
+  "pk:chicken-biryani": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AChicken_Biryani",
+    "videoUrl": "https://www.youtube.com/results?search_query=Chicken%20Biryani%20Pakistan%20recipe",
+    "fetchedAt": "2026-08-08T11:47:50.073Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/%22Hyderabadi_Dum_Biryani%22.jpg/3840px-%22Hyderabadi_Dum_Biryani%22.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "imageAttribution": "Wikipedia / Biryani"
+  },
+  "pk:raita": {
+    "sourceUrl": "https://www.google.com/search?q=Cucumber%20Raita%20Pakistan%20recipe&udm=18",
+    "videoUrl": "https://www.youtube.com/results?search_query=Cucumber%20Raita%20Pakistan%20recipe",
+    "fetchedAt": "2026-08-08T11:47:57.052Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/a/ae/Kheere_Ka_Raita_%28cropped%29.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original",
+    "imageAttribution": "Miansari66 / CC0"
+  },
+  "pk:kheer": {
+    "sourceUrl": "https://en.wikibooks.org/wiki/Cookbook%3AKheer_(Rice_Pudding)",
+    "videoUrl": "https://www.youtube.com/results?search_query=Kheer%20Pakistan%20recipe",
+    "fetchedAt": "2026-08-08T11:47:59.028Z",
+    "imageUrl": "https://upload.wikimedia.org/wikipedia/commons/4/46/Kheer.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "imageAttribution": "Wikipedia / Kheer"
   }
 }

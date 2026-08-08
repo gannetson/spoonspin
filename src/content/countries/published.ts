@@ -32,6 +32,30 @@ import { egCountry } from "./eg";
 import { phCountry } from "./ph";
 import { gbCountry } from "./gb";
 import { plCountry } from "./pl";
+import { ilCountry } from "./il";
+import { huCountry } from "./hu";
+import { czCountry } from "./cz";
+import { coCountry } from "./co";
+import { clCountry } from "./cl";
+import { cuCountry } from "./cu";
+import { azCountry } from "./az";
+import { auCountry } from "./au";
+import { caCountry } from "./ca";
+import { boCountry } from "./bo";
+import { syCountry } from "./sy";
+import { pkCountry } from "./pk";
+import { afCountry } from "./af";
+import { beCountry } from "./be";
+import { irCountry } from "./ir";
+import { iqCountry } from "./iq";
+import { ghCountry } from "./gh";
+import { hrCountry } from "./hr";
+import { baCountry } from "./ba";
+import { amCountry } from "./am";
+import { alCountry } from "./al";
+import { bdCountry } from "./bd";
+import { myCountry } from "./my";
+import { ieCountry } from "./ie";
 
 /** Countries with hand-authored Cook menus. */
 export const authoredCountries: AuthoredCountry[] = [
@@ -68,6 +92,30 @@ export const authoredCountries: AuthoredCountry[] = [
   phCountry,
   gbCountry,
   plCountry,
+  ilCountry,
+  huCountry,
+  czCountry,
+  coCountry,
+  clCountry,
+  cuCountry,
+  azCountry,
+  auCountry,
+  caCountry,
+  boCountry,
+  syCountry,
+  pkCountry,
+  afCountry,
+  beCountry,
+  irCountry,
+  iqCountry,
+  ghCountry,
+  hrCountry,
+  baCountry,
+  amCountry,
+  alCountry,
+  bdCountry,
+  myCountry,
+  ieCountry,
 ];
 
 /** @deprecated Use authoredCountries — kept for older imports. */

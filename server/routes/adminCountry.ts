@@ -6,6 +6,7 @@ import {
   appendMoreRecipes,
   appendSpecialtyShops,
   deleteRecipe,
+  getAdminCountryOverview,
   getCountryFromDb,
   getRecipeRow,
   listRecipeIdsForCountry,
@@ -186,6 +187,41 @@ function openaiRequired(
 export function registerAdminCountryRoutes(
   app: import("express").Express,
 ): void {
+  app.get(
+    "/api/admin/overview",
+    requireAdmin,
+    async (_req: AuthedRequest, res) => {
+      try {
+        const countries = await getAdminCountryOverview();
+        const totals = countries.reduce(
+          (acc, row) => {
+            acc.recipes += row.recipes;
+            acc.drinks += row.drinks;
+            acc.shops += row.shops;
+            acc.restaurants += row.restaurants;
+            return acc;
+          },
+          { recipes: 0, drinks: 0, shops: 0, restaurants: 0 },
+        );
+        res.json({
+          countries,
+          totals: {
+            countries: countries.length,
+            ...totals,
+          },
+        });
+      } catch (error) {
+        console.error("Admin overview failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not load admin overview.",
+        });
+      }
+    },
+  );
+
   app.post(
     "/api/admin/countries/:code/replace-image",
     requireAdmin,

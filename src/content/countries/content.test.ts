@@ -49,7 +49,7 @@ describe("worldwide country content", () => {
     expect(getCountryByCode("bg")?.name).toBe("Bulgaria");
     expect(getCountryByCode("bg")?.cookReady).toBe(true);
     expect(getCountryByCode("af")?.name).toBe("Afghanistan");
-    expect(getCountryByCode("af")?.cookReady).toBe(false);
+    expect(getCountryByCode("af")?.cookReady).toBe(true);
     expect(getCountryByCode("xx")).toBeUndefined();
     expect(getCountryByCode("fr")?.name).toBe("France");
     expect(getCountryByCode("gb")?.cookReady).toBe(true);
