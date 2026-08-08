@@ -4,34 +4,46 @@ import type { RestaurantSubmissionPayload } from "../db/submissions.ts";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
+const optionalString = z
+  .string()
+  .nullish()
+  .transform((value) => {
+    if (value == null) return undefined;
+    const trimmed = value.trim();
+    return trimmed.length > 0 ? trimmed : undefined;
+  });
+
 const recipeDraftSchema = z.object({
   found: z.boolean(),
   confirmationNotes: z.string(),
   recipe: z
     .object({
       name: z.string().min(1),
-      localName: z.string().optional(),
+      localName: optionalString,
       description: z.string().min(20),
       category: z.enum(["starter", "main", "side", "dessert", "snack"]),
-      servings: z.number().int().positive(),
-      prepMinutes: z.number().int().nonnegative(),
-      cookMinutes: z.number().int().nonnegative(),
+      servings: z.coerce.number().int().positive(),
+      prepMinutes: z.coerce.number().int().nonnegative(),
+      cookMinutes: z.coerce.number().int().nonnegative(),
       difficulty: z.enum(["easy", "medium", "challenging"]),
-      dietaryLabels: z.array(z.string()),
+      dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
       ingredients: z
         .array(
           z.object({
             name: z.string().min(1),
-            quantity: z.number().positive(),
+            quantity: z.coerce.number().positive(),
             unit: z.string().min(1),
-            note: z.string().optional(),
+            note: optionalString,
           }),
         )
         .min(2),
       steps: z.array(z.string().min(8)).min(3),
-      substitutions: z.array(z.string()).optional(),
-      servingSuggestion: z.string().optional(),
-      drinkPairing: z.string().optional(),
+      substitutions: z
+        .array(z.string())
+        .nullish()
+        .transform((v) => v ?? undefined),
+      servingSuggestion: optionalString,
+      drinkPairing: optionalString,
     })
     .nullable(),
 });
@@ -44,13 +56,13 @@ const restaurantDraftSchema = z.object({
       name: z.string().min(1),
       address: z.string().min(1),
       city: z.string().min(1),
-      postcode: z.string().nullable().optional(),
-      website: z.string().nullable().optional(),
-      mapsUrl: z.string().nullable().optional(),
-      lat: z.number().nullable().optional(),
-      lng: z.number().nullable().optional(),
-      authenticityNotes: z.string().nullable().optional(),
-      phone: z.string().nullable().optional(),
+      postcode: optionalString,
+      website: optionalString,
+      mapsUrl: optionalString,
+      lat: z.coerce.number().nullish().transform((v) => v ?? undefined),
+      lng: z.coerce.number().nullish().transform((v) => v ?? undefined),
+      authenticityNotes: optionalString,
+      phone: optionalString,
     })
     .nullable(),
 });
@@ -75,7 +87,7 @@ function getModel(): string {
   return process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
 }
 
-async function chatJson(system: string, user: string): Promise<unknown> {
+export async function chatJson(system: string, user: string): Promise<unknown> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error(
@@ -109,8 +121,14 @@ async function chatJson(system: string, user: string): Promise<unknown> {
     choices?: Array<{ message?: { content?: string } }>;
   };
   const content = data.choices?.[0]?.message?.content;
-  if (!content) throw new Error("OpenAI returned an empty response.");
-  return JSON.parse(content) as unknown;
+  if (!content?.trim()) throw new Error("OpenAI returned an empty response.");
+  try {
+    return JSON.parse(content) as unknown;
+  } catch {
+    throw new Error(
+      "OpenAI returned invalid JSON. Try a narrower search (e.g. street food).",
+    );
+  }
 }
 
 export function isOpenAiConfigured(): boolean {
@@ -223,12 +241,23 @@ JSON shape:
     place.website && /^https?:\/\//i.test(place.website)
       ? place.website
       : undefined;
-  const mapsUrl =
-    place.mapsUrl && /^https?:\/\//i.test(place.mapsUrl)
-      ? place.mapsUrl
-      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-          `${place.name} ${place.address} ${place.city} Netherlands`,
-        )}`;
+  const fallbackMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${place.name} ${place.address} ${place.city} Netherlands`,
+  )}`;
+  let mapsUrl = fallbackMaps;
+  if (place.mapsUrl && /^https?:\/\//i.test(place.mapsUrl)) {
+    try {
+      const host = new URL(place.mapsUrl).hostname.toLowerCase();
+      const short =
+        host === "goo.gl" ||
+        host.endsWith(".goo.gl") ||
+        host === "g.co" ||
+        host === "maps.app.goo.gl";
+      if (!short) mapsUrl = place.mapsUrl;
+    } catch {
+      mapsUrl = fallbackMaps;
+    }
+  }
 
   return {
     found: true,

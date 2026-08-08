@@ -10,6 +10,7 @@ describe("restaurant deduplication", () => {
         name: "Tbilisi Table",
         address: "Street 1, Amsterdam",
         city: "Amsterdam",
+        cuisineCodes: ["ge"],
         mapsUrl: "https://maps.example/1",
       },
       {
@@ -17,6 +18,7 @@ describe("restaurant deduplication", () => {
         name: "Kavkaz Kitchen",
         address: "Street 2, Utrecht",
         city: "Utrecht",
+        cuisineCodes: ["ge"],
         mapsUrl: "https://maps.example/2",
       },
       {
@@ -24,6 +26,7 @@ describe("restaurant deduplication", () => {
         name: "Tbilisi Table",
         address: "Street 1, Amsterdam",
         city: "Amsterdam",
+        cuisineCodes: ["ge"],
         mapsUrl: "https://maps.example/1",
       },
     ];

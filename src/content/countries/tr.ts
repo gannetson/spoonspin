@@ -53,6 +53,62 @@ export const trCountry: AuthoredCountry = {
       false,
       "Strong black tea poured into tulip-shaped glasses.",
     ),
+    moreRecipes: [
+      r(
+        "lahmacun",
+        "Turkish Flatbread Pizza",
+        "Lahmacun",
+        "main",
+        [
+          { name: "pizza dough or flatbread dough", quantity: 400, unit: "g" },
+          { name: "minced lamb or beef", quantity: 300, unit: "g" },
+          { name: "tomato", quantity: 2, unit: "pieces" },
+          { name: "parsley", quantity: 30, unit: "g" },
+        ],
+        {
+          description:
+            "Thin crisp flatbread topped with spiced minced meat, then rolled with herbs and lemon.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Lahmacun",
+        },
+      ),
+      r(
+        "imam-bayildi",
+        "Stuffed Eggplant",
+        "İmam bayıldı",
+        "side",
+        [
+          { name: "eggplants", quantity: 4, unit: "pieces" },
+          { name: "onions", quantity: 2, unit: "pieces" },
+          { name: "tomatoes", quantity: 400, unit: "g" },
+          { name: "olive oil", quantity: 80, unit: "ml" },
+        ],
+        {
+          description:
+            "Eggplants slowly cooked with olive oil, onion, and tomato until silky and sweet.",
+          dietaryLabels: ["vegetarian", "vegan"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Imam_bayildi",
+        },
+      ),
+      r(
+        "baklava-tr",
+        "Gaziantep Baklava",
+        "Baklava",
+        "dessert",
+        [
+          { name: "filo pastry", quantity: 250, unit: "g" },
+          { name: "pistachios", quantity: 200, unit: "g" },
+          { name: "butter", quantity: 150, unit: "g" },
+          { name: "sugar", quantity: 250, unit: "g" },
+        ],
+        {
+          description:
+            "Paper-thin pastry layered with pistachios and soaked in light sugar syrup.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Baklava",
+        },
+      ),
+    ],
   },
   status: "published",
 };

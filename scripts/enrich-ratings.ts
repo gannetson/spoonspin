@@ -5,7 +5,7 @@
  * - Tripadvisor Content API (TRIPADVISOR_API_KEY) — optional
  * - The Fork — no free public API; keep values already in curated.json
  *
- * Writes ratings back into curated.json and upserts SQLite.
+ * Writes ratings back into curated.json and upserts Postgres.
  */
 import "dotenv/config";
 import fs from "node:fs";
@@ -232,7 +232,7 @@ async function main() {
   const curated = curatedSchema.parse(
     JSON.parse(fs.readFileSync(CURATED_PATH, "utf8")),
   );
-  getDb();
+  await getDb();
 
   let googleHits = 0;
   let tripadvisorHits = 0;
@@ -280,7 +280,7 @@ async function main() {
     if (aggregated.rating != null) place.userRating = aggregated.rating;
     if (aggregated.reviewCount != null) place.reviewCount = aggregated.reviewCount;
 
-    upsertRestaurant({
+    await upsertRestaurant({
       id: place.id,
       name: place.name,
       address: place.address,
@@ -307,7 +307,7 @@ async function main() {
   }
 
   fs.writeFileSync(CURATED_PATH, `${JSON.stringify(curated, null, 2)}\n`);
-  closeDb();
+  await closeDb();
 
   console.log(
     `\nDone. Google hits: ${googleHits}, Tripadvisor hits: ${tripadvisorHits}, failures: ${failures}`,

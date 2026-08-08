@@ -6,16 +6,11 @@ import {
   Navigation,
   Plus,
   RotateCcw,
-  Star,
 } from "lucide-react";
 import type { Country } from "@/types/content";
+import { useAuth } from "@/auth/AuthContext";
 import { fetchRestaurants } from "@/restaurants/client";
-import { formatDistanceKm } from "@/lib/haversine";
 import type { Restaurant } from "@/restaurants/types";
-import {
-  listSourceRatings,
-  normalizeToFive,
-} from "@/restaurants/ratings";
 import {
   sortRestaurants,
   type RestaurantSortMode,
@@ -27,12 +22,21 @@ import {
   saveDineLocation,
   setRememberCityPreference,
 } from "@/restaurants/locationPreference";
-import { restaurantImageFor } from "@/lib/images";
 import { dineBannerUrl } from "@/content/countries/cuisineImages";
 import { SuggestModal } from "@/components/SuggestModal";
+import { RestaurantCard } from "@/components/RestaurantCard";
+import { MediaPlaceholder } from "@/components/MediaPlaceholder";
+import {
+  handleRestaurantAdminAction,
+  useAdminItemBusy,
+} from "@/admin/itemActions";
+import { useT } from "@/i18n/LocaleContext";
 
 type DineSearchProps = {
   country: Country;
+  onOpenRestaurant: (restaurant: Restaurant) => void;
+  /** Bump to force a fresh search (e.g. after admin add). */
+  refreshKey?: number;
 };
 
 type ViewState =
@@ -55,15 +59,29 @@ type ViewState =
       message: string;
     };
 
-const SORT_OPTIONS: Array<{ value: RestaurantSortMode; label: string }> = [
-  { value: "default", label: "Best match (distance + ratings)" },
-  { value: "authenticity", label: "Authenticity" },
-  { value: "rating", label: "Guest rating (Google / Fork / TA)" },
+const SORT_OPTION_VALUES: RestaurantSortMode[] = [
+  "default",
+  "authenticity",
+  "rating",
 ];
+
+const SORT_OPTION_KEYS: Record<RestaurantSortMode, string> = {
+  default: "dine.sort.default",
+  authenticity: "dine.sort.authenticity",
+  rating: "dine.sort.rating",
+};
 
 const DEFAULT_CITY = "Leiden";
 
-export function DineSearch({ country }: DineSearchProps) {
+export function DineSearch({
+  country,
+  onOpenRestaurant,
+  refreshKey = 0,
+}: DineSearchProps) {
+  const t = useT();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const { busy, status, error, run } = useAdminItemBusy();
   const inputId = useId();
   const sortId = useId();
   const rememberId = useId();
@@ -90,18 +108,25 @@ export function DineSearch({ country }: DineSearchProps) {
     cityOrPostcode,
     visitorLocation,
     rememberCity,
+    t,
   });
   searchRef.current = {
     country,
     cityOrPostcode,
     visitorLocation,
     rememberCity,
+    t,
   };
 
   const sortedRestaurants = useMemo(() => {
     if (state.status !== "ready") return [];
     return sortRestaurants(state.restaurants, sortMode);
   }, [state, sortMode]);
+
+  const sortOptions = SORT_OPTION_VALUES.map((value) => ({
+    value,
+    label: t(SORT_OPTION_KEYS[value]),
+  }));
 
   async function runSearch(location = visitorLocation) {
     const city = cityOrPostcode.trim();
@@ -144,7 +169,7 @@ export function DineSearch({ country }: DineSearchProps) {
         mapsSearchUrl: result.mapsSearchUrl,
         message:
           result.message ??
-          `No reviewed ${country.name} restaurants nearby yet. Open Google Maps, or try another city.`,
+          t("dine.empty.default", { name: country.name }),
       });
       return;
     }
@@ -163,9 +188,11 @@ export function DineSearch({ country }: DineSearchProps) {
       cityOrPostcode: city,
       visitorLocation: coords,
       rememberCity: remember,
+      t: translate,
     } = searchRef.current;
 
-    if (!remember || !city.trim()) return;
+    if (!city.trim()) return;
+    if (refreshKey === 0 && !remember) return;
 
     let cancelled = false;
 
@@ -205,7 +232,7 @@ export function DineSearch({ country }: DineSearchProps) {
           mapsSearchUrl: result.mapsSearchUrl,
           message:
             result.message ??
-            `No reviewed ${activeCountry.name} restaurants nearby yet. Open Google Maps, or try another city.`,
+            translate("dine.empty.default", { name: activeCountry.name }),
         });
         return;
       }
@@ -222,11 +249,11 @@ export function DineSearch({ country }: DineSearchProps) {
     return () => {
       cancelled = true;
     };
-  }, [country.code]);
+  }, [country.code, refreshKey]);
 
   function useMyLocation() {
     if (!navigator.geolocation) {
-      setLocationError("Location is not supported in this browser.");
+      setLocationError(t("dine.locationUnsupported"));
       return;
     }
     setLocationError(null);
@@ -240,9 +267,7 @@ export function DineSearch({ country }: DineSearchProps) {
         void runSearch(next);
       },
       () => {
-        setLocationError(
-          "We could not access your location. You can still search by city or postcode.",
-        );
+        setLocationError(t("dine.locationDenied"));
       },
       { enableHighAccuracy: false, timeout: 10000 },
     );
@@ -257,15 +282,25 @@ export function DineSearch({ country }: DineSearchProps) {
   }
 
   const showLocationForm = editingLocation || !rememberCity;
+  const bannerUrl = dineBannerUrl(country);
 
   return (
     <section aria-labelledby="dine-heading" className="space-y-5">
       <div className="relative overflow-hidden rounded-[2rem]">
-        <img
-          src={dineBannerUrl(country)}
-          alt=""
-          className="h-40 w-full object-cover sm:h-52"
-        />
+        {bannerUrl ? (
+          <img
+            src={bannerUrl}
+            alt=""
+            className="h-40 w-full object-cover sm:h-52"
+          />
+        ) : (
+          <div className="h-40 w-full sm:h-52">
+            <MediaPlaceholder
+              labelKey="media.placeholder.country"
+              tone="dark"
+            />
+          </div>
+        )}
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/55 to-ink/20"
@@ -275,10 +310,10 @@ export function DineSearch({ country }: DineSearchProps) {
             id="dine-heading"
             className="font-display text-3xl text-cream sm:text-5xl"
           >
-            Dine in the Netherlands
+            {t("dine.heading")}
           </h2>
           <p className="mt-2 max-w-lg text-cream/85">
-            Find reviewed {country.name} restaurants within about 100 km.
+            {t("dine.subtitle", { name: country.name })}
           </p>
         </div>
       </div>
@@ -290,7 +325,7 @@ export function DineSearch({ country }: DineSearchProps) {
           className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
         >
           <Plus aria-hidden="true" className="size-4" />
-          Suggest a restaurant
+          {t("dine.suggestRestaurant")}
         </button>
       </div>
 
@@ -299,7 +334,7 @@ export function DineSearch({ country }: DineSearchProps) {
           <p className="inline-flex items-center gap-2 text-sm text-ink">
             <MapPin aria-hidden="true" className="size-4 shrink-0" />
             <span>
-              Searching near <span className="font-semibold">{cityOrPostcode}</span>
+              {t("dine.searchingNear", { location: cityOrPostcode })}
             </span>
           </p>
           <button
@@ -307,7 +342,7 @@ export function DineSearch({ country }: DineSearchProps) {
             onClick={() => setEditingLocation(true)}
             className="min-h-10 rounded-full border border-ink/20 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
           >
-            Change location
+            {t("dine.changeLocation")}
           </button>
         </div>
       ) : (
@@ -321,7 +356,7 @@ export function DineSearch({ country }: DineSearchProps) {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1">
               <label htmlFor={inputId} className="text-sm font-semibold text-ink">
-                City or postcode
+                {t("dine.cityOrPostcode")}
               </label>
               <input
                 id={inputId}
@@ -331,7 +366,7 @@ export function DineSearch({ country }: DineSearchProps) {
                   setCityOrPostcode(event.target.value);
                   setVisitorLocation(undefined);
                 }}
-                placeholder="e.g. Leiden or 2312"
+                placeholder={t("dine.cityOrPostcode.placeholder")}
                 className="mt-1 min-h-12 w-full rounded-xl border border-ink/20 bg-white px-3 text-ink"
                 autoComplete="address-level2"
               />
@@ -340,7 +375,7 @@ export function DineSearch({ country }: DineSearchProps) {
               type="submit"
               className="min-h-12 rounded-full bg-tomato px-6 font-semibold text-cream hover:bg-tomato-deep"
             >
-              Search restaurants
+              {t("dine.searchRestaurants")}
             </button>
             <button
               type="button"
@@ -348,7 +383,7 @@ export function DineSearch({ country }: DineSearchProps) {
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-ink/20 px-5 font-semibold text-ink hover:border-tomato hover:text-tomato"
             >
               <Navigation aria-hidden="true" className="size-4" />
-              Use my location
+              {t("dine.useMyLocation")}
             </button>
           </div>
           <label
@@ -362,7 +397,7 @@ export function DineSearch({ country }: DineSearchProps) {
               onChange={(event) => onRememberChange(event.target.checked)}
               className="size-4 rounded border-ink/30"
             />
-            Remember city for other countries
+            {t("dine.rememberCity")}
           </label>
         </form>
       )}
@@ -376,7 +411,7 @@ export function DineSearch({ country }: DineSearchProps) {
       {state.status === "loading" ? (
         <p className="inline-flex items-center gap-2 text-ink-soft" role="status">
           <LoaderCircle aria-hidden="true" className="size-5 animate-spin" />
-          Searching restaurants…
+          {t("dine.searching")}
         </p>
       ) : null}
 
@@ -390,7 +425,7 @@ export function DineSearch({ country }: DineSearchProps) {
               className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-cream"
             >
               <RotateCcw aria-hidden="true" className="size-4" />
-              Retry
+              {t("dine.retry")}
             </button>
             <MapsLink href={state.mapsSearchUrl} />
           </div>
@@ -410,13 +445,19 @@ export function DineSearch({ country }: DineSearchProps) {
         <div className="grid gap-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-sm text-ink-soft">
-              {sortedRestaurants.length} reviewed place
-              {sortedRestaurants.length === 1 ? "" : "s"} within 100 km of{" "}
-              {cityOrPostcode}
+              {sortedRestaurants.length === 1
+                ? t("dine.results.count", {
+                    count: sortedRestaurants.length,
+                    location: cityOrPostcode,
+                  })
+                : t("dine.results.countPlural", {
+                    count: sortedRestaurants.length,
+                    location: cityOrPostcode,
+                  })}
             </p>
             <div className="flex items-center gap-2">
               <label htmlFor={sortId} className="text-sm font-semibold text-ink">
-                Sort by
+                {t("dine.sortBy")}
               </label>
               <select
                 id={sortId}
@@ -426,7 +467,7 @@ export function DineSearch({ country }: DineSearchProps) {
                 }
                 className="min-h-11 rounded-xl border border-ink/20 bg-white px-3 text-sm text-ink"
               >
-                {SORT_OPTIONS.map((option) => (
+                {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
                     {option.label}
                   </option>
@@ -435,107 +476,54 @@ export function DineSearch({ country }: DineSearchProps) {
             </div>
           </div>
           <ul className="grid gap-3">
-            {sortedRestaurants.map((restaurant, index) => (
-              <li
+            {sortedRestaurants.map((restaurant) => (
+              <RestaurantCard
                 key={restaurant.id}
-                className="flex overflow-hidden rounded-2xl bg-cream ring-1 ring-ink/10"
-              >
-                <img
-                  src={restaurant.photoUrl ?? restaurantImageFor(index)}
-                  alt=""
-                  className="hidden w-36 shrink-0 object-cover sm:block"
-                />
-                <div className="flex min-w-0 flex-1 flex-col">
-                  <div className="flex flex-wrap items-start justify-between gap-3 p-5">
-                    <div>
-                      <h3 className="font-display text-2xl text-ink">
-                        {restaurant.name}
-                      </h3>
-                      <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
-                        <MapPin
-                          aria-hidden="true"
-                          className="mt-0.5 size-4 shrink-0"
-                        />
-                        <span>
-                          {restaurant.address}
-                          {restaurant.city ? ` · ${restaurant.city}` : ""}
-                        </span>
-                      </p>
-                      {restaurant.distanceKm != null ? (
-                        <p className="mt-2 text-base font-semibold text-ink">
-                          {formatDistanceKm(restaurant.distanceKm)} away
-                        </p>
-                      ) : null}
-                      {restaurant.authenticityNotes ? (
-                        <p className="mt-2 max-w-xl text-sm text-ink-soft">
-                          {restaurant.authenticityNotes}
-                        </p>
-                      ) : null}
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      {restaurant.authenticityRating != null ? (
-                        <p
-                          className="inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1 text-sm font-semibold text-cream"
-                          title="Editorial authenticity rating for this cuisine"
-                        >
-                          Authenticity {restaurant.authenticityRating.toFixed(0)}
-                          /5
-                        </p>
-                      ) : null}
-                      {restaurant.rating != null ? (
-                        <p className="inline-flex items-center gap-1 rounded-full bg-parchment px-3 py-1 text-sm font-semibold">
-                          <Star
-                            aria-hidden="true"
-                            className="size-4 text-saffron"
-                          />
-                          {restaurant.rating.toFixed(1)}
-                          {restaurant.reviewCount != null
-                            ? ` (${restaurant.reviewCount})`
-                            : ""}
-                        </p>
-                      ) : null}
-                      {listSourceRatings(restaurant.ratings).map((item) => (
-                        <p
-                          key={item.source}
-                          className="inline-flex items-center gap-1 rounded-full border border-ink/15 bg-white px-3 py-1 text-xs font-semibold text-ink"
-                          title={`${item.label} guest rating`}
-                        >
-                          {item.label}{" "}
-                          {item.rating.scale === 10
-                            ? `${item.rating.score.toFixed(1)}/10`
-                            : `${normalizeToFive(item.rating).toFixed(1)}/5`}
-                          {item.rating.count != null
-                            ? ` · ${item.rating.count}`
-                            : ""}
-                        </p>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap gap-3 px-5 pb-5">
-                    {restaurant.website ? (
-                      <a
-                        href={restaurant.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
-                      >
-                        Website
-                        <ExternalLink aria-hidden="true" className="size-4" />
-                      </a>
-                    ) : null}
-                    <a
-                      href={restaurant.mapsUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                    >
-                      Open in Google Maps
-                      <ExternalLink aria-hidden="true" className="size-4" />
-                    </a>
-                  </div>
-                </div>
-              </li>
+                restaurant={restaurant}
+                onOpen={() => onOpenRestaurant(restaurant)}
+                isAdmin={isAdmin}
+                adminBusy={Boolean(busy[`restaurant:${restaurant.id}`])}
+                adminStatus={status[`restaurant:${restaurant.id}`]}
+                adminError={error[`restaurant:${restaurant.id}`]}
+                onAdminAction={(action) => {
+                  void run(`restaurant:${restaurant.id}`, () =>
+                    handleRestaurantAdminAction({
+                      action,
+                      countryName: country.name,
+                      countryCode: country.code,
+                      restaurant,
+                      onUpdated: (next) => {
+                        setState((prev) => {
+                          if (prev.status !== "ready") return prev;
+                          return {
+                            ...prev,
+                            restaurants: prev.restaurants.map((item) =>
+                              item.id === next.id
+                                ? {
+                                    ...item,
+                                    ...next,
+                                    distanceKm: item.distanceKm,
+                                  }
+                                : item,
+                            ),
+                          };
+                        });
+                      },
+                      onRemoved: (id) => {
+                        setState((prev) => {
+                          if (prev.status !== "ready") return prev;
+                          return {
+                            ...prev,
+                            restaurants: prev.restaurants.filter(
+                              (item) => item.id !== id,
+                            ),
+                          };
+                        });
+                      },
+                    }),
+                  );
+                }}
+              />
             ))}
           </ul>
         </div>
@@ -543,7 +531,7 @@ export function DineSearch({ country }: DineSearchProps) {
 
       {state.status === "idle" && showLocationForm ? (
         <p className="text-sm text-ink-soft">
-          Enter a city or postcode, or use your location to search.
+          {t("dine.idleHint")}
         </p>
       ) : null}
 
@@ -561,6 +549,7 @@ export function DineSearch({ country }: DineSearchProps) {
 }
 
 function MapsLink({ href }: { href: string }) {
+  const t = useT();
   return (
     <a
       href={href}
@@ -568,7 +557,7 @@ function MapsLink({ href }: { href: string }) {
       rel="noreferrer"
       className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
     >
-      Open Google Maps search
+      {t("dine.openGoogleMapsSearch")}
       <ExternalLink aria-hidden="true" className="size-4" />
     </a>
   );

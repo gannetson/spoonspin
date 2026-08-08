@@ -70,17 +70,17 @@ function mapsUrl(name: string, address: string): string {
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${address}`)}`;
 }
 
-function main() {
+async function main() {
   const raw = JSON.parse(fs.readFileSync(CURATED_PATH, "utf8"));
   const curated = curatedSchema.parse(raw);
-  getDb();
+  await getDb();
 
   const now = new Date().toISOString();
   let imported = 0;
 
   for (const place of curated) {
     const aggregated = aggregateGuestRating(place.ratings);
-    upsertRestaurant({
+    await upsertRestaurant({
       id: place.id,
       name: place.name,
       address: place.address,
@@ -106,7 +106,7 @@ function main() {
     imported += 1;
   }
 
-  const totals = countByCuisineCode();
+  const totals = await countByCuisineCode();
   const missing = publishedCountries
     .map((c) => c.code)
     .filter((code) => !totals[code]);
@@ -131,7 +131,10 @@ function main() {
   console.log(
     "Guest ratings: run `npm run agent:ratings` (Google / optional Tripadvisor).",
   );
-  closeDb();
+  await closeDb();
 }
 
-main();
+main().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});

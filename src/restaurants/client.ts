@@ -1,5 +1,17 @@
-import type { RestaurantSearchParams, RestaurantSearchResult } from "./types";
+import type { Restaurant, RestaurantSearchParams, RestaurantSearchResult } from "./types";
 import { buildMapsSearchUrl, withDistances } from "./shared";
+
+export async function fetchRestaurantById(
+  id: string,
+): Promise<Restaurant | null> {
+  const response = await fetch(`/api/restaurants/${encodeURIComponent(id)}`);
+  if (response.status === 404) return null;
+  if (!response.ok) {
+    throw new Error("Could not load restaurant.");
+  }
+  const data = (await response.json()) as { restaurant: Restaurant };
+  return data.restaurant;
+}
 
 export async function fetchRestaurants(
   params: RestaurantSearchParams,

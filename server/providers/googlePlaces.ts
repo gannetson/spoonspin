@@ -82,6 +82,7 @@ async function textSearch(
         name: place.displayName!.text!,
         address,
         city: extractCity(address),
+        cuisineCodes: [],
         rating: place.rating,
         reviewCount: place.userRatingCount,
         website: place.websiteUri,

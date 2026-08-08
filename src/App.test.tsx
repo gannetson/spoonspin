@@ -1,13 +1,42 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import App from "@/App";
+import { AuthProvider } from "@/auth/AuthContext";
+import { LocaleProvider } from "@/i18n/LocaleContext";
+
+vi.stubGlobal(
+  "fetch",
+  vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes("/api/auth/me")) {
+      return new Response(JSON.stringify({ user: null }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    if (url.includes("/api/countries")) {
+      return new Response(JSON.stringify({ countries: [] }), {
+        status: 503,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    return new Response(JSON.stringify({ recipes: [] }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+);
 
 function renderAt(path: string) {
   return render(
     <MemoryRouter initialEntries={[path]}>
-      <App />
+      <LocaleProvider>
+        <AuthProvider>
+          <App />
+        </AuthProvider>
+      </LocaleProvider>
     </MemoryRouter>,
   );
 }
@@ -35,10 +64,12 @@ describe("URL state", () => {
   it("lets you manually select a country", async () => {
     const user = userEvent.setup();
     renderAt("/");
-    await user.selectOptions(
-      screen.getByLabelText(/or choose a country/i),
-      "bg",
-    );
+    const combobox = screen.getByRole("combobox", {
+      name: /or choose a country/i,
+    });
+    await user.click(combobox);
+    await user.type(combobox, "Bulgaria");
+    await user.click(screen.getByRole("option", { name: /bulgaria/i }));
     expect(screen.getByRole("heading", { name: "Bulgaria" })).toBeInTheDocument();
   });
 });

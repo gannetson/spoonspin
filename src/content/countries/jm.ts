@@ -57,6 +57,62 @@ export const jmCountry: AuthoredCountry = {
       false,
       "Spiced hibiscus drink often made for celebrations.",
     ),
+    moreRecipes: [
+      r(
+        "jerk-chicken",
+        "Jerk Chicken",
+        "Jerk chicken",
+        "main",
+        [
+          { name: "chicken thighs", quantity: 1000, unit: "g" },
+          { name: "jerk seasoning or paste", quantity: 60, unit: "g" },
+          { name: "scotch bonnet", quantity: 1, unit: "piece" },
+          { name: "lime", quantity: 2, unit: "pieces" },
+        ],
+        {
+          description:
+            "Chicken marinated in fiery allspice-scotch bonnet paste and grilled until lacquered.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Jerk_(cooking)",
+        },
+      ),
+      r(
+        "callaloo",
+        "Callaloo Greens",
+        "Callaloo",
+        "side",
+        [
+          { name: "callaloo or spinach", quantity: 500, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "tomato", quantity: 1, unit: "piece" },
+          { name: "thyme", quantity: 5, unit: "g" },
+        ],
+        {
+          description:
+            "Leafy greens simmered with onion, tomato, and thyme into a soft, savoury side.",
+          dietaryLabels: ["vegetarian", "vegan"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Callaloo",
+        },
+      ),
+      r(
+        "rum-cake",
+        "Jamaican Rum Cake",
+        "Rum cake",
+        "dessert",
+        [
+          { name: "mixed dried fruit", quantity: 300, unit: "g" },
+          { name: "dark rum", quantity: 120, unit: "ml" },
+          { name: "butter", quantity: 200, unit: "g" },
+          { name: "brown sugar", quantity: 200, unit: "g" },
+        ],
+        {
+          description:
+            "Dense fruit-studded cake soaked with dark rum syrup for festive gatherings.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Rum_cake",
+        },
+      ),
+    ],
   },
   status: "published",
 };

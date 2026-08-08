@@ -1,0 +1,176 @@
+import { Clock3, Flame } from "lucide-react";
+import type { Recipe, RecipeCategory } from "@/types/content";
+import { AdminItemMenu, type AdminItemAction } from "@/components/AdminItemMenu";
+import { MediaPlaceholder } from "@/components/MediaPlaceholder";
+import { useT } from "@/i18n/LocaleContext";
+
+const COURSE_KEYS: Record<RecipeCategory, string> = {
+  starter: "cook.course.starter",
+  main: "cook.course.main",
+  side: "cook.course.side",
+  dessert: "cook.course.dessert",
+  snack: "cook.course.snack",
+};
+
+const DIFFICULTY_KEYS = {
+  easy: "recipe.difficulty.easy",
+  medium: "recipe.difficulty.medium",
+  challenging: "recipe.difficulty.challenging",
+} as const;
+
+type RecipeCardProps = {
+  recipe: Recipe;
+  onOpen: () => void;
+  variant?: "default" | "national" | "community" | "simple";
+  showMeta?: boolean;
+  isAdmin?: boolean;
+  adminBusy?: boolean;
+  adminStatus?: string | null;
+  adminError?: string | null;
+  onAdminAction?: (action: AdminItemAction) => void;
+};
+
+export function RecipeCard({
+  recipe,
+  onOpen,
+  variant = "default",
+  showMeta = true,
+  isAdmin = false,
+  adminBusy = false,
+  adminStatus = null,
+  adminError = null,
+  onAdminAction,
+}: RecipeCardProps) {
+  const t = useT();
+  const isNational = variant === "national";
+  const isCommunity = variant === "community";
+  const isSimple = variant === "simple";
+  const imageUrl = recipe.imageUrl?.trim() || null;
+
+  return (
+    <li>
+      <div
+        className={`group relative flex cursor-pointer overflow-hidden rounded-2xl transition ${
+          isNational
+            ? "bg-ink text-cream shadow-md shadow-ink/15 ring-2 ring-saffron"
+            : "bg-cream text-ink ring-1 ring-ink/10 hover:ring-tomato/35"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={onOpen}
+          className="flex min-w-0 flex-1 cursor-pointer text-left"
+        >
+          <div className="relative h-28 w-28 shrink-0 self-stretch sm:h-auto sm:min-h-[7.5rem] sm:w-36">
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt=""
+                className="absolute inset-0 size-full object-cover transition duration-300 group-hover:scale-[1.03]"
+              />
+            ) : (
+              <MediaPlaceholder
+                labelKey="media.placeholder.recipe"
+                tone={isNational ? "dark" : "light"}
+                compact
+                className="absolute inset-0"
+              />
+            )}
+          </div>
+
+          <div
+            className={`flex min-w-0 flex-1 flex-col justify-center gap-1.5 px-4 py-3 sm:gap-2 sm:px-5 ${
+              isAdmin ? "pr-14" : ""
+            }`}
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
+                  isNational
+                    ? "bg-saffron/20 text-saffron-soft"
+                    : "bg-parchment text-stamp"
+                }`}
+              >
+                {isCommunity && isSimple
+                  ? t("cook.communitySuggestion")
+                  : t(COURSE_KEYS[recipe.category])}
+              </span>
+              {isNational ? (
+                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-saffron-soft">
+                  {t("cook.badge.iconicNationalDish")}
+                </span>
+              ) : null}
+              {isCommunity && !isSimple ? (
+                <span
+                  className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
+                    isNational ? "text-cream/70" : "text-stamp"
+                  }`}
+                >
+                  {t("cook.badge.community")}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="min-w-0">
+              <p className="truncate font-display text-xl leading-tight sm:text-2xl">
+                {recipe.name}
+              </p>
+              {recipe.localName ? (
+                <p
+                  className={`mt-0.5 truncate text-sm ${
+                    isNational ? "text-cream/75" : "text-ink-soft"
+                  }`}
+                >
+                  {recipe.localName}
+                </p>
+              ) : null}
+            </div>
+
+            {showMeta && !isSimple ? (
+              <div
+                className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-sm ${
+                  isNational ? "text-cream/75" : "text-ink-soft"
+                }`}
+              >
+                <span className="inline-flex items-center gap-1">
+                  <Clock3 aria-hidden="true" className="size-3.5" />
+                  {t("cook.meta.minutes", {
+                    minutes: recipe.prepMinutes + recipe.cookMinutes,
+                  })}
+                </span>
+                <span className="inline-flex items-center gap-1 capitalize">
+                  <Flame aria-hidden="true" className="size-3.5" />
+                  {t(DIFFICULTY_KEYS[recipe.difficulty])}
+                </span>
+                {recipe.dietaryLabels.slice(0, 2).map((label) => (
+                  <span
+                    key={label}
+                    className={`rounded-full px-2 py-0.5 text-xs ${
+                      isNational
+                        ? "bg-cream/10 text-cream/80"
+                        : "bg-parchment text-ink-soft"
+                    }`}
+                  >
+                    {label}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </button>
+
+        {isAdmin && onAdminAction ? (
+          <AdminItemMenu
+            className="absolute right-2 top-2"
+            label={recipe.name}
+            tone={isNational ? "dark" : "light"}
+            busy={adminBusy}
+            status={adminStatus}
+            error={adminError}
+            onAction={onAdminAction}
+          />
+        ) : null}
+      </div>
+    </li>
+  );
+}

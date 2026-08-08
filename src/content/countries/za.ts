@@ -57,6 +57,61 @@ export const zaCountry: AuthoredCountry = {
       false,
       "Naturally caffeine-free red bush tea, served plain or with milk.",
     ),
+    moreRecipes: [
+      r(
+        "boerewors",
+        "Boerewors Sausage",
+        "Boerewors",
+        "main",
+        [
+          { name: "boerewors sausage", quantity: 800, unit: "g" },
+          { name: "braai spice or coriander seed", quantity: 10, unit: "g" },
+          { name: "soft rolls", quantity: 4, unit: "pieces" },
+        ],
+        {
+          description:
+            "Coiled spiced beef-and-pork sausage grilled over coals for a classic braai.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Boerewors",
+        },
+      ),
+      r(
+        "potjiekos",
+        "Potjie Stew",
+        "Potjiekos",
+        "main",
+        [
+          { name: "beef stewing meat", quantity: 800, unit: "g" },
+          { name: "potatoes", quantity: 400, unit: "g" },
+          { name: "carrots", quantity: 300, unit: "g" },
+          { name: "onion", quantity: 2, unit: "pieces" },
+        ],
+        {
+          description:
+            "Layered meat-and-vegetable stew cooked slowly in a cast-iron potjie over fire.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Potjiekos",
+        },
+      ),
+      r(
+        "koeksisters",
+        "Syrup Twists",
+        "Koeksisters",
+        "dessert",
+        [
+          { name: "flour", quantity: 400, unit: "g" },
+          { name: "milk", quantity: 200, unit: "ml" },
+          { name: "sugar", quantity: 400, unit: "g" },
+          { name: "lemon", quantity: 1, unit: "piece" },
+        ],
+        {
+          description:
+            "Plaited doughnuts plunged into ice-cold syrup until glassy and intensely sweet.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Koeksister",
+        },
+      ),
+    ],
   },
   status: "published",
 };

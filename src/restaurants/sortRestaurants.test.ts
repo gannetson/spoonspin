@@ -6,6 +6,7 @@ function place(partial: Partial<Restaurant> & Pick<Restaurant, "id" | "name">): 
   return {
     address: "Test",
     city: "Leiden",
+    cuisineCodes: [],
     mapsUrl: "https://maps.example",
     ...partial,
   };

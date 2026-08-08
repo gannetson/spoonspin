@@ -58,6 +58,62 @@ export const lbCountry: AuthoredCountry = {
       false,
       "A sweet date-and-grape drink often topped with pine nuts.",
     ),
+    moreRecipes: [
+      r(
+        "tabbouleh",
+        "Parsley Tabbouleh",
+        "تبولة",
+        "side",
+        [
+          { name: "flat-leaf parsley", quantity: 150, unit: "g" },
+          { name: "tomatoes", quantity: 3, unit: "pieces" },
+          { name: "fine bulgur", quantity: 40, unit: "g" },
+          { name: "lemons", quantity: 2, unit: "pieces" },
+        ],
+        {
+          description:
+            "A herb-forward salad of parsley, mint, tomato, and fine bulgur dressed with lemon.",
+          dietaryLabels: ["vegetarian", "vegan"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Tabbouleh",
+        },
+      ),
+      r(
+        "shawarma",
+        "Chicken Shawarma",
+        "شاورما دجاج",
+        "main",
+        [
+          { name: "chicken thighs", quantity: 800, unit: "g" },
+          { name: "shawarma spice mix", quantity: 30, unit: "g" },
+          { name: "yogurt", quantity: 100, unit: "g" },
+          { name: "flatbreads", quantity: 8, unit: "pieces" },
+        ],
+        {
+          description:
+            "Spice-rubbed chicken roasted until caramelised, carved into warm flatbread wraps.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Shawarma",
+        },
+      ),
+      r(
+        "maamoul",
+        "Date-Filled Cookies",
+        "معمول",
+        "dessert",
+        [
+          { name: "semolina", quantity: 300, unit: "g" },
+          { name: "butter", quantity: 150, unit: "g" },
+          { name: "date paste", quantity: 250, unit: "g" },
+          { name: "orange blossom water", quantity: 15, unit: "ml" },
+        ],
+        {
+          description:
+            "Shortbread-like cookies filled with dates or nuts, pressed in decorative moulds.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Maamoul",
+        },
+      ),
+    ],
   },
   status: "published",
 };

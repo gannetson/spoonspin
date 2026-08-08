@@ -53,6 +53,62 @@ export const inCountry: AuthoredCountry = {
       false,
       "Yogurt blended smooth with ripe mango.",
     ),
+    moreRecipes: [
+      r(
+        "palak-paneer",
+        "Spinach Paneer Curry",
+        "पालक पनीर",
+        "main",
+        [
+          { name: "spinach", quantity: 500, unit: "g" },
+          { name: "paneer", quantity: 300, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "garam masala", quantity: 5, unit: "g" },
+        ],
+        {
+          description:
+            "Soft paneer cubes in a velvety spinach gravy scented with cumin and garlic.",
+          dietaryLabels: ["vegetarian", "gluten-free"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Palak_paneer",
+        },
+      ),
+      r(
+        "masala-dosa",
+        "Masala Dosa",
+        "மசாலா தோசை",
+        "main",
+        [
+          { name: "dosa batter", quantity: 500, unit: "ml" },
+          { name: "potatoes", quantity: 500, unit: "g" },
+          { name: "mustard seeds", quantity: 5, unit: "g" },
+          { name: "curry leaves", quantity: 10, unit: "pieces" },
+        ],
+        {
+          description:
+            "Crisp fermented rice-lentil crepe filled with spiced potato mash.",
+          dietaryLabels: ["vegetarian", "vegan"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Masala_dosa",
+        },
+      ),
+      r(
+        "jalebi",
+        "Jalebi",
+        "जलेबी",
+        "dessert",
+        [
+          { name: "flour", quantity: 150, unit: "g" },
+          { name: "yogurt", quantity: 80, unit: "g" },
+          { name: "sugar", quantity: 250, unit: "g" },
+          { name: "saffron or food colour", quantity: 1, unit: "pinch" },
+        ],
+        {
+          description:
+            "Crisp saffron-tinted pretzel swirls soaked in warm sugar syrup.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Jalebi",
+        },
+      ),
+    ],
   },
   status: "published",
 };

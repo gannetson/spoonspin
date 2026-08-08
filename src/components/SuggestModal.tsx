@@ -8,6 +8,7 @@ import {
   type RestaurantDraft,
   type SuggestionKind,
 } from "@/suggestions/client";
+import { useT } from "@/i18n/LocaleContext";
 
 type SuggestModalProps = {
   kind: SuggestionKind;
@@ -33,6 +34,20 @@ type PreviewState =
   | { status: "not-found"; notes: string }
   | { status: "error"; message: string };
 
+const DIFFICULTY_KEYS: Record<Recipe["difficulty"], string> = {
+  easy: "recipe.difficulty.easy",
+  medium: "recipe.difficulty.medium",
+  challenging: "recipe.difficulty.challenging",
+};
+
+const COURSE_KEYS: Record<Recipe["category"], string> = {
+  starter: "cook.course.starter",
+  main: "cook.course.main",
+  side: "cook.course.side",
+  dessert: "cook.course.dessert",
+  snack: "cook.course.snack",
+};
+
 export function SuggestModal({
   kind,
   country,
@@ -40,6 +55,7 @@ export function SuggestModal({
   onClose,
   onAdded,
 }: SuggestModalProps) {
+  const t = useT();
   const titleId = useId();
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [query, setQuery] = useState("");
@@ -75,11 +91,10 @@ export function SuggestModal({
 
   if (!open) return null;
 
-  const noun = kind === "recipe" ? "recipe" : "restaurant";
   const placeholder =
     kind === "recipe"
-      ? `e.g. Banitsa, or “cheese filo pastry breakfast”`
-      : `e.g. Restaurant name in Leiden, or “cozy Bulgarian place near Den Haag”`;
+      ? t("suggest.placeholder.recipe")
+      : t("suggest.placeholder.restaurant");
   const lookupDisabled =
     preview.status === "loading" ||
     saving ||
@@ -90,15 +105,14 @@ export function SuggestModal({
     if (trimmed.length < 2) {
       setPreview({
         status: "error",
-        message: "Type a name or short description first.",
+        message: t("suggest.error.queryTooShort"),
       });
       return;
     }
     if (openaiConfigured === false) {
       setPreview({
         status: "error",
-        message:
-          "Add OPENAI_API_KEY to your .env (not ADMIN_TOKEN), then restart npm run dev.",
+        message: t("suggest.openaiMissing.error"),
       });
       return;
     }
@@ -113,7 +127,7 @@ export function SuggestModal({
       if (!result.found) {
         setPreview({
           status: "not-found",
-          notes: result.confirmationNotes || "Nothing clear enough to add.",
+          notes: result.confirmationNotes || t("suggest.notFound.default"),
         });
         return;
       }
@@ -139,7 +153,7 @@ export function SuggestModal({
       }
       setPreview({
         status: "not-found",
-        notes: result.confirmationNotes || "Nothing clear enough to add.",
+        notes: result.confirmationNotes || t("suggest.notFound.default"),
       });
     } catch (error) {
       setPreview({
@@ -147,7 +161,7 @@ export function SuggestModal({
         message:
           error instanceof Error
             ? error.message
-            : "Could not look this up right now.",
+            : t("suggest.error.lookupFailed"),
       });
     }
   }
@@ -187,7 +201,9 @@ export function SuggestModal({
       setPreview({
         status: "error",
         message:
-          error instanceof Error ? error.message : "Could not save suggestion.",
+          error instanceof Error
+            ? error.message
+            : t("suggest.error.saveFailed"),
       });
     } finally {
       setSaving(false);
@@ -211,25 +227,29 @@ export function SuggestModal({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 id={titleId} className="font-display text-3xl text-ink">
-              Suggest a {noun}
+              {kind === "recipe"
+                ? t("suggest.title.recipe")
+                : t("suggest.title.restaurant")}
             </h2>
             <p className="mt-1 text-sm text-ink-soft">
-              For {country.flag} {country.name}. We&apos;ll confirm with a quick
-              search, then add it right away for review.
+              {t("suggest.subtitle", {
+                flag: country.flag,
+                name: country.name,
+              })}
             </p>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="rounded-full p-2 text-ink-soft hover:bg-parchment hover:text-ink"
-            aria-label="Close"
+            aria-label={t("suggest.closeAria")}
           >
             <X className="size-5" aria-hidden="true" />
           </button>
         </div>
 
         <label htmlFor="suggest-query" className="mt-5 block text-sm font-semibold text-ink">
-          Name or short description
+          {t("suggest.queryLabel")}
         </label>
         <textarea
           ref={inputRef}
@@ -246,14 +266,7 @@ export function SuggestModal({
             role="status"
             className="mt-3 rounded-2xl border border-tomato/30 bg-white px-4 py-3 text-sm text-tomato"
           >
-            Suggestions need <code className="font-semibold">OPENAI_API_KEY</code> in{" "}
-            <code className="font-semibold">.env</code>, then restart{" "}
-            <code className="font-semibold">npm run dev</code>.{" "}
-            <code className="font-semibold">ADMIN_TOKEN</code> is only for the{" "}
-            <a href="/admin" className="underline">
-              /admin
-            </a>{" "}
-            review page.
+            {t("suggest.openaiMissing.banner")}
           </p>
         ) : null}
 
@@ -267,14 +280,16 @@ export function SuggestModal({
             {preview.status === "loading" ? (
               <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
             ) : null}
-            Look up &amp; confirm
+            {preview.status === "loading"
+              ? t("suggest.lookingUp")
+              : t("suggest.lookupConfirm")}
           </button>
           <button
             type="button"
             onClick={onClose}
             className="min-h-11 rounded-full border border-ink/15 px-5 text-sm font-semibold text-ink"
           >
-            Cancel
+            {t("suggest.cancel")}
           </button>
         </div>
 
@@ -296,8 +311,12 @@ export function SuggestModal({
             <p className="font-display text-2xl text-ink">{preview.recipe.name}</p>
             <p className="text-sm text-ink-soft">{preview.recipe.description}</p>
             <p className="text-xs font-semibold uppercase tracking-wide text-stamp">
-              {preview.recipe.category} · {preview.recipe.prepMinutes + preview.recipe.cookMinutes}{" "}
-              min · {preview.recipe.difficulty}
+              {t("suggest.preview.meta", {
+                category: t(COURSE_KEYS[preview.recipe.category]),
+                minutes:
+                  preview.recipe.prepMinutes + preview.recipe.cookMinutes,
+                difficulty: t(DIFFICULTY_KEYS[preview.recipe.difficulty]),
+              })}
             </p>
             <button
               type="button"
@@ -310,7 +329,7 @@ export function SuggestModal({
               ) : (
                 <Plus className="size-4" aria-hidden="true" />
               )}
-              Add recipe
+              {saving ? t("suggest.adding") : t("suggest.addRecipe")}
             </button>
           </div>
         ) : null}
@@ -341,7 +360,7 @@ export function SuggestModal({
               ) : (
                 <Plus className="size-4" aria-hidden="true" />
               )}
-              Add restaurant
+              {saving ? t("suggest.adding") : t("suggest.addRestaurant")}
             </button>
           </div>
         ) : null}

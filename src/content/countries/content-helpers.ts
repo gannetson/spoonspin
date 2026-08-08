@@ -9,6 +9,10 @@ type RecipeOptions = {
   substitutions?: string[];
   servingSuggestion?: string;
   drinkPairing?: string;
+  sourceUrl?: string;
+  videoUrl?: string;
+  imageUrl?: string;
+  imageAttribution?: string;
 };
 
 export const recipe = (
@@ -52,6 +56,10 @@ export const recipe = (
     ],
     servingSuggestion: options.servingSuggestion,
     drinkPairing: options.drinkPairing,
+    sourceUrl: options.sourceUrl,
+    videoUrl: options.videoUrl,
+    imageUrl: options.imageUrl,
+    imageAttribution: options.imageAttribution,
   };
 };
 

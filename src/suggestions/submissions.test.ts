@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
-import { closeDb, getDb } from "../../server/db/restaurants.ts";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import {
+  closeDb,
+  ensureDb,
+  resetAllTables,
+} from "../../server/db/restaurants.ts";
 import {
   insertRecipeSubmission,
   listVisibleRecipesForCountry,
@@ -10,7 +11,23 @@ import {
   slugifyId,
 } from "../../server/db/submissions.ts";
 
+const TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL?.trim() ||
+  "postgresql://localhost:5432/spoonspin_test";
+
 describe("suggestion submissions", () => {
+  beforeEach(async () => {
+    process.env.DATABASE_URL = TEST_DATABASE_URL;
+    await closeDb();
+    await ensureDb();
+    await resetAllTables();
+  });
+
+  afterEach(async () => {
+    await closeDb();
+    delete process.env.DATABASE_URL;
+  });
+
   it("slugifies stable unique ids", () => {
     const a = slugifyId("suggest", "Banitsa!");
     const b = slugifyId("suggest", "Banitsa!");
@@ -18,13 +35,7 @@ describe("suggestion submissions", () => {
     expect(a).not.toEqual(b);
   });
 
-  it("lists pending recipes and hides rejected ones", () => {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "spoonspin-sub-"));
-    const dbPath = path.join(dir, "test.sqlite");
-    process.env.RESTAURANTS_DB_PATH = dbPath;
-    closeDb();
-    getDb(dbPath);
-
+  it("lists pending recipes and hides rejected ones", async () => {
     const recipe = {
       id: "suggest-test-1",
       name: "Test Dish",
@@ -47,7 +58,7 @@ describe("suggestion submissions", () => {
       ],
     };
 
-    insertRecipeSubmission({
+    await insertRecipeSubmission({
       id: recipe.id,
       countryCode: "bg",
       countryName: "Bulgaria",
@@ -55,17 +66,13 @@ describe("suggestion submissions", () => {
       recipe,
     });
 
-    expect(listVisibleRecipesForCountry("bg").map((r) => r.id)).toContain(
-      recipe.id,
-    );
+    expect(
+      (await listVisibleRecipesForCountry("bg")).map((r) => r.id),
+    ).toContain(recipe.id);
 
-    setRecipeSubmissionStatus(recipe.id, "rejected");
-    expect(listVisibleRecipesForCountry("bg").map((r) => r.id)).not.toContain(
-      recipe.id,
-    );
-
-    closeDb();
-    fs.rmSync(dir, { recursive: true, force: true });
-    delete process.env.RESTAURANTS_DB_PATH;
+    await setRecipeSubmissionStatus(recipe.id, "rejected");
+    expect(
+      (await listVisibleRecipesForCountry("bg")).map((r) => r.id),
+    ).not.toContain(recipe.id);
   });
 });

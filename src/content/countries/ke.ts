@@ -1,6 +1,6 @@
-import type { Country } from "@/types/content";
+import type { AuthoredCountry } from "@/types/content";
 
-export const keCountry: Country = {
+export const keCountry: AuthoredCountry = {
   code: "ke",
   slug: "kenya",
   name: "Kenya",
@@ -18,36 +18,6 @@ export const keCountry: Country = {
     description:
       "Strong black tea simmered with milk, sugar, and warming spices such as cardamom or ginger.",
   },
-  specialtyShops: [
-    {
-      name: "Kenyan Diaspora Market",
-      url: "https://www.kenyandiasporamarket.com/product-category/kenyan-food/",
-      description:
-        "Online Kenyan pantry source with sukuma wiki, Royco mchuzi mix, tea masala, Kenyan tea, omena, and ready Kenyan dry goods.",
-      ingredients: ["sukuma wiki", "Royco mchuzi mix", "tea masala", "Kenyan tea"],
-    },
-    {
-      name: "African Taste",
-      url: "https://africantaste.eu/",
-      description:
-        "Netherlands-based African grocery carrying East African staples including maize flour and stew seasoning mixes.",
-      ingredients: ["Maganjo maize flour", "Royco mchuzi mix", "cassava flour"],
-    },
-    {
-      name: "Africa Products Shop",
-      url: "https://africaproducts.nl/products/jogoo-maize-flour-unga-wa-mahindi-2-kg",
-      description:
-        "Specialty African webshop with Kenyan Jogoo maize flour for ugali and alternatives such as white maize flour.",
-      ingredients: ["Jogoo maize flour", "white maize flour", "ugali flour"],
-    },
-    {
-      name: "Kenyan Delicacies",
-      url: "https://www.kenyandelicacies.com/",
-      description:
-        "Kenyan restaurant and caterer in The Hague that also sources Kenyan dry foods such as flour, spices, oils, and tea.",
-      ingredients: ["Kenyan flour", "Kenyan spices", "Kenyan tea"],
-    },
-  ],
   menu: {
     starter: {
       id: "kachumbari",
@@ -79,24 +49,8 @@ export const keCountry: Country = {
       servingSuggestion:
         "Serve chilled or at room temperature beside nyama choma, ugali, or any grilled food.",
       drinkPairing:
-        "Kenyan chai is classic later in the meal; fresh passion fruit juice also works.",
-      sources: [
-        {
-          title: "Kenyan Food Journal kachumbari method within nyama choma",
-          url: "https://kenyanfoodjournal.com/nyama-choma-recipe-kenyan-grilled-meat/",
-          type: "full-recipe",
-        },
-        {
-          title: "AfroKitchen nyama choma plate photos with kachumbari",
-          url: "https://afrotools.com/tools/afrokitchen/recipes/nyama-choma/",
-          type: "photo-guide",
-        },
-        {
-          title: "How to make ugali and sukuma wiki Kenyan cooking class",
-          url: "https://www.youtube.com/watch?v=tdZ0YhB8exE",
-          type: "video",
-        },
-      ],
+        "Kenyan chai is classic later in the meal; fresh passion fruit juice also works.",      sourceUrl: "https://kenyanfoodjournal.com/nyama-choma-recipe-kenyan-grilled-meat/",
+      videoUrl: "https://www.youtube.com/watch?v=tdZ0YhB8exE",
     },
     main: {
       id: "nyama-choma",
@@ -130,24 +84,7 @@ export const keCountry: Country = {
       servingSuggestion:
         "Put the chopped meat on a board with kachumbari, ugali, sukuma wiki, and extra salt for dipping.",
       drinkPairing:
-        "Serve with cold Tusker-style lager if desired, or keep it non-alcoholic with Kenyan chai or passion fruit juice.",
-      sources: [
-        {
-          title: "Kenyan Food Journal authentic nyama choma recipe",
-          url: "https://kenyanfoodjournal.com/nyama-choma-recipe-kenyan-grilled-meat/",
-          type: "full-recipe",
-        },
-        {
-          title: "We Eat At Last nyama choma recipe and video guide",
-          url: "https://weeatatlast.com/the-ultimate-nyama-choma-recipe/",
-          type: "photo-guide",
-        },
-        {
-          title: "AfroKitchen nyama choma finished dish photos",
-          url: "https://afrotools.com/tools/afrokitchen/recipes/nyama-choma/",
-          type: "photo-guide",
-        },
-      ],
+        "Serve with cold Tusker-style lager if desired, or keep it non-alcoholic with Kenyan chai or passion fruit juice.",      sourceUrl: "https://kenyanfoodjournal.com/nyama-choma-recipe-kenyan-grilled-meat/",
     },
     side: {
       id: "ugali-sukuma-wiki",
@@ -182,24 +119,8 @@ export const keCountry: Country = {
       servingSuggestion:
         "Pinch off pieces of ugali by hand or slice it into wedges for scooping the greens and juices.",
       drinkPairing:
-        "Milky Kenyan chai balances the greens and maize with gentle sweetness.",
-      sources: [
-        {
-          title: "Serious Eats ugali recipe with serving photo",
-          url: "https://www.seriouseats.com/ugali-cornmeal-porridge-recipe-8690802",
-          type: "full-recipe",
-        },
-        {
-          title: "Kenyan Food Journal ugali na sukuma wiki method",
-          url: "https://kenyanfoodjournal.com/ugali-na-sukuma-wiki-kenyan-comfort-food/",
-          type: "full-recipe",
-        },
-        {
-          title: "Infoods Specials sukuma wiki and ugali video",
-          url: "https://www.youtube.com/watch?v=7seIPgxQOY0",
-          type: "video",
-        },
-      ],
+        "Milky Kenyan chai balances the greens and maize with gentle sweetness.",      sourceUrl: "https://www.seriouseats.com/ugali-cornmeal-porridge-recipe-8690802",
+      videoUrl: "https://www.youtube.com/watch?v=7seIPgxQOY0",
     },
     dessert: {
       id: "mandazi",
@@ -234,24 +155,8 @@ export const keCountry: Country = {
       ],
       servingSuggestion:
         "Serve warm in a basket with Kenyan chai, coffee, or fruit; leftovers reheat briefly in a low oven.",
-      drinkPairing: "Kenyan chai is the classic partner for mandazi.",
-      sources: [
-        {
-          title: "Kenyan Food Journal authentic mandazi recipe",
-          url: "https://kenyanfoodjournal.com/mandazi-recipe-kenyan-fried-bread/",
-          type: "full-recipe",
-        },
-        {
-          title: "Bellies Kitchen Kenyan mandazi step-by-step photos",
-          url: "https://bellieskitchen.com/kenyan-mandazi-recipe/",
-          type: "photo-guide",
-        },
-        {
-          title: "Recipes and Hospitality with Clara mandazi video",
-          url: "https://www.youtube.com/watch?v=eoWWXUvidWs",
-          type: "video",
-        },
-      ],
+      drinkPairing: "Kenyan chai is the classic partner for mandazi.",      sourceUrl: "https://kenyanfoodjournal.com/mandazi-recipe-kenyan-fried-bread/",
+      videoUrl: "https://www.youtube.com/watch?v=eoWWXUvidWs",
     },
     drink: {
       name: "Kenyan Chai",
@@ -261,6 +166,83 @@ export const keCountry: Country = {
       description:
         "Black tea simmered with milk, sugar, and optional tea masala, cardamom, or ginger.",
     },
+    moreRecipes: [
+      {
+        id: "githeri",
+        name: "Githeri",
+        localName: "Githeri",
+        description:
+          "One-pot maize-and-bean stew simmered with onion, tomato, and spices.",
+        category: "main",
+        servings: 4,
+        prepMinutes: 20,
+        cookMinutes: 35,
+        difficulty: "medium",
+        dietaryLabels: ["vegetarian", "vegan"],
+        ingredients: [
+          { name: "cooked maize kernels", quantity: 400, unit: "g" },
+          { name: "cooked beans", quantity: 400, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "tomatoes", quantity: 2, unit: "pieces" },
+        ],
+        steps: [
+          "1. Soften onion in oil, then add tomatoes until saucy.",
+          "2. Stir in maize and beans with a splash of water or stock.",
+          "3. Simmer until thick and well seasoned; serve with greens if you like.",
+        ],
+        sourceUrl: "https://en.wikipedia.org/wiki/Githeri",
+      },
+      {
+        id: "chapati-ke",
+        name: "Kenyan Chapati",
+        localName: "Chapati",
+        description:
+          "Soft, flaky East African flatbreads enriched with oil and cooked on a hot pan.",
+        category: "side",
+        servings: 4,
+        prepMinutes: 20,
+        cookMinutes: 35,
+        difficulty: "medium",
+        dietaryLabels: ["vegetarian", "vegan"],
+        ingredients: [
+          { name: "flour", quantity: 400, unit: "g" },
+          { name: "warm water", quantity: 220, unit: "ml" },
+          { name: "oil", quantity: 60, unit: "ml" },
+          { name: "salt", quantity: 5, unit: "g" },
+        ],
+        steps: [
+          "1. Knead a soft dough with flour, salt, water, and oil; rest 30 minutes.",
+          "2. Roll, oil, coil, and roll again for flaky layers.",
+          "3. Cook on a hot dry pan until spotted brown on both sides.",
+        ],
+        sourceUrl: "https://en.wikipedia.org/wiki/Chapati",
+      },
+      {
+        id: "irio",
+        name: "Irio Mash",
+        localName: "Irio",
+        description:
+          "Kikuyu mash of potatoes, maize, peas, and greens pounded together.",
+        category: "side",
+        servings: 4,
+        prepMinutes: 20,
+        cookMinutes: 35,
+        difficulty: "medium",
+        dietaryLabels: ["vegetarian", "vegan"],
+        ingredients: [
+          { name: "potatoes", quantity: 600, unit: "g" },
+          { name: "maize kernels", quantity: 200, unit: "g" },
+          { name: "green peas", quantity: 150, unit: "g" },
+          { name: "spinach", quantity: 100, unit: "g" },
+        ],
+        steps: [
+          "1. Boil potatoes with maize and peas until soft.",
+          "2. Add chopped greens for the last minutes.",
+          "3. Drain and mash roughly with salt and a little oil or butter.",
+        ],
+        sourceUrl: "https://en.wikipedia.org/wiki/Irio",
+      },
+    ],
   },
   status: "published",
 };

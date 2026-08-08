@@ -1,35 +1,32 @@
 /** @vitest-environment node */
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   closeDb,
-  getDb,
+  ensureDb,
+  resetAllTables,
   searchLocalRestaurants,
   upsertRestaurant,
 } from "./restaurants";
 
-describe("local restaurant repository", () => {
-  let tempDir: string;
-  let dbPath: string;
+const TEST_DATABASE_URL =
+  process.env.TEST_DATABASE_URL?.trim() ||
+  "postgresql://localhost:5432/spoonspin_test";
 
-  afterEach(() => {
-    closeDb();
-    delete process.env.RESTAURANTS_DB_PATH;
-    if (tempDir) fs.rmSync(tempDir, { recursive: true, force: true });
+describe("local restaurant repository", () => {
+  beforeEach(async () => {
+    process.env.DATABASE_URL = TEST_DATABASE_URL;
+    await closeDb();
+    await ensureDb();
+    await resetAllTables();
   });
 
-  function openTempDb() {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "spoonspin-db-"));
-    dbPath = path.join(tempDir, "test.sqlite");
-    process.env.RESTAURANTS_DB_PATH = dbPath;
-    getDb(dbPath);
-  }
+  afterEach(async () => {
+    await closeDb();
+    delete process.env.DATABASE_URL;
+  });
 
-  it("returns specialty Italian matches and ignores weak tags", () => {
-    openTempDb();
-    upsertRestaurant({
+  it("returns specialty Italian matches and ignores weak tags", async () => {
+    await upsertRestaurant({
       id: "osm:node/1",
       name: "Trattoria Leiden",
       address: "Breestraat 1, Leiden",
@@ -44,7 +41,7 @@ describe("local restaurant repository", () => {
       reviewed: true,
       authenticityRating: 4,
     });
-    upsertRestaurant({
+    await upsertRestaurant({
       id: "osm:node/2",
       name: "Asian Fusion Spot",
       address: "Somewhere 2, Leiden",
@@ -60,7 +57,7 @@ describe("local restaurant repository", () => {
       authenticityRating: 2,
     });
 
-    const results = searchLocalRestaurants({
+    const results = await searchLocalRestaurants({
       countryCode: "it",
       cityOrPostcode: "Leiden",
     });
@@ -69,9 +66,33 @@ describe("local restaurant repository", () => {
     expect(results[0]?.name).toBe("Trattoria Leiden");
   });
 
-  it("ranks nearby specialty places even when city text differs", () => {
-    openTempDb();
-    upsertRestaurant({
+  it("includes admin-discovered places even when cuisine tags are aliases", async () => {
+    await upsertRestaurant({
+      id: "admin-test-af",
+      name: "Admin Afghan Spot",
+      address: "Somewhere 9, Den Haag",
+      city: "Den Haag",
+      lat: 52.07,
+      lng: 4.3,
+      cuisineCodes: ["af"],
+      cuisineTags: ["Afghanistan restaurant", "Afghanistan cuisine"],
+      source: "admin-discover",
+      osmId: "admin:test-af",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Admin",
+      reviewed: true,
+      authenticityRating: 4,
+    });
+
+    const results = await searchLocalRestaurants({
+      countryCode: "af",
+      cityOrPostcode: "Den Haag",
+    });
+
+    expect(results.some((row) => row.name === "Admin Afghan Spot")).toBe(true);
+  });
+
+  it("ranks nearby specialty places even when city text differs", async () => {
+    await upsertRestaurant({
       id: "osm:node/3",
       name: "Marani",
       address: "Delft",
@@ -87,7 +108,7 @@ describe("local restaurant repository", () => {
       authenticityRating: 5,
     });
 
-    const results = searchLocalRestaurants({
+    const results = await searchLocalRestaurants({
       countryCode: "ge",
       cityOrPostcode: "Leiden",
     });
@@ -95,9 +116,8 @@ describe("local restaurant repository", () => {
     expect(results[0]?.name).toBe("Marani");
   });
 
-  it("defaults to reviewed-only and sorts by authenticity then distance", () => {
-    openTempDb();
-    upsertRestaurant({
+  it("defaults to reviewed-only and sorts by authenticity then distance", async () => {
+    await upsertRestaurant({
       id: "curated:a",
       name: "High Authenticity Far",
       address: "Amsterdam",
@@ -113,7 +133,7 @@ describe("local restaurant repository", () => {
       authenticityRating: 5,
       authenticityNotes: "Highly authentic Georgian specialty kitchen for testing.",
     });
-    upsertRestaurant({
+    await upsertRestaurant({
       id: "curated:b",
       name: "Mid Authenticity Near",
       address: "Leiden",
@@ -129,7 +149,7 @@ describe("local restaurant repository", () => {
       authenticityRating: 3,
       authenticityNotes: "Solid specialty with adaptation for testing order.",
     });
-    upsertRestaurant({
+    await upsertRestaurant({
       id: "osm:node/unreviewed",
       name: "Unreviewed OSM",
       address: "Leiden",
@@ -143,7 +163,7 @@ describe("local restaurant repository", () => {
       mapsUrl: "https://www.google.com/maps/search/?api=1&query=Unreviewed",
     });
 
-    const reviewed = searchLocalRestaurants({
+    const reviewed = await searchLocalRestaurants({
       countryCode: "ge",
       cityOrPostcode: "Leiden",
     });
@@ -153,11 +173,64 @@ describe("local restaurant repository", () => {
     ]);
     expect(reviewed[0]?.authenticityRating).toBe(5);
 
-    const all = searchLocalRestaurants({
+    const all = await searchLocalRestaurants({
       countryCode: "ge",
       cityOrPostcode: "Leiden",
       reviewedOnly: false,
     });
     expect(all).toHaveLength(3);
+  });
+
+  it("hides low-authenticity and ungeocoded admin additions", async () => {
+    await upsertRestaurant({
+      id: "admin-weak",
+      name: "Weak Match Cafe",
+      address: "Somewhere 1, Leiden",
+      city: "Leiden",
+      lat: 52.16,
+      lng: 4.49,
+      cuisineCodes: ["it"],
+      cuisineTags: ["italian"],
+      source: "admin-discover",
+      osmId: "admin:weak",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Weak",
+      reviewed: true,
+      authenticityRating: 2,
+    });
+    await upsertRestaurant({
+      id: "admin-nocoords",
+      name: "No Coords Trattoria",
+      address: "Mystery Street 1, Leiden",
+      city: "Leiden",
+      cuisineCodes: ["it"],
+      cuisineTags: ["italian"],
+      source: "admin-discover",
+      osmId: "admin:nocoords",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=NoCoords",
+      reviewed: true,
+      authenticityRating: 4,
+    });
+    await upsertRestaurant({
+      id: "admin-good",
+      name: "Good Trattoria",
+      address: "Breestraat 9, Leiden",
+      city: "Leiden",
+      lat: 52.1605,
+      lng: 4.492,
+      cuisineCodes: ["it"],
+      cuisineTags: ["italian"],
+      source: "admin-discover",
+      osmId: "admin:good",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Good",
+      reviewed: true,
+      authenticityRating: 4,
+    });
+
+    const results = await searchLocalRestaurants({
+      countryCode: "it",
+      cityOrPostcode: "Leiden",
+    });
+
+    expect(results.map((row) => row.name)).toEqual(["Good Trattoria"]);
   });
 });

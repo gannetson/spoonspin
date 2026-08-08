@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto";
-import { getDb } from "./restaurants.ts";
+import type { QueryResultRow } from "pg";
+import { ensureDb } from "./restaurants.ts";
 import type { Recipe } from "../../src/types/content.ts";
 
 export type SubmissionStatus = "pending" | "approved" | "rejected";
@@ -47,79 +48,45 @@ export type AnySubmission =
   | ({ kind: "recipe" } & RecipeSubmission)
   | ({ kind: "restaurant" } & RestaurantSubmission);
 
-function migrateSubmissions() {
-  const db = getDb();
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS recipe_submissions (
-      id TEXT PRIMARY KEY,
-      country_code TEXT NOT NULL,
-      country_name TEXT NOT NULL,
-      query TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'pending',
-      recipe_json TEXT NOT NULL,
-      confirmation_notes TEXT,
-      created_at TEXT NOT NULL,
-      reviewed_at TEXT
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_recipe_submissions_country_status
-      ON recipe_submissions (country_code, status);
-
-    CREATE TABLE IF NOT EXISTS restaurant_submissions (
-      id TEXT PRIMARY KEY,
-      country_code TEXT NOT NULL,
-      country_name TEXT NOT NULL,
-      query TEXT NOT NULL,
-      status TEXT NOT NULL DEFAULT 'pending',
-      restaurant_json TEXT NOT NULL,
-      restaurant_row_id TEXT,
-      confirmation_notes TEXT,
-      created_at TEXT NOT NULL,
-      reviewed_at TEXT
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_restaurant_submissions_country_status
-      ON restaurant_submissions (country_code, status);
-  `);
+function parseRecipe(value: unknown): Recipe {
+  if (typeof value === "string") return JSON.parse(value) as Recipe;
+  return value as Recipe;
 }
 
-let submissionsReadyFor: string | null = null;
-
-function dbReady() {
-  const db = getDb();
-  const pathKey = process.env.RESTAURANTS_DB_PATH || "default";
-  if (submissionsReadyFor !== pathKey) {
-    migrateSubmissions();
-    submissionsReadyFor = pathKey;
+function parseRestaurant(value: unknown): RestaurantSubmissionPayload {
+  if (typeof value === "string") {
+    return JSON.parse(value) as RestaurantSubmissionPayload;
   }
-  return db;
+  return value as RestaurantSubmissionPayload;
 }
 
-function parseRecipe(json: string): Recipe {
-  return JSON.parse(json) as Recipe;
+function toIso(value: unknown): string {
+  if (value instanceof Date) return value.toISOString();
+  return String(value ?? "");
 }
 
-function parseRestaurant(json: string): RestaurantSubmissionPayload {
-  return JSON.parse(json) as RestaurantSubmissionPayload;
+function toIsoOrNull(value: unknown): string | null {
+  if (value == null) return null;
+  return toIso(value);
 }
 
-function rowToRecipeSubmission(row: Record<string, unknown>): RecipeSubmission {
+function rowToRecipeSubmission(row: QueryResultRow): RecipeSubmission {
   return {
     id: String(row.id),
     countryCode: String(row.country_code),
     countryName: String(row.country_name),
     query: String(row.query),
     status: String(row.status) as SubmissionStatus,
-    recipe: parseRecipe(String(row.recipe_json)),
+    recipe: parseRecipe(row.recipe_json),
     confirmationNotes:
       row.confirmation_notes == null ? null : String(row.confirmation_notes),
-    createdAt: String(row.created_at),
-    reviewedAt: row.reviewed_at == null ? null : String(row.reviewed_at),
+    createdAt: toIso(row.created_at),
+    reviewedAt: toIsoOrNull(row.reviewed_at),
   };
 }
 
 function rowToRestaurantSubmission(
-  row: Record<string, unknown>,
+  row: QueryResultRow,
 ): RestaurantSubmission {
   return {
     id: String(row.id),
@@ -127,43 +94,46 @@ function rowToRestaurantSubmission(
     countryName: String(row.country_name),
     query: String(row.query),
     status: String(row.status) as SubmissionStatus,
-    restaurant: parseRestaurant(String(row.restaurant_json)),
+    restaurant: parseRestaurant(row.restaurant_json),
     restaurantRowId:
       row.restaurant_row_id == null ? null : String(row.restaurant_row_id),
     confirmationNotes:
       row.confirmation_notes == null ? null : String(row.confirmation_notes),
-    createdAt: String(row.created_at),
-    reviewedAt: row.reviewed_at == null ? null : String(row.reviewed_at),
+    createdAt: toIso(row.created_at),
+    reviewedAt: toIsoOrNull(row.reviewed_at),
   };
 }
 
-export function insertRecipeSubmission(input: {
+export async function insertRecipeSubmission(input: {
   id: string;
   countryCode: string;
   countryName: string;
   query: string;
   recipe: Recipe;
   confirmationNotes?: string | null;
-}): RecipeSubmission {
-  const db = dbReady();
+}): Promise<RecipeSubmission> {
+  const db = await ensureDb();
   const createdAt = new Date().toISOString();
-  db.prepare(
+  await db.query(
     `INSERT INTO recipe_submissions
       (id, country_code, country_name, query, status, recipe_json, confirmation_notes, created_at)
-     VALUES (?, ?, ?, ?, 'pending', ?, ?, ?)`,
-  ).run(
-    input.id,
-    input.countryCode.toLowerCase(),
-    input.countryName,
-    input.query,
-    JSON.stringify(input.recipe),
-    input.confirmationNotes ?? null,
-    createdAt,
+     VALUES ($1, $2, $3, $4, 'pending', $5::jsonb, $6, $7::timestamptz)`,
+    [
+      input.id,
+      input.countryCode.toLowerCase(),
+      input.countryName,
+      input.query,
+      JSON.stringify(input.recipe),
+      input.confirmationNotes ?? null,
+      createdAt,
+    ],
   );
-  return getRecipeSubmission(input.id)!;
+  const created = await getRecipeSubmission(input.id);
+  if (!created) throw new Error(`Failed to insert recipe submission ${input.id}`);
+  return created;
 }
 
-export function insertRestaurantSubmission(input: {
+export async function insertRestaurantSubmission(input: {
   id: string;
   countryCode: string;
   countryName: string;
@@ -171,85 +141,104 @@ export function insertRestaurantSubmission(input: {
   restaurant: RestaurantSubmissionPayload;
   restaurantRowId?: string | null;
   confirmationNotes?: string | null;
-}): RestaurantSubmission {
-  const db = dbReady();
+}): Promise<RestaurantSubmission> {
+  const db = await ensureDb();
   const createdAt = new Date().toISOString();
-  db.prepare(
+  await db.query(
     `INSERT INTO restaurant_submissions
       (id, country_code, country_name, query, status, restaurant_json, restaurant_row_id, confirmation_notes, created_at)
-     VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?)`,
-  ).run(
-    input.id,
-    input.countryCode.toLowerCase(),
-    input.countryName,
-    input.query,
-    JSON.stringify(input.restaurant),
-    input.restaurantRowId ?? null,
-    input.confirmationNotes ?? null,
-    createdAt,
+     VALUES ($1, $2, $3, $4, 'pending', $5::jsonb, $6, $7, $8::timestamptz)`,
+    [
+      input.id,
+      input.countryCode.toLowerCase(),
+      input.countryName,
+      input.query,
+      JSON.stringify(input.restaurant),
+      input.restaurantRowId ?? null,
+      input.confirmationNotes ?? null,
+      createdAt,
+    ],
   );
-  return getRestaurantSubmission(input.id)!;
+  const created = await getRestaurantSubmission(input.id);
+  if (!created) {
+    throw new Error(`Failed to insert restaurant submission ${input.id}`);
+  }
+  return created;
 }
 
-export function getRecipeSubmission(id: string): RecipeSubmission | undefined {
-  const row = dbReady()
-    .prepare(`SELECT * FROM recipe_submissions WHERE id = ?`)
-    .get(id) as Record<string, unknown> | undefined;
+export async function getRecipeSubmission(
+  id: string,
+): Promise<RecipeSubmission | undefined> {
+  const db = await ensureDb();
+  const result = await db.query(
+    `SELECT * FROM recipe_submissions WHERE id = $1`,
+    [id],
+  );
+  const row = result.rows[0];
   return row ? rowToRecipeSubmission(row) : undefined;
 }
 
-export function getRestaurantSubmission(
+export async function getRestaurantSubmission(
   id: string,
-): RestaurantSubmission | undefined {
-  const row = dbReady()
-    .prepare(`SELECT * FROM restaurant_submissions WHERE id = ?`)
-    .get(id) as Record<string, unknown> | undefined;
+): Promise<RestaurantSubmission | undefined> {
+  const db = await ensureDb();
+  const result = await db.query(
+    `SELECT * FROM restaurant_submissions WHERE id = $1`,
+    [id],
+  );
+  const row = result.rows[0];
   return row ? rowToRestaurantSubmission(row) : undefined;
 }
 
 /** Visible in the public app: pending + approved. */
-export function listVisibleRecipesForCountry(countryCode: string): Recipe[] {
-  const rows = dbReady()
-    .prepare(
-      `SELECT recipe_json FROM recipe_submissions
-       WHERE country_code = ? AND status IN ('pending', 'approved')
-       ORDER BY created_at DESC`,
-    )
-    .all(countryCode.toLowerCase()) as Array<{ recipe_json: string }>;
-  return rows.map((row) => parseRecipe(row.recipe_json));
+export async function listVisibleRecipesForCountry(
+  countryCode: string,
+): Promise<Recipe[]> {
+  const db = await ensureDb();
+  const result = await db.query(
+    `SELECT recipe_json FROM recipe_submissions
+     WHERE country_code = $1 AND status IN ('pending', 'approved')
+     ORDER BY created_at DESC`,
+    [countryCode.toLowerCase()],
+  );
+  return result.rows.map((row) => parseRecipe(row.recipe_json));
 }
 
-export function listSubmissions(options?: {
+export async function listSubmissions(options?: {
   status?: SubmissionStatus | "all";
   kind?: SubmissionKind | "all";
-}): AnySubmission[] {
+}): Promise<AnySubmission[]> {
   const status = options?.status ?? "pending";
   const kind = options?.kind ?? "all";
-  const db = dbReady();
+  const db = await ensureDb();
   const out: AnySubmission[] = [];
 
   if (kind === "all" || kind === "recipe") {
-    const sql =
+    const result =
       status === "all"
-        ? `SELECT * FROM recipe_submissions ORDER BY created_at DESC`
-        : `SELECT * FROM recipe_submissions WHERE status = ? ORDER BY created_at DESC`;
-    const rows = (
-      status === "all" ? db.prepare(sql).all() : db.prepare(sql).all(status)
-    ) as Array<Record<string, unknown>>;
-    for (const row of rows) {
+        ? await db.query(
+            `SELECT * FROM recipe_submissions ORDER BY created_at DESC`,
+          )
+        : await db.query(
+            `SELECT * FROM recipe_submissions WHERE status = $1 ORDER BY created_at DESC`,
+            [status],
+          );
+    for (const row of result.rows) {
       out.push({ kind: "recipe", ...rowToRecipeSubmission(row) });
     }
   }
 
   if (kind === "all" || kind === "restaurant") {
-    const sql =
+    const result =
       status === "all"
-        ? `SELECT * FROM restaurant_submissions ORDER BY created_at DESC`
-        : `SELECT * FROM restaurant_submissions WHERE status = ? ORDER BY created_at DESC`;
-    const rows = (
-      status === "all" ? db.prepare(sql).all() : db.prepare(sql).all(status)
-    ) as Array<Record<string, unknown>>;
-    for (const row of rows) {
+        ? await db.query(
+            `SELECT * FROM restaurant_submissions ORDER BY created_at DESC`,
+          )
+        : await db.query(
+            `SELECT * FROM restaurant_submissions WHERE status = $1 ORDER BY created_at DESC`,
+            [status],
+          );
+    for (const row of result.rows) {
       out.push({ kind: "restaurant", ...rowToRestaurantSubmission(row) });
     }
   }
@@ -257,38 +246,95 @@ export function listSubmissions(options?: {
   return out.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
 }
 
-export function setRecipeSubmissionStatus(
+export async function setRecipeSubmissionStatus(
   id: string,
   status: SubmissionStatus,
-): RecipeSubmission | undefined {
+): Promise<RecipeSubmission | undefined> {
   const reviewedAt = status === "pending" ? null : new Date().toISOString();
-  dbReady()
-    .prepare(
-      `UPDATE recipe_submissions SET status = ?, reviewed_at = ? WHERE id = ?`,
-    )
-    .run(status, reviewedAt, id);
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE recipe_submissions SET status = $1, reviewed_at = $2::timestamptz WHERE id = $3`,
+    [status, reviewedAt, id],
+  );
   return getRecipeSubmission(id);
 }
 
-export function setRestaurantSubmissionStatus(
+export async function setRestaurantSubmissionStatus(
   id: string,
   status: SubmissionStatus,
-): RestaurantSubmission | undefined {
+): Promise<RestaurantSubmission | undefined> {
   const reviewedAt = status === "pending" ? null : new Date().toISOString();
-  dbReady()
-    .prepare(
-      `UPDATE restaurant_submissions SET status = ?, reviewed_at = ? WHERE id = ?`,
-    )
-    .run(status, reviewedAt, id);
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE restaurant_submissions SET status = $1, reviewed_at = $2::timestamptz WHERE id = $3`,
+    [status, reviewedAt, id],
+  );
   return getRestaurantSubmission(id);
 }
 
-export function setRestaurantRowReviewed(id: string, reviewed: boolean) {
-  dbReady()
-    .prepare(
-      `UPDATE restaurants SET reviewed = ?, updated_at = ? WHERE id = ?`,
-    )
-    .run(reviewed ? 1 : 0, new Date().toISOString(), id);
+export async function setRestaurantRowReviewed(
+  id: string,
+  reviewed: boolean,
+): Promise<void> {
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE restaurants SET reviewed = $1, updated_at = $2::timestamptz WHERE id = $3`,
+    [reviewed, new Date().toISOString(), id],
+  );
+}
+
+export async function findVisibleCommunityRecipe(
+  countryCode: string,
+  recipeId: string,
+): Promise<{ submissionId: string; recipe: Recipe } | null> {
+  const db = await ensureDb();
+  const result = await db.query(
+    `SELECT id, recipe_json FROM recipe_submissions
+     WHERE country_code = $1
+       AND status IN ('pending', 'approved')
+       AND recipe_json->>'id' = $2
+     ORDER BY created_at DESC
+     LIMIT 1`,
+    [countryCode.toLowerCase(), recipeId],
+  );
+  const row = result.rows[0];
+  if (!row) return null;
+  return {
+    submissionId: String(row.id),
+    recipe: parseRecipe(row.recipe_json),
+  };
+}
+
+export async function deleteCommunityRecipe(
+  countryCode: string,
+  recipeId: string,
+): Promise<boolean> {
+  const db = await ensureDb();
+  const result = await db.query(
+    `DELETE FROM recipe_submissions
+     WHERE country_code = $1
+       AND status IN ('pending', 'approved')
+       AND recipe_json->>'id' = $2`,
+    [countryCode.toLowerCase(), recipeId],
+  );
+  return (result.rowCount ?? 0) > 0;
+}
+
+export async function updateCommunityRecipe(
+  countryCode: string,
+  recipeId: string,
+  recipe: Recipe,
+): Promise<Recipe | null> {
+  const found = await findVisibleCommunityRecipe(countryCode, recipeId);
+  if (!found) return null;
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE recipe_submissions
+     SET recipe_json = $2::jsonb
+     WHERE id = $1`,
+    [found.submissionId, JSON.stringify(recipe)],
+  );
+  return recipe;
 }
 
 export function slugifyId(prefix: string, name: string): string {

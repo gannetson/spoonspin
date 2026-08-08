@@ -169,6 +169,7 @@ function toRestaurant(feature: MapboxFeature): Restaurant | null {
     name,
     address: address || city || "Netherlands",
     city: city || "Netherlands",
+    cuisineCodes: [],
     website: props.metadata?.website,
     mapsUrl: `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`,
     location:

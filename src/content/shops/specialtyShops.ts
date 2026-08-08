@@ -160,6 +160,226 @@ export const specialtyShopsByCountry: Record<string, SpecialtyShop[]> = {
       mapsUrl: maps("Italiaanse delicatessen Leiden"),
     },
   ],
+  bg: [
+    {
+      id: "balkan-shop-ams",
+      name: "Balkan / Eastern European grocer",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Sirene, yogurt, peppers, and Balkan spices",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Balkan%20supermarkt%20Amsterdam",
+    },
+  ],
+  es: [
+    {
+      id: "spanish-deli-ams",
+      name: "Spanish deli / tapas shop",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Jamón, olive oil, smoked paprika, and sherry vinegar",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Spaanse%20delicatessen%20Amsterdam",
+    },
+  ],
+  gr: [
+    {
+      id: "greek-deli-ams",
+      name: "Greek deli",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Feta, filo, olives, and oregano",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Griekse%20delicatessen%20Amsterdam",
+    },
+  ],
+  et: [
+    {
+      id: "ethiopian-shop-denhaag",
+      name: "Ethiopian / Eritrean grocer",
+      city: "Den Haag",
+      address: "Den Haag",
+      specialty: "Teff flour, berbere, niter kibbeh, and coffee",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Ethiopische%20winkel%20Den%20Haag",
+    },
+  ],
+  sn: [
+    {
+      id: "west-african-shop-ams",
+      name: "West African grocer",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Broken rice, palm oil, dried fish, and peanut paste",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=West%20Afrikaanse%20supermarkt%20Amsterdam",
+    },
+  ],
+  za: [
+    {
+      id: "south-african-shop-ams",
+      name: "South African shop",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Boerewors spices, Mrs Ball's chutney, and braai staples",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Zuid-Afrikaanse%20winkel%20Amsterdam",
+    },
+  ],
+  ke: [
+    {
+      id: "african-taste-ke",
+      name: "African Taste",
+      city: "Netherlands",
+      address: "Online / Netherlands",
+      specialty: "Maize flour, Royco mchuzi mix, and East African pantry goods",
+      website: "https://africantaste.eu/",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=African%20Taste%20Nederland",
+      notes: "Useful for ugali flour and Kenyan stew seasonings.",
+    },
+    {
+      id: "africa-products-ke",
+      name: "Africa Products Shop",
+      city: "Netherlands",
+      address: "Online / Netherlands",
+      specialty: "Jogoo maize flour and other Kenyan dry goods",
+      website: "https://africaproducts.nl/",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Africa%20Products%20Nederland",
+    },
+    {
+      id: "kenyan-delicacies-denhaag",
+      name: "Kenyan Delicacies",
+      city: "Den Haag",
+      address: "Den Haag",
+      specialty: "Kenyan restaurant pantry staples, spices, and tea",
+      website: "https://www.kenyandelicacies.com/",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Kenyan%20Delicacies%20Den%20Haag",
+    },
+  ],
+  pe: [
+    {
+      id: "latin-peruvian-ams",
+      name: "Latin / Peruvian grocer",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Aji amarillo, quinoa, corn, and Andean pantry goods",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Peruaanse%20winkel%20Amsterdam",
+    },
+  ],
+  br: [
+    {
+      id: "brazilian-shop-ams",
+      name: "Brazilian shop",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Cassava flour, dendê oil, guaraná, and beans",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Braziliaanse%20winkel%20Amsterdam",
+    },
+  ],
+  jm: [
+    {
+      id: "caribbean-shop-ams",
+      name: "Caribbean grocer",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Jerk seasoning, scotch bonnet, callaloo, and spices",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Caribische%20supermarkt%20Amsterdam",
+    },
+  ],
+  fr: [
+    {
+      id: "french-deli-leiden",
+      name: "French deli / fromagerie",
+      city: "Leiden",
+      address: "Leiden",
+      specialty: "Cheese, charcuterie, Dijon mustard, and pastry butter",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Franse%20delicatessen%20Leiden",
+    },
+  ],
+  de: [
+    {
+      id: "german-deli-ams",
+      name: "German deli",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Mustards, sausages, sauerkraut, and baking goods",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Duitse%20delicatessen%20Amsterdam",
+    },
+  ],
+  pt: [
+    {
+      id: "portuguese-shop-ams",
+      name: "Portuguese grocer",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Bacalhau, peri-peri, olive oil, and pastries",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Portugese%20winkel%20Amsterdam",
+    },
+  ],
+  ar: [
+    {
+      id: "argentinian-shop-ams",
+      name: "Argentinian / Latin grill shop",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Chimichurri ingredients, dulce de leche, and mate",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Argentijnse%20winkel%20Amsterdam",
+    },
+  ],
+  ng: [
+    {
+      id: "nigerian-shop-ams",
+      name: "Nigerian / West African grocer",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Egusi, palm oil, stockfish, and pounded yam flour",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Nigeriaanse%20supermarkt%20Amsterdam",
+    },
+  ],
+  eg: [
+    {
+      id: "egyptian-shop-ams",
+      name: "Egyptian / Middle Eastern grocer",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Fava beans, molokhia, spices, and flatbreads",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Egyptische%20winkel%20Amsterdam",
+    },
+  ],
+  ph: [
+    {
+      id: "filipino-shop-ams",
+      name: "Filipino store",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Sinigang mix, banana ketchup, rice noodles, and vinegar",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Filipijnse%20winkel%20Amsterdam",
+    },
+  ],
+  gb: [
+    {
+      id: "british-shop-ams",
+      name: "British specialty shop",
+      city: "Amsterdam",
+      address: "Amsterdam",
+      specialty: "Cheddar, marmite, custard, and baking staples",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=British%20shop%20Amsterdam",
+    },
+  ],
+  pl: [
+    {
+      id: "polish-shop-leiden",
+      name: "Polish supermarket",
+      city: "Leiden",
+      address: "Leiden",
+      specialty: "Pierogi fillings, kielbasa, sauerkraut, and twaróg",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Poolse%20supermarkt%20Leiden",
+    },
+  ],
+  nl: [
+    {
+      id: "dutch-market-leiden",
+      name: "Leiden market / butchers",
+      city: "Leiden",
+      address: "Leiden",
+      specialty: "Fresh kale, rookworst, and baking goods for stamppot nights",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=markt%20Leiden",
+    },
+  ],
 };
 
 export function specialtyShopsFor(countryCode: string): SpecialtyShop[] {

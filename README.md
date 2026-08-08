@@ -11,7 +11,7 @@ Spoon Spin is a mobile-friendly MVP for food-and-travel inspiration:
 3. Choose **Cook** for a full menu and recipes, or **Dine** to search Dutch restaurants.
 4. Share a deep link such as `/?country=bg&mode=cook`.
 
-Content lives in typed TypeScript modules (no database, CMS, auth, or payments).
+Content lives in Postgres for countries, recipes, users, and restaurants. TypeScript modules remain the seed source for cuisines. Simple email/password login is supported.
 
 ## Stack
 
@@ -56,6 +56,7 @@ npm run dev
 | `npm run agent:gather`     | Incremental gather over time (resumable batches) |
 | `npm run agent:curate`     | Import reviewed restaurants + authenticity ratings |
 | `npm run agent:ratings`    | Enrich guest ratings from Google (and Tripadvisor if keyed) |
+| `npm run db:seed-content`  | Seed countries + recipes into Postgres from TS modules |
 
 ## Environment variables
 
@@ -68,24 +69,41 @@ Copy `.env.example` to `.env`:
 | `TRIPADVISOR_API_KEY`   | No                           | Tripadvisor Content API key (optional)  |
 | `OPENAI_API_KEY`        | No (suggestions)             | Confirms community recipe/restaurant suggestions |
 | `OPENAI_MODEL`          | No                           | Defaults to `gpt-4o-mini`               |
-| `ADMIN_TOKEN`           | No (admin UI)                | Shared secret for `/admin` review       |
 | `RESTAURANT_PROVIDER`   | No                           | `auto` (default), `mapbox`, or `google` |
 | `RESTAURANT_LIVE_FALLBACK` | No                        | Set `1` to allow Mapbox/Google when curated DB has no match (off by default) |
-| `RESTAURANTS_DB_PATH`   | No                           | Defaults to `data/restaurants.sqlite`   |
+| `DATABASE_URL`          | No                           | Defaults to `postgresql://localhost:5432/spoonspin` |
 | `API_PORT`              | No                           | Defaults to `3001`                      |
 
 Never put provider secrets in Vite `VITE_*` variables or client code.
+
+## Auth
+
+Register or sign in at `/login` with email and password (min 8 characters). Sessions use an httpOnly cookie (`spoonspin_session`). The API exposes `/api/auth/register`, `/api/auth/login`, `/api/auth/logout`, and `/api/auth/me`. New accounts get role `member`. Promote an admin with:
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
+```
+
+## Countries & recipes in Postgres
+
+After setting `DATABASE_URL`, seed authored country menus:
+
+```bash
+npm run db:seed-content
+```
+
+The app loads countries from `GET /api/countries` (with a static TS fallback if the DB is empty). TS modules under `src/content/countries/` remain the editorial source for reseeding.
 
 ## Community suggestions
 
 On Cook and Dine, **Suggest a recipe/restaurant** opens a modal. Enter a name or short description, then **Look up & confirm** (OpenAI). Confirmed items are added immediately and queued for review.
 
 - Public app: pending + approved stay visible; rejected items are hidden
-- Admin: open [http://localhost:5173/admin](http://localhost:5173/admin), unlock with `ADMIN_TOKEN`, then approve or reject
+- Admin: sign in as a user with role `admin`, then open [http://localhost:5173/admin](http://localhost:5173/admin) to approve or reject
 
 ## Local restaurant database (primary)
 
-Dine searches a local SQLite database first (`data/restaurants.sqlite`, gitignored). By default it returns **reviewed** restaurants only, sorted by **authenticity rating** (5→1), then distance from Leiden/your city. Live Mapbox/Google providers are used only when there are no reviewed matches for that cuisine.
+Dine searches a local PostgreSQL database first (default database `spoonspin`). By default it returns **reviewed** restaurants only, sorted by **authenticity rating** (5→1), then distance from Leiden/your city. Live Mapbox/Google providers are used only when there are no reviewed matches for that cuisine.
 
 ### Authenticity scale
 
@@ -199,7 +217,7 @@ Mapbox includes a recurring free monthly allowance for Search Box usage. Keep an
 
 Search order:
 
-1. Local SQLite matches for the selected country code
+1. Local Postgres matches for the selected country code
 2. With `RESTAURANT_PROVIDER=auto`: Mapbox if token set, else Google if key set
 3. Otherwise show a friendly fallback + Google Maps search link
 
@@ -259,7 +277,7 @@ Other countries show a Wikipedia cuisine overview (when found) and support Dine;
 
 - Dine prefers **reviewed** local restaurants with authenticity ratings (`npm run agent:curate`). Unreviewed OSM harvest rows are ignored until curated.
 - Sparse cuisines (e.g. Bulgaria, Senegal, Egypt, Philippines) may still fall back to Mapbox/Google when no reviewed entry exists.
-- The SQLite file is local (`data/restaurants.sqlite`) and not committed; run `npm run agent:curate` (and optionally `npm run agent:restaurants`) on each machine.
+- Restaurant data lives in Postgres (`DATABASE_URL`, default database `spoonspin`) and is not committed; run `npm run agent:curate` (and optionally `npm run agent:restaurants`) on each machine.
 - In-memory live-provider cache resets when the API process restarts.
 - Production hosting should run the Express API alongside the static Vite build (or put the API behind the same origin `/api` proxy).
 - A few small countries lack a dedicated Wikipedia cuisine article; those still spin with a short fallback blurb.

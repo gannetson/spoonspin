@@ -116,6 +116,62 @@ export const grCountry: AuthoredCountry = {
       alcoholic: false,
       description: "Finely ground coffee brewed unfiltered in a small briki.",
     },
+    moreRecipes: [
+      r(
+        "spanakopita",
+        "Spinach Pie",
+        "Σπανακόπιτα",
+        "Flaky filo pastry layered with spinach, herbs, and briny feta cheese.",
+        "starter",
+        [
+        { name: "filo pastry", quantity: 250, unit: "g" },
+        { name: "spinach", quantity: 500, unit: "g" },
+        { name: "feta", quantity: 200, unit: "g" },
+        { name: "spring onions", quantity: 4, unit: "pieces" },
+        ],
+        [
+        "1. Wilt spinach, squeeze dry, and mix with feta, herbs, and spring onions.",
+        "2. Layer buttered filo in a tin, add filling, and top with more sheets.",
+        "3. Score and bake until the pastry is shatteringly crisp.",
+        ],
+      ),
+      r(
+        "souvlaki",
+        "Pork Souvlaki",
+        "Σουβλάκι",
+        "Lemon-oregano marinated pork skewers grilled until juicy and lightly charred.",
+        "main",
+        [
+        { name: "pork shoulder", quantity: 700, unit: "g" },
+        { name: "lemon", quantity: 2, unit: "pieces" },
+        { name: "dried oregano", quantity: 10, unit: "g" },
+        { name: "olive oil", quantity: 60, unit: "ml" },
+        ],
+        [
+        "1. Cube the pork and marinate with lemon, oregano, garlic, and oil.",
+        "2. Thread onto skewers and grill over high heat, turning often.",
+        "3. Rest briefly and serve with pita, tzatziki, and salad.",
+        ],
+      ),
+      r(
+        "baklava",
+        "Honey Nut Baklava",
+        "Μπακλαβάς",
+        "Buttery filo layers filled with nuts and soaked in fragrant honey syrup.",
+        "dessert",
+        [
+        { name: "filo pastry", quantity: 250, unit: "g" },
+        { name: "walnuts", quantity: 250, unit: "g" },
+        { name: "butter", quantity: 150, unit: "g" },
+        { name: "honey", quantity: 200, unit: "g" },
+        ],
+        [
+        "1. Layer buttered filo with chopped nuts and cinnamon in a tin.",
+        "2. Bake until golden, then pour cool honey syrup over the hot pastry.",
+        "3. Rest until the syrup is absorbed before cutting into diamonds.",
+        ],
+      ),
+    ],
   },
   status: "published",
 };

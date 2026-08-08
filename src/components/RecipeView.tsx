@@ -1,24 +1,59 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, ExternalLink, PlayCircle, Printer } from "lucide-react";
 import type { Country, Drink, Recipe } from "@/types/content";
+import { useAuth } from "@/auth/AuthContext";
 import { formatQuantity, scaleIngredients } from "@/lib/scaleIngredients";
-import { recipeImageFor } from "@/lib/images";
+import { AdminItemMenu } from "@/components/AdminItemMenu";
+import { MediaPlaceholder } from "@/components/MediaPlaceholder";
+import {
+  handleRecipeAdminAction,
+  useAdminItemBusy,
+} from "@/admin/itemActions";
+import { useT } from "@/i18n/LocaleContext";
 
 type RecipeViewProps = {
   country: Country;
   recipe: Recipe;
   drink: Drink;
+  communityRecipes: Recipe[];
+  onCommunityRecipesChange: (recipes: Recipe[]) => void;
+  onCountryUpdated: (country: Country) => void;
   onBack: () => void;
 };
 
-export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) {
+const DIFFICULTY_KEYS: Record<Recipe["difficulty"], string> = {
+  easy: "recipe.difficulty.easy",
+  medium: "recipe.difficulty.medium",
+  challenging: "recipe.difficulty.challenging",
+};
+
+export function RecipeView({
+  country,
+  recipe,
+  drink,
+  communityRecipes,
+  onCommunityRecipesChange,
+  onCountryUpdated,
+  onBack,
+}: RecipeViewProps) {
+  const t = useT();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const { busy, status, error, run } = useAdminItemBusy();
   const [servings, setServings] = useState(recipe.servings);
   const scaled = useMemo(
     () => scaleIngredients(recipe.ingredients, recipe.servings, servings),
     [recipe.ingredients, recipe.servings, servings],
   );
   const isNational = recipe.id === country.nationalDishId;
-  const imageSrc = recipe.imageUrl ?? recipeImageFor(recipe.category);
+  const imageSrc = recipe.imageUrl?.trim() || null;
+  const adminKey = `recipe:${recipe.id}`;
+
+  const sourceLabel = recipe.sourceUrl?.includes("wikibooks.org")
+    ? t("recipe.source.cookbook")
+    : recipe.sourceUrl?.includes("wikipedia.org")
+      ? t("recipe.source.aboutDish")
+      : t("recipe.source.moreRecipes");
 
   return (
     <article
@@ -26,15 +61,42 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
       className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream shadow-sm print:border-0 print:shadow-none"
     >
       <div className="relative h-52 overflow-hidden sm:h-72 print:hidden">
-        <img
-          src={imageSrc}
-          alt=""
-          className="size-full object-cover"
-        />
+        {imageSrc ? (
+          <img src={imageSrc} alt="" className="size-full object-cover" />
+        ) : (
+          <MediaPlaceholder
+            labelKey="media.placeholder.recipe"
+            tone="dark"
+            className="absolute inset-0"
+          />
+        )}
         <div
           aria-hidden="true"
           className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent"
         />
+        {isAdmin ? (
+          <AdminItemMenu
+            className="absolute right-4 top-4"
+            label={recipe.name}
+            tone="dark"
+            busy={Boolean(busy[adminKey])}
+            status={status[adminKey]}
+            error={error[adminKey]}
+            onAction={(action) => {
+              void run(adminKey, () =>
+                handleRecipeAdminAction({
+                  action,
+                  country,
+                  recipe,
+                  communityRecipes,
+                  onCountryUpdated,
+                  onCommunityRecipesChange,
+                  onRemoved: onBack,
+                }),
+              );
+            }}
+          />
+        ) : null}
       </div>
 
       <div className="p-5 sm:p-8">
@@ -45,7 +107,7 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
             className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
-            Back to menu
+            {t("recipe.backToMenu")}
           </button>
           <button
             type="button"
@@ -53,14 +115,14 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
             className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-cream"
           >
             <Printer aria-hidden="true" className="size-4" />
-            Print recipe
+            {t("recipe.print")}
           </button>
         </div>
 
         <header className="mt-5">
           {isNational ? (
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-tomato">
-              Iconic national dish
+              {t("recipe.iconicNationalDish")}
             </p>
           ) : null}
           <h2 id="recipe-heading" className="font-display text-4xl text-ink sm:text-5xl">
@@ -83,11 +145,7 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
                   className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
                 >
                   <ExternalLink aria-hidden="true" className="size-4" />
-                  {recipe.sourceUrl.includes("wikibooks.org")
-                    ? "Cookbook recipe"
-                    : recipe.sourceUrl.includes("wikipedia.org")
-                      ? "About this dish"
-                      : "More recipes"}
+                  {sourceLabel}
                 </a>
               ) : null}
               {recipe.videoUrl ? (
@@ -98,7 +156,7 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
                   className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
                 >
                   <PlayCircle aria-hidden="true" className="size-4" />
-                  Watch how-to videos
+                  {t("recipe.watchVideos")}
                 </a>
               ) : null}
             </div>
@@ -106,14 +164,26 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
         </header>
 
         <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-          <Meta label="Servings" value={String(servings)} />
-          <Meta label="Prep" value={`${recipe.prepMinutes} min`} />
-          <Meta label="Cook" value={`${recipe.cookMinutes} min`} />
-          <Meta label="Difficulty" value={recipe.difficulty} />
+          <Meta label={t("recipe.meta.servings")} value={String(servings)} />
+          <Meta
+            label={t("recipe.meta.prep")}
+            value={t("recipe.meta.minutes", { minutes: recipe.prepMinutes })}
+          />
+          <Meta
+            label={t("recipe.meta.cook")}
+            value={t("recipe.meta.minutes", { minutes: recipe.cookMinutes })}
+          />
+          <Meta
+            label={t("recipe.meta.difficulty")}
+            value={t(DIFFICULTY_KEYS[recipe.difficulty])}
+          />
         </dl>
 
         {recipe.dietaryLabels.length > 0 ? (
-          <ul className="mt-4 flex flex-wrap gap-2" aria-label="Dietary labels">
+          <ul
+            className="mt-4 flex flex-wrap gap-2"
+            aria-label={t("recipe.dietaryLabels.aria")}
+          >
             {recipe.dietaryLabels.map((label) => (
               <li
                 key={label}
@@ -127,7 +197,7 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
 
         <div className="mt-6 flex flex-wrap items-center gap-3 print:hidden">
           <label htmlFor="servings" className="text-sm font-semibold text-ink">
-            Adjust servings
+            {t("recipe.adjustServings")}
           </label>
           <input
             id="servings"
@@ -142,14 +212,14 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
             className="min-h-11 w-24 rounded-xl border border-ink/20 bg-white px-3 text-ink"
           />
           <p className="text-sm text-ink-soft">
-            Scaled from original {recipe.servings} servings
+            {t("recipe.scaledFrom", { count: recipe.servings })}
           </p>
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
           <section aria-labelledby="ingredients-heading">
             <h3 id="ingredients-heading" className="font-display text-2xl">
-              Ingredients
+              {t("recipe.ingredients")}
             </h3>
             <ul className="mt-3 space-y-2">
               {scaled.map((ingredient) => (
@@ -171,7 +241,7 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
 
           <section aria-labelledby="steps-heading">
             <h3 id="steps-heading" className="font-display text-2xl">
-              Preparation
+              {t("recipe.preparation")}
             </h3>
             <ol className="mt-3 list-decimal space-y-3 pl-5 text-ink">
               {recipe.steps.map((step) => (
@@ -186,7 +256,7 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
         {recipe.substitutions && recipe.substitutions.length > 0 ? (
           <section className="mt-8" aria-labelledby="subs-heading">
             <h3 id="subs-heading" className="font-display text-2xl">
-              Dutch kitchen substitutions
+              {t("recipe.substitutions")}
             </h3>
             <ul className="mt-3 list-disc space-y-2 pl-5 text-ink-soft">
               {recipe.substitutions.map((item) => (
@@ -199,15 +269,19 @@ export function RecipeView({ country, recipe, drink, onBack }: RecipeViewProps) 
         <section className="mt-8 grid gap-4 sm:grid-cols-2">
           {recipe.servingSuggestion ? (
             <div className="rounded-2xl bg-parchment p-4">
-              <h3 className="font-display text-xl">Serving suggestion</h3>
+              <h3 className="font-display text-xl">{t("recipe.servingSuggestion")}</h3>
               <p className="mt-2 text-sm text-ink-soft">{recipe.servingSuggestion}</p>
             </div>
           ) : null}
           <div className="rounded-2xl bg-parchment p-4">
-            <h3 className="font-display text-xl">Drink pairing</h3>
+            <h3 className="font-display text-xl">{t("recipe.drinkPairing")}</h3>
             <p className="mt-2 text-sm text-ink-soft">
               {recipe.drinkPairing ??
-                `${drink.name} (${drink.alcoholic ? "alcoholic" : "non-alcoholic"}) — ${drink.description}`}
+                `${drink.name} (${
+                  drink.alcoholic
+                    ? t("cook.drink.alcoholic")
+                    : t("cook.drink.nonAlcoholic")
+                }) — ${drink.description}`}
             </p>
           </div>
         </section>

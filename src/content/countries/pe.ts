@@ -53,6 +53,62 @@ export const peCountry: AuthoredCountry = {
       false,
       "Purple-corn drink perfumed with pineapple, cinnamon, and clove.",
     ),
+    moreRecipes: [
+      r(
+        "lomo-saltado",
+        "Lomo Saltado",
+        "Lomo saltado",
+        "main",
+        [
+          { name: "beef sirloin", quantity: 600, unit: "g" },
+          { name: "red onion", quantity: 2, unit: "pieces" },
+          { name: "tomatoes", quantity: 3, unit: "pieces" },
+          { name: "soy sauce", quantity: 40, unit: "ml" },
+        ],
+        {
+          description:
+            "Wok-tossed beef with onion, tomato, and soy, served with fries and rice.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Lomo_saltado",
+        },
+      ),
+      r(
+        "aji-de-gallina",
+        "Aji de Gallina",
+        "Ají de gallina",
+        "main",
+        [
+          { name: "cooked chicken", quantity: 500, unit: "g" },
+          { name: "aji amarillo paste", quantity: 40, unit: "g" },
+          { name: "evaporated milk", quantity: 200, unit: "ml" },
+          { name: "bread", quantity: 80, unit: "g" },
+        ],
+        {
+          description:
+            "Shredded chicken in a creamy yellow chilli sauce thickened with bread and nuts.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Ají_de_gallina",
+        },
+      ),
+      r(
+        "picarones",
+        "Picarones",
+        "Picarones",
+        "dessert",
+        [
+          { name: "sweet potato", quantity: 250, unit: "g" },
+          { name: "pumpkin puree", quantity: 200, unit: "g" },
+          { name: "flour", quantity: 300, unit: "g" },
+          { name: "chancaca or dark sugar", quantity: 200, unit: "g" },
+        ],
+        {
+          description:
+            "Pumpkin-sweet potato doughnuts soaked in spiced chancaca syrup.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Picarones",
+        },
+      ),
+    ],
   },
   status: "published",
 };

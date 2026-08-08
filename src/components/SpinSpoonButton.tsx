@@ -1,3 +1,5 @@
+import { useT } from "@/i18n/LocaleContext";
+
 type SpinSpoonButtonProps = {
   spinning: boolean;
   onClick: () => void;
@@ -9,6 +11,7 @@ export function SpinSpoonButton({
   onClick,
   size = "lg",
 }: SpinSpoonButtonProps) {
+  const t = useT();
   const large = size === "lg";
   const tile = size === "tile";
 
@@ -18,7 +21,7 @@ export function SpinSpoonButton({
       onClick={onClick}
       disabled={spinning}
       aria-busy={spinning}
-      aria-label={spinning ? "Spinning" : "Spin the spoon"}
+      aria-label={spinning ? t("spin.ariaLabel.spinning") : t("spin.ariaLabel")}
       className={[
         "group relative inline-flex flex-col items-center justify-center",
         "border-4 border-ink/15 bg-tomato text-cream",
@@ -70,23 +73,23 @@ export function SpinSpoonButton({
       {large ? (
         <>
           <span className="font-display text-3xl leading-none tracking-tight sm:text-4xl">
-            {spinning ? "Spinning…" : "Spin the spoon!"}
+            {spinning ? t("spin.label.spinning") : t("spin.label")}
           </span>
           <span className="text-sm font-semibold uppercase tracking-[0.18em] text-cream/85">
-            {spinning ? "Hold onto your forks" : "Give it a whirl"}
+            {spinning ? t("spin.hint.lg.spinning") : t("spin.hint.lg")}
           </span>
         </>
       ) : tile ? (
         <span className="max-w-full px-1 text-center font-display text-xs leading-tight sm:text-sm">
-          {spinning ? "Spinning…" : "Spin the spoon!"}
+          {spinning ? t("spin.label.spinning") : t("spin.label")}
         </span>
       ) : (
         <>
           <span className="font-display text-xl leading-none tracking-tight">
-            {spinning ? "Spinning…" : "Spin the spoon!"}
+            {spinning ? t("spin.label.spinning") : t("spin.label")}
           </span>
           <span className="text-[0.65rem] font-semibold uppercase tracking-[0.16em] text-cream/85">
-            {spinning ? "Again…" : "Try another"}
+            {spinning ? t("spin.hint.sm.spinning") : t("spin.hint.sm")}
           </span>
         </>
       )}
@@ -100,6 +103,8 @@ type FlagSpinnerProps = {
 };
 
 export function FlagSpinner({ current, compact = false }: FlagSpinnerProps) {
+  const t = useT();
+
   return (
     <div
       aria-live="polite"
@@ -109,7 +114,9 @@ export function FlagSpinner({ current, compact = false }: FlagSpinnerProps) {
         compact ? "" : "w-full max-w-md sm:items-start sm:text-left",
       ].join(" ")}
     >
-      <p className="text-sm uppercase tracking-[0.2em] text-stamp">Choosing…</p>
+      <p className="text-sm uppercase tracking-[0.2em] text-stamp">
+        {t("spin.flag.choosing")}
+      </p>
       <p
         className={[
           "font-display leading-none motion-safe:animate-pulse",
@@ -125,7 +132,7 @@ export function FlagSpinner({ current, compact = false }: FlagSpinnerProps) {
           compact ? "text-xl" : "text-2xl",
         ].join(" ")}
       >
-        {current?.name ?? "Finding a country…"}
+        {current?.name ?? t("spin.flag.finding")}
       </p>
     </div>
   );

@@ -115,6 +115,62 @@ export const esCountry: AuthoredCountry = {
       alcoholic: false,
       description: "A chilled, sweet tiger-nut drink from Valencia.",
     },
+    moreRecipes: [
+      r(
+        "tortilla-espanola",
+        "Spanish Potato Omelette",
+        "Tortilla española",
+        "Eggs and slowly cooked potatoes set into a thick omelette, served warm or room temperature.",
+        "main",
+        [
+        { name: "waxy potatoes", quantity: 700, unit: "g" },
+        { name: "eggs", quantity: 6, unit: "pieces" },
+        { name: "onion", quantity: 1, unit: "piece" },
+        { name: "olive oil", quantity: 120, unit: "ml" },
+        ],
+        [
+        "1. Gently fry sliced potatoes and onion in olive oil until tender, then drain.",
+        "2. Mix with beaten seasoned eggs and return to a hot pan.",
+        "3. Cook until set, flip carefully, and finish the second side.",
+        ],
+      ),
+      r(
+        "gazpacho",
+        "Andalusian Gazpacho",
+        "Gazpacho",
+        "Chilled tomato soup blended with pepper, cucumber, garlic, and olive oil.",
+        "starter",
+        [
+        { name: "ripe tomatoes", quantity: 800, unit: "g" },
+        { name: "cucumber", quantity: 0.5, unit: "piece" },
+        { name: "green pepper", quantity: 1, unit: "piece" },
+        { name: "stale bread", quantity: 60, unit: "g" },
+        ],
+        [
+        "1. Soak bread briefly, then blend with tomatoes, cucumber, pepper, and garlic.",
+        "2. Stream in olive oil and sherry vinegar until silky.",
+        "3. Chill well and serve with diced vegetable garnishes.",
+        ],
+      ),
+      r(
+        "churros",
+        "Churros with Chocolate",
+        "Churros",
+        "Crisp fried dough ridges rolled in sugar and dipped in thick drinking chocolate.",
+        "dessert",
+        [
+        { name: "flour", quantity: 250, unit: "g" },
+        { name: "water", quantity: 250, unit: "ml" },
+        { name: "butter", quantity: 30, unit: "g" },
+        { name: "dark chocolate", quantity: 150, unit: "g" },
+        ],
+        [
+        "1. Bring water, butter, and salt to a boil, then beat in flour to a smooth dough.",
+        "2. Pipe ridges into hot oil and fry until deep golden.",
+        "3. Toss in sugar and serve with melted chocolate for dipping.",
+        ],
+      ),
+    ],
   },
   status: "published",
 };

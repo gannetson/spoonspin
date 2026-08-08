@@ -20,45 +20,13 @@ import {
 } from "../openai/suggest.ts";
 import { upsertRestaurant } from "../db/restaurants.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
+import { requireAdmin } from "./auth.ts";
 
 const previewBodySchema = z.object({
   kind: z.enum(["recipe", "restaurant"]),
   countryCode: z.string().length(2),
   countryName: z.string().min(1),
   query: z.string().min(2).max(280),
-});
-
-const recipeConfirmSchema = z.object({
-  kind: z.literal("recipe"),
-  countryCode: z.string().length(2),
-  countryName: z.string().min(1),
-  query: z.string().min(2).max(280),
-  confirmationNotes: z.string().optional(),
-  recipe: z.object({
-    name: z.string().min(1),
-    localName: z.string().optional(),
-    description: z.string().min(20),
-    category: z.enum(["starter", "main", "side", "dessert", "snack"]),
-    servings: z.number().int().positive(),
-    prepMinutes: z.number().int().nonnegative(),
-    cookMinutes: z.number().int().nonnegative(),
-    difficulty: z.enum(["easy", "medium", "challenging"]),
-    dietaryLabels: z.array(z.string()),
-    ingredients: z
-      .array(
-        z.object({
-          name: z.string().min(1),
-          quantity: z.number().positive(),
-          unit: z.string().min(1),
-          note: z.string().optional(),
-        }),
-      )
-      .min(2),
-    steps: z.array(z.string().min(8)).min(3),
-    substitutions: z.array(z.string()).optional(),
-    servingSuggestion: z.string().optional(),
-    drinkPairing: z.string().optional(),
-  }),
 });
 
 const optionalUrl = z
@@ -74,6 +42,42 @@ const optionalText = z
     const trimmed = value.trim();
     return trimmed.length > 0 ? trimmed : undefined;
   });
+
+const recipeConfirmSchema = z.object({
+  kind: z.literal("recipe"),
+  countryCode: z.string().length(2),
+  countryName: z.string().min(1),
+  query: z.string().min(2).max(280),
+  confirmationNotes: z.string().optional(),
+  recipe: z.object({
+    name: z.string().min(1),
+    localName: optionalText,
+    description: z.string().min(20),
+    category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+    servings: z.coerce.number().int().positive(),
+    prepMinutes: z.coerce.number().int().nonnegative(),
+    cookMinutes: z.coerce.number().int().nonnegative(),
+    difficulty: z.enum(["easy", "medium", "challenging"]),
+    dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
+    ingredients: z
+      .array(
+        z.object({
+          name: z.string().min(1),
+          quantity: z.coerce.number().positive(),
+          unit: z.string().min(1),
+          note: optionalText,
+        }),
+      )
+      .min(2),
+    steps: z.array(z.string().min(8)).min(3),
+    substitutions: z
+      .array(z.string())
+      .nullish()
+      .transform((v) => v ?? undefined),
+    servingSuggestion: optionalText,
+    drinkPairing: optionalText,
+  }),
+});
 
 const restaurantConfirmSchema = z.object({
   kind: z.literal("restaurant"),
@@ -100,19 +104,6 @@ const confirmBodySchema = z.discriminatedUnion("kind", [
   restaurantConfirmSchema,
 ]);
 
-function adminAuthorized(req: {
-  headers: Record<string, string | string[] | undefined>;
-  query: Record<string, unknown>;
-}): boolean {
-  const expected = process.env.ADMIN_TOKEN?.trim();
-  if (!expected) return false;
-  const header = req.headers["x-admin-token"];
-  const fromHeader = Array.isArray(header) ? header[0] : header;
-  const fromQuery =
-    typeof req.query.token === "string" ? req.query.token : undefined;
-  return fromHeader === expected || fromQuery === expected;
-}
-
 export function registerSuggestionRoutes(
   app: import("express").Express,
 ): void {
@@ -120,7 +111,7 @@ export function registerSuggestionRoutes(
     res.json({ openaiConfigured: isOpenAiConfigured() });
   });
 
-  app.get("/api/suggestions/recipes", (req, res) => {
+  app.get("/api/suggestions/recipes", async (req, res) => {
     const countryCode = String(req.query.countryCode ?? "")
       .trim()
       .toLowerCase();
@@ -128,7 +119,7 @@ export function registerSuggestionRoutes(
       res.status(400).json({ message: "countryCode is required." });
       return;
     }
-    res.json({ recipes: listVisibleRecipesForCountry(countryCode) });
+    res.json({ recipes: await listVisibleRecipesForCountry(countryCode) });
   });
 
   app.post("/api/suggestions/preview", async (req, res) => {
@@ -168,7 +159,7 @@ export function registerSuggestionRoutes(
   app.post("/api/suggestions", createSuggestion);
   app.post("/api/suggestions/create", createSuggestion);
 
-  function createSuggestion(
+  async function createSuggestion(
     req: import("express").Request,
     res: import("express").Response,
   ) {
@@ -189,7 +180,7 @@ export function registerSuggestionRoutes(
           recipe.description.length >= 40
             ? recipe.description
             : `${recipe.description} A home-cook recipe for ${parsed.data.countryName} cuisine.`;
-        const submission = insertRecipeSubmission({
+        const submission = await insertRecipeSubmission({
           id,
           countryCode: parsed.data.countryCode,
           countryName: parsed.data.countryName,
@@ -223,7 +214,7 @@ export function registerSuggestionRoutes(
       const rowId = slugifyId("user", place.name);
       const code = parsed.data.countryCode.toLowerCase();
       const cuisineTags = osmTagsForCountry(code);
-      upsertRestaurant({
+      await upsertRestaurant({
         id: rowId,
         name: place.name,
         address: place.address,
@@ -250,7 +241,7 @@ export function registerSuggestionRoutes(
         reviewSource: "user-suggestion-pending",
       });
 
-      const submission = insertRestaurantSubmission({
+      const submission = await insertRestaurantSubmission({
         id: slugifyId("suggest-rest", place.name),
         countryCode: parsed.data.countryCode,
         countryName: parsed.data.countryName,
@@ -271,28 +262,20 @@ export function registerSuggestionRoutes(
     }
   }
 
-  app.get("/api/admin/submissions", (req, res) => {
-    if (!adminAuthorized(req)) {
-      res.status(401).json({ message: "Admin token required." });
-      return;
-    }
+  app.get("/api/admin/submissions", requireAdmin, async (req, res) => {
     const status = (String(req.query.status ?? "pending") ||
       "pending") as SubmissionStatus | "all";
     const kind = (String(req.query.kind ?? "all") ||
       "all") as SubmissionKind | "all";
     res.json({
-      submissions: listSubmissions({
+      submissions: await listSubmissions({
         status: status === "all" ? "all" : status,
         kind: kind === "all" ? "all" : kind,
       }),
     });
   });
 
-  app.post("/api/admin/submissions/:id/:action", (req, res) => {
-    if (!adminAuthorized(req)) {
-      res.status(401).json({ message: "Admin token required." });
-      return;
-    }
+  app.post("/api/admin/submissions/:id/:action", requireAdmin, async (req, res) => {
     const action = req.params.action;
     if (action !== "approve" && action !== "reject") {
       res.status(400).json({ message: "Use approve or reject." });
@@ -303,7 +286,7 @@ export function registerSuggestionRoutes(
     const kind = String(req.query.kind ?? req.body?.kind ?? "");
 
     if (kind === "recipe") {
-      const updated = setRecipeSubmissionStatus(req.params.id, nextStatus);
+      const updated = await setRecipeSubmissionStatus(req.params.id, nextStatus);
       if (!updated) {
         res.status(404).json({ message: "Submission not found." });
         return;
@@ -313,13 +296,16 @@ export function registerSuggestionRoutes(
     }
 
     if (kind === "restaurant") {
-      const updated = setRestaurantSubmissionStatus(req.params.id, nextStatus);
+      const updated = await setRestaurantSubmissionStatus(
+        req.params.id,
+        nextStatus,
+      );
       if (!updated) {
         res.status(404).json({ message: "Submission not found." });
         return;
       }
       if (updated.restaurantRowId) {
-        setRestaurantRowReviewed(
+        await setRestaurantRowReviewed(
           updated.restaurantRowId,
           nextStatus !== "rejected",
         );

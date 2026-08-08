@@ -73,3 +73,11 @@ export function listSourceRatings(
       rating: ratings[source]!,
     }));
 }
+
+/** Render price level 1–4 as €–€€€€. */
+export function formatPriceLevel(
+  level: 1 | 2 | 3 | 4 | null | undefined,
+): string | null {
+  if (level == null || level < 1 || level > 4) return null;
+  return "€".repeat(level);
+}

@@ -113,7 +113,17 @@ export type Country = {
   nationalDrink?: Drink;
   /** Present when Cook mode has a full hand-authored menu. */
   menu?: Menu;
+  /**
+   * Recipes from the DB when a full cook menu is not assembled yet
+   * (e.g. admin-added dishes on a stub country).
+   */
+  standaloneRecipes?: Recipe[];
+  /** Extra drinks when a full cook menu is not assembled yet. */
+  moreDrinks?: Drink[];
   specialtyShops?: SpecialtyShop[];
+  /** Cuisine banner plate (DB or curated). */
+  imageUrl?: string;
+  imageAttribution?: string;
   /** True when recipes are ready for Cook mode. */
   cookReady: boolean;
   status: CountryStatus;

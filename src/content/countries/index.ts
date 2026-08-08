@@ -21,7 +21,6 @@ export function getRecipeFromCountry(
   country: Country,
   recipeId: string,
 ): Recipe | undefined {
-  if (!country.menu) return undefined;
   return getCountryRecipes(country).find((recipe) => recipe.id === recipeId);
 }
 

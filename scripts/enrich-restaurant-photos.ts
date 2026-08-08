@@ -6,7 +6,7 @@
  * 1. Google Places photos (when GOOGLE_PLACES_API_KEY is set)
  * 2. Wikimedia Commons search fallback
  *
- * Writes photoUrl into curated.json (when listed) and SQLite.
+ * Writes photoUrl into curated.json (when listed) and Postgres.
  *
  * Usage:
  *   npm run agent:restaurant-photos
@@ -21,9 +21,12 @@ import { fileURLToPath } from "node:url";
 import {
   closeDb,
   getDb,
+  listRestaurants,
   upsertRestaurant,
   type StoredRestaurant,
 } from "../server/db/restaurants.ts";
+import { fetchGoogleRestaurantPhoto } from "../server/lib/googlePlacesPhoto.ts";
+import { findCommonsImage } from "../server/lib/wikimedia.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CURATED_PATH = path.join(rootDir, "src/content/restaurants/curated.json");
@@ -31,8 +34,6 @@ const PROGRESS_PATH = path.join(
   rootDir,
   "data/restaurant-photo-progress.json",
 );
-const USER_AGENT =
-  "SpoonSpin/0.1 (https://github.com/gannetson/spoonspin; restaurant photos)";
 
 type Progress = {
   completedIds: string[];
@@ -97,206 +98,10 @@ function saveJson(filePath: string, value: unknown) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
-function normalizeName(value: string): string {
-  return value
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim();
-}
-
-function namesLikelyMatch(a: string, b: string): boolean {
-  const left = normalizeName(a);
-  const right = normalizeName(b);
-  if (!left || !right) return false;
-  if (left === right) return true;
-  if (left.includes(right) || right.includes(left)) return true;
-  const leftTokens = new Set(left.split(" ").filter((t) => t.length > 2));
-  const rightTokens = right.split(" ").filter((t) => t.length > 2);
-  if (rightTokens.length === 0) return false;
-  const overlap = rightTokens.filter((t) => leftTokens.has(t)).length;
-  return overlap / rightTokens.length >= 0.6;
-}
-
-function parseJsonArray(value: unknown): string[] {
-  try {
-    const parsed: unknown =
-      typeof value === "string" ? JSON.parse(value) : value;
-    if (!Array.isArray(parsed)) return [];
-    return parsed.filter((item): item is string => typeof item === "string");
-  } catch {
-    return [];
-  }
-}
-
-function rowToStored(row: Record<string, unknown>): StoredRestaurant {
-  return {
-    id: String(row.id),
-    name: String(row.name),
-    address: String(row.address),
-    city: String(row.city),
-    postcode: row.postcode == null ? null : String(row.postcode),
-    lat: typeof row.lat === "number" ? row.lat : null,
-    lng: typeof row.lng === "number" ? row.lng : null,
-    cuisineCodes: parseJsonArray(row.cuisine_codes),
-    cuisineTags: parseJsonArray(row.cuisine_tags),
-    website: row.website == null ? null : String(row.website),
-    phone: row.phone == null ? null : String(row.phone),
-    source: String(row.source),
-    osmId: String(row.osm_id),
-    mapsUrl: String(row.maps_url),
-    updatedAt: String(row.updated_at),
-    reviewed: Number(row.reviewed ?? 0) === 1,
-    authenticityRating:
-      typeof row.authenticity_rating === "number"
-        ? row.authenticity_rating
-        : null,
-    authenticityNotes:
-      row.authenticity_notes == null ? null : String(row.authenticity_notes),
-    reviewedAt: row.reviewed_at == null ? null : String(row.reviewed_at),
-    reviewSource: row.review_source == null ? null : String(row.review_source),
-    userRating: typeof row.user_rating === "number" ? row.user_rating : null,
-    reviewCount:
-      typeof row.review_count === "number" ? row.review_count : null,
-    ratings: null,
-    photoUrl: row.photo_url == null ? null : String(row.photo_url),
-    photoAttribution:
-      row.photo_attribution == null ? null : String(row.photo_attribution),
-  };
-}
-
-async function fetchGooglePhoto(
-  place: { name: string; city: string },
-  apiKey: string,
-): Promise<{ url: string; attribution: string } | null> {
-  const response = await fetch(
-    "https://places.googleapis.com/v1/places:searchText",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask":
-          "places.id,places.displayName,places.photos,places.formattedAddress",
-      },
-      body: JSON.stringify({
-        textQuery: `${place.name} restaurant ${place.city} Netherlands`,
-        languageCode: "en",
-        regionCode: "NL",
-        maxResultCount: 5,
-      }),
-    },
-  );
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Google search ${response.status}: ${body.slice(0, 200)}`);
-  }
-
-  const data = (await response.json()) as {
-    places?: Array<{
-      displayName?: { text?: string };
-      photos?: Array<{
-        name?: string;
-        authorAttributions?: Array<{ displayName?: string }>;
-      }>;
-    }>;
-  };
-
-  const match = (data.places ?? []).find((candidate) =>
-    namesLikelyMatch(place.name, candidate.displayName?.text ?? ""),
-  );
-  const photoName = match?.photos?.[0]?.name;
-  if (!photoName) return null;
-
-  const media = await fetch(
-    `https://places.googleapis.com/v1/${photoName}/media?maxHeightPx=800&skipHttpRedirect=true`,
-    { headers: { "X-Goog-Api-Key": apiKey } },
-  );
-  if (!media.ok) {
-    const body = await media.text();
-    throw new Error(`Google photo ${media.status}: ${body.slice(0, 200)}`);
-  }
-  const payload = (await media.json()) as { photoUri?: string };
-  if (!payload.photoUri) return null;
-
-  const credit =
-    match?.photos?.[0]?.authorAttributions?.[0]?.displayName ?? "Google";
-  return {
-    url: payload.photoUri,
-    attribution: `Photo: ${credit} via Google`,
-  };
-}
-
 async function fetchCommonsPhoto(
   place: { name: string; city: string },
 ): Promise<{ url: string; attribution: string } | null> {
-  const query = `${place.name} ${place.city} restaurant`;
-  const searchUrl =
-    "https://commons.wikimedia.org/w/api.php?" +
-    new URLSearchParams({
-      action: "query",
-      list: "search",
-      srsearch: query,
-      srnamespace: "6",
-      srlimit: "5",
-      format: "json",
-      origin: "*",
-    });
-  const searchRes = await fetch(searchUrl, {
-    headers: { "User-Agent": USER_AGENT, "Api-User-Agent": USER_AGENT },
-  });
-  if (!searchRes.ok) return null;
-  const search = (await searchRes.json()) as {
-    query?: { search?: Array<{ title: string }> };
-  };
-  const hit = search.query?.search?.[0];
-  if (!hit?.title) return null;
-
-  const infoUrl =
-    "https://commons.wikimedia.org/w/api.php?" +
-    new URLSearchParams({
-      action: "query",
-      titles: hit.title,
-      prop: "imageinfo",
-      iiprop: "url|extmetadata",
-      format: "json",
-      origin: "*",
-    });
-  const infoRes = await fetch(infoUrl, {
-    headers: { "User-Agent": USER_AGENT, "Api-User-Agent": USER_AGENT },
-  });
-  if (!infoRes.ok) return null;
-  const info = (await infoRes.json()) as {
-    query?: {
-      pages?: Record<
-        string,
-        {
-          imageinfo?: Array<{
-            url?: string;
-            extmetadata?: {
-              Artist?: { value?: string };
-              LicenseShortName?: { value?: string };
-            };
-          }>;
-        }
-      >;
-    };
-  };
-  const page = Object.values(info.query?.pages ?? {})[0];
-  const image = page?.imageinfo?.[0];
-  if (!image?.url) return null;
-  const license =
-    image.extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
-  const artist = image.extmetadata?.Artist?.value
-    ?.replace(/<[^>]+>/g, "")
-    .trim();
-  return {
-    url: image.url,
-    attribution: artist
-      ? `${artist} / ${license}`
-      : `Wikimedia Commons / ${license}`,
-  };
+  return findCommonsImage(`${place.name} ${place.city} restaurant`);
 }
 
 function buildTargets(
@@ -344,12 +149,8 @@ async function main() {
   const curated = loadJson<CuratedPlace[]>(CURATED_PATH, []);
   const curatedById = new Map(curated.map((row) => [row.id, { ...row }]));
 
-  const db = getDb();
-  const reviewed = (
-    db.prepare(`SELECT * FROM restaurants WHERE reviewed = 1`).all() as Array<
-      Record<string, unknown>
-    >
-  ).map(rowToStored);
+  await getDb();
+  const reviewed = await listRestaurants({ reviewedOnly: true });
 
   const pending = buildTargets(reviewed, curated).filter((item) => {
     if (completed.has(item.id)) return false;
@@ -370,7 +171,7 @@ async function main() {
     for (const item of pending.slice(0, 8)) {
       console.log(`  - ${item.id} · ${item.name} (${item.city})`);
     }
-    closeDb();
+    await closeDb();
     return;
   }
 
@@ -390,7 +191,10 @@ async function main() {
     try {
       let photo: { url: string; attribution: string } | null = null;
       if (googleKey) {
-        photo = await fetchGooglePhoto(item, googleKey);
+        photo = await fetchGoogleRestaurantPhoto({
+          name: item.name,
+          city: item.city,
+        });
       }
       if (!photo) {
         photo = await fetchCommonsPhoto(item);
@@ -403,7 +207,7 @@ async function main() {
       }
 
       if (item.dbRow) {
-        upsertRestaurant({
+        await upsertRestaurant({
           ...item.dbRow,
           photoUrl: photo.url,
           photoAttribution: photo.attribution,
@@ -436,7 +240,7 @@ async function main() {
   progress.runs += 1;
   progress.lastRunAt = new Date().toISOString();
   saveJson(PROGRESS_PATH, progress);
-  closeDb();
+  await closeDb();
 
   console.log(
     `\nPhotos enriched this run: ${enriched} · lifetime ${progress.lifetimeEnriched}`,
@@ -445,6 +249,6 @@ async function main() {
 
 main().catch((error) => {
   console.error(error);
-  closeDb();
+  await closeDb();
   process.exit(1);
 });

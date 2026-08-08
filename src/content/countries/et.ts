@@ -57,6 +57,62 @@ export const etCountry: AuthoredCountry = {
       false,
       "Freshly roasted, brewed coffee served in small cups.",
     ),
+    moreRecipes: [
+      r(
+        "tibs",
+        "Sautéed Beef Tibs",
+        "ጥብስ",
+        "main",
+        [
+          { name: "beef sirloin", quantity: 600, unit: "g" },
+          { name: "onion", quantity: 2, unit: "pieces" },
+          { name: "berbere", quantity: 15, unit: "g" },
+          { name: "fresh rosemary", quantity: 5, unit: "g" },
+        ],
+        {
+          description:
+            "Quick-seared beef with onion, rosemary, and berbere, served sizzling with injera.",
+          dietaryLabels: ["contains-meat", "gluten-free"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Tibs",
+        },
+      ),
+      r(
+        "shiro",
+        "Chickpea Shiro Stew",
+        "ሽሮ",
+        "side",
+        [
+          { name: "shiro flour or chickpea flour", quantity: 150, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "tomato", quantity: 1, unit: "piece" },
+          { name: "niter kibbeh or oil", quantity: 40, unit: "ml" },
+        ],
+        {
+          description:
+            "Silky spiced chickpea-flour stew that is everyday comfort across Ethiopia.",
+          dietaryLabels: ["vegetarian", "vegan"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Shiro_(food)",
+        },
+      ),
+      r(
+        "genfo",
+        "Barley Porridge",
+        "ገንፎ",
+        "dessert",
+        [
+          { name: "barley flour", quantity: 250, unit: "g" },
+          { name: "water", quantity: 600, unit: "ml" },
+          { name: "niter kibbeh or butter", quantity: 60, unit: "g" },
+          { name: "berbere", quantity: 5, unit: "g" },
+        ],
+        {
+          description:
+            "Thick barley porridge shaped into a well and filled with spiced butter.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Genfo",
+        },
+      ),
+    ],
   },
   status: "published",
 };

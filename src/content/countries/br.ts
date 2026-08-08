@@ -53,6 +53,62 @@ export const brCountry: AuthoredCountry = {
       false,
       "Sweet, lightly fruity Brazilian soda made from guaraná.",
     ),
+    moreRecipes: [
+      r(
+        "coxinha",
+        "Chicken Coxinha",
+        "Coxinha",
+        "starter",
+        [
+          { name: "cooked chicken", quantity: 400, unit: "g" },
+          { name: "cream cheese", quantity: 100, unit: "g" },
+          { name: "flour", quantity: 300, unit: "g" },
+          { name: "chicken stock", quantity: 400, unit: "ml" },
+        ],
+        {
+          description:
+            "Teardrop croquettes of creamy shredded chicken wrapped in dough and fried crisp.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Coxinha",
+        },
+      ),
+      r(
+        "moqueca",
+        "Bahian Fish Stew",
+        "Moqueca",
+        "main",
+        [
+          { name: "firm white fish", quantity: 700, unit: "g" },
+          { name: "coconut milk", quantity: 400, unit: "ml" },
+          { name: "red pepper", quantity: 2, unit: "pieces" },
+          { name: "dendê or palm oil", quantity: 30, unit: "ml" },
+        ],
+        {
+          description:
+            "Fish gently cooked with coconut milk, peppers, tomatoes, and dendê oil.",
+          dietaryLabels: ["gluten-free"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Moqueca",
+        },
+      ),
+      r(
+        "pudim",
+        "Brazilian Milk Pudding",
+        "Pudim de leite",
+        "dessert",
+        [
+          { name: "sweetened condensed milk", quantity: 395, unit: "g" },
+          { name: "whole milk", quantity: 400, unit: "ml" },
+          { name: "eggs", quantity: 3, unit: "pieces" },
+          { name: "sugar", quantity: 150, unit: "g" },
+        ],
+        {
+          description:
+            "Silky condensed-milk flan with a dark caramel top, chilled until sliceable.",
+          dietaryLabels: ["vegetarian", "gluten-free"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Crème_caramel",
+        },
+      ),
+    ],
   },
   status: "published",
 };

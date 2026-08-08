@@ -180,7 +180,7 @@ export async function harvestCountryAtHub(options: {
   for (const element of elements) {
     const restaurant = elementToRestaurant(element, options.countryCode);
     if (!restaurant) continue;
-    upsertRestaurant(restaurant);
+    await upsertRestaurant(restaurant);
     upserted += 1;
   }
   return upserted;

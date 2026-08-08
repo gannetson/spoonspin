@@ -59,6 +59,62 @@ export const gbCountry: AuthoredCountry = {
       false,
       "Floral non-alcoholic cordial diluted with still or sparkling water.",
     ),
+    moreRecipes: [
+      r(
+        "shepherd-pie",
+        "Shepherd's Pie",
+        "Shepherd's pie",
+        "main",
+        [
+          { name: "minced lamb", quantity: 600, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "carrots", quantity: 2, unit: "pieces" },
+          { name: "potatoes", quantity: 900, unit: "g" },
+        ],
+        {
+          description:
+            "Minced lamb in gravy under a golden mashed-potato crust.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Shepherd's_pie",
+        },
+      ),
+      r(
+        "sunday-roast",
+        "Sunday Roast Chicken",
+        "Sunday roast",
+        "main",
+        [
+          { name: "whole chicken", quantity: 1500, unit: "g" },
+          { name: "potatoes", quantity: 800, unit: "g" },
+          { name: "carrots", quantity: 400, unit: "g" },
+          { name: "chicken stock", quantity: 300, unit: "ml" },
+        ],
+        {
+          description:
+            "Roast chicken with gravy, roast potatoes, and seasonal vegetables.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Sunday_roast",
+        },
+      ),
+      r(
+        "scones",
+        "Cream Scones",
+        "Scones",
+        "dessert",
+        [
+          { name: "flour", quantity: 350, unit: "g" },
+          { name: "butter", quantity: 80, unit: "g" },
+          { name: "milk", quantity: 150, unit: "ml" },
+          { name: "baking powder", quantity: 15, unit: "g" },
+        ],
+        {
+          description:
+            "Light tea-time scones split and filled with jam and thick cream.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Scone",
+        },
+      ),
+    ],
   },
   status: "published",
 };

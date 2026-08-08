@@ -22,6 +22,7 @@ import {
   closeDb,
   countByCuisineCode,
   getDb,
+  listRestaurants,
   upsertRestaurant,
   type StoredRestaurant,
 } from "../server/db/restaurants.ts";
@@ -154,8 +155,8 @@ function saveProgress(progress: GatherProgress) {
   fs.writeFileSync(PROGRESS_PATH, `${JSON.stringify(progress, null, 2)}\n`);
 }
 
-function buildJobs(options: CliOptions): GatherJob[] {
-  const reviewed = countByCuisineCode();
+async function buildJobs(options: CliOptions): Promise<GatherJob[]> {
+  const reviewed = await countByCuisineCode();
   const rankedCountries = [...options.countries].sort((a, b) => {
     const gap = (reviewed[a] ?? 0) - (reviewed[b] ?? 0);
     if (gap !== 0) return gap;
@@ -201,43 +202,15 @@ function scoreAuthenticity(restaurant: StoredRestaurant, countryCode: string): {
   };
 }
 
-function promoteUnreviewed(limit = 80): number {
-  const db = getDb();
-  const rows = db
-    .prepare(`SELECT * FROM restaurants WHERE reviewed = 0`)
-    .all() as Array<Record<string, unknown>>;
+async function promoteUnreviewed(limit = 80): Promise<number> {
+  const rows = await listRestaurants({ reviewedOnly: false });
+  const unreviewed = rows.filter((row) => !row.reviewed);
 
   let promoted = 0;
   const now = new Date().toISOString();
 
-  for (const raw of rows) {
+  for (const restaurant of unreviewed) {
     if (promoted >= limit) break;
-
-    const restaurant = {
-      id: String(raw.id),
-      name: String(raw.name),
-      address: String(raw.address),
-      city: String(raw.city),
-      postcode: raw.postcode == null ? null : String(raw.postcode),
-      lat: typeof raw.lat === "number" ? raw.lat : null,
-      lng: typeof raw.lng === "number" ? raw.lng : null,
-      cuisineCodes: JSON.parse(String(raw.cuisine_codes)) as string[],
-      cuisineTags: JSON.parse(String(raw.cuisine_tags)) as string[],
-      website: raw.website == null ? null : String(raw.website),
-      phone: raw.phone == null ? null : String(raw.phone),
-      source: String(raw.source),
-      osmId: String(raw.osm_id),
-      mapsUrl: String(raw.maps_url),
-      updatedAt: String(raw.updated_at),
-      reviewed: false,
-      authenticityRating: null,
-      authenticityNotes: null,
-      reviewedAt: null,
-      reviewSource: null,
-      userRating: null,
-      reviewCount: null,
-      ratings: null,
-    } satisfies StoredRestaurant;
 
     if (!restaurant.name || restaurant.lat == null || restaurant.lng == null) {
       continue;
@@ -251,7 +224,7 @@ function promoteUnreviewed(limit = 80): number {
     const countryCode = matchingCodes[0]!;
     const scored = scoreAuthenticity(restaurant, countryCode);
 
-    upsertRestaurant({
+    await upsertRestaurant({
       id: restaurant.id,
       name: restaurant.name,
       address: restaurant.address,
@@ -292,11 +265,11 @@ function promoteUnreviewed(limit = 80): number {
   return promoted;
 }
 
-function printStatus(options: CliOptions, progress: GatherProgress) {
-  const jobs = buildJobs(options);
+async function printStatus(options: CliOptions, progress: GatherProgress) {
+  const jobs = await buildJobs(options);
   const completed = new Set(progress.completedJobIds);
   const remaining = jobs.filter((job) => !completed.has(job.id));
-  const reviewed = countByCuisineCode();
+  const reviewed = await countByCuisineCode();
 
   console.log("Gather progress");
   console.log(`  preset: ${options.hubsPreset} · radius ${options.radiusKm} km`);
@@ -329,7 +302,7 @@ function printStatus(options: CliOptions, progress: GatherProgress) {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  getDb();
+  await getDb();
 
   let progress = loadProgress(options);
   if (options.reset) {
@@ -339,8 +312,8 @@ async function main() {
   }
 
   if (options.statusOnly) {
-    printStatus(options, progress);
-    closeDb();
+    await printStatus(options, progress);
+    await closeDb();
     return;
   }
 
@@ -348,7 +321,7 @@ async function main() {
   let promoted = 0;
 
   if (!options.promoteOnly) {
-    const jobs = buildJobs(options);
+    const jobs = await buildJobs(options);
     const completed = new Set(progress.completedJobIds);
     const pending = jobs.filter((job) => !completed.has(job.id));
     const batch = pending.slice(0, options.batch);
@@ -383,7 +356,7 @@ async function main() {
   }
 
   process.stdout.write("Promoting specialty OSM matches… ");
-  promoted = promoteUnreviewed(120);
+  promoted = await promoteUnreviewed(120);
   console.log(`${promoted} promoted`);
 
   progress.lastRunAt = new Date().toISOString();
@@ -395,15 +368,15 @@ async function main() {
   saveProgress(progress);
 
   console.log("");
-  printStatus(options, progress);
+  await printStatus(options, progress);
   console.log(
     "\nRun again anytime: npm run agent:gather\nOptional: npm run agent:ratings (needs Google key)",
   );
-  closeDb();
+  await closeDb();
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
-  closeDb();
+  await closeDb();
   process.exit(1);
 });

@@ -67,7 +67,7 @@ function parseArgs(argv: string[]): CliOptions {
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  getDb();
+  await getDb();
 
   console.log(
     `Spoon Spin restaurant agent — hubs: ${options.hubs.map((h) => h.name).join(", ")} r=${options.radiusKm}km`,
@@ -109,16 +109,16 @@ async function main() {
   }
 
   console.log("\nReviewed coverage by cuisine:");
-  const totals = countByCuisineCode();
+  const totals = await countByCuisineCode();
   for (const code of options.countries) {
     console.log(`  ${code}: ${totals[code] ?? 0}`);
   }
 
-  closeDb();
+  await closeDb();
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
-  closeDb();
+  await closeDb();
   process.exit(1);
 });

@@ -141,21 +141,20 @@ export async function confirmSuggestion(
 }
 
 export async function fetchAdminSubmissions(input: {
-  token: string;
   status?: SubmissionStatus | "all";
 }): Promise<AnySubmission[]> {
   const params = new URLSearchParams({
-    token: input.token,
     status: input.status ?? "pending",
   });
-  const response = await fetch(`/api/admin/submissions?${params}`);
+  const response = await fetch(`/api/admin/submissions?${params}`, {
+    credentials: "include",
+  });
   if (!response.ok) throw new Error(await readError(response));
   const data = (await response.json()) as { submissions: AnySubmission[] };
   return data.submissions;
 }
 
 export async function reviewSubmission(input: {
-  token: string;
   id: string;
   kind: SuggestionKind;
   action: "approve" | "reject";
@@ -164,9 +163,9 @@ export async function reviewSubmission(input: {
     `/api/admin/submissions/${encodeURIComponent(input.id)}/${input.action}?kind=${input.kind}`,
     {
       method: "POST",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
-        "x-admin-token": input.token,
       },
       body: JSON.stringify({ kind: input.kind }),
     },

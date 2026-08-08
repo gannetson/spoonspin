@@ -57,6 +57,62 @@ export const snCountry: AuthoredCountry = {
       false,
       "Fresh ginger, lemon, and sugar chilled over ice.",
     ),
+    moreRecipes: [
+      r(
+        "yassa-poulet",
+        "Chicken Yassa",
+        "Yassa poulet",
+        "main",
+        [
+          { name: "chicken pieces", quantity: 1000, unit: "g" },
+          { name: "onions", quantity: 4, unit: "pieces" },
+          { name: "lemons", quantity: 3, unit: "pieces" },
+          { name: "Dijon mustard", quantity: 30, unit: "g" },
+        ],
+        {
+          description:
+            "Onion-lemon marinated chicken grilled then simmered in a tangy caramelised sauce.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Yassa_(food)",
+        },
+      ),
+      r(
+        "maafe",
+        "Peanut Stew",
+        "Mafé",
+        "main",
+        [
+          { name: "beef or chicken", quantity: 700, unit: "g" },
+          { name: "natural peanut butter", quantity: 150, unit: "g" },
+          { name: "tomato paste", quantity: 60, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+        ],
+        {
+          description:
+            "Rich peanut and tomato stew with tender meat or vegetables, served over rice.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Maafe",
+        },
+      ),
+      r(
+        "fataya",
+        "Fish Pastries",
+        "Fataya",
+        "snack",
+        [
+          { name: "flour", quantity: 300, unit: "g" },
+          { name: "cooked flaked fish", quantity: 250, unit: "g" },
+          { name: "onion", quantity: 1, unit: "piece" },
+          { name: "parsley", quantity: 20, unit: "g" },
+        ],
+        {
+          description:
+            "Crisp half-moon pastries filled with seasoned fish, onion, and herbs.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Senegalese_cuisine",
+        },
+      ),
+    ],
   },
   status: "published",
 };

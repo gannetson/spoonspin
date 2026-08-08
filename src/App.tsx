@@ -1,25 +1,30 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
+import { useAuth } from "@/auth/AuthContext";
 import {
-  getCountryByCode,
   getPublishedCountries,
   getRecipeFromCountry,
 } from "@/content/countries";
+import { fetchCountries } from "@/content/client";
 import {
   getRecentCountryCodes,
   pickRandomCountry,
   rememberCountryCode,
 } from "@/lib/picker";
-import type { Drink, Recipe } from "@/types/content";
+import type { Country, Drink, Recipe } from "@/types/content";
 import { CountryCard } from "@/components/CountryCard";
 import { CountrySelect } from "@/components/CountrySelect";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
 import { HomeHero } from "@/components/HomeHero";
+import { AdminCountryMenu } from "@/components/AdminCountryMenu";
 import { RecipeView } from "@/components/RecipeView";
+import { RestaurantView } from "@/components/RestaurantView";
 import { ShareButton } from "@/components/ShareButton";
 import { FlagSpinner, SpinSpoonButton } from "@/components/SpinSpoonButton";
 import { fetchCommunityRecipes } from "@/suggestions/client";
+import type { Restaurant } from "@/restaurants/types";
+import { useT } from "@/i18n/LocaleContext";
 
 export type AppMode = "choose" | "cook" | "dine";
 
@@ -35,14 +40,49 @@ function parseMode(value: string | null): AppMode {
   return "choose";
 }
 
+function findCountry(
+  countries: Country[],
+  code: string | null,
+): Country | undefined {
+  if (!code) return undefined;
+  return countries.find((country) => country.code === code.toLowerCase());
+}
+
 export default function App() {
+  const t = useT();
+  const { user, logout, loading: authLoading } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
-  const published = useMemo(() => getPublishedCountries(), []);
+  const [published, setPublished] = useState<Country[]>(() =>
+    getPublishedCountries(),
+  );
   const countryCode = searchParams.get("country")?.toLowerCase() ?? null;
   const mode = parseMode(searchParams.get("mode"));
   const recipeId = searchParams.get("recipe");
+  const restaurantId = searchParams.get("restaurant");
+  const [dineRestaurantCache, setDineRestaurantCache] =
+    useState<Restaurant | null>(null);
+  const [dineRefreshKey, setDineRefreshKey] = useState(0);
 
-  const selectedCountry = countryCode ? getCountryByCode(countryCode) : undefined;
+  useEffect(() => {
+    let cancelled = false;
+    void fetchCountries()
+      .then((countries) => {
+        if (!cancelled && countries.length > 0) {
+          setPublished(countries);
+        }
+      })
+      .catch(() => {
+        // Keep static TypeScript content as fallback when API/DB is empty.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const selectedCountry = useMemo(
+    () => findCountry(published, countryCode),
+    [published, countryCode],
+  );
   const invalidCountry = Boolean(countryCode) && !selectedCountry;
 
   const [communityRecipes, setCommunityRecipes] = useState<Recipe[]>([]);
@@ -76,11 +116,11 @@ export default function App() {
   useEffect(() => {
     if (invalidCountry) {
       setFallbackNotice(
-        `We could not find a published country for “${countryCode}”. Pick again to continue.`,
+        t("app.fallback.unknownCountry", { code: countryCode ?? "" }),
       );
       setSearchParams({}, { replace: true });
     }
-  }, [invalidCountry, countryCode, setSearchParams]);
+  }, [invalidCountry, countryCode, setSearchParams, t]);
 
   useEffect(() => {
     return () => {
@@ -89,7 +129,12 @@ export default function App() {
   }, []);
 
   const updateParams = useCallback(
-    (next: { country?: string; mode?: AppMode; recipe?: string | null }) => {
+    (next: {
+      country?: string;
+      mode?: AppMode;
+      recipe?: string | null;
+      restaurant?: string | null;
+    }) => {
       setSearchParams(
         (prev) => {
           const params = new URLSearchParams(prev);
@@ -98,6 +143,8 @@ export default function App() {
           else if (next.mode) params.set("mode", next.mode);
           if (next.recipe === null) params.delete("recipe");
           else if (next.recipe) params.set("recipe", next.recipe);
+          if (next.restaurant === null) params.delete("restaurant");
+          else if (next.restaurant) params.set("restaurant", next.restaurant);
           return params;
         },
         { replace: false },
@@ -110,12 +157,12 @@ export default function App() {
     if (spinning) return;
     setFallbackNotice(null);
     setSpinning(true);
-    // Drop an open recipe, but keep cook/dine mode for the next country.
     setSearchParams(
       (prev) => {
-        if (!prev.get("recipe")) return prev;
+        if (!prev.get("recipe") && !prev.get("restaurant")) return prev;
         const params = new URLSearchParams(prev);
         params.delete("recipe");
+        params.delete("restaurant");
         return params;
       },
       { replace: true },
@@ -136,7 +183,7 @@ export default function App() {
         const picked = pickRandomCountry(published, recent);
         rememberCountryCode(picked.code);
         setSpinning(false);
-        setAnnouncement(`Selected ${picked.name}`);
+        setAnnouncement(t("app.announce.selected", { name: picked.name }));
         setSearchParams(
           (prev) => {
             const params = new URLSearchParams();
@@ -151,16 +198,16 @@ export default function App() {
         );
       }
     }, 70);
-  }, [published, setSearchParams, spinning]);
+  }, [published, setSearchParams, spinning, t]);
 
   const selectCountry = useCallback(
     (code: string) => {
       if (spinning) return;
-      const country = getCountryByCode(code);
+      const country = findCountry(published, code);
       if (!country) return;
       setFallbackNotice(null);
       rememberCountryCode(country.code);
-      setAnnouncement(`Selected ${country.name}`);
+      setAnnouncement(t("app.announce.selected", { name: country.name }));
       setSearchParams(
         (prev) => {
           const params = new URLSearchParams();
@@ -174,19 +221,49 @@ export default function App() {
         { replace: false },
       );
     },
-    [setSearchParams, spinning],
+    [published, setSearchParams, spinning, t],
   );
 
+  const handleCountryUpdated = useCallback((country: Country) => {
+    setPublished((prev) => {
+      const index = prev.findIndex((item) => item.code === country.code);
+      if (index === -1) return [...prev, country];
+      const next = [...prev];
+      next[index] = country;
+      return next;
+    });
+  }, []);
+
   const openRecipe = (recipe: Recipe) => {
-    updateParams({ mode: "cook", recipe: recipe.id });
+    updateParams({ mode: "cook", recipe: recipe.id, restaurant: null });
   };
 
   const closeRecipe = () => {
     updateParams({ mode: "cook", recipe: null });
   };
 
+  const openRestaurant = (restaurant: Restaurant) => {
+    setDineRestaurantCache(restaurant);
+    updateParams({ mode: "dine", restaurant: restaurant.id, recipe: null });
+  };
+
+  const closeRestaurant = () => {
+    updateParams({ mode: "dine", restaurant: null });
+  };
+
+  useEffect(() => {
+    if (!restaurantId) setDineRestaurantCache(null);
+  }, [restaurantId]);
+
+  useEffect(() => {
+    if (mode !== "dine" && restaurantId) {
+      updateParams({ restaurant: null });
+    }
+  }, [mode, restaurantId, updateParams]);
+
   const showHome = !selectedCountry && !spinning;
   const showCompactHeader = !showHome;
+  const switcherTone = showHome ? "dark" : "light";
 
   return (
     <div className="relative passport-grid min-h-screen">
@@ -194,29 +271,84 @@ export default function App() {
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-cream focus:px-3 focus:py-2"
       >
-        Skip to content
+        {t("app.skipToContent")}
       </a>
 
-      {showCompactHeader ? (
-        <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-4 pb-2 pt-6 sm:px-6">
+      <header
+        className={`mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 pt-6 sm:px-6 ${
+          showHome ? "absolute inset-x-0 top-0 z-20" : "pb-2"
+        }`}
+      >
+        {showCompactHeader ? (
           <button
             type="button"
             onClick={() => setSearchParams({}, { replace: false })}
             className="text-left"
           >
-            <p className="font-display text-3xl text-ink sm:text-4xl">Spoon Spin</p>
-            <p className="text-sm text-ink-soft">Food &amp; travel, by chance</p>
+            <p className="font-display text-3xl text-ink sm:text-4xl">
+              {t("app.brand")}
+            </p>
+            <p className="text-sm text-ink-soft">{t("app.tagline")}</p>
           </button>
+        ) : (
+          <span className="sr-only">{t("app.brand")}</span>
+        )}
+
+        <div
+          className={`ml-auto flex flex-wrap items-center gap-3 ${
+            showHome ? "text-cream" : "text-ink"
+          }`}
+        >
+          {!authLoading && user ? (
+            <>
+              <span className="max-w-[12rem] truncate text-sm opacity-90">
+                {user.name || user.email}
+              </span>
+              {user.role === "admin" ? (
+                <AdminCountryMenu
+                  country={selectedCountry && !spinning ? selectedCountry : null}
+                  onCountryUpdated={handleCountryUpdated}
+                  onRestaurantsAdded={() =>
+                    setDineRefreshKey((value) => value + 1)
+                  }
+                  tone={switcherTone}
+                />
+              ) : null}
+              <button
+                type="button"
+                onClick={() => void logout()}
+                className={`rounded-full px-3 py-1.5 text-sm font-semibold underline-offset-2 hover:underline ${
+                  showHome ? "text-cream" : "text-tomato"
+                }`}
+              >
+                {t("app.signOut")}
+              </button>
+            </>
+          ) : !authLoading ? (
+            <Link
+              to="/login"
+              className={`rounded-full px-3 py-1.5 text-sm font-semibold underline-offset-2 hover:underline ${
+                showHome ? "text-cream" : "text-tomato"
+              }`}
+            >
+              {t("app.signIn")}
+            </Link>
+          ) : null}
           {selectedCountry ? (
             <ShareButton
-              title={`Spoon Spin: ${selectedCountry.name}`}
+              title={t("app.share.title", { name: selectedCountry.name })}
               url={window.location.href}
             />
           ) : null}
-        </header>
-      ) : null}
+        </div>
+      </header>
 
-      <main id="main" className={showHome ? "" : "mx-auto w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6"}>
+      <main
+        id="main"
+        className={
+          showHome ? "" : "mx-auto w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6"
+        }
+      >
         <div aria-live="polite" className="sr-only">
           {announcement}
         </div>
@@ -232,7 +364,7 @@ export default function App() {
 
         {spinning && !selectedCountry ? (
           <section
-            aria-label="Spinning for a country"
+            aria-label={t("app.spin.ariaLabel")}
             className="mx-auto flex max-w-5xl flex-col items-center gap-8 px-4 py-16 sm:items-start sm:px-6"
           >
             <SpinSpoonButton spinning onClick={pickCountry} size="lg" />
@@ -251,7 +383,9 @@ export default function App() {
         {selectedCountry ? (
           <section
             className="space-y-6"
-            aria-label={`${selectedCountry.name} result`}
+            aria-label={t("app.result.ariaLabel", {
+              name: selectedCountry.name,
+            })}
             aria-busy={spinning}
           >
             <CountryCard
@@ -264,26 +398,30 @@ export default function App() {
             <div className="flex flex-wrap items-end gap-4">
               <ModeButton
                 active={mode === "cook"}
-                onClick={() => updateParams({ mode: "cook", recipe: null })}
-                label="Cook"
+                onClick={() =>
+                  updateParams({ mode: "cook", recipe: null, restaurant: null })
+                }
+                label={t("app.mode.cook")}
                 description={
                   selectedCountry.cookReady
-                    ? "Cook a typical menu at home"
-                    : "Recipes coming soon — overview available"
+                    ? t("app.mode.cook.descriptionReady")
+                    : t("app.mode.cook.descriptionSoon")
                 }
               />
               <ModeButton
                 active={mode === "dine"}
-                onClick={() => updateParams({ mode: "dine", recipe: null })}
-                label="Dine"
-                description="Find restaurants in the Netherlands"
+                onClick={() =>
+                  updateParams({ mode: "dine", recipe: null, restaurant: null })
+                }
+                label={t("app.mode.dine")}
+                description={t("app.mode.dine.description")}
               />
               <CountrySelect
                 countries={published}
                 value={selectedCountry.code}
                 onSelect={selectCountry}
                 id="result-country-select"
-                label="Or pick a country"
+                label={t("app.countrySelect.labelResult")}
               />
             </div>
 
@@ -292,6 +430,7 @@ export default function App() {
                 country={selectedCountry}
                 communityRecipes={communityRecipes}
                 onCommunityRecipesChange={setCommunityRecipes}
+                onCountryUpdated={handleCountryUpdated}
                 onOpenRecipe={openRecipe}
               />
             ) : null}
@@ -300,6 +439,9 @@ export default function App() {
               <RecipeView
                 country={selectedCountry}
                 recipe={selectedRecipe}
+                communityRecipes={communityRecipes}
+                onCommunityRecipesChange={setCommunityRecipes}
+                onCountryUpdated={handleCountryUpdated}
                 drink={
                   selectedCountry.menu?.drink ??
                   selectedCountry.nationalDrink ??
@@ -309,7 +451,28 @@ export default function App() {
               />
             ) : null}
 
-            {mode === "dine" ? <DineSearch country={selectedCountry} /> : null}
+            {mode === "dine" && restaurantId ? (
+              <RestaurantView
+                country={selectedCountry}
+                restaurantId={restaurantId}
+                initialRestaurant={
+                  dineRestaurantCache?.id === restaurantId
+                    ? dineRestaurantCache
+                    : null
+                }
+                onBack={closeRestaurant}
+                onUpdated={(next) => setDineRestaurantCache(next)}
+                onRemoved={() => setDineRestaurantCache(null)}
+              />
+            ) : null}
+
+            {mode === "dine" && !restaurantId ? (
+              <DineSearch
+                country={selectedCountry}
+                onOpenRestaurant={openRestaurant}
+                refreshKey={dineRefreshKey}
+              />
+            ) : null}
           </section>
         ) : null}
       </main>
@@ -340,7 +503,10 @@ function ModeButton({
           : "bg-cream text-ink ring-1 ring-ink/10 hover:ring-tomato/40"
       }`}
     >
-      <span aria-hidden="true" className="block font-display text-2xl leading-none sm:text-3xl">
+      <span
+        aria-hidden="true"
+        className="block font-display text-2xl leading-none sm:text-3xl"
+      >
         {label}
       </span>
       <span

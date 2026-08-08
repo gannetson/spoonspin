@@ -9,19 +9,35 @@ import { specialtyShopsFor } from "../shops/specialtyShops";
 import { applyRecipeEnrichment } from "../recipes/enrichments";
 
 export function getCountryRecipes(country: Country): Recipe[] {
-  if (!country.menu) return [];
-  return [
-    country.menu.starter,
-    country.menu.main,
-    country.menu.side,
-    country.menu.dessert,
-    ...(country.menu.moreRecipes ?? []),
-  ].map((recipe) => applyRecipeEnrichment(country.code, recipe));
+  const enrich = (recipe: Recipe) =>
+    applyRecipeEnrichment(country.code, recipe);
+
+  if (country.menu) {
+    return [
+      country.menu.starter,
+      country.menu.main,
+      country.menu.side,
+      country.menu.dessert,
+      ...(country.menu.moreRecipes ?? []),
+    ].map(enrich);
+  }
+
+  return (country.standaloneRecipes ?? []).map(enrich);
 }
 
 export function getCountryDrinks(country: Country): Drink[] {
   if (!country.menu) {
-    return country.nationalDrink ? [country.nationalDrink] : [];
+    const drinks = [
+      ...(country.nationalDrink ? [country.nationalDrink] : []),
+      ...(country.moreDrinks ?? []),
+    ];
+    const seen = new Set<string>();
+    return drinks.filter((drink) => {
+      const key = drink.name.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }
   const drinks = [country.menu.drink, ...(country.menu.moreDrinks ?? [])];
   if (
@@ -37,10 +53,10 @@ export function getCountryDrinks(country: Country): Drink[] {
 }
 
 export function getSpecialtyShops(country: Country): SpecialtyShop[] {
-  const local = country.specialtyShops ?? [];
-  const shared = specialtyShopsFor(country.code);
-  const seen = new Set(local.map((shop) => shop.id));
-  return [...local, ...shared.filter((shop) => !seen.has(shop.id))];
+  if (country.specialtyShops != null) {
+    return country.specialtyShops;
+  }
+  return specialtyShopsFor(country.code);
 }
 
 export function recipeMatchesDiet(

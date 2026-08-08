@@ -53,6 +53,62 @@ export const maCountry: AuthoredCountry = {
       false,
       "Freshly squeezed sweet orange juice.",
     ),
+    moreRecipes: [
+      r(
+        "harira",
+        "Harira Soup",
+        "حريرة",
+        "starter",
+        [
+          { name: "lamb or beef", quantity: 300, unit: "g" },
+          { name: "red lentils", quantity: 100, unit: "g" },
+          { name: "chickpeas", quantity: 200, unit: "g" },
+          { name: "tomatoes", quantity: 400, unit: "g" },
+        ],
+        {
+          description:
+            "Tomato, lentil, and chickpea soup thickened with flour and brightened with herbs and lemon.",
+          dietaryLabels: ["contains-meat"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Harira",
+        },
+      ),
+      r(
+        "couscous-tfaya",
+        "Couscous with Tfaya",
+        "كسكس",
+        "main",
+        [
+          { name: "couscous", quantity: 400, unit: "g" },
+          { name: "onions", quantity: 3, unit: "pieces" },
+          { name: "raisins", quantity: 80, unit: "g" },
+          { name: "chickpeas", quantity: 250, unit: "g" },
+        ],
+        {
+          description:
+            "Steamed couscous topped with caramelised onion-raisin tfaya and a fragrant broth.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Couscous",
+        },
+      ),
+      r(
+        "chebakia",
+        "Sesame Honey Pastries",
+        "شباكية",
+        "dessert",
+        [
+          { name: "flour", quantity: 400, unit: "g" },
+          { name: "sesame seeds", quantity: 80, unit: "g" },
+          { name: "honey", quantity: 300, unit: "g" },
+          { name: "orange blossom water", quantity: 30, unit: "ml" },
+        ],
+        {
+          description:
+            "Flower-shaped fried pastries soaked in honey and coated with sesame.",
+          dietaryLabels: ["vegetarian"],
+          sourceUrl: "https://en.wikipedia.org/wiki/Chebakia",
+        },
+      ),
+    ],
   },
   status: "published",
 };

@@ -1,20 +1,26 @@
 import "dotenv/config";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import express from "express";
 import { z } from "zod";
-import { buildMapsSearchUrl } from "../src/restaurants/utils.ts";
+import { buildMapsSearchUrl, stableMapsUrl } from "../src/restaurants/utils.ts";
 import type {
   Restaurant,
   RestaurantSearchResult,
 } from "../src/restaurants/types.ts";
 import { haversineKm } from "../src/lib/haversine.ts";
 import {
+  ensureDb,
+  getRestaurantById,
   searchLocalRestaurants,
   type StoredRestaurant,
 } from "./db/restaurants.ts";
 import { createGooglePlacesProvider } from "./providers/googlePlaces.ts";
 import { createMapboxProvider } from "./providers/mapbox.ts";
 import type { LiveRestaurantProvider } from "./providers/types.ts";
+import { registerAuthRoutes } from "./routes/auth.ts";
+import { registerAdminCountryRoutes } from "./routes/adminCountry.ts";
+import { registerContentRoutes } from "./routes/content.ts";
 import { registerSuggestionRoutes } from "./routes/suggestions.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
 
@@ -45,19 +51,54 @@ type CacheEntry = {
 const cache = new Map<string, CacheEntry>();
 
 const app = express();
-app.use(cors({ origin: true }));
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  }),
+);
+app.use(cookieParser());
 app.use(express.json({ limit: "64kb" }));
 
-app.get("/api/health", (_req, res) => {
+app.get("/api/health", async (_req, res) => {
+  let dbOk = false;
+  try {
+    await ensureDb();
+    dbOk = true;
+  } catch {
+    dbOk = false;
+  }
   res.json({
     ok: true,
+    dbOk,
     provider: resolveProvider()?.id ?? null,
     openaiConfigured: isOpenAiConfigured(),
-    adminConfigured: Boolean(process.env.ADMIN_TOKEN?.trim()),
   });
 });
 
+registerAuthRoutes(app);
+registerContentRoutes(app);
+registerAdminCountryRoutes(app);
 registerSuggestionRoutes(app);
+
+app.get("/api/restaurants/:id", async (req, res) => {
+  try {
+    const id = String(req.params.id ?? "");
+    if (!id) {
+      res.status(400).json({ message: "Restaurant id required." });
+      return;
+    }
+    const row = await getRestaurantById(id);
+    if (!row) {
+      res.status(404).json({ message: "Restaurant not found." });
+      return;
+    }
+    res.json({ restaurant: toApiRestaurant(row) });
+  } catch (error) {
+    console.error("Get restaurant failed", error);
+    res.status(500).json({ message: "Could not load restaurant." });
+  }
+});
 
 app.post("/api/restaurants", async (req, res) => {
   const parsed = searchBodySchema.safeParse(req.body);
@@ -76,14 +117,16 @@ app.post("/api/restaurants", async (req, res) => {
   const mapsSearchUrl = buildMapsSearchUrl(params);
 
   if (params.countryCode) {
-    const local = searchLocalRestaurants({
-      countryCode: params.countryCode,
-      cityOrPostcode: params.cityOrPostcode,
-      visitorLocation: params.visitorLocation,
-      reviewedOnly: true,
-      maxDistanceKm: 100,
-      limit: 50,
-    }).map((row) =>
+    const local = (
+      await searchLocalRestaurants({
+        countryCode: params.countryCode,
+        cityOrPostcode: params.cityOrPostcode,
+        visitorLocation: params.visitorLocation,
+        reviewedOnly: true,
+        maxDistanceKm: 100,
+        limit: 50,
+      })
+    ).map((row) =>
       toApiRestaurant(row, params.visitorLocation, params.cityOrPostcode),
     );
 
@@ -199,12 +242,19 @@ function toApiRestaurant(
     name: row.name,
     address: row.address,
     city: row.city,
+    cuisineCodes: row.cuisineCodes,
     website: row.website ?? undefined,
-    mapsUrl: row.mapsUrl,
+    mapsUrl: stableMapsUrl(row.mapsUrl, {
+      name: row.name,
+      address: row.address,
+      city: row.city,
+    }),
     location,
     rating: row.userRating ?? undefined,
     reviewCount: row.reviewCount ?? undefined,
     ratings: row.ratings ?? undefined,
+    priceLevel: row.priceLevel ?? undefined,
+    menu: row.menu ?? undefined,
     distanceKm:
       anchor && location ? haversineKm(anchor, location) : undefined,
     authenticityRating: row.authenticityRating ?? undefined,
@@ -231,17 +281,13 @@ function resolveProvider(): LiveRestaurantProvider | null {
 const server = app.listen(PORT, () => {
   const provider = resolveProvider();
   console.log(`Spoon Spin API listening on http://localhost:${PORT}`);
-  console.log("Local SQLite prefers reviewed restaurants with authenticity ratings.");
+  console.log("Local Postgres prefers reviewed restaurants with authenticity ratings.");
   console.log(
     isOpenAiConfigured()
       ? "OpenAI suggestions: configured"
       : "OpenAI suggestions: set OPENAI_API_KEY to enable Look up & confirm",
   );
-  console.log(
-    process.env.ADMIN_TOKEN?.trim()
-      ? "Admin review: /admin (ADMIN_TOKEN required)"
-      : "Admin review: set ADMIN_TOKEN to unlock /admin",
-  );
+  console.log("Admin review: /admin (requires signed-in admin user)");
   if (!provider) {
     console.log(
       "No live restaurant provider configured — set MAPBOX_ACCESS_TOKEN or GOOGLE_PLACES_API_KEY for fallback.",

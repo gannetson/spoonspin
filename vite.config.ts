@@ -19,6 +19,9 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:3001",
         changeOrigin: true,
+        // Admin OpenAI discover/expand calls can take well over a minute.
+        timeout: 300_000,
+        proxyTimeout: 300_000,
       },
     },
   },

@@ -1,0 +1,1171 @@
+import { z } from "zod";
+import type { Recipe, SpecialtyShop } from "../../src/types/content.ts";
+import { countryCatalog } from "../../src/content/countries/catalog.ts";
+import { OSM_CUISINE_BY_COUNTRY } from "../../src/restaurants/osmCuisineMap.ts";
+import {
+  isGooglePlacesConfigured,
+  lookupGoogleRestaurant,
+} from "../lib/googlePlacesLookup.ts";
+import { chatJson, isOpenAiConfigured } from "./suggest.ts";
+
+export { isOpenAiConfigured };
+
+/** OpenAI often returns null for omitted optional fields. */
+const optionalString = z.string().nullish().transform((value) => value ?? undefined);
+const optionalNumber = z.number().nullish().transform((value) => value ?? undefined);
+const optionalStringArray = z
+  .array(z.string())
+  .nullish()
+  .transform((value) => value ?? undefined);
+
+function normalizeCountryCodes(codes: string[] | undefined): string[] {
+  if (!codes?.length) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const raw of codes) {
+    const code = raw.trim().toLowerCase();
+    if (!/^[a-z]{2}$/.test(code) || seen.has(code)) continue;
+    seen.add(code);
+    out.push(code);
+  }
+  return out;
+}
+
+/** Compact reference of country codes the model may assign. */
+function cuisineCodeReference(): string {
+  const byCode = new Map(
+    countryCatalog.map((entry) => [entry.code, entry.name] as const),
+  );
+  return Object.keys(OSM_CUISINE_BY_COUNTRY)
+    .map((code) => {
+      const name = byCode.get(code);
+      return name ? `${code}=${name}` : code;
+    })
+    .join(", ");
+}
+
+const recipeItemSchema = z.object({
+  name: z.string().min(1),
+  localName: optionalString,
+  description: z.string().min(20),
+  category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+  servings: z.coerce.number().int().positive(),
+  prepMinutes: z.coerce.number().int().nonnegative(),
+  cookMinutes: z.coerce.number().int().nonnegative(),
+  difficulty: z.enum(["easy", "medium", "challenging"]),
+  dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
+  ingredients: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        quantity: z.coerce.number().positive(),
+        unit: z.string().min(1),
+        note: optionalString,
+      }),
+    )
+    .min(2),
+  steps: z.array(z.string().min(8)).min(3),
+  substitutions: optionalStringArray,
+  servingSuggestion: optionalString,
+  drinkPairing: optionalString,
+});
+
+const dishCandidateSchema = z.object({
+  name: z.string().min(1),
+  localName: optionalString,
+  description: z.string().min(20),
+  category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+});
+
+const recipesDiscoverSchema = z.object({
+  notes: z.string(),
+  recipes: z.array(dishCandidateSchema).min(1).max(20),
+});
+
+const restaurantItemSchema = z.object({
+  name: z.string().min(1),
+  address: z.string().min(1),
+  city: z.string().min(1),
+  postcode: optionalString,
+  website: optionalString,
+  mapsUrl: optionalString,
+  lat: optionalNumber,
+  lng: optionalNumber,
+  authenticityNotes: optionalString,
+  phone: optionalString,
+});
+
+const restaurantsDiscoverSchema = z.object({
+  notes: z.string(),
+  restaurants: z.array(restaurantItemSchema).min(1).max(20),
+});
+
+const restaurantVerifyItemSchema = z.object({
+  name: z.string().min(1),
+  city: z.string().min(1),
+  accept: z.boolean(),
+  authenticityRating: z.coerce.number().min(1).max(5),
+  authenticityNotes: z.string().min(20),
+  reason: optionalString,
+});
+
+const restaurantsVerifySchema = z.object({
+  notes: z.string(),
+  verifications: z.array(restaurantVerifyItemSchema).min(1).max(20),
+});
+
+const shopItemSchema = z.object({
+  name: z.string().min(1),
+  city: z.string().min(1),
+  address: z.string().min(1),
+  specialty: z.string().min(3),
+  website: optionalString,
+  mapsUrl: optionalString,
+  notes: optionalString,
+});
+
+const shopsDiscoverSchema = z.object({
+  notes: z.string(),
+  shops: z.array(shopItemSchema).min(1).max(20),
+});
+
+const drinkItemSchema = z.object({
+  name: z.string().min(1),
+  localName: optionalString,
+  type: z.enum([
+    "beer",
+    "wine",
+    "spirit",
+    "cocktail",
+    "soft-drink",
+    "tea",
+    "coffee",
+  ]),
+  alcoholic: z.boolean(),
+  description: z.string().min(20),
+});
+
+const drinksDiscoverSchema = z.object({
+  notes: z.string(),
+  drinks: z.array(drinkItemSchema).min(1).max(50),
+});
+
+const imageDiscoverSchema = z.object({
+  notes: z.string(),
+  dishName: z.string().min(1),
+  searchQueries: z.array(z.string().min(2)).min(2).max(6),
+});
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 48);
+}
+
+function mapsSearchUrl(parts: string[]): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    parts.filter(Boolean).join(" "),
+  )}`;
+}
+
+function isUnstableMapsShortUrl(url: string | undefined): boolean {
+  if (!url?.trim()) return true;
+  try {
+    const host = new URL(url).hostname.toLowerCase();
+    return (
+      host === "goo.gl" ||
+      host.endsWith(".goo.gl") ||
+      host === "g.co" ||
+      host === "maps.app.goo.gl"
+    );
+  } catch {
+    return true;
+  }
+}
+
+function stableMapsUrl(
+  url: string | undefined,
+  place: { name: string; address: string; city: string },
+): string {
+  if (url?.trim() && /^https?:\/\//i.test(url) && !isUnstableMapsShortUrl(url)) {
+    return url.trim();
+  }
+  return mapsSearchUrl([place.name, place.address, place.city, "Netherlands"]);
+}
+
+export type DiscoveredRestaurant = {
+  name: string;
+  address: string;
+  city: string;
+  postcode?: string;
+  website?: string;
+  mapsUrl: string;
+  lat?: number;
+  lng?: number;
+  authenticityNotes?: string;
+  authenticityRating?: number;
+  phone?: string;
+  verified?: boolean;
+};
+
+export type DishCandidate = {
+  id: string;
+  name: string;
+  localName?: string;
+  description: string;
+  category: Recipe["category"];
+};
+
+export async function discoverCountryRecipes(input: {
+  countryCode: string;
+  countryName: string;
+  query?: string;
+  existingNames: string[];
+}): Promise<{ notes: string; recipes: DishCandidate[] }> {
+  const focus = input.query?.trim()
+    ? `Focus on: ${input.query.trim()}`
+    : "Focus on iconic national dishes and classic home-cook favourites.";
+
+  const existing = input.existingNames
+    .map((name) => name.trim())
+    .filter(Boolean)
+    .slice(0, 40);
+
+  const raw = await chatJson(
+    `You are a cuisine editor for Spoon Spin. Reply with JSON only.
+Propose authentic dishes for the given country that Dutch home cooks can make.
+Avoid duplicates of existing dish names. Return dish candidates only (no full recipes).`,
+    `Country: ${input.countryName} (${input.countryCode})
+Existing dishes (do not repeat): ${existing.join("; ") || "none"}
+${focus}
+
+Return up to 15 distinct dishes (quality over quantity).
+
+JSON shape:
+{
+  "notes": string,
+  "recipes": [{
+    "name": string,
+    "localName": string?,
+    "description": string,
+    "category": "starter"|"main"|"side"|"dessert"|"snack"
+  }]
+}`,
+  );
+
+  const parsed = recipesDiscoverSchema.parse(raw);
+  return {
+    notes: parsed.notes,
+    recipes: parsed.recipes.map((recipe) => ({
+      ...recipe,
+      id: slugify(recipe.name) || "dish",
+      description:
+        recipe.description.length >= 40
+          ? recipe.description
+          : `${recipe.description} A traditional dish from ${input.countryName} cuisine.`,
+    })),
+  };
+}
+
+export async function expandDishCandidates(input: {
+  countryCode: string;
+  countryName: string;
+  dishes: DishCandidate[];
+}): Promise<Recipe[]> {
+  if (input.dishes.length === 0) return [];
+
+  const expanded: Recipe[] = [];
+  const batchSize = 8;
+  for (let i = 0; i < input.dishes.length; i += batchSize) {
+    const batch = input.dishes.slice(i, i + batchSize);
+    const raw = await chatJson(
+      `You write practical home-cook recipes for Spoon Spin. Reply with JSON only.
+Use metric units. Keep steps concrete. description at least 40 characters.`,
+      `Country: ${input.countryName} (${input.countryCode})
+Expand each dish into a full recipe.
+
+Dishes:
+${JSON.stringify(batch, null, 2)}
+
+JSON shape:
+{
+  "recipes": [{
+    "name": string,
+    "localName": string?,
+    "description": string,
+    "category": "starter"|"main"|"side"|"dessert"|"snack",
+    "servings": number,
+    "prepMinutes": number,
+    "cookMinutes": number,
+    "difficulty": "easy"|"medium"|"challenging",
+    "dietaryLabels": string[],
+    "ingredients": [{"name":string,"quantity":number,"unit":string,"note":string?}],
+    "steps": string[],
+    "substitutions": string[]?,
+    "servingSuggestion": string?,
+    "drinkPairing": string?
+  }]
+}`,
+    );
+
+    const parsed = z
+      .object({ recipes: z.array(recipeItemSchema).min(1).max(batchSize) })
+      .parse(raw);
+
+    for (const recipe of parsed.recipes) {
+      const match =
+        batch.find(
+          (dish) =>
+            dish.name.toLowerCase() === recipe.name.toLowerCase() ||
+            (dish.localName &&
+              recipe.localName &&
+              dish.localName.toLowerCase() === recipe.localName.toLowerCase()),
+        ) ?? batch[expanded.length % batch.length];
+      expanded.push({
+        ...recipe,
+        id: match?.id || slugify(recipe.name) || `dish-${expanded.length + 1}`,
+        description:
+          recipe.description.length >= 40
+            ? recipe.description
+            : `${recipe.description} A traditional dish from ${input.countryName} cuisine.`,
+      });
+    }
+  }
+
+  return expanded;
+}
+
+export async function discoverCountryRestaurants(input: {
+  countryCode: string;
+  countryName: string;
+  query?: string;
+}): Promise<{ notes: string; restaurants: DiscoveredRestaurant[] }> {
+  const focus = input.query?.trim()
+    ? `Focus on: ${input.query.trim()}`
+    : "Prefer family-run or chef-driven specialists that mainly serve this cuisine.";
+
+  const raw = await chatJson(
+    `You research REAL restaurants in the Netherlands that specialise in one national cuisine.
+Reply with JSON only.
+
+Strict rules:
+- Only name places you are confident actually exist at that address today.
+- Prefer authentic specialists (national/regional cuisine as the main offering), not generic "world food", all-you-can-eat, hotel restaurants, or casual chains.
+- Reject fusion-only, pan-Asian (unless the cuisine IS pan-Asian), pizza/kebab takeaways, and places whose menu is mostly Dutch/international.
+- City must be in the Netherlands. Give a real street address when known.
+- Never invent goo.gl or short Maps links — omit mapsUrl if unsure.
+- Prefer quality over quantity: fewer authentic places beat a long weak list.
+- If unsure a place is a true specialist for this cuisine, omit it.`,
+    `Cuisine country: ${input.countryName} (${input.countryCode})
+${focus}
+
+Return up to 10 specialist restaurants you are confident about.
+
+JSON shape:
+{
+  "notes": string,
+  "restaurants": [{
+    "name": string,
+    "address": string,
+    "city": string,
+    "postcode": string?,
+    "website": string?,
+    "mapsUrl": string?,
+    "lat": number?,
+    "lng": number?,
+    "authenticityNotes": string?,
+    "phone": string?
+  }]
+}`,
+  );
+
+  const parsed = restaurantsDiscoverSchema.parse(raw);
+  const placesConfigured = isGooglePlacesConfigured();
+
+  // 1) Ground each candidate in Google Places (existence + address).
+  const grounded: DiscoveredRestaurant[] = [];
+  let placesMisses = 0;
+  for (const place of parsed.restaurants) {
+    let match: Awaited<ReturnType<typeof lookupGoogleRestaurant>> = null;
+    if (placesConfigured) {
+      try {
+        match = await lookupGoogleRestaurant({
+          name: place.name,
+          city: place.city,
+          address: place.address,
+        });
+      } catch (error) {
+        console.warn(
+          `Places verify failed for ${place.name} (${place.city})`,
+          error,
+        );
+      }
+    }
+
+    if (placesConfigured && !match) {
+      placesMisses += 1;
+      continue;
+    }
+
+    const name = match?.name ?? place.name;
+    const address = match?.address ?? place.address;
+    const city = match?.city ?? place.city;
+    const website =
+      match?.website && /^https?:\/\//i.test(match.website)
+        ? match.website
+        : place.website && /^https?:\/\//i.test(place.website)
+          ? place.website
+          : undefined;
+    const mapsUrl = stableMapsUrl(match?.mapsUrl ?? place.mapsUrl, {
+      name,
+      address,
+      city,
+    });
+
+    grounded.push({
+      name,
+      address,
+      city,
+      postcode: match?.postcode ?? place.postcode,
+      website,
+      mapsUrl,
+      lat: match?.lat ?? place.lat,
+      lng: match?.lng ?? place.lng,
+      authenticityNotes: place.authenticityNotes,
+      phone: match?.phone ?? place.phone,
+      verified: Boolean(match),
+    });
+  }
+
+  if (grounded.length === 0) {
+    return {
+      notes: placesConfigured
+        ? `${parsed.notes} None of the candidates could be verified on Google Places in the Netherlands (${placesMisses} rejected). Try a tighter city or specialist focus.`
+        : `${parsed.notes} No candidates survived filtering. Set GOOGLE_PLACES_API_KEY to verify places, or try a different focus.`,
+      restaurants: [],
+    };
+  }
+
+  // 2) Authenticity gate — drop false positives / weak matches.
+  const verification = await verifyRestaurantAuthenticity({
+    countryCode: input.countryCode,
+    countryName: input.countryName,
+    restaurants: grounded,
+  });
+
+  const rejected = grounded.length - verification.restaurants.length;
+  const parts = [parsed.notes, verification.notes].filter(Boolean);
+  if (!placesConfigured) {
+    parts.push(
+      "GOOGLE_PLACES_API_KEY is not set — candidates were authenticity-checked only. Set the key to verify places exist in Google.",
+    );
+  }
+  if (placesConfigured && placesMisses > 0) {
+    parts.push(
+      `Dropped ${placesMisses} candidate(s) that Google Places could not confirm in the Netherlands.`,
+    );
+  }
+  if (rejected > 0) {
+    parts.push(
+      `Dropped ${rejected} candidate(s) that failed the authenticity check.`,
+    );
+  }
+  if (verification.restaurants.length === 0) {
+    parts.push(
+      "No authentic specialists remained after verification. Try another city or a more specific query.",
+    );
+  }
+
+  return {
+    notes: parts.join(" "),
+    restaurants: verification.restaurants,
+  };
+}
+
+async function verifyRestaurantAuthenticity(input: {
+  countryCode: string;
+  countryName: string;
+  restaurants: DiscoveredRestaurant[];
+}): Promise<{ notes: string; restaurants: DiscoveredRestaurant[] }> {
+  if (input.restaurants.length === 0) {
+    return { notes: "", restaurants: [] };
+  }
+
+  const listing = input.restaurants
+    .map(
+      (place, index) =>
+        `${index + 1}. ${place.name} — ${place.address}, ${place.city}` +
+        (place.website ? ` — ${place.website}` : ""),
+    )
+    .join("\n");
+
+  const raw = await chatJson(
+    `You verify whether restaurants in the Netherlands are authentic specialists for a given national cuisine.
+Reply with JSON only.
+
+Accept only when the place mainly serves that cuisine (or a closely related regional cuisine diners would expect under that flag).
+Reject: wrong cuisine, generic Asian/Mediterranean, fusion-first concepts, hotel restaurants, chains with token dishes, closed/unknown venues, or places you are not confident about.
+authenticityRating 1–5 (only accept if rating >= 3). authenticityNotes must explain why it is (or is not) authentic.`,
+    `Cuisine country: ${input.countryName} (${input.countryCode})
+
+Candidates:
+${listing}
+
+Return one verification per candidate (same names/cities).
+
+JSON shape:
+{
+  "notes": string,
+  "verifications": [{
+    "name": string,
+    "city": string,
+    "accept": boolean,
+    "authenticityRating": number,
+    "authenticityNotes": string,
+    "reason": string?
+  }]
+}`,
+  );
+
+  const parsed = restaurantsVerifySchema.parse(raw);
+  const byKey = new Map(
+    parsed.verifications.map((item) => [
+      `${item.name.trim().toLowerCase()}|${item.city.trim().toLowerCase()}`,
+      item,
+    ]),
+  );
+
+  const accepted: DiscoveredRestaurant[] = [];
+  for (const place of input.restaurants) {
+    const key = `${place.name.trim().toLowerCase()}|${place.city.trim().toLowerCase()}`;
+    let verdict = byKey.get(key);
+    if (!verdict) {
+      // Fuzzy fallback: match by name only.
+      verdict = parsed.verifications.find(
+        (item) =>
+          item.name.trim().toLowerCase() === place.name.trim().toLowerCase(),
+      );
+    }
+    if (!verdict?.accept) continue;
+    if (verdict.authenticityRating < 3) continue;
+    accepted.push({
+      ...place,
+      authenticityRating: Math.round(verdict.authenticityRating * 10) / 10,
+      authenticityNotes: verdict.authenticityNotes,
+      verified: true,
+    });
+  }
+
+  return { notes: parsed.notes, restaurants: accepted };
+}
+
+export async function discoverCountryShops(input: {
+  countryCode: string;
+  countryName: string;
+  query?: string;
+}): Promise<{ notes: string; shops: SpecialtyShop[] }> {
+  const focus = input.query?.trim()
+    ? `Focus on: ${input.query.trim()}`
+    : "Prefer specialty grocery stores and delis that stock ingredients for this cuisine.";
+
+  const raw = await chatJson(
+    `You research specialty food shops in the Netherlands for a national cuisine.
+Reply with JSON only. Prefer real shops when known; otherwise best-effort with honest notes.
+City must be in the Netherlands.`,
+    `Cuisine country: ${input.countryName} (${input.countryCode})
+${focus}
+
+Return up to 15 specialty shops.
+
+JSON shape:
+{
+  "notes": string,
+  "shops": [{
+    "name": string,
+    "city": string,
+    "address": string,
+    "specialty": string,
+    "website": string?,
+    "mapsUrl": string?,
+    "notes": string?
+  }]
+}`,
+  );
+
+  const parsed = shopsDiscoverSchema.parse(raw);
+  return {
+    notes: parsed.notes,
+    shops: parsed.shops.map((shop) => {
+      const website =
+        shop.website && /^https?:\/\//i.test(shop.website)
+          ? shop.website
+          : undefined;
+      const mapsUrl = stableMapsUrl(shop.mapsUrl, {
+        name: shop.name,
+        address: shop.address,
+        city: shop.city,
+      });
+      return {
+        id: slugify(`${shop.name}-${shop.city}`) || "shop",
+        name: shop.name,
+        city: shop.city,
+        address: shop.address,
+        specialty: shop.specialty,
+        website,
+        mapsUrl,
+        notes: shop.notes,
+      };
+    }),
+  };
+}
+
+export async function discoverCountryDrinks(input: {
+  countryCode: string;
+  countryName: string;
+  query?: string;
+  existingNames: string[];
+}): Promise<{ notes: string; drinks: Drink[] }> {
+  const focus = input.query?.trim()
+    ? `Focus on: ${input.query.trim()}`
+    : "Include classic soft drinks, spirits, tea/coffee, and especially local wines and beers.";
+
+  const raw = await chatJson(
+    `You are a drinks editor for Spoon Spin. Reply with JSON only.
+Propose authentic drinks from the given country that pair with its cuisine.
+Always include several local wines and local beers when the country produces them.
+Avoid duplicates of existing drink names.`,
+    `Country: ${input.countryName} (${input.countryCode})
+Existing drinks (do not repeat): ${input.existingNames.join("; ") || "none"}
+${focus}
+
+Return as many distinct drinks as you can, up to 50.
+Include a mix of types, with clear representation of local wines and beers.
+
+JSON shape:
+{
+  "notes": string,
+  "drinks": [{
+    "name": string,
+    "localName": string?,
+    "type": "beer"|"wine"|"spirit"|"cocktail"|"soft-drink"|"tea"|"coffee",
+    "alcoholic": boolean,
+    "description": string
+  }]
+}`,
+  );
+
+  const parsed = drinksDiscoverSchema.parse(raw);
+  return {
+    notes: parsed.notes,
+    drinks: parsed.drinks.map((drink) => ({
+      name: drink.name,
+      localName: drink.localName,
+      type: drink.type,
+      alcoholic: drink.alcoholic,
+      description:
+        drink.description.length >= 40
+          ? drink.description
+          : `${drink.description} A traditional drink from ${input.countryName}.`,
+    })),
+  };
+}
+
+export async function discoverCountryImageQueries(input: {
+  countryCode: string;
+  countryName: string;
+  nationalDishName?: string;
+}): Promise<{ notes: string; dishName: string; searchQueries: string[] }> {
+  const raw = await chatJson(
+    `You help find Wikimedia Commons photos of authentic national cuisine plates.
+Reply with JSON only. Prefer concrete dish names and photo-friendly search queries.`,
+    `Country: ${input.countryName} (${input.countryCode})
+Known national dish: ${input.nationalDishName ?? "unknown"}
+
+Suggest one iconic plated dish and 3–5 Wikimedia Commons search queries that will find a real food photo (not a flag or map).
+
+JSON shape:
+{
+  "notes": string,
+  "dishName": string,
+  "searchQueries": string[]
+}`,
+  );
+
+  return imageDiscoverSchema.parse(raw);
+}
+
+const recipeRewriteSchema = z.object({
+  notes: z.string(),
+  localName: optionalString,
+  description: z.string().min(20),
+  dietaryLabels: z.array(z.string()),
+  ingredients: z
+    .array(
+      z.object({
+        name: z.string().min(1),
+        quantity: z.number().positive(),
+        unit: z.string().min(1),
+        note: optionalString,
+      }),
+    )
+    .min(2),
+  steps: z.array(z.string().min(8)).min(3),
+  substitutions: optionalStringArray,
+  servingSuggestion: optionalString,
+  drinkPairing: optionalString,
+});
+
+const shopRewriteSchema = z.object({
+  notes: z.string(),
+  specialty: z.string().min(3),
+  shopNotes: optionalString,
+  address: optionalString,
+  website: optionalString,
+});
+
+const restaurantRewriteSchema = z.object({
+  notes: z.string(),
+  authenticityNotes: z.string().min(20),
+  cuisineCodes: z
+    .array(z.string().length(2))
+    .nullish()
+    .transform((value) => value ?? undefined),
+});
+
+const restaurantMenuItemSchema = z.object({
+  name: z.string().min(1),
+  localName: optionalString,
+  description: optionalString,
+  category: z
+    .enum(["starter", "main", "side", "dessert", "snack", "drink"])
+    .nullish()
+    .transform((value) => value ?? undefined),
+  priceEur: optionalNumber,
+  cuisineCodes: z
+    .array(z.string().length(2))
+    .nullish()
+    .transform((value) => value ?? undefined),
+});
+
+const restaurantMenuSchema = z.object({
+  notes: z.string(),
+  cuisineCodes: z
+    .array(z.string().length(2))
+    .nullish()
+    .transform((value) => value ?? undefined),
+  items: z.array(restaurantMenuItemSchema).min(1).max(40),
+});
+
+const sourceRatingResearchSchema = z
+  .object({
+    score: z.number().min(0).max(10),
+    count: z.number().int().min(0).optional(),
+    scale: z.union([z.literal(5), z.literal(10)]).optional(),
+    url: z.string().url().optional(),
+  })
+  .nullish()
+  .transform((value) => value ?? undefined);
+
+const restaurantScoresSchema = z.object({
+  notes: z.string(),
+  priceLevel: z.union([
+    z.literal(1),
+    z.literal(2),
+    z.literal(3),
+    z.literal(4),
+  ]),
+  authenticityRating: z.number().min(1).max(5),
+  authenticityNotes: z.string().min(20),
+  ratings: z.object({
+    google: sourceRatingResearchSchema,
+    tripadvisor: sourceRatingResearchSchema,
+    theFork: sourceRatingResearchSchema,
+  }),
+});
+
+const itemImageQueriesSchema = z.object({
+  notes: z.string(),
+  searchQueries: z.array(z.string().min(2)).min(2).max(6),
+});
+
+export async function rewriteRecipeText(input: {
+  countryName: string;
+  recipe: Recipe;
+}): Promise<{ notes: string; patch: Partial<Recipe> }> {
+  const raw = await chatJson(
+    `You improve Spoon Spin recipe copy with accurate, practical home-cooking detail.
+Keep the same dish identity. Reply with JSON only.`,
+    `Country cuisine: ${input.countryName}
+Current recipe JSON:
+${JSON.stringify(input.recipe, null, 2)}
+
+Research and rewrite the editorial text fields for this dish.
+Keep servings/times/difficulty/category unless clearly wrong.
+Prefer authentic ingredients and clear steps.
+
+JSON shape:
+{
+  "notes": string,
+  "localName": string?,
+  "description": string,
+  "dietaryLabels": string[],
+  "ingredients": [{ "name": string, "quantity": number, "unit": string, "note": string? }],
+  "steps": string[],
+  "substitutions": string[]?,
+  "servingSuggestion": string?,
+  "drinkPairing": string?
+}`,
+  );
+  const parsed = recipeRewriteSchema.parse(raw);
+  return {
+    notes: parsed.notes,
+    patch: {
+      localName: parsed.localName,
+      description: parsed.description,
+      dietaryLabels: parsed.dietaryLabels,
+      ingredients: parsed.ingredients,
+      steps: parsed.steps,
+      substitutions: parsed.substitutions,
+      servingSuggestion: parsed.servingSuggestion,
+      drinkPairing: parsed.drinkPairing,
+    },
+  };
+}
+
+export async function rewriteShopText(input: {
+  countryName: string;
+  shop: SpecialtyShop;
+}): Promise<{
+  notes: string;
+  patch: Partial<SpecialtyShop>;
+}> {
+  const raw = await chatJson(
+    `You improve specialty grocery shop blurbs for home cooks in the Netherlands.
+Reply with JSON only. Keep the shop identity; improve specialty and notes.`,
+    `Cuisine country: ${input.countryName}
+Current shop JSON:
+${JSON.stringify(input.shop, null, 2)}
+
+JSON shape:
+{
+  "notes": string,
+  "specialty": string,
+  "shopNotes": string?,
+  "address": string?,
+  "website": string?
+}`,
+  );
+  const parsed = shopRewriteSchema.parse(raw);
+  const website =
+    parsed.website && /^https?:\/\//i.test(parsed.website)
+      ? parsed.website
+      : undefined;
+  return {
+    notes: parsed.notes,
+    patch: {
+      specialty: parsed.specialty,
+      notes: parsed.shopNotes,
+      address: parsed.address,
+      website,
+    },
+  };
+}
+
+export async function rewriteRestaurantText(input: {
+  countryName: string;
+  countryCode?: string;
+  existingCuisineCodes?: string[];
+  restaurant: {
+    name: string;
+    address: string;
+    city: string;
+    authenticityNotes?: string | null;
+  };
+}): Promise<{
+  notes: string;
+  authenticityNotes: string;
+  cuisineCodes: string[];
+}> {
+  const seedCodes = normalizeCountryCodes([
+    ...(input.countryCode ? [input.countryCode] : []),
+    ...(input.existingCuisineCodes ?? []),
+  ]);
+  const raw = await chatJson(
+    `You write concise authenticity notes for restaurants in the Netherlands and identify which national cuisines they match.
+Reply with JSON only.
+Restaurants often span multiple countries (e.g. Levantine, Horn of Africa, Balkan, pan-Asian). List every ISO country code that genuinely fits.
+Do not invent weak matches — only countries a diner would reasonably expect from this place.`,
+    `Context country (viewer may be browsing this cuisine): ${input.countryName}${
+      input.countryCode ? ` (${input.countryCode})` : ""
+    }
+Restaurant: ${input.restaurant.name}
+Address: ${input.restaurant.address}, ${input.restaurant.city}
+Current notes: ${input.restaurant.authenticityNotes ?? "none"}
+Current cuisine codes: ${seedCodes.join(", ") || "none"}
+
+Allowed cuisine codes (use only these): ${cuisineCodeReference()}
+
+Write improved authenticity notes (2–4 sentences) covering the cuisines this place actually represents.
+Set cuisineCodes to all matching countries (1–6). Include the context country when it fits.
+
+JSON shape:
+{
+  "notes": string,
+  "authenticityNotes": string,
+  "cuisineCodes": ["et", "er"]
+}`,
+  );
+  const parsed = restaurantRewriteSchema.parse(raw);
+  let cuisineCodes = normalizeCountryCodes(parsed.cuisineCodes);
+  if (cuisineCodes.length === 0) {
+    cuisineCodes = seedCodes.length > 0 ? seedCodes : [];
+  }
+  if (
+    input.countryCode &&
+    !cuisineCodes.includes(input.countryCode.toLowerCase())
+  ) {
+    // Keep the page country if the model omitted it but notes still concern it.
+    cuisineCodes = [
+      input.countryCode.toLowerCase(),
+      ...cuisineCodes,
+    ];
+  }
+  return {
+    notes: parsed.notes,
+    authenticityNotes: parsed.authenticityNotes,
+    cuisineCodes,
+  };
+}
+
+export async function researchRestaurantMenu(input: {
+  countryName: string;
+  countryCode?: string;
+  knownCuisineCodes?: string[];
+  restaurant: {
+    name: string;
+    address: string;
+    city: string;
+    website?: string | null;
+  };
+}): Promise<{
+  notes: string;
+  cuisineCodes: string[];
+  items: Array<{
+    id: string;
+    name: string;
+    localName?: string;
+    description?: string;
+    category?: "starter" | "main" | "side" | "dessert" | "snack" | "drink";
+    priceEur?: number;
+    cuisineCodes?: string[];
+  }>;
+}> {
+  const seedCodes = normalizeCountryCodes([
+    ...(input.countryCode ? [input.countryCode] : []),
+    ...(input.knownCuisineCodes ?? []),
+  ]);
+
+  const raw = await chatJson(
+    `You research restaurant menus in the Netherlands.
+Reply with JSON only. Prefer dishes this specific restaurant is known to serve.
+If the exact menu is unknown, list typical authentic dishes this venue would plausibly offer.
+Aim for 8–25 items. Do not invent fake euro prices unless reasonably confident.
+
+Restaurants may match multiple countries. Set top-level cuisineCodes to every ISO country this venue's food represents (not only the primary one).
+For each dish, set cuisineCodes to the country flag(s) that should appear on that dish.
+Use one code for most dishes; multiple only for clear fusion. Leave empty for generic drinks/bread/house extras.`,
+    `Context country (viewer may be browsing this cuisine): ${input.countryName}${
+      input.countryCode ? ` (${input.countryCode})` : ""
+    }
+Restaurant: ${input.restaurant.name}
+Address: ${input.restaurant.address}, ${input.restaurant.city}
+Website: ${input.restaurant.website ?? "unknown"}
+Seed cuisine codes (include when still accurate, and add any others that fit): ${
+      seedCodes.join(", ") || "none"
+    }
+
+Allowed cuisine codes (use only these): ${cuisineCodeReference()}
+
+JSON shape:
+{
+  "notes": string,
+  "cuisineCodes": ["lb", "sy"],
+  "items": [{
+    "name": string,
+    "localName": string?,
+    "description": string?,
+    "category": "starter"|"main"|"side"|"dessert"|"snack"|"drink"?,
+    "priceEur": number?,
+    "cuisineCodes": ["lb"]
+  }]
+}`,
+  );
+  const parsed = restaurantMenuSchema.parse(raw);
+
+  const used = new Set<string>();
+  const items = parsed.items.map((item) => {
+    let id = slugify(item.name) || "dish";
+    if (used.has(id)) {
+      let n = 2;
+      while (used.has(`${id}-${n}`)) n += 1;
+      id = `${id}-${n}`;
+    }
+    used.add(id);
+    const itemCodes = normalizeCountryCodes(item.cuisineCodes);
+    return {
+      id,
+      name: item.name,
+      localName: item.localName,
+      description: item.description,
+      category: item.category,
+      priceEur: item.priceEur,
+      cuisineCodes: itemCodes.length > 0 ? itemCodes : undefined,
+    };
+  });
+
+  let cuisineCodes = normalizeCountryCodes(parsed.cuisineCodes);
+  if (cuisineCodes.length === 0) {
+    const fromItems = new Set<string>();
+    for (const item of items) {
+      for (const code of item.cuisineCodes ?? []) fromItems.add(code);
+    }
+    cuisineCodes = Array.from(fromItems);
+  }
+  for (const code of seedCodes) {
+    if (!cuisineCodes.includes(code)) cuisineCodes.push(code);
+  }
+  if (cuisineCodes.length === 0 && input.countryCode) {
+    cuisineCodes = [input.countryCode.toLowerCase()];
+  }
+
+  return { notes: parsed.notes, cuisineCodes, items };
+}
+
+export async function researchRestaurantScores(input: {
+  countryName: string;
+  restaurant: {
+    name: string;
+    address: string;
+    city: string;
+    website?: string | null;
+    authenticityNotes?: string | null;
+    authenticityRating?: number | null;
+  };
+}): Promise<{
+  notes: string;
+  priceLevel: 1 | 2 | 3 | 4;
+  authenticityRating: number;
+  authenticityNotes: string;
+  ratings: {
+    google?: {
+      score: number;
+      count?: number;
+      scale?: 5 | 10;
+      url?: string;
+      fetchedAt: string;
+    };
+    tripadvisor?: {
+      score: number;
+      count?: number;
+      scale?: 5 | 10;
+      url?: string;
+      fetchedAt: string;
+    };
+    theFork?: {
+      score: number;
+      count?: number;
+      scale?: 5 | 10;
+      url?: string;
+      fetchedAt: string;
+    };
+  };
+}> {
+  const raw = await chatJson(
+    `You research public guest ratings and price level for restaurants in the Netherlands.
+Reply with JSON only. Use best-known Google, Tripadvisor, and The Fork scores when available.
+Google and Tripadvisor use a 5-point scale; The Fork often uses 10 — set "scale" accordingly.
+priceLevel is 1–4 (€ to €€€€).
+Also refresh authenticityRating (1–5) and authenticityNotes for how well the place represents the cuisine.`,
+    `Cuisine country: ${input.countryName}
+Restaurant: ${input.restaurant.name}
+Address: ${input.restaurant.address}, ${input.restaurant.city}
+Website: ${input.restaurant.website ?? "unknown"}
+Current authenticity rating: ${input.restaurant.authenticityRating ?? "none"}
+Current authenticity notes: ${input.restaurant.authenticityNotes ?? "none"}
+
+JSON shape:
+{
+  "notes": string,
+  "priceLevel": 1|2|3|4,
+  "authenticityRating": number,
+  "authenticityNotes": string,
+  "ratings": {
+    "google": { "score": number, "count": number?, "scale": 5|10?, "url": string? }?,
+    "tripadvisor": { "score": number, "count": number?, "scale": 5|10?, "url": string? }?,
+    "theFork": { "score": number, "count": number?, "scale": 5|10?, "url": string? }?
+  }
+}`,
+  );
+  const parsed = restaurantScoresSchema.parse(raw);
+  const fetchedAt = new Date().toISOString();
+  const stamp = (
+    value:
+      | {
+          score: number;
+          count?: number;
+          scale?: 5 | 10;
+          url?: string;
+        }
+      | undefined,
+  ) =>
+    value
+      ? {
+          score: value.score,
+          count: value.count,
+          scale: value.scale,
+          url: value.url,
+          fetchedAt,
+        }
+      : undefined;
+
+  return {
+    notes: parsed.notes,
+    priceLevel: parsed.priceLevel,
+    authenticityRating: Math.round(parsed.authenticityRating * 10) / 10,
+    authenticityNotes: parsed.authenticityNotes,
+    ratings: {
+      google: stamp(parsed.ratings.google),
+      tripadvisor: stamp(parsed.ratings.tripadvisor),
+      theFork: stamp(parsed.ratings.theFork),
+    },
+  };
+}
+
+export async function discoverItemImageQueries(input: {
+  kind: "recipe" | "restaurant";
+  countryName: string;
+  title: string;
+  detail?: string;
+}): Promise<{ notes: string; searchQueries: string[] }> {
+  const raw = await chatJson(
+    `You help find Wikimedia Commons photos.
+Reply with JSON only. Prefer real photo search queries, not logos or maps.`,
+    `Kind: ${input.kind}
+Country/cuisine: ${input.countryName}
+Title: ${input.title}
+Detail: ${input.detail ?? "none"}
+
+Suggest 3–5 Wikimedia Commons search queries for a good photo.
+
+JSON shape:
+{
+  "notes": string,
+  "searchQueries": string[]
+}`,
+  );
+  return itemImageQueriesSchema.parse(raw);
+}
