@@ -13,8 +13,9 @@ import type {
   RestaurantMenuItem,
 } from "../../src/restaurants/types.ts";
 
-/** Default local Postgres (Unix socket / peer — no user or password). */
-export const DEFAULT_DATABASE_URL = "postgresql:///spoonspin";
+/** Default: Unix socket peer auth (no password). Override with DATABASE_URL. */
+export const DEFAULT_DATABASE_URL =
+  "postgresql:///spoonspin?host=/var/run/postgresql";
 
 export type StoredRestaurant = {
   id: string;
@@ -87,20 +88,25 @@ export function getDatabaseUrl(): string {
   );
 }
 
+const DEFAULT_SOCKET_DIR = "/var/run/postgresql";
+
 /**
- * Pool config for local Postgres.
- * - With a password in the URL: use discrete fields (password always a string for SCRAM).
- * - Passwordless (peer/trust): pass connectionString through unchanged so pg does not
- *   invent an undefined password. Prefer a Unix socket URL on the server, e.g.
- *   postgresql:///spoonspin  or  postgresql://localhost/spoonspin?host=/var/run/postgresql
+ * Build node-pg Pool options.
+ *
+ * Passwordless access only works with peer/trust — almost always a Unix socket.
+ * `postgresql://localhost/...` without a password hits SCRAM and crashes node-pg
+ * with "client password must be a string".
  */
-function poolOptions(connectionString: string): ConstructorParameters<typeof Pool>[0] {
+export function poolOptions(
+  connectionString: string,
+): ConstructorParameters<typeof Pool>[0] {
   let parsed: URL;
   try {
     parsed = new URL(connectionString);
   } catch {
     throw new Error(
-      `Invalid DATABASE_URL. Expected postgresql:///DB or postgresql://USER:PASSWORD@HOST:5432/DB`,
+      "Invalid DATABASE_URL. Use postgresql:///spoonspin?host=/var/run/postgresql " +
+        "or postgresql://USER:PASSWORD@localhost:5432/spoonspin",
     );
   }
 
@@ -110,21 +116,43 @@ function poolOptions(connectionString: string): ConstructorParameters<typeof Poo
     );
   }
 
+  const database =
+    decodeURIComponent(parsed.pathname.replace(/^\//, "") || "") || "spoonspin";
+  const user = decodeURIComponent(parsed.username || "") || undefined;
   const password = decodeURIComponent(parsed.password || "");
-  if (!password) {
-    // Peer/trust / no-password setups — do not set password: undefined (SCRAM crash).
-    return { connectionString };
+  const hostQuery = parsed.searchParams.get("host")?.trim() || undefined;
+  const hostname = parsed.hostname || "";
+
+  if (password) {
+    return {
+      host: hostname || hostQuery || "localhost",
+      port: parsed.port ? Number(parsed.port) : 5432,
+      database,
+      user,
+      password,
+    };
   }
 
-  const user = decodeURIComponent(parsed.username || "");
-  const database = decodeURIComponent(parsed.pathname.replace(/^\//, "") || "");
+  // Passwordless: never use TCP localhost — that triggers SCRAM.
+  if (
+    !hostQuery &&
+    (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1")
+  ) {
+    throw new Error(
+      `DATABASE_URL is ${hostname} without a password, so Postgres uses SCRAM and login fails.\n` +
+        `For passwordless peer auth, set:\n` +
+        `  DATABASE_URL=postgresql:///${database}?host=${DEFAULT_SOCKET_DIR}\n` +
+        `Or set a real password:\n` +
+        `  DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/${database}`,
+    );
+  }
 
+  const socketDir = hostQuery || DEFAULT_SOCKET_DIR;
+  // Absolute path → Unix socket (peer). Do not set password at all.
   return {
-    host: parsed.hostname || undefined,
-    port: parsed.port ? Number(parsed.port) : 5432,
-    database: database || "spoonspin",
-    user: user || undefined,
-    password,
+    host: socketDir,
+    database,
+    user,
   };
 }
 
@@ -134,7 +162,20 @@ export function getPool(connectionString = getDatabaseUrl()): Pool {
     void pool.end();
     pool = null;
   }
-  pool = new Pool(poolOptions(connectionString));
+  const options = poolOptions(connectionString);
+  console.info(
+    "[db] connecting",
+    JSON.stringify({
+      host: options?.host ?? null,
+      port: options?.port ?? null,
+      database: options?.database ?? null,
+      user: options?.user ?? `(os user)`,
+      password: options && "password" in options && options.password != null
+        ? "(set)"
+        : "(none)",
+    }),
+  );
+  pool = new Pool(options);
   poolUrl = connectionString;
   return pool;
 }
