@@ -12,6 +12,7 @@ import {
   listRecipeIdsForCountry,
   removeSpecialtyShop,
   saveCountryDrinks,
+  saveDinnerSuggestion,
   updateCountryImage,
   updateRecipeFields,
   updateRecipeImage,
@@ -38,6 +39,7 @@ import {
   discoverCountryRestaurants,
   discoverCountryShops,
   discoverItemImageQueries,
+  composeDinnerSuggestion,
   enrichDrinkWithImage,
   isOpenAiConfigured,
   researchRestaurantMenu,
@@ -56,7 +58,10 @@ import { scheduleRestaurantEnrichments } from "../lib/restaurantEnrichmentQueue.
 import { scheduleRecipeEnrichments } from "../lib/recipeEnrichmentQueue.ts";
 import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import type { Restaurant } from "../../src/restaurants/types.ts";
-import { getCountryDrinks } from "../../src/content/countries/menuAccessors.ts";
+import {
+  getCountryDrinks,
+  getCountryRecipes,
+} from "../../src/content/countries/menuAccessors.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import { stableMapsUrl } from "../../src/restaurants/utils.ts";
 
@@ -796,6 +801,71 @@ export function registerAdminCountryRoutes(
         console.error("Add drinks failed", error);
         res.status(500).json({
           message: publicErrorMessage(error, "Could not add drinks."),
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/compose-dinner",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      if (!openaiRequired(res)) return;
+      try {
+        const country = await getCountryFromDb(String(req.params.code ?? ""));
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+
+        const recipes = getCountryRecipes(country);
+        const drinks = getCountryDrinks(country);
+        if (recipes.length < 3) {
+          res.status(400).json({
+            message: "Add at least 3 recipes before composing a dinner.",
+          });
+          return;
+        }
+        if (drinks.length < 1) {
+          res.status(400).json({
+            message: "Add at least 1 drink before composing a dinner.",
+          });
+          return;
+        }
+
+        const composed = await composeDinnerSuggestion({
+          countryCode: country.code,
+          countryName: country.name,
+          introduction: country.introduction,
+          recipes: recipes.map((recipe) => ({
+            id: recipe.id,
+            name: recipe.name,
+            localName: recipe.localName,
+            description: recipe.description,
+            category: recipe.category,
+          })),
+          drinks: drinks.map((drink) => ({
+            name: drink.name,
+            localName: drink.localName,
+            type: drink.type,
+            alcoholic: drink.alcoholic,
+            description: drink.description,
+          })),
+        });
+
+        const updated = await saveDinnerSuggestion(
+          country.code,
+          composed.dinner,
+        );
+        res.json({
+          country: updated,
+          dinner: composed.dinner,
+          notes: composed.notes,
+        });
+      } catch (error) {
+        console.error("Compose dinner failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(error, "Could not compose dinner."),
         });
       }
     },

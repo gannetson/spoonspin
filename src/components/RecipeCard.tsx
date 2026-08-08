@@ -21,7 +21,7 @@ const DIFFICULTY_KEYS = {
 type RecipeCardProps = {
   recipe: Recipe;
   onOpen: () => void;
-  variant?: "default" | "national" | "community" | "simple";
+  variant?: "default" | "national" | "community" | "simple" | "dinner";
   showMeta?: boolean;
   isAdmin?: boolean;
   adminBusy?: boolean;
@@ -43,6 +43,8 @@ export function RecipeCard({
 }: RecipeCardProps) {
   const t = useT();
   const isNational = variant === "national";
+  const isDinner = variant === "dinner";
+  const isHighlighted = isNational || isDinner;
   const isCommunity = variant === "community";
   const isSimple = variant === "simple";
   const imageUrl = recipe.imageUrl?.trim() || null;
@@ -51,7 +53,7 @@ export function RecipeCard({
     <li>
       <div
         className={`group relative flex cursor-pointer overflow-hidden rounded-2xl transition ${
-          isNational
+          isHighlighted
             ? "bg-ink text-cream shadow-md shadow-ink/15 ring-2 ring-saffron"
             : "bg-cream text-ink ring-1 ring-ink/10 hover:ring-tomato/35"
         }`}
@@ -71,7 +73,7 @@ export function RecipeCard({
             ) : (
               <MediaPlaceholder
                 labelKey="media.placeholder.recipe"
-                tone={isNational ? "dark" : "light"}
+                tone={isHighlighted ? "dark" : "light"}
                 compact
                 className="absolute inset-0"
               />
@@ -86,7 +88,7 @@ export function RecipeCard({
             <div className="flex flex-wrap items-center gap-2">
               <span
                 className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
-                  isNational
+                  isHighlighted
                     ? "bg-saffron/20 text-saffron-soft"
                     : "bg-parchment text-stamp"
                 }`}
@@ -95,7 +97,12 @@ export function RecipeCard({
                   ? t("cook.communitySuggestion")
                   : t(COURSE_KEYS[recipe.category])}
               </span>
-              {isNational ? (
+              {isDinner ? (
+                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-saffron-soft">
+                  {t("cook.badge.dinner")}
+                </span>
+              ) : null}
+              {isNational && !isDinner ? (
                 <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-saffron-soft">
                   {t("cook.badge.iconicNationalDish")}
                 </span>
@@ -103,7 +110,7 @@ export function RecipeCard({
               {isCommunity && !isSimple ? (
                 <span
                   className={`text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
-                    isNational ? "text-cream/70" : "text-stamp"
+                    isHighlighted ? "text-cream/70" : "text-stamp"
                   }`}
                 >
                   {t("cook.badge.community")}
@@ -118,7 +125,7 @@ export function RecipeCard({
               {recipe.localName ? (
                 <p
                   className={`mt-0.5 truncate text-sm ${
-                    isNational ? "text-cream/75" : "text-ink-soft"
+                    isHighlighted ? "text-cream/75" : "text-ink-soft"
                   }`}
                 >
                   {recipe.localName}
@@ -127,7 +134,7 @@ export function RecipeCard({
               {recipe.description.trim() ? (
                 <p
                   className={`mt-1.5 line-clamp-2 text-sm leading-snug ${
-                    isNational ? "text-cream/80" : "text-ink-soft"
+                    isHighlighted ? "text-cream/80" : "text-ink-soft"
                   }`}
                 >
                   {recipe.description.trim()}
@@ -138,7 +145,7 @@ export function RecipeCard({
             {showMeta && !isSimple ? (
               <div
                 className={`flex flex-wrap items-center gap-x-3 gap-y-1 text-sm ${
-                  isNational ? "text-cream/75" : "text-ink-soft"
+                  isHighlighted ? "text-cream/75" : "text-ink-soft"
                 }`}
               >
                 <span className="inline-flex items-center gap-1">
@@ -155,7 +162,7 @@ export function RecipeCard({
                   <span
                     key={label}
                     className={`rounded-full px-2 py-0.5 text-xs ${
-                      isNational
+                      isHighlighted
                         ? "bg-cream/10 text-cream/80"
                         : "bg-parchment text-ink-soft"
                     }`}
@@ -172,7 +179,7 @@ export function RecipeCard({
           <AdminItemMenu
             className="absolute right-2 top-2"
             label={recipe.name}
-            tone={isNational ? "dark" : "light"}
+            tone={isHighlighted ? "dark" : "light"}
             busy={adminBusy}
             status={adminStatus}
             error={adminError}

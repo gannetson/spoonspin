@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
-import { ExternalLink, MapPin, Plus, Store } from "lucide-react";
+import { ExternalLink, MapPin, Plus, Store, UtensilsCrossed } from "lucide-react";
 import type { Country, Drink, Recipe, RecipeCategory, SpecialtyShop } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import {
+  dinnerRecipeIdSet,
   drinkMatchesAlcohol,
   getCountryDrinks,
   getCountryRecipes,
+  getDinnerSuggestion,
   getSpecialtyShops,
   groupDrinksIntoSections,
   recipeMatchesCategory,
@@ -36,6 +38,7 @@ type CookMenuProps = {
   onOpenRecipe: (recipe: Recipe) => void;
 };
 
+type CookTab = "dinner" | "recipes" | "drinks" | "shops";
 type CategoryFilter = "all" | RecipeCategory;
 type DietFilter = "all" | "vegan" | "vegetarian" | "meat";
 type AlcoholFilter =
@@ -44,6 +47,8 @@ type AlcoholFilter =
   | "non-alcoholic"
   | "beer"
   | "wine";
+
+const TABS: CookTab[] = ["dinner", "recipes", "drinks", "shops"];
 
 const CATEGORY_FILTER_VALUES: CategoryFilter[] = [
   "all",
@@ -93,6 +98,15 @@ const ALCOHOL_FILTER_KEYS: Record<AlcoholFilter, string> = {
   "non-alcoholic": "cook.filter.alcohol.nonAlcoholic",
 };
 
+const COURSE_KEYS: Record<RecipeCategory | "extra", string> = {
+  starter: "cook.course.starter",
+  main: "cook.course.main",
+  side: "cook.course.side",
+  dessert: "cook.course.dessert",
+  snack: "cook.course.snack",
+  extra: "cook.course.extra",
+};
+
 export function CookMenu({
   country,
   communityRecipes,
@@ -108,6 +122,7 @@ export function CookMenu({
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
+  const [tab, setTab] = useState<CookTab>("dinner");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [dietFilter, setDietFilter] = useState<DietFilter>("all");
   const [alcoholFilter, setAlcoholFilter] = useState<AlcoholFilter>("all");
@@ -162,6 +177,13 @@ export function CookMenu({
     [communityShops],
   );
   const bannerUrl = cookBannerUrl(country);
+  const dinner = useMemo(() => getDinnerSuggestion(country), [country]);
+  const dinnerIds = useMemo(() => dinnerRecipeIdSet(country), [country]);
+  const recipesById = useMemo(() => {
+    const map = new Map<string, Recipe>();
+    for (const recipe of recipes) map.set(recipe.id, recipe);
+    return map;
+  }, [recipes]);
 
   const filteredRecipes = useMemo(
     () =>
@@ -229,125 +251,6 @@ export function CookMenu({
     />
   );
 
-  if (!country.cookReady || !country.menu) {
-    return (
-      <section
-        aria-labelledby="menu-heading"
-        className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream"
-      >
-        <div className="relative h-40 sm:h-48">
-          {bannerUrl ? (
-            <img
-              src={bannerUrl}
-              alt=""
-              className="size-full object-cover"
-            />
-          ) : (
-            <MediaPlaceholder
-              labelKey="media.placeholder.country"
-              tone="dark"
-              className="absolute inset-0"
-            />
-          )}
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 bg-gradient-to-t from-ink/70 to-ink/10"
-          />
-        </div>
-        <div className="space-y-4 p-6 sm:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <h2 id="menu-heading" className="font-display text-3xl text-ink sm:text-4xl">
-              {t("cook.menu.heading")}
-            </h2>
-            {suggestButton("recipe", "cook.suggestRecipe")}
-          </div>
-          <p className="max-w-2xl text-ink-soft">
-            {authoredRecipes.length > 0 ? (
-              t("cook.incomplete.withRecipes", { name: country.name })
-            ) : (
-              <>
-                {t("cook.incomplete.noRecipesPrefix", { name: country.name })}
-                {country.wikipedia ? t("cook.incomplete.wikipediaClause") : ""}
-                {t("cook.incomplete.orSwitch")}
-                <span className="font-semibold text-ink">{t("app.mode.dine")}</span>
-                {t("cook.incomplete.dineSuffix")}
-              </>
-            )}
-          </p>
-          {authoredRecipes.length > 0 ? (
-            <ul className="grid gap-3 pt-2">
-              {authoredRecipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                  variant="simple"
-                  showMeta={false}
-                  onOpen={() => onOpenRecipe(recipe)}
-                  isAdmin={isAdmin}
-                  adminBusy={Boolean(busy[`recipe:${recipe.id}`])}
-                  adminStatus={status[`recipe:${recipe.id}`]}
-                  adminError={error[`recipe:${recipe.id}`]}
-                  onAdminAction={(action) => {
-                    void run(`recipe:${recipe.id}`, () =>
-                      handleRecipeAdminAction({
-                        action,
-                        country,
-                        recipe,
-                        communityRecipes,
-                        onCountryUpdated,
-                        onCommunityRecipesChange,
-                      }),
-                    );
-                  }}
-                />
-              ))}
-            </ul>
-          ) : null}
-          {communityRecipes.length > 0 ? (
-            <ul className="grid gap-3 pt-2">
-              {communityRecipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  recipe={recipe}
-                  variant="community"
-                  showMeta={false}
-                  onOpen={() => onOpenRecipe(recipe)}
-                  isAdmin={isAdmin}
-                  adminBusy={Boolean(busy[`recipe:${recipe.id}`])}
-                  adminStatus={status[`recipe:${recipe.id}`]}
-                  adminError={error[`recipe:${recipe.id}`]}
-                  onAdminAction={(action) => {
-                    void run(`recipe:${recipe.id}`, () =>
-                      handleRecipeAdminAction({
-                        action,
-                        country,
-                        recipe,
-                        communityRecipes,
-                        onCountryUpdated,
-                        onCommunityRecipesChange,
-                      }),
-                    );
-                  }}
-                />
-              ))}
-            </ul>
-          ) : null}
-        </div>
-        <SuggestModal
-          kind={suggestKind ?? "recipe"}
-          country={country}
-          open={suggestKind != null}
-          onClose={() => setSuggestKind(null)}
-          onAdded={(result) => {
-            if (result.kind === "recipe") {
-              onCommunityRecipesChange([result.recipe, ...communityRecipes]);
-            }
-          }}
-        />
-      </section>
-    );
-  }
-
   return (
     <section aria-labelledby="menu-heading" className="space-y-6">
       <div className="relative overflow-hidden rounded-[2rem]">
@@ -386,205 +289,369 @@ export function CookMenu({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        {suggestButton("recipe", "cook.suggestRecipe")}
-      </div>
-
-      <div className="space-y-3 rounded-2xl bg-cream p-4 ring-1 ring-ink/10">
-        <p className="text-sm font-semibold text-ink">{t("cook.filters")}</p>
-        <FilterRow
-          label={t("cook.filter.course")}
-          options={categoryFilters}
-          value={categoryFilter}
-          onChange={setCategoryFilter}
-        />
-        <FilterRow
-          label={t("cook.filter.diet")}
-          options={dietFilters}
-          value={dietFilter}
-          onChange={setDietFilter}
-        />
-      </div>
-
-      <ul className="grid gap-3">
-        {filteredRecipes.map((recipe) => {
-          const isNational = recipe.id === country.nationalDishId;
-          const isCommunity = communityRecipeIds.has(recipe.id);
+      <div
+        role="tablist"
+        aria-label={t("cook.tabs.label")}
+        className="flex flex-wrap gap-2 rounded-2xl bg-cream p-2 ring-1 ring-ink/10"
+      >
+        {TABS.map((value) => {
+          const active = tab === value;
           return (
-            <RecipeCard
-              key={recipe.id}
-              recipe={recipe}
-              variant={
-                isNational ? "national" : isCommunity ? "community" : "default"
-              }
-              onOpen={() => onOpenRecipe(recipe)}
-              isAdmin={isAdmin}
-              adminBusy={Boolean(busy[`recipe:${recipe.id}`])}
-              adminStatus={status[`recipe:${recipe.id}`]}
-              adminError={error[`recipe:${recipe.id}`]}
-              onAdminAction={(action) => {
-                void run(`recipe:${recipe.id}`, () =>
-                  handleRecipeAdminAction({
-                    action,
-                    country,
-                    recipe,
-                    communityRecipes,
-                    onCountryUpdated,
-                    onCommunityRecipesChange,
-                  }),
-                );
-              }}
-            />
+            <button
+              key={value}
+              type="button"
+              role="tab"
+              aria-selected={active}
+              onClick={() => setTab(value)}
+              className={`min-h-11 rounded-xl px-4 text-sm font-semibold transition ${
+                active
+                  ? "bg-ink text-cream"
+                  : "text-ink hover:bg-ink/5"
+              }`}
+            >
+              {t(`cook.tabs.${value}`)}
+            </button>
           );
         })}
-      </ul>
+      </div>
 
-      {filteredRecipes.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-stamp/40 bg-white/50 p-5 text-ink-soft">
-          {t("cook.empty.recipes")}
-        </p>
+      {tab === "dinner" ? (
+        <div role="tabpanel" className="space-y-5">
+          {dinner ? (
+            <>
+              <div className="rounded-[1.75rem] bg-cream p-6 ring-1 ring-ink/10 sm:p-8">
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
+                  <UtensilsCrossed aria-hidden="true" className="size-4" />
+                  {t("cook.dinner.kicker")}
+                </p>
+                <h3 className="mt-2 font-display text-3xl text-ink sm:text-4xl">
+                  {dinner.title}
+                </h3>
+                <p className="mt-3 max-w-2xl text-ink-soft">{dinner.description}</p>
+                <button
+                  type="button"
+                  onClick={() => setTab("recipes")}
+                  className="mt-5 inline-flex min-h-11 items-center rounded-full bg-tomato px-5 text-sm font-semibold text-cream hover:bg-tomato-deep"
+                >
+                  {t("cook.dinner.showRecipes")}
+                </button>
+              </div>
+
+              <ol className="grid gap-3">
+                {dinner.courses.map((course, index) => {
+                  const recipe = recipesById.get(course.recipeId);
+                  if (!recipe) return null;
+                  return (
+                    <li
+                      key={`${course.recipeId}-${index}`}
+                      className="rounded-2xl bg-white/70 p-5 ring-1 ring-ink/10"
+                    >
+                      <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
+                        {t(COURSE_KEYS[course.role])}
+                      </p>
+                      <p className="mt-1 font-display text-2xl text-ink">
+                        {recipe.name}
+                        {recipe.localName ? (
+                          <span className="ml-2 font-sans text-base font-normal text-ink-soft">
+                            {recipe.localName}
+                          </span>
+                        ) : null}
+                      </p>
+                      {course.note ? (
+                        <p className="mt-2 text-sm text-ink-soft">{course.note}</p>
+                      ) : (
+                        <p className="mt-2 line-clamp-2 text-sm text-ink-soft">
+                          {recipe.description}
+                        </p>
+                      )}
+                      <button
+                        type="button"
+                        onClick={() => setTab("recipes")}
+                        className="mt-3 text-sm font-semibold text-tomato underline-offset-2 hover:underline"
+                      >
+                        {t("cook.dinner.openInRecipes")}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ol>
+
+              {dinner.drinks.length > 0 ? (
+                <div className="space-y-3">
+                  <h4 className="font-display text-2xl text-ink">
+                    {t("cook.dinner.drinksHeading")}
+                  </h4>
+                  <ul className="grid gap-3 sm:grid-cols-2">
+                    {dinner.drinks.map((suggestion) => {
+                      const drink = drinks.find(
+                        (item) =>
+                          item.name.toLowerCase() ===
+                          suggestion.drinkName.toLowerCase(),
+                      );
+                      return (
+                        <li
+                          key={suggestion.drinkName}
+                          className="rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4"
+                        >
+                          <p className="font-semibold text-ink">
+                            {drink?.name ?? suggestion.drinkName}
+                          </p>
+                          {suggestion.note ? (
+                            <p className="mt-2 text-sm text-ink-soft">
+                              {suggestion.note}
+                            </p>
+                          ) : drink?.description ? (
+                            <p className="mt-2 line-clamp-3 text-sm text-ink-soft">
+                              {drink.description}
+                            </p>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  <button
+                    type="button"
+                    onClick={() => setTab("drinks")}
+                    className="text-sm font-semibold text-tomato underline-offset-2 hover:underline"
+                  >
+                    {t("cook.dinner.openDrinks")}
+                  </button>
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="rounded-2xl border border-dashed border-stamp/40 bg-cream/60 p-6 text-ink-soft">
+              <p>{t("cook.dinner.empty", { name: country.name })}</p>
+              {recipes.length > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setTab("recipes")}
+                  className="mt-4 text-sm font-semibold text-tomato underline-offset-2 hover:underline"
+                >
+                  {t("cook.dinner.browseRecipes")}
+                </button>
+              ) : null}
+            </div>
+          )}
+        </div>
       ) : null}
 
-      <div className="space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <h3 className="font-display text-2xl text-ink">{t("cook.drinks.heading")}</h3>
-            <p className="text-sm text-ink-soft">
-              {t("cook.drinks.subtitle")}
-            </p>
+      {tab === "recipes" ? (
+        <div role="tabpanel" className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            {suggestButton("recipe", "cook.suggestRecipe")}
           </div>
-          <div className="flex flex-col items-stretch gap-3 sm:items-end">
-            {suggestButton("drink", "cook.suggestDrink")}
+
+          <div className="space-y-3 rounded-2xl bg-cream p-4 ring-1 ring-ink/10">
+            <p className="text-sm font-semibold text-ink">{t("cook.filters")}</p>
             <FilterRow
-              label={t("cook.filter.drinks")}
-              options={alcoholFilters}
-              value={alcoholFilter}
-              onChange={setAlcoholFilter}
+              label={t("cook.filter.course")}
+              options={categoryFilters}
+              value={categoryFilter}
+              onChange={setCategoryFilter}
+            />
+            <FilterRow
+              label={t("cook.filter.diet")}
+              options={dietFilters}
+              value={dietFilter}
+              onChange={setDietFilter}
             />
           </div>
-        </div>
 
-        {drinkSections.map((section) => (
-          <div key={section.id} className="space-y-3">
-            <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
-              {t(`cook.drinks.section.${section.id}` as const)}
-            </h4>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {section.drinks.map((item) => {
-                const key = item.id ?? `${item.name}|${item.type}`;
-                return (
-                  <li key={`${section.id}-${key}`}>
-                    <DrinkCard
-                      drink={item}
-                      community={communityDrinkKeys.has(key)}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
-
-        {filteredDrinks.length === 0 ? (
-          <p className="text-sm text-ink-soft">{t("cook.drinks.empty")}</p>
-        ) : null}
-      </div>
-
-      <div className="space-y-3">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h3 className="font-display text-2xl text-ink">{t("cook.shops.heading")}</h3>
-            <p className="text-sm text-ink-soft">
-              {t("cook.shops.subtitle", { name: country.name })}
-            </p>
-          </div>
-          {suggestButton("shop", "cook.suggestShop")}
-        </div>
-        {shops.length > 0 ? (
           <ul className="grid gap-3">
-            {shops.map((shop) => (
-              <li
-                key={shop.id}
-                className="relative rounded-2xl bg-cream p-5 ring-1 ring-ink/10"
-              >
-                {communityShopIds.has(shop.id) ? (
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
-                    {t("cook.communitySuggestion")}
-                  </p>
-                ) : null}
-                {isAdmin ? (
-                  <AdminItemMenu
-                    className="absolute right-3 top-3"
-                    label={shop.name}
-                    showReplaceImage={false}
-                    busy={Boolean(busy[`shop:${shop.id}`])}
-                    status={status[`shop:${shop.id}`]}
-                    error={error[`shop:${shop.id}`]}
-                    onAction={(action) => {
-                      void run(`shop:${shop.id}`, () =>
-                        handleShopAdminAction({
-                          action,
-                          country,
-                          shop,
-                          onCountryUpdated,
-                        }),
-                      );
-                    }}
-                  />
-                ) : null}
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div className={isAdmin ? "pr-12" : undefined}>
-                    <p className="inline-flex items-center gap-2 font-display text-xl text-ink">
-                      <Store aria-hidden="true" className="size-5" />
-                      {shop.name}
-                    </p>
-                    <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
-                      <MapPin
-                        aria-hidden="true"
-                        className="mt-0.5 size-4 shrink-0"
+            {filteredRecipes.map((recipe) => {
+              const isNational = recipe.id === country.nationalDishId;
+              const isDinner = dinnerIds.has(recipe.id);
+              const isCommunity = communityRecipeIds.has(recipe.id);
+              return (
+                <RecipeCard
+                  key={recipe.id}
+                  recipe={recipe}
+                  variant={
+                    isDinner
+                      ? "dinner"
+                      : isNational
+                        ? "national"
+                        : isCommunity
+                          ? "community"
+                          : "default"
+                  }
+                  onOpen={() => onOpenRecipe(recipe)}
+                  isAdmin={isAdmin}
+                  adminBusy={Boolean(busy[`recipe:${recipe.id}`])}
+                  adminStatus={status[`recipe:${recipe.id}`]}
+                  adminError={error[`recipe:${recipe.id}`]}
+                  onAdminAction={(action) => {
+                    void run(`recipe:${recipe.id}`, () =>
+                      handleRecipeAdminAction({
+                        action,
+                        country,
+                        recipe,
+                        communityRecipes,
+                        onCountryUpdated,
+                        onCommunityRecipesChange,
+                      }),
+                    );
+                  }}
+                />
+              );
+            })}
+          </ul>
+
+          {filteredRecipes.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-stamp/40 bg-white/50 p-5 text-ink-soft">
+              {t("cook.empty.recipes")}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {tab === "drinks" ? (
+        <div role="tabpanel" className="space-y-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h3 className="font-display text-2xl text-ink">
+                {t("cook.drinks.heading")}
+              </h3>
+              <p className="text-sm text-ink-soft">{t("cook.drinks.subtitle")}</p>
+            </div>
+            <div className="flex flex-col items-stretch gap-3 sm:items-end">
+              {suggestButton("drink", "cook.suggestDrink")}
+              <FilterRow
+                label={t("cook.filter.drinks")}
+                options={alcoholFilters}
+                value={alcoholFilter}
+                onChange={setAlcoholFilter}
+              />
+            </div>
+          </div>
+
+          {drinkSections.map((section) => (
+            <div key={section.id} className="space-y-3">
+              <h4 className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
+                {t(`cook.drinks.section.${section.id}` as const)}
+              </h4>
+              <ul className="grid gap-3 sm:grid-cols-2">
+                {section.drinks.map((item) => {
+                  const key = item.id ?? `${item.name}|${item.type}`;
+                  return (
+                    <li key={`${section.id}-${key}`}>
+                      <DrinkCard
+                        drink={item}
+                        community={communityDrinkKeys.has(key)}
                       />
-                      <span>
-                        {shop.address}
-                        {shop.city ? ` · ${shop.city}` : ""}
-                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+
+          {filteredDrinks.length === 0 ? (
+            <p className="text-sm text-ink-soft">{t("cook.drinks.empty")}</p>
+          ) : null}
+        </div>
+      ) : null}
+
+      {tab === "shops" ? (
+        <div role="tabpanel" className="space-y-3">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <h3 className="font-display text-2xl text-ink">
+                {t("cook.shops.heading")}
+              </h3>
+              <p className="text-sm text-ink-soft">
+                {t("cook.shops.subtitle", { name: country.name })}
+              </p>
+            </div>
+            {suggestButton("shop", "cook.suggestShop")}
+          </div>
+          {shops.length > 0 ? (
+            <ul className="grid gap-3">
+              {shops.map((shop) => (
+                <li
+                  key={shop.id}
+                  className="relative rounded-2xl bg-cream p-5 ring-1 ring-ink/10"
+                >
+                  {communityShopIds.has(shop.id) ? (
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
+                      {t("cook.communitySuggestion")}
                     </p>
-                    <p className="mt-2 text-sm font-semibold text-ink">
-                      {shop.specialty}
-                    </p>
-                    {shop.notes ? (
-                      <p className="mt-1 text-sm text-ink-soft">{shop.notes}</p>
-                    ) : null}
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {shop.website ? (
+                  ) : null}
+                  {isAdmin ? (
+                    <AdminItemMenu
+                      className="absolute right-3 top-3"
+                      label={shop.name}
+                      showReplaceImage={false}
+                      busy={Boolean(busy[`shop:${shop.id}`])}
+                      status={status[`shop:${shop.id}`]}
+                      error={error[`shop:${shop.id}`]}
+                      onAction={(action) => {
+                        void run(`shop:${shop.id}`, () =>
+                          handleShopAdminAction({
+                            action,
+                            country,
+                            shop,
+                            onCountryUpdated,
+                          }),
+                        );
+                      }}
+                    />
+                  ) : null}
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className={isAdmin ? "pr-12" : undefined}>
+                      <p className="inline-flex items-center gap-2 font-display text-xl text-ink">
+                        <Store aria-hidden="true" className="size-5" />
+                        {shop.name}
+                      </p>
+                      <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
+                        <MapPin
+                          aria-hidden="true"
+                          className="mt-0.5 size-4 shrink-0"
+                        />
+                        <span>
+                          {shop.address}
+                          {shop.city ? ` · ${shop.city}` : ""}
+                        </span>
+                      </p>
+                      <p className="mt-2 text-sm font-semibold text-ink">
+                        {shop.specialty}
+                      </p>
+                      {shop.notes ? (
+                        <p className="mt-1 text-sm text-ink-soft">{shop.notes}</p>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {shop.website ? (
+                        <a
+                          href={shop.website}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                        >
+                          {t("cook.shops.website")}
+                          <ExternalLink aria-hidden="true" className="size-4" />
+                        </a>
+                      ) : null}
                       <a
-                        href={shop.website}
+                        href={shop.mapsUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
                       >
-                        {t("cook.shops.website")}
+                        {t("cook.shops.openInMaps")}
                         <ExternalLink aria-hidden="true" className="size-4" />
                       </a>
-                    ) : null}
-                    <a
-                      href={shop.mapsUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                    >
-                      {t("cook.shops.openInMaps")}
-                      <ExternalLink aria-hidden="true" className="size-4" />
-                    </a>
+                    </div>
                   </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-sm text-ink-soft">{t("cook.shops.empty")}</p>
-        )}
-      </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-sm text-ink-soft">{t("cook.shops.empty")}</p>
+          )}
+        </div>
+      ) : null}
 
       {suggestModal}
     </section>

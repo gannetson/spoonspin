@@ -48,6 +48,8 @@ export {
   getCountryRecipes,
   getCountryDrinks,
   getSpecialtyShops,
+  getDinnerSuggestion,
+  dinnerRecipeIdSet,
   recipeMatchesDiet,
   recipeMatchesCategory,
   drinkMatchesAlcohol,

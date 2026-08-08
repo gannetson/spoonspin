@@ -57,6 +57,20 @@ export const en: Messages = {
   "media.placeholder.country": "No cuisine photo yet",
 
   "cook.menu.heading": "Tonight's menu",
+  "cook.tabs.label": "Cook sections",
+  "cook.tabs.dinner": "Dinner",
+  "cook.tabs.recipes": "Recipes",
+  "cook.tabs.drinks": "Drinks",
+  "cook.tabs.shops": "Shops",
+  "cook.dinner.kicker": "A perfect taste",
+  "cook.dinner.showRecipes": "Show recipes",
+  "cook.dinner.openInRecipes": "Open in Recipes",
+  "cook.dinner.drinksHeading": "What to drink",
+  "cook.dinner.openDrinks": "Browse all drinks",
+  "cook.dinner.browseRecipes": "Browse recipes",
+  "cook.dinner.empty":
+    "No dinner suggestion yet for {name}. Add a few recipes and drinks, then compose one from Admin.",
+  "cook.course.extra": "Course",
   "cook.suggestRecipe": "Suggest a recipe",
   "cook.suggestDrink": "Suggest a drink",
   "cook.suggestShop": "Suggest a shop",
@@ -95,6 +109,7 @@ export const en: Messages = {
   "cook.course.dessert": "Dessert",
   "cook.course.snack": "Snack",
   "cook.badge.iconicNationalDish": "iconic national dish",
+  "cook.badge.dinner": "tonight's dinner",
   "cook.badge.community": "community",
   "cook.meta.minutes": "{minutes} min",
   "cook.empty.recipes": "No recipes match these filters. Try another course or diet.",
@@ -340,6 +355,12 @@ export const en: Messages = {
   "admin.country.findRecipes": "Find recipes",
   "admin.country.findRecipes.hint":
     "Query national dishes and add selected recipes",
+  "admin.country.composeDinner": "Compose dinner",
+  "admin.country.composeDinner.hint":
+    "Pick 3–5 courses and drinks for the Dinner tab",
+  "admin.country.composingDinner": "Composing dinner…",
+  "admin.country.dinnerComposed": "Dinner ready: {title}",
+  "admin.country.dinnerError": "Could not compose dinner.",
   "admin.country.findDrinks": "Find drinks",
   "admin.country.findDrinks.hint":
     "Beers with brands/images, wines with grapes & food pairing, plus other drinks",

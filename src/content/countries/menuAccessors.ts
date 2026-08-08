@@ -1,5 +1,6 @@
 import type {
   Country,
+  DinnerSuggestion,
   Drink,
   Recipe,
   RecipeCategory,
@@ -146,4 +147,53 @@ export function groupDrinksIntoSections(drinks: Drink[]): DrinkSection[] {
     { id: "wines", drinks: wines },
     { id: "alcoholicOther", drinks: alcoholicOther },
   ];
+}
+
+/**
+ * Prefer stored dinner_json; otherwise derive a simple dinner from the cook menu slots.
+ */
+export function getDinnerSuggestion(
+  country: Country,
+): DinnerSuggestion | undefined {
+  if (country.dinner && country.dinner.courses.length >= 3) {
+    return country.dinner;
+  }
+  if (!country.menu) return undefined;
+  return {
+    title: `A taste of ${country.name}`,
+    description: country.introduction,
+    courses: [
+      {
+        recipeId: country.menu.starter.id,
+        role: "starter",
+        note: "Open with something bright and typical.",
+      },
+      {
+        recipeId: country.menu.main.id,
+        role: "main",
+        note: "The heart of the meal.",
+      },
+      {
+        recipeId: country.menu.side.id,
+        role: "side",
+        note: "A supporting plate that completes the main.",
+      },
+      {
+        recipeId: country.menu.dessert.id,
+        role: "dessert",
+        note: "Finish the way locals often do.",
+      },
+    ],
+    drinks: [
+      {
+        drinkName: country.menu.drink.name,
+        note: "The pour that belongs with this table.",
+      },
+    ],
+  };
+}
+
+export function dinnerRecipeIdSet(country: Country): Set<string> {
+  const dinner = getDinnerSuggestion(country);
+  return new Set(dinner?.courses.map((course) => course.recipeId) ?? []);
 }

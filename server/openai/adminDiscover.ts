@@ -1290,3 +1290,144 @@ JSON shape:
   );
   return itemImageQueriesSchema.parse(raw);
 }
+
+const dinnerComposeSchema = z.object({
+  title: z.string().min(3),
+  description: z.string().min(40),
+  courses: z
+    .array(
+      z.object({
+        recipeId: z.string().min(1),
+        role: z.enum(["starter", "main", "side", "dessert", "snack", "extra"]),
+        note: optionalString,
+      }),
+    )
+    .min(3)
+    .max(5),
+  drinks: z
+    .array(
+      z.object({
+        drinkName: z.string().min(1),
+        note: optionalString,
+      }),
+    )
+    .min(1)
+    .max(4),
+});
+
+/**
+ * Compose a 3–5 course “perfect taste” dinner from existing recipes + drinks.
+ */
+export async function composeDinnerSuggestion(input: {
+  countryCode: string;
+  countryName: string;
+  introduction?: string;
+  recipes: Array<{
+    id: string;
+    name: string;
+    localName?: string;
+    description: string;
+    category: string;
+  }>;
+  drinks: Array<{
+    name: string;
+    localName?: string;
+    type: string;
+    alcoholic: boolean;
+    description: string;
+  }>;
+}): Promise<{ notes: string; dinner: import("../../src/types/content.ts").DinnerSuggestion }> {
+  if (input.recipes.length < 3) {
+    throw new Error("Need at least 3 recipes to compose a dinner.");
+  }
+  if (input.drinks.length < 1) {
+    throw new Error("Need at least 1 drink to compose a dinner.");
+  }
+
+  const raw = await chatJson(
+    `You curate one memorable home dinner that captures the soul of a national cuisine.
+Reply with JSON only.
+
+Rules:
+- Pick 3–5 courses from the provided recipe list only (use exact recipeId values).
+- Prefer a natural arc: starter → main → side and/or dessert (snack allowed).
+- Include 1–3 drink suggestions from the provided drink names only (exact drinkName).
+- Write a warm, specific description (why this dinner tastes like the country) — not generic tourism copy.
+- Per-course and per-drink notes should be short and practical (why it belongs / how it pairs).`,
+    `Country: ${input.countryName} (${input.countryCode})
+Introduction: ${input.introduction ?? "n/a"}
+
+Available recipes:
+${JSON.stringify(input.recipes, null, 2)}
+
+Available drinks:
+${JSON.stringify(input.drinks, null, 2)}
+
+JSON shape:
+{
+  "notes": string,
+  "title": string,
+  "description": string,
+  "courses": [{"recipeId": string, "role": "starter"|"main"|"side"|"dessert"|"snack"|"extra", "note": string?}],
+  "drinks": [{"drinkName": string, "note": string?}]
+}`,
+  );
+
+  const parsed = z
+    .object({
+      notes: z.string(),
+      ...dinnerComposeSchema.shape,
+    })
+    .parse(raw);
+
+  const recipeIds = new Set(input.recipes.map((recipe) => recipe.id));
+  const drinkNames = new Set(
+    input.drinks.map((drink) => drink.name.toLowerCase()),
+  );
+
+  const courses = parsed.courses.filter((course) => recipeIds.has(course.recipeId));
+  if (courses.length < 3) {
+    throw new Error("Dinner composition referenced too few valid recipes.");
+  }
+
+  const drinks = parsed.drinks
+    .map((drink) => {
+      const match = input.drinks.find(
+        (item) => item.name.toLowerCase() === drink.drinkName.toLowerCase(),
+      );
+      if (!match) return null;
+      return {
+        drinkName: match.name,
+        note: drink.note,
+      };
+    })
+    .filter((drink): drink is { drinkName: string; note?: string } =>
+      Boolean(drink),
+    );
+
+  if (drinks.length === 0) {
+    // Fall back to first drink if the model invented names.
+    const first = input.drinks[0]!;
+    drinks.push({
+      drinkName: first.name,
+      note: "A classic pour with this cuisine.",
+    });
+  }
+
+  void drinkNames;
+
+  return {
+    notes: parsed.notes,
+    dinner: {
+      title: parsed.title,
+      description: parsed.description,
+      courses: courses.slice(0, 5).map((course) => ({
+        recipeId: course.recipeId,
+        role: course.role,
+        note: course.note,
+      })),
+      drinks: drinks.slice(0, 4),
+      composedAt: new Date().toISOString(),
+    },
+  };
+}

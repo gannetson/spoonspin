@@ -57,6 +57,20 @@ export const nl: Messages = {
   "media.placeholder.country": "Nog geen keukenfoto",
 
   "cook.menu.heading": "Vanavond op het menu",
+  "cook.tabs.label": "Kook-onderdelen",
+  "cook.tabs.dinner": "Diner",
+  "cook.tabs.recipes": "Recepten",
+  "cook.tabs.drinks": "Dranken",
+  "cook.tabs.shops": "Winkels",
+  "cook.dinner.kicker": "Een perfecte smaak",
+  "cook.dinner.showRecipes": "Toon recepten",
+  "cook.dinner.openInRecipes": "Open in Recepten",
+  "cook.dinner.drinksHeading": "Wat te drinken",
+  "cook.dinner.openDrinks": "Bekijk alle dranken",
+  "cook.dinner.browseRecipes": "Bekijk recepten",
+  "cook.dinner.empty":
+    "Nog geen dinersuggestie voor {name}. Voeg recepten en dranken toe, en stel er een samen via Beheer.",
+  "cook.course.extra": "Gang",
   "cook.suggestRecipe": "Stel een recept voor",
   "cook.suggestDrink": "Stel een drank voor",
   "cook.suggestShop": "Stel een winkel voor",
@@ -95,6 +109,7 @@ export const nl: Messages = {
   "cook.course.dessert": "Nagerecht",
   "cook.course.snack": "Snack",
   "cook.badge.iconicNationalDish": "nationaal icoon",
+  "cook.badge.dinner": "vanavond op tafel",
   "cook.badge.community": "community",
   "cook.meta.minutes": "{minutes} min",
   "cook.empty.recipes":
@@ -344,6 +359,12 @@ export const nl: Messages = {
   "admin.country.findRecipes": "Recepten zoeken",
   "admin.country.findRecipes.hint":
     "Zoek nationale gerechten en voeg geselecteerde recepten toe",
+  "admin.country.composeDinner": "Diner samenstellen",
+  "admin.country.composeDinner.hint":
+    "Kies 3–5 gangen en dranken voor het Diner-tabblad",
+  "admin.country.composingDinner": "Diner samenstellen…",
+  "admin.country.dinnerComposed": "Diner klaar: {title}",
+  "admin.country.dinnerError": "Kon diner niet samenstellen.",
   "admin.country.findDrinks": "Dranken zoeken",
   "admin.country.findDrinks.hint":
     "Bieren met merken/foto’s, wijnen met druiven & pairing, plus andere dranken",

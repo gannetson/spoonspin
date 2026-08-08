@@ -1,6 +1,7 @@
 import type { QueryResultRow } from "pg";
 import type {
   Country,
+  DinnerSuggestion,
   Drink,
   Recipe,
   SpecialtyShop,
@@ -104,6 +105,7 @@ function assembleCountry(
       ];
 
   const moreDrinksList = asArray<Drink>(row.more_drinks);
+  const dinner = asObject<DinnerSuggestion>(row.dinner_json);
 
   return {
     code: String(row.code),
@@ -125,6 +127,7 @@ function assembleCountry(
         : String(row.image_attribution),
     cookReady,
     status: String(row.status) as Country["status"],
+    dinner,
     standaloneRecipes:
       standaloneRecipes.length > 0 ? standaloneRecipes : undefined,
     moreDrinks:
@@ -187,11 +190,13 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
     `INSERT INTO countries (
       code, slug, name, flag, region, introduction, cuisine_aliases,
       national_dish_id, national_drink, menu_drink, more_drinks, wikipedia,
-      specialty_shops, image_url, image_attribution, cook_ready, status, updated_at
+      specialty_shops, image_url, image_attribution, dinner_json,
+      cook_ready, status, updated_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7::jsonb,
       $8, $9::jsonb, $10::jsonb, $11::jsonb, $12::jsonb,
-      $13::jsonb, $14, $15, $16, $17, NOW()
+      $13::jsonb, $14, $15, $16::jsonb,
+      $17, $18, NOW()
     )
     ON CONFLICT (code) DO UPDATE SET
       slug = EXCLUDED.slug,
@@ -208,6 +213,7 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
       specialty_shops = EXCLUDED.specialty_shops,
       image_url = COALESCE(EXCLUDED.image_url, countries.image_url),
       image_attribution = COALESCE(EXCLUDED.image_attribution, countries.image_attribution),
+      dinner_json = COALESCE(EXCLUDED.dinner_json, countries.dinner_json),
       cook_ready = EXCLUDED.cook_ready,
       status = EXCLUDED.status,
       updated_at = NOW()`,
@@ -222,11 +228,14 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
       country.nationalDishId ?? null,
       country.nationalDrink ? JSON.stringify(country.nationalDrink) : null,
       country.menu?.drink ? JSON.stringify(country.menu.drink) : null,
-      JSON.stringify(country.menu?.moreDrinks ?? []),
+      JSON.stringify(
+        country.menu?.moreDrinks ?? country.moreDrinks ?? [],
+      ),
       country.wikipedia ? JSON.stringify(country.wikipedia) : null,
       JSON.stringify(country.specialtyShops ?? []),
       country.imageUrl ?? null,
       country.imageAttribution ?? null,
+      country.dinner ? JSON.stringify(country.dinner) : null,
       country.cookReady,
       country.status,
     ],
@@ -680,6 +689,20 @@ export async function saveCountryDrinks(
       input.menuDrink ? JSON.stringify(input.menuDrink) : null,
       JSON.stringify(input.moreDrinks),
     ],
+  );
+  return getCountryFromDb(countryCode);
+}
+
+export async function saveDinnerSuggestion(
+  countryCode: string,
+  dinner: DinnerSuggestion,
+): Promise<Country | undefined> {
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE countries
+     SET dinner_json = $2::jsonb, updated_at = NOW()
+     WHERE code = $1`,
+    [countryCode.toLowerCase(), JSON.stringify(dinner)],
   );
   return getCountryFromDb(countryCode);
 }

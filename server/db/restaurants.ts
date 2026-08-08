@@ -405,6 +405,7 @@ async function migrate(db: Pool) {
 
     ALTER TABLE countries ADD COLUMN IF NOT EXISTS image_url TEXT;
     ALTER TABLE countries ADD COLUMN IF NOT EXISTS image_attribution TEXT;
+    ALTER TABLE countries ADD COLUMN IF NOT EXISTS dinner_json JSONB;
 
     CREATE INDEX IF NOT EXISTS idx_countries_cook_ready
       ON countries (cook_ready);

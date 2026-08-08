@@ -13,7 +13,11 @@ import {
   Warehouse,
 } from "lucide-react";
 import type { Country } from "@/types/content";
-import { findDrinkImages, replaceCountryImage } from "@/admin/countryTools";
+import {
+  composeDinner,
+  findDrinkImages,
+  replaceCountryImage,
+} from "@/admin/countryTools";
 import {
   AdminDiscoverModal,
   type AdminDiscoverKind,
@@ -42,10 +46,11 @@ export function AdminCountryMenu({
   );
   const [imageBusy, setImageBusy] = useState(false);
   const [drinkImagesBusy, setDrinkImagesBusy] = useState(false);
+  const [dinnerBusy, setDinnerBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const hasCountry = Boolean(country);
-  const menuBusy = imageBusy || drinkImagesBusy;
+  const menuBusy = imageBusy || drinkImagesBusy || dinnerBusy;
 
   useEffect(() => {
     if (!open) return;
@@ -113,6 +118,25 @@ export function AdminCountryMenu({
     }
   }
 
+  async function onComposeDinner() {
+    if (!country || !onCountryUpdated) return;
+    setOpen(false);
+    setDinnerBusy(true);
+    setError(null);
+    setStatus(null);
+    try {
+      const result = await composeDinner(country.code);
+      onCountryUpdated(result.country);
+      setStatus(t("admin.country.dinnerComposed", { title: result.dinner.title }));
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : t("admin.country.dinnerError"),
+      );
+    } finally {
+      setDinnerBusy(false);
+    }
+  }
+
   function openDiscover(kind: AdminDiscoverKind) {
     if (!country) return;
     setOpen(false);
@@ -149,7 +173,9 @@ export function AdminCountryMenu({
               <LoaderCircle className="size-4 animate-spin" />
               {drinkImagesBusy
                 ? t("admin.country.findingDrinkImages")
-                : t("admin.country.findingImage")}
+                : dinnerBusy
+                  ? t("admin.country.composingDinner")
+                  : t("admin.country.findingImage")}
             </span>
           ) : null}
           {status ? (
@@ -257,6 +283,23 @@ export function AdminCountryMenu({
                   </span>
                   <span className="mt-0.5 block text-xs text-ink-soft">
                     {t("admin.country.findRecipes.hint")}
+                  </span>
+                </span>
+              </button>
+              <button
+                type="button"
+                role="menuitem"
+                disabled={dinnerBusy}
+                onClick={() => void onComposeDinner()}
+                className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment disabled:opacity-60"
+              >
+                <LayoutGrid className="mt-0.5 size-4 shrink-0 text-tomato" />
+                <span>
+                  <span className="block font-semibold text-ink">
+                    {t("admin.country.composeDinner")}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-soft">
+                    {t("admin.country.composeDinner.hint")}
                   </span>
                 </span>
               </button>

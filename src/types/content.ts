@@ -82,6 +82,33 @@ export type Menu = {
   moreDrinks?: Drink[];
 };
 
+/** Curated “perfect taste” dinner for the Dinner tab (refs into recipes/drinks). */
+export type DinnerCourseRole =
+  | RecipeCategory
+  | "extra";
+
+export type DinnerCourse = {
+  recipeId: string;
+  role: DinnerCourseRole;
+  /** Short note on why this course belongs in the dinner. */
+  note?: string;
+};
+
+export type DinnerDrinkSuggestion = {
+  /** Match against drink.name (case-insensitive). */
+  drinkName: string;
+  note?: string;
+};
+
+export type DinnerSuggestion = {
+  title: string;
+  /** Narrative: how this dinner captures the cuisine. */
+  description: string;
+  courses: DinnerCourse[];
+  drinks: DinnerDrinkSuggestion[];
+  composedAt?: string;
+};
+
 export type CountryStatus = "draft" | "published";
 
 /** Wikipedia extract for "{Country} cuisine" (or closest page). */
@@ -129,6 +156,8 @@ export type Country = {
   standaloneRecipes?: Recipe[];
   /** Extra drinks when a full cook menu is not assembled yet. */
   moreDrinks?: Drink[];
+  /** Composed dinner suggestion for the Dinner tab. */
+  dinner?: DinnerSuggestion;
   specialtyShops?: SpecialtyShop[];
   /** Cuisine banner plate (DB or curated). */
   imageUrl?: string;

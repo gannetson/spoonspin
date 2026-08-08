@@ -150,6 +150,14 @@ export function findDrinkImages(code: string) {
   );
 }
 
+export function composeDinner(code: string) {
+  return postAdmin<{
+    country: Country;
+    dinner: import("@/types/content").DinnerSuggestion;
+    notes: string;
+  }>(`/api/admin/countries/${encodeURIComponent(code)}/compose-dinner`);
+}
+
 async function deleteAdmin<T>(path: string): Promise<T> {
   const response = await fetch(path, {
     method: "DELETE",

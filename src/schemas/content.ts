@@ -60,6 +60,25 @@ export const specialtyShopSchema = z.object({
   notes: z.string().optional(),
 });
 
+export const dinnerCourseSchema = z.object({
+  recipeId: z.string().min(1),
+  role: z.enum(["starter", "main", "side", "dessert", "snack", "extra"]),
+  note: z.string().min(8).optional(),
+});
+
+export const dinnerDrinkSuggestionSchema = z.object({
+  drinkName: z.string().min(1),
+  note: z.string().min(8).optional(),
+});
+
+export const dinnerSuggestionSchema = z.object({
+  title: z.string().min(3),
+  description: z.string().min(40),
+  courses: z.array(dinnerCourseSchema).min(3).max(5),
+  drinks: z.array(dinnerDrinkSuggestionSchema).min(1).max(4),
+  composedAt: z.string().optional(),
+});
+
 export const menuSchema = z.object({
   starter: recipeSchema,
   main: recipeSchema,
