@@ -19,6 +19,9 @@ import { RecipeCard } from "@/components/RecipeCard";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import {
+  handleDinnerCourseAdminAction,
+  handleDinnerDrinkAdminAction,
+  handleDrinkAdminAction,
   handleRecipeAdminAction,
   handleShopAdminAction,
   useAdminItemBusy,
@@ -341,10 +344,32 @@ export function CookMenu({
                   return (
                     <section
                       key={`${course.recipeId}-${index}`}
-                      className={`grid items-stretch gap-0 md:grid-cols-2 ${
+                      className={`relative grid items-stretch gap-0 md:grid-cols-2 ${
                         imageLeft ? "" : "md:[&>figure]:order-2"
                       }`}
                     >
+                      {isAdmin ? (
+                        <AdminItemMenu
+                          className="absolute right-3 top-3"
+                          label={recipe.name}
+                          removeOnly
+                          removeHintKey="admin.item.removeFromDinner.hint"
+                          busy={Boolean(busy[`dinner-course:${course.recipeId}`])}
+                          status={status[`dinner-course:${course.recipeId}`]}
+                          error={error[`dinner-course:${course.recipeId}`]}
+                          onAction={(action) => {
+                            void run(`dinner-course:${course.recipeId}`, () =>
+                              handleDinnerCourseAdminAction({
+                                action,
+                                country,
+                                recipeId: course.recipeId,
+                                recipeName: recipe.name,
+                                onCountryUpdated,
+                              }),
+                            );
+                          }}
+                        />
+                      ) : null}
                       <figure className="relative min-h-56 bg-parchment md:min-h-72">
                         {imageUrl ? (
                           <img
@@ -406,8 +431,37 @@ export function CookMenu({
                       return (
                         <div
                           key={suggestion.drinkName}
-                          className="flex gap-4"
+                          className="relative flex gap-4 pr-12"
                         >
+                          {isAdmin ? (
+                            <AdminItemMenu
+                              className="absolute right-0 top-0"
+                              label={suggestion.drinkName}
+                              removeOnly
+                              removeHintKey="admin.item.removeFromDinner.hint"
+                              busy={Boolean(
+                                busy[`dinner-drink:${suggestion.drinkName}`],
+                              )}
+                              status={
+                                status[`dinner-drink:${suggestion.drinkName}`]
+                              }
+                              error={
+                                error[`dinner-drink:${suggestion.drinkName}`]
+                              }
+                              onAction={(action) => {
+                                void run(
+                                  `dinner-drink:${suggestion.drinkName}`,
+                                  () =>
+                                    handleDinnerDrinkAdminAction({
+                                      action,
+                                      country,
+                                      drinkName: suggestion.drinkName,
+                                      onCountryUpdated,
+                                    }),
+                                );
+                              }}
+                            />
+                          ) : null}
                           <div className="relative h-28 w-20 shrink-0 overflow-hidden rounded-xl bg-parchment">
                             {drinkImage ? (
                               <img
@@ -572,6 +626,20 @@ export function CookMenu({
                       <DrinkCard
                         drink={item}
                         community={communityDrinkKeys.has(key)}
+                        isAdmin={isAdmin}
+                        adminBusy={Boolean(busy[`drink:${key}`])}
+                        adminStatus={status[`drink:${key}`]}
+                        adminError={error[`drink:${key}`]}
+                        onAdminAction={(action) => {
+                          void run(`drink:${key}`, () =>
+                            handleDrinkAdminAction({
+                              action,
+                              country,
+                              drink: item,
+                              onCountryUpdated,
+                            }),
+                          );
+                        }}
                       />
                     </li>
                   );
@@ -694,14 +762,36 @@ export function CookMenu({
 function DrinkCard({
   drink,
   community = false,
+  isAdmin = false,
+  adminBusy = false,
+  adminStatus = null,
+  adminError = null,
+  onAdminAction,
 }: {
   drink: Drink;
   community?: boolean;
+  isAdmin?: boolean;
+  adminBusy?: boolean;
+  adminStatus?: string | null;
+  adminError?: string | null;
+  onAdminAction?: (action: import("@/components/AdminItemMenu").AdminItemAction) => void;
 }) {
   const t = useT();
 
   return (
-    <article className="flex gap-3 rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4">
+    <article className="relative flex gap-3 rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4">
+      {isAdmin && onAdminAction ? (
+        <AdminItemMenu
+          className="absolute right-2 top-2"
+          label={drink.name}
+          showSelectForDinner
+          selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
+          busy={adminBusy}
+          status={adminStatus}
+          error={adminError}
+          onAction={onAdminAction}
+        />
+      ) : null}
       {drink.imageUrl ? (
         <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-lg bg-parchment">
           <img
@@ -712,7 +802,7 @@ function DrinkCard({
           />
         </div>
       ) : null}
-      <div className="min-w-0 flex-1">
+      <div className={`min-w-0 flex-1 ${isAdmin ? "pr-10" : ""}`}>
         {community ? (
           <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
             {t("cook.communitySuggestion")}

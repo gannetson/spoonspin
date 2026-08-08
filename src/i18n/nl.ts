@@ -46,10 +46,6 @@ export const nl: Messages = {
   "country.card.choosing": "Kiezen…",
   "country.card.spinningPlate": "Draaien voor je volgende gerecht…",
   "country.card.wikipediaLink": "{title} op Wikipedia",
-  "country.card.iconicDish": "Icoonachtig gerecht",
-  "country.card.typicalDrink": "Typische drank",
-  "country.card.alcoholic": "Alcoholisch",
-  "country.card.nonAlcoholic": "Alcoholvrij",
 
   "media.placeholder": "Nog geen foto",
   "media.placeholder.restaurant": "Nog geen restaurantfoto",
@@ -393,6 +389,9 @@ export const nl: Messages = {
   "admin.item.selectForDinner": "Selecteer voor diner",
   "admin.item.selectForDinner.hint":
     "Gebruik dit gerecht als dinergang voor zijn categorie (vervangt de huidige)",
+  "admin.item.selectForDinner.drink.hint":
+    "Voeg deze drank toe aan het diner (andere dranken blijven staan)",
+  "admin.item.removeFromDinner.hint": "Alleen uit het diner vanavond verwijderen",
   "admin.item.findMenu": "Menu zoeken",
   "admin.item.findMenu.hint": "Onderzoek gerechten en sla een menu op",
   "admin.item.findScores": "Scores zoeken",

@@ -155,7 +155,7 @@ export function groupDrinksIntoSections(drinks: Drink[]): DrinkSection[] {
 export function getDinnerSuggestion(
   country: Country,
 ): DinnerSuggestion | undefined {
-  if (country.dinner && country.dinner.courses.length >= 3) {
+  if (country.dinner && country.dinner.courses.length > 0) {
     return country.dinner;
   }
   if (!country.menu) return undefined;

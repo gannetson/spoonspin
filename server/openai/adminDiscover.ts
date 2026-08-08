@@ -957,6 +957,64 @@ JSON shape:
   };
 }
 
+const drinkRewriteSchema = z.object({
+  notes: z.string(),
+  localName: optionalString,
+  description: z.string().min(20),
+  grape: optionalString,
+  foodPairing: optionalString,
+  type: z
+    .enum([
+      "beer",
+      "wine",
+      "spirit",
+      "cocktail",
+      "soft-drink",
+      "tea",
+      "coffee",
+    ])
+    .optional(),
+  alcoholic: z.boolean().optional(),
+});
+
+export async function rewriteDrinkText(input: {
+  countryName: string;
+  drink: Drink;
+}): Promise<{ notes: string; patch: Partial<Drink> }> {
+  const raw = await chatJson(
+    `You improve Spoon Spin drink copy with accurate, practical detail for home cooks.
+Keep the same drink identity. Reply with JSON only.`,
+    `Country cuisine: ${input.countryName}
+Current drink JSON:
+${JSON.stringify(input.drink, null, 2)}
+
+Rewrite the editorial text. Keep the drink name unchanged.
+
+JSON shape:
+{
+  "notes": string,
+  "localName": string?,
+  "description": string,
+  "grape": string?,
+  "foodPairing": string?,
+  "type": "beer"|"wine"|"spirit"|"cocktail"|"soft-drink"|"tea"|"coffee"?,
+  "alcoholic": boolean?
+}`,
+  );
+  const parsed = drinkRewriteSchema.parse(raw);
+  return {
+    notes: parsed.notes,
+    patch: {
+      localName: parsed.localName,
+      description: parsed.description,
+      grape: parsed.grape,
+      foodPairing: parsed.foodPairing,
+      ...(parsed.type ? { type: parsed.type } : {}),
+      ...(parsed.alcoholic != null ? { alcoholic: parsed.alcoholic } : {}),
+    },
+  };
+}
+
 export async function rewriteShopText(input: {
   countryName: string;
   shop: SpecialtyShop;
@@ -1267,7 +1325,7 @@ JSON shape:
 }
 
 export async function discoverItemImageQueries(input: {
-  kind: "recipe" | "restaurant";
+  kind: "recipe" | "restaurant" | "drink";
   countryName: string;
   title: string;
   detail?: string;
@@ -1303,7 +1361,7 @@ const dinnerComposeSchema = z.object({
       }),
     )
     .min(3)
-    .max(5),
+    .max(6),
   drinks: z
     .array(
       z.object({
@@ -1311,8 +1369,8 @@ const dinnerComposeSchema = z.object({
         note: optionalString,
       }),
     )
-    .min(1)
-    .max(4),
+    .min(0)
+    .max(6),
 });
 
 /**

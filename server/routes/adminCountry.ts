@@ -5,15 +5,21 @@ import {
   appendMoreDrinks,
   appendMoreRecipes,
   appendSpecialtyShops,
+  addDrinkToDinner,
   deleteRecipe,
   getAdminCountryOverview,
   getCountryFromDb,
   getRecipeRow,
   listRecipeIdsForCountry,
+  publicDrinkKey,
+  removeCountryDrink,
+  removeDinnerCourse,
+  removeDinnerDrink,
   removeSpecialtyShop,
   saveCountryDrinks,
   saveDinnerSuggestion,
   selectRecipeForDinner,
+  updateCountryDrink,
   updateCountryImage,
   updateRecipeFields,
   updateRecipeImage,
@@ -46,6 +52,7 @@ import {
   researchRestaurantMenu,
   researchRestaurantScores,
   rewriteDinnerNarrative,
+  rewriteDrinkText,
   rewriteRecipeText,
   rewriteRestaurantText,
   rewriteShopText,
@@ -1067,6 +1074,218 @@ export function registerAdminCountryRoutes(
             error instanceof Error
               ? error.message
               : "Could not select recipe for dinner.",
+        });
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/countries/:code/drinks/:drinkKey",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const code = String(req.params.code ?? "");
+        const drinkKeyValue = decodeURIComponent(String(req.params.drinkKey ?? ""));
+        const updated = await removeCountryDrink(code, drinkKeyValue);
+        if (!updated) {
+          res.status(404).json({ message: "Country or drink not found." });
+          return;
+        }
+        res.json({ country: updated });
+      } catch (error) {
+        console.error("Remove drink failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error ? error.message : "Could not remove drink.",
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/drinks/:drinkKey/replace-image",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      if (!openaiRequired(res)) return;
+      try {
+        const code = String(req.params.code ?? "");
+        const drinkKeyValue = decodeURIComponent(String(req.params.drinkKey ?? ""));
+        const country = await getCountryFromDb(code);
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        const drink = getCountryDrinks(country).find(
+          (item) =>
+            publicDrinkKey(item).toLowerCase() === drinkKeyValue.toLowerCase() ||
+            item.name.trim().toLowerCase() === drinkKeyValue.toLowerCase() ||
+            item.id?.toLowerCase() === drinkKeyValue.toLowerCase(),
+        );
+        if (!drink) {
+          res.status(404).json({ message: "Drink not found." });
+          return;
+        }
+
+        const discovered = await discoverItemImageQueries({
+          kind: "drink",
+          countryName: country.name,
+          title: drink.name,
+          detail: drink.localName ?? drink.description.slice(0, 160),
+        });
+        const queries = [
+          ...discovered.searchQueries,
+          `${drink.name} drink`,
+          `${drink.name} ${country.name}`,
+          `${drink.localName ?? drink.name} bottle`,
+        ];
+        const image = await findCuisineImageFromQueries(queries, {
+          excludeUrls: [drink.imageUrl],
+        });
+        if (!image) {
+          res.status(404).json({
+            message: "Could not find a suitable Wikimedia image.",
+            notes: discovered.notes,
+            searchQueries: queries,
+          });
+          return;
+        }
+
+        const result = await updateCountryDrink(code, drinkKeyValue, {
+          imageUrl: image.url,
+          imageAttribution: image.attribution,
+        });
+        res.json({
+          country: result.country,
+          drink: result.drink,
+          notes: discovered.notes,
+        });
+      } catch (error) {
+        console.error("Replace drink image failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not replace drink image.",
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/drinks/:drinkKey/replace-text",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      if (!openaiRequired(res)) return;
+      try {
+        const code = String(req.params.code ?? "");
+        const drinkKeyValue = decodeURIComponent(String(req.params.drinkKey ?? ""));
+        const country = await getCountryFromDb(code);
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        const drink = getCountryDrinks(country).find(
+          (item) =>
+            publicDrinkKey(item).toLowerCase() === drinkKeyValue.toLowerCase() ||
+            item.name.trim().toLowerCase() === drinkKeyValue.toLowerCase() ||
+            item.id?.toLowerCase() === drinkKeyValue.toLowerCase(),
+        );
+        if (!drink) {
+          res.status(404).json({ message: "Drink not found." });
+          return;
+        }
+        const rewritten = await rewriteDrinkText({
+          countryName: country.name,
+          drink,
+        });
+        const result = await updateCountryDrink(code, drinkKeyValue, rewritten.patch);
+        res.json({
+          country: result.country,
+          drink: result.drink,
+          notes: rewritten.notes,
+        });
+      } catch (error) {
+        console.error("Replace drink text failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not replace drink text.",
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/drinks/:drinkKey/select-for-dinner",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const code = String(req.params.code ?? "");
+        const drinkKeyValue = decodeURIComponent(String(req.params.drinkKey ?? ""));
+        const updated = await addDrinkToDinner(code, drinkKeyValue);
+        if (!updated) {
+          res.status(404).json({ message: "Country or drink not found." });
+          return;
+        }
+        res.json({ country: updated, dinner: updated.dinner });
+      } catch (error) {
+        console.error("Add drink to dinner failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not add drink to dinner.",
+        });
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/countries/:code/dinner/courses/:recipeId",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const code = String(req.params.code ?? "");
+        const recipeId = String(req.params.recipeId ?? "");
+        const updated = await removeDinnerCourse(code, recipeId);
+        if (!updated) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        res.json({ country: updated, dinner: updated.dinner });
+      } catch (error) {
+        console.error("Remove dinner course failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not remove dinner course.",
+        });
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/countries/:code/dinner/drinks/:drinkName",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const code = String(req.params.code ?? "");
+        const drinkName = decodeURIComponent(String(req.params.drinkName ?? ""));
+        const updated = await removeDinnerDrink(code, drinkName);
+        if (!updated) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        res.json({ country: updated, dinner: updated.dinner });
+      } catch (error) {
+        console.error("Remove dinner drink failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not remove dinner drink.",
         });
       }
     },

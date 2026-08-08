@@ -1,6 +1,5 @@
-import { Beer, ExternalLink, UtensilsCrossed } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import type { Country } from "@/types/content";
-import { getCountryRecipes } from "@/content/countries/menuAccessors";
 import { SpinSpoonButton } from "@/components/SpinSpoonButton";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { cuisineBannerUrl } from "@/content/countries/cuisineImages";
@@ -20,13 +19,6 @@ export function CountryCard({
   onSpin,
 }: CountryCardProps) {
   const t = useT();
-  const nationalDish =
-    country.cookReady && country.menu
-      ? (getCountryRecipes(country).find(
-          (recipe) => recipe.id === country.nationalDishId,
-        ) ?? country.menu.main)
-      : undefined;
-
   const flag = spinning ? (spinningCountry?.flag ?? "🌍") : country.flag;
   const name = spinning ? (spinningCountry?.name ?? "…") : country.name;
   const description = country.wikipedia?.summary ?? country.introduction;
@@ -108,60 +100,6 @@ export function CountryCard({
           <SpinSpoonButton spinning={spinning} onClick={onSpin} size="tile" />
         </div>
       </div>
-
-      {!spinning && (nationalDish || country.nationalDrink) ? (
-        <div className="grid gap-4 border-t border-ink/10 bg-parchment/60 p-6 sm:grid-cols-2 sm:p-8">
-          {nationalDish ? (
-            <div>
-              <div className="flex items-center gap-2 text-tomato">
-                <UtensilsCrossed aria-hidden="true" className="size-5" />
-                <h3 className="font-display text-xl">
-                  {t("country.card.iconicDish")}
-                </h3>
-              </div>
-              <p className="mt-2 font-semibold text-ink">
-                {nationalDish.name}
-                {nationalDish.localName ? (
-                  <span className="font-normal text-ink-soft">
-                    {" "}
-                    · {nationalDish.localName}
-                  </span>
-                ) : null}
-              </p>
-              <p className="mt-2 text-sm text-ink-soft">{nationalDish.description}</p>
-            </div>
-          ) : null}
-
-          {country.nationalDrink ? (
-            <div>
-              <div className="flex items-center gap-2 text-stamp">
-                <Beer aria-hidden="true" className="size-5" />
-                <h3 className="font-display text-xl">
-                  {t("country.card.typicalDrink")}
-                </h3>
-              </div>
-              <p className="mt-2 font-semibold text-ink">
-                {country.nationalDrink.name}
-                {country.nationalDrink.localName ? (
-                  <span className="font-normal text-ink-soft">
-                    {" "}
-                    · {country.nationalDrink.localName}
-                  </span>
-                ) : null}
-              </p>
-              <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                {country.nationalDrink.alcoholic
-                  ? t("country.card.alcoholic")
-                  : t("country.card.nonAlcoholic")}{" "}
-                · {country.nationalDrink.type}
-              </p>
-              <p className="mt-2 text-sm text-ink-soft">
-                {country.nationalDrink.description}
-              </p>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
     </article>
   );
 }

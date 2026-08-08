@@ -640,6 +640,167 @@ function drinkKey(drink: Drink): string {
   return drink.name.trim().toLowerCase();
 }
 
+function drinkMatchesKey(drink: Drink, key: string): boolean {
+  const needle = key.trim().toLowerCase();
+  if (!needle) return false;
+  if (drink.id?.trim().toLowerCase() === needle) return true;
+  return drinkKey(drink) === needle;
+}
+
+export function publicDrinkKey(drink: Drink): string {
+  return drink.id?.trim() || drink.name.trim();
+}
+
+type DrinkBuckets = {
+  nationalDrink: Drink | null;
+  menuDrink: Drink | null;
+  moreDrinks: Drink[];
+};
+
+function readDrinkBuckets(country: Country): DrinkBuckets {
+  return {
+    nationalDrink: country.nationalDrink ?? null,
+    menuDrink: country.menu?.drink ?? null,
+    moreDrinks: [...(country.menu?.moreDrinks ?? country.moreDrinks ?? [])],
+  };
+}
+
+function mapDrinkBuckets(
+  buckets: DrinkBuckets,
+  matcher: (drink: Drink) => boolean,
+  map: (drink: Drink) => Drink | null,
+): { buckets: DrinkBuckets; found: boolean } {
+  let found = false;
+  let nationalDrink = buckets.nationalDrink;
+  if (nationalDrink && matcher(nationalDrink)) {
+    found = true;
+    nationalDrink = map(nationalDrink);
+  }
+  let menuDrink = buckets.menuDrink;
+  if (menuDrink && matcher(menuDrink)) {
+    found = true;
+    menuDrink = map(menuDrink);
+  }
+  const moreDrinks: Drink[] = [];
+  for (const drink of buckets.moreDrinks) {
+    if (matcher(drink)) {
+      found = true;
+      const next = map(drink);
+      if (next) moreDrinks.push(next);
+    } else {
+      moreDrinks.push(drink);
+    }
+  }
+  return { buckets: { nationalDrink, menuDrink, moreDrinks }, found };
+}
+
+export async function removeCountryDrink(
+  countryCode: string,
+  drinkKeyValue: string,
+): Promise<Country | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country) return undefined;
+  const mapped = mapDrinkBuckets(
+    readDrinkBuckets(country),
+    (drink) => drinkMatchesKey(drink, drinkKeyValue),
+    () => null,
+  );
+  if (!mapped.found) throw new Error("Drink not found.");
+  return saveCountryDrinks(countryCode, mapped.buckets);
+}
+
+export async function updateCountryDrink(
+  countryCode: string,
+  drinkKeyValue: string,
+  patch: Partial<Drink>,
+): Promise<{ country: Country | undefined; drink: Drink }> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country) throw new Error("Country not found.");
+  let updatedDrink: Drink | null = null;
+  const mapped = mapDrinkBuckets(
+    readDrinkBuckets(country),
+    (drink) => drinkMatchesKey(drink, drinkKeyValue),
+    (drink) => {
+      updatedDrink = { ...drink, ...patch, name: drink.name };
+      return updatedDrink;
+    },
+  );
+  if (!mapped.found || !updatedDrink) throw new Error("Drink not found.");
+  const next = await saveCountryDrinks(countryCode, mapped.buckets);
+  return { country: next, drink: updatedDrink };
+}
+
+/** Append a drink to the dinner pour list (does not replace existing drinks). */
+export async function addDrinkToDinner(
+  countryCode: string,
+  drinkKeyValue: string,
+): Promise<Country | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country) return undefined;
+
+  const drink = getCountryDrinks(country).find((item) =>
+    drinkMatchesKey(item, drinkKeyValue),
+  );
+  if (!drink) throw new Error("Drink not found.");
+
+  const base =
+    country.dinner && country.dinner.courses.length > 0
+      ? country.dinner
+      : {
+          title: `A taste of ${country.name}`,
+          description: country.introduction,
+          courses: [] as DinnerSuggestion["courses"],
+          drinks: [] as DinnerSuggestion["drinks"],
+        };
+
+  const already = base.drinks.some(
+    (item) => item.drinkName.trim().toLowerCase() === drinkKey(drink),
+  );
+  if (already) {
+    return country;
+  }
+
+  const dinner: DinnerSuggestion = {
+    ...base,
+    drinks: [...base.drinks, { drinkName: drink.name }].slice(0, 6),
+    composedAt: new Date().toISOString(),
+  };
+  return saveDinnerSuggestion(countryCode, dinner);
+}
+
+export async function removeDinnerCourse(
+  countryCode: string,
+  recipeId: string,
+): Promise<Country | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country?.dinner) return country;
+  const dinner: DinnerSuggestion = {
+    ...country.dinner,
+    courses: country.dinner.courses.filter(
+      (course) => course.recipeId !== recipeId,
+    ),
+    composedAt: new Date().toISOString(),
+  };
+  return saveDinnerSuggestion(countryCode, dinner);
+}
+
+export async function removeDinnerDrink(
+  countryCode: string,
+  drinkName: string,
+): Promise<Country | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country?.dinner) return country;
+  const needle = drinkName.trim().toLowerCase();
+  const dinner: DinnerSuggestion = {
+    ...country.dinner,
+    drinks: country.dinner.drinks.filter(
+      (item) => item.drinkName.trim().toLowerCase() !== needle,
+    ),
+    composedAt: new Date().toISOString(),
+  };
+  return saveDinnerSuggestion(countryCode, dinner);
+}
+
 export async function appendMoreDrinks(
   countryCode: string,
   drinks: Drink[],

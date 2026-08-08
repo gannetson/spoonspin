@@ -206,6 +206,59 @@ export function selectRecipeForDinner(code: string, recipeId: string) {
   );
 }
 
+export function removeDrink(code: string, drinkKey: string) {
+  return deleteAdmin<{ country: Country | undefined }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/drinks/${encodeURIComponent(drinkKey)}`,
+  );
+}
+
+export function replaceDrinkImage(code: string, drinkKey: string) {
+  return postAdmin<{
+    country: Country | undefined;
+    drink: Drink;
+    notes: string;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/drinks/${encodeURIComponent(drinkKey)}/replace-image`,
+  );
+}
+
+export function replaceDrinkText(code: string, drinkKey: string) {
+  return postAdmin<{
+    country: Country | undefined;
+    drink: Drink;
+    notes: string;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/drinks/${encodeURIComponent(drinkKey)}/replace-text`,
+  );
+}
+
+export function selectDrinkForDinner(code: string, drinkKey: string) {
+  return postAdmin<{
+    country: Country;
+    dinner?: import("@/types/content").DinnerSuggestion;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/drinks/${encodeURIComponent(drinkKey)}/select-for-dinner`,
+  );
+}
+
+export function removeDinnerCourse(code: string, recipeId: string) {
+  return deleteAdmin<{
+    country: Country;
+    dinner?: import("@/types/content").DinnerSuggestion;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/dinner/courses/${encodeURIComponent(recipeId)}`,
+  );
+}
+
+export function removeDinnerDrink(code: string, drinkName: string) {
+  return deleteAdmin<{
+    country: Country;
+    dinner?: import("@/types/content").DinnerSuggestion;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/dinner/drinks/${encodeURIComponent(drinkName)}`,
+  );
+}
+
 export function removeShop(code: string, shopId: string) {
   return deleteAdmin<{ country: Country | undefined }>(
     `/api/admin/countries/${encodeURIComponent(code)}/shops/${encodeURIComponent(shopId)}`,

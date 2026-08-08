@@ -24,8 +24,13 @@ type AdminItemMenuProps = {
   label: string;
   /** Hide replace-image for items without photos (e.g. specialty shops). */
   showReplaceImage?: boolean;
-  /** Recipe-only: set this dish as the Dinner course for its category. */
+  showReplaceText?: boolean;
+  /** Recipe/drink: add to the Dinner tab composition. */
   showSelectForDinner?: boolean;
+  /** Only show the remove action (e.g. dinner membership). */
+  removeOnly?: boolean;
+  removeHintKey?: string;
+  selectForDinnerHintKey?: string;
   /** Restaurant-only enrichment actions. */
   showRestaurantResearch?: boolean;
   replaceImageHintKey?: string;
@@ -45,7 +50,11 @@ type MenuPosition = {
 export function AdminItemMenu({
   label,
   showReplaceImage = true,
+  showReplaceText = true,
   showSelectForDinner = false,
+  removeOnly = false,
+  removeHintKey = "admin.item.remove.hint",
+  selectForDinnerHintKey = "admin.item.selectForDinner.hint",
   showRestaurantResearch = false,
   replaceImageHintKey = "admin.item.replaceImage.hint",
   busy = false,
@@ -170,11 +179,11 @@ export function AdminItemMenu({
                   {t("admin.item.remove")}
                 </span>
                 <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.item.remove.hint")}
+                  {t(removeHintKey)}
                 </span>
               </span>
             </button>
-            {showReplaceImage ? (
+            {!removeOnly && showReplaceImage ? (
               <button
                 type="button"
                 role="menuitem"
@@ -196,6 +205,7 @@ export function AdminItemMenu({
                 </span>
               </button>
             ) : null}
+            {!removeOnly && showReplaceText ? (
             <button
               type="button"
               role="menuitem"
@@ -212,7 +222,8 @@ export function AdminItemMenu({
                 </span>
               </span>
             </button>
-            {showSelectForDinner ? (
+            ) : null}
+            {!removeOnly && showSelectForDinner ? (
               <button
                 type="button"
                 role="menuitem"
@@ -225,12 +236,12 @@ export function AdminItemMenu({
                     {t("admin.item.selectForDinner")}
                   </span>
                   <span className="mt-0.5 block text-xs text-ink-soft">
-                    {t("admin.item.selectForDinner.hint")}
+                    {t(selectForDinnerHintKey)}
                   </span>
                 </span>
               </button>
             ) : null}
-            {showRestaurantResearch ? (
+            {!removeOnly && showRestaurantResearch ? (
               <>
                 <button
                   type="button"

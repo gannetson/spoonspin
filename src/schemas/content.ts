@@ -75,7 +75,7 @@ export const dinnerSuggestionSchema = z.object({
   title: z.string().min(3),
   description: z.string().min(40),
   courses: z.array(dinnerCourseSchema).min(3).max(5),
-  drinks: z.array(dinnerDrinkSuggestionSchema).min(1).max(4),
+  drinks: z.array(dinnerDrinkSuggestionSchema).min(0).max(6),
   composedAt: z.string().optional(),
 });
 

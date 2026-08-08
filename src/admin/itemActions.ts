@@ -1,10 +1,15 @@
 import { useCallback, useState } from "react";
-import type { Country, Recipe, SpecialtyShop } from "@/types/content";
+import type { Country, Drink, Recipe, SpecialtyShop } from "@/types/content";
 import type { Restaurant } from "@/restaurants/types";
 import {
+  removeDinnerCourse,
+  removeDinnerDrink,
+  removeDrink,
   removeRecipe,
   removeRestaurant,
   removeShop,
+  replaceDrinkImage,
+  replaceDrinkText,
   replaceRecipeImage,
   replaceRecipeText,
   replaceRestaurantImage,
@@ -12,9 +17,14 @@ import {
   findRestaurantMenu,
   findRestaurantScores,
   replaceShopText,
+  selectDrinkForDinner,
   selectRecipeForDinner,
 } from "@/admin/countryTools";
 import type { AdminItemAction } from "@/components/AdminItemMenu";
+
+function drinkAdminKey(drink: Drink): string {
+  return drink.id?.trim() || drink.name.trim();
+}
 
 type BusyMap = Record<string, boolean>;
 type MessageMap = Record<string, string | null>;
@@ -98,6 +108,82 @@ export async function handleRecipeAdminAction(input: {
     return "Text updated";
   }
   throw new Error("Unsupported recipe action.");
+}
+
+export async function handleDrinkAdminAction(input: {
+  action: AdminItemAction;
+  country: Country;
+  drink: Drink;
+  onCountryUpdated: (country: Country) => void;
+}): Promise<string> {
+  const { action, country, drink } = input;
+  const key = drinkAdminKey(drink);
+
+  if (action === "remove") {
+    if (!window.confirm(`Remove “${drink.name}”? This cannot be undone.`)) {
+      return "";
+    }
+    const result = await removeDrink(country.code, key);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Removed";
+  }
+  if (action === "replace-image") {
+    const result = await replaceDrinkImage(country.code, key);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Image updated";
+  }
+  if (action === "replace-text") {
+    const result = await replaceDrinkText(country.code, key);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Text updated";
+  }
+  if (action === "select-for-dinner") {
+    const result = await selectDrinkForDinner(country.code, key);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Added to dinner drinks";
+  }
+  throw new Error("Unsupported drink action.");
+}
+
+export async function handleDinnerCourseAdminAction(input: {
+  action: AdminItemAction;
+  country: Country;
+  recipeId: string;
+  recipeName: string;
+  onCountryUpdated: (country: Country) => void;
+}): Promise<string> {
+  if (input.action !== "remove") {
+    throw new Error("Unsupported dinner course action.");
+  }
+  if (
+    !window.confirm(
+      `Remove “${input.recipeName}” from tonight’s dinner?`,
+    )
+  ) {
+    return "";
+  }
+  const result = await removeDinnerCourse(input.country.code, input.recipeId);
+  if (result.country) input.onCountryUpdated(result.country);
+  return "Removed from dinner";
+}
+
+export async function handleDinnerDrinkAdminAction(input: {
+  action: AdminItemAction;
+  country: Country;
+  drinkName: string;
+  onCountryUpdated: (country: Country) => void;
+}): Promise<string> {
+  if (input.action !== "remove") {
+    throw new Error("Unsupported dinner drink action.");
+  }
+  if (
+    !window.confirm(`Remove “${input.drinkName}” from tonight’s dinner?`)
+  ) {
+    return "";
+  }
+  const result = await removeDinnerDrink(input.country.code, input.drinkName);
+  if (result.country) input.onCountryUpdated(result.country);
+  return "Removed from dinner";
 }
 
 export async function handleShopAdminAction(input: {

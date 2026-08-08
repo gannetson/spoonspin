@@ -46,10 +46,6 @@ export const en: Messages = {
   "country.card.choosing": "Choosing…",
   "country.card.spinningPlate": "Spinning for your next plate…",
   "country.card.wikipediaLink": "{title} on Wikipedia",
-  "country.card.iconicDish": "Iconic dish",
-  "country.card.typicalDrink": "Typical drink",
-  "country.card.alcoholic": "Alcoholic",
-  "country.card.nonAlcoholic": "Non-alcoholic",
 
   "media.placeholder": "No photo yet",
   "media.placeholder.restaurant": "No restaurant photo yet",
@@ -389,6 +385,9 @@ export const en: Messages = {
   "admin.item.selectForDinner": "Select for dinner",
   "admin.item.selectForDinner.hint":
     "Use this dish as the dinner course for its category (replaces the current one)",
+  "admin.item.selectForDinner.drink.hint":
+    "Add this drink to tonight’s dinner (keeps other drinks)",
+  "admin.item.removeFromDinner.hint": "Remove from tonight’s dinner only",
   "admin.item.findMenu": "Find menu",
   "admin.item.findMenu.hint": "Research dishes and save a menu",
   "admin.item.findScores": "Find scores",
