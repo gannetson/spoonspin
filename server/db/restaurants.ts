@@ -90,12 +90,19 @@ export function getDatabaseUrl(): string {
 
 const DEFAULT_SOCKET_DIR = "/var/run/postgresql";
 
+function isLoopbackHost(hostname: string): boolean {
+  return (
+    hostname === "localhost" ||
+    hostname === "127.0.0.1" ||
+    hostname === "::1"
+  );
+}
+
 /**
  * Build node-pg Pool options.
  *
- * Passwordless access only works with peer/trust — almost always a Unix socket.
- * `postgresql://localhost/...` without a password hits SCRAM and crashes node-pg
- * with "client password must be a string".
+ * Passwordless peer auth needs a Unix socket. TCP `localhost` without a password
+ * uses SCRAM and crashes node-pg ("client password must be a string").
  */
 export function poolOptions(
   connectionString: string,
@@ -133,26 +140,34 @@ export function poolOptions(
     };
   }
 
-  // Passwordless: never use TCP localhost — that triggers SCRAM.
-  if (
-    !hostQuery &&
-    (hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1")
-  ) {
-    throw new Error(
-      `DATABASE_URL is ${hostname} without a password, so Postgres uses SCRAM and login fails.\n` +
-        `For passwordless peer auth, set:\n` +
-        `  DATABASE_URL=postgresql:///${database}?host=${DEFAULT_SOCKET_DIR}\n` +
-        `Or set a real password:\n` +
-        `  DATABASE_URL=postgresql://USER:PASSWORD@localhost:5432/${database}`,
-    );
+  // Explicit socket, or URL with no host (postgresql:///db)
+  if (hostQuery || !hostname) {
+    return {
+      host: hostQuery || DEFAULT_SOCKET_DIR,
+      database,
+      user,
+    };
   }
 
-  const socketDir = hostQuery || DEFAULT_SOCKET_DIR;
-  // Absolute path → Unix socket (peer). Do not set password at all.
+  // Production passwordless + localhost → force socket (peer), not SCRAM/TCP
+  if (process.env.NODE_ENV === "production" && isLoopbackHost(hostname)) {
+    console.warn(
+      `[db] DATABASE_URL uses ${hostname} without a password; using Unix socket ${DEFAULT_SOCKET_DIR} for peer auth`,
+    );
+    return {
+      host: DEFAULT_SOCKET_DIR,
+      database,
+      user,
+    };
+  }
+
+  // Dev/test: allow TCP trust; password must be a string if SCRAM is negotiated
   return {
-    host: socketDir,
+    host: hostname,
+    port: parsed.port ? Number(parsed.port) : 5432,
     database,
     user,
+    password: "",
   };
 }
 
@@ -167,12 +182,13 @@ export function getPool(connectionString = getDatabaseUrl()): Pool {
     "[db] connecting",
     JSON.stringify({
       host: options?.host ?? null,
-      port: options?.port ?? null,
+      port: "port" in (options ?? {}) ? (options as { port?: number }).port ?? null : null,
       database: options?.database ?? null,
-      user: options?.user ?? `(os user)`,
-      password: options && "password" in options && options.password != null
-        ? "(set)"
-        : "(none)",
+      user: options?.user ?? "(os user)",
+      password:
+        options && "password" in options && (options as { password?: string }).password
+          ? "(set)"
+          : "(none)",
     }),
   );
   pool = new Pool(options);
