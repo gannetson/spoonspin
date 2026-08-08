@@ -1,13 +1,19 @@
 import { z } from "zod";
-import type { Recipe } from "../../src/types/content.ts";
+import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import {
+  insertDrinkSubmission,
   insertRecipeSubmission,
   insertRestaurantSubmission,
+  insertShopSubmission,
   listSubmissions,
+  listVisibleDrinksForCountry,
   listVisibleRecipesForCountry,
+  listVisibleShopsForCountry,
+  setDrinkSubmissionStatus,
   setRecipeSubmissionStatus,
   setRestaurantRowReviewed,
   setRestaurantSubmissionStatus,
+  setShopSubmissionStatus,
   slugifyId,
   type RestaurantSubmissionPayload,
   type SubmissionKind,
@@ -15,15 +21,17 @@ import {
 } from "../db/submissions.ts";
 import {
   isOpenAiConfigured,
+  previewDrinkSuggestion,
   previewRecipeSuggestion,
   previewRestaurantSuggestion,
+  previewShopSuggestion,
 } from "../openai/suggest.ts";
 import { upsertRestaurant } from "../db/restaurants.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import { requireAdmin } from "./auth.ts";
 
 const previewBodySchema = z.object({
-  kind: z.enum(["recipe", "restaurant"]),
+  kind: z.enum(["recipe", "restaurant", "drink", "shop"]),
   countryCode: z.string().length(2),
   countryName: z.string().min(1),
   query: z.string().min(2).max(280),
@@ -99,9 +107,53 @@ const restaurantConfirmSchema = z.object({
   }),
 });
 
+const drinkConfirmSchema = z.object({
+  kind: z.literal("drink"),
+  countryCode: z.string().length(2),
+  countryName: z.string().min(1),
+  query: z.string().min(2).max(280),
+  confirmationNotes: z.string().optional(),
+  drink: z.object({
+    name: z.string().min(1),
+    localName: optionalText,
+    type: z.enum([
+      "beer",
+      "wine",
+      "spirit",
+      "cocktail",
+      "soft-drink",
+      "tea",
+      "coffee",
+    ]),
+    alcoholic: z.boolean(),
+    description: z.string().min(20),
+    grape: optionalText,
+    foodPairing: optionalText,
+  }),
+});
+
+const shopConfirmSchema = z.object({
+  kind: z.literal("shop"),
+  countryCode: z.string().length(2),
+  countryName: z.string().min(1),
+  query: z.string().min(2).max(280),
+  confirmationNotes: z.string().optional(),
+  shop: z.object({
+    name: z.string().min(1),
+    city: z.string().min(1),
+    address: z.string().min(1),
+    specialty: z.string().min(8),
+    website: optionalUrl,
+    mapsUrl: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
+    notes: optionalText,
+  }),
+});
+
 const confirmBodySchema = z.discriminatedUnion("kind", [
   recipeConfirmSchema,
   restaurantConfirmSchema,
+  drinkConfirmSchema,
+  shopConfirmSchema,
 ]);
 
 export function registerSuggestionRoutes(
@@ -122,6 +174,28 @@ export function registerSuggestionRoutes(
     res.json({ recipes: await listVisibleRecipesForCountry(countryCode) });
   });
 
+  app.get("/api/suggestions/drinks", async (req, res) => {
+    const countryCode = String(req.query.countryCode ?? "")
+      .trim()
+      .toLowerCase();
+    if (!/^[a-z]{2}$/.test(countryCode)) {
+      res.status(400).json({ message: "countryCode is required." });
+      return;
+    }
+    res.json({ drinks: await listVisibleDrinksForCountry(countryCode) });
+  });
+
+  app.get("/api/suggestions/shops", async (req, res) => {
+    const countryCode = String(req.query.countryCode ?? "")
+      .trim()
+      .toLowerCase();
+    if (!/^[a-z]{2}$/.test(countryCode)) {
+      res.status(400).json({ message: "countryCode is required." });
+      return;
+    }
+    res.json({ shops: await listVisibleShopsForCountry(countryCode) });
+  });
+
   app.post("/api/suggestions/preview", async (req, res) => {
     if (!isOpenAiConfigured()) {
       res.status(503).json({
@@ -139,12 +213,18 @@ export function registerSuggestionRoutes(
 
     try {
       if (parsed.data.kind === "recipe") {
-        const preview = await previewRecipeSuggestion(parsed.data);
-        res.json(preview);
+        res.json(await previewRecipeSuggestion(parsed.data));
         return;
       }
-      const preview = await previewRestaurantSuggestion(parsed.data);
-      res.json(preview);
+      if (parsed.data.kind === "restaurant") {
+        res.json(await previewRestaurantSuggestion(parsed.data));
+        return;
+      }
+      if (parsed.data.kind === "drink") {
+        res.json(await previewDrinkSuggestion(parsed.data));
+        return;
+      }
+      res.json(await previewShopSuggestion(parsed.data));
     } catch (error) {
       console.error("Suggestion preview failed", error);
       res.status(502).json({
@@ -189,6 +269,58 @@ export function registerSuggestionRoutes(
           confirmationNotes: parsed.data.confirmationNotes,
         });
         res.status(201).json({ kind: "recipe", submission });
+        return;
+      }
+
+      if (parsed.data.kind === "drink") {
+        const id = slugifyId("suggest-drink", parsed.data.drink.name);
+        const drink: Drink = {
+          id,
+          ...parsed.data.drink,
+          description:
+            parsed.data.drink.description.length >= 40
+              ? parsed.data.drink.description
+              : `${parsed.data.drink.description} A traditional drink from ${parsed.data.countryName}.`,
+        };
+        const submission = await insertDrinkSubmission({
+          id,
+          countryCode: parsed.data.countryCode,
+          countryName: parsed.data.countryName,
+          query: parsed.data.query,
+          drink,
+          confirmationNotes: parsed.data.confirmationNotes,
+        });
+        res.status(201).json({ kind: "drink", submission });
+        return;
+      }
+
+      if (parsed.data.kind === "shop") {
+        const incoming = parsed.data.shop;
+        const mapsUrl =
+          incoming.mapsUrl && incoming.mapsUrl.length > 0
+            ? incoming.mapsUrl
+            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                `${incoming.name} ${incoming.address} ${incoming.city} Netherlands`,
+              )}`;
+        const shop: SpecialtyShop = {
+          id: slugifyId("suggest-shop", incoming.name),
+          name: incoming.name,
+          city: incoming.city,
+          address: incoming.address,
+          specialty: incoming.specialty,
+          website: incoming.website,
+          mapsUrl,
+          notes: incoming.notes,
+        };
+        const submission = await insertShopSubmission({
+          id: shop.id,
+          countryCode: parsed.data.countryCode,
+          countryName: parsed.data.countryName,
+          query: parsed.data.query,
+          shop,
+          confirmationNotes: parsed.data.confirmationNotes,
+        });
+        res.status(201).json({ kind: "shop", submission });
         return;
       }
 
@@ -314,6 +446,28 @@ export function registerSuggestionRoutes(
       return;
     }
 
-    res.status(400).json({ message: "kind=recipe|restaurant is required." });
+    if (kind === "drink") {
+      const updated = await setDrinkSubmissionStatus(req.params.id, nextStatus);
+      if (!updated) {
+        res.status(404).json({ message: "Submission not found." });
+        return;
+      }
+      res.json({ kind: "drink", submission: updated });
+      return;
+    }
+
+    if (kind === "shop") {
+      const updated = await setShopSubmissionStatus(req.params.id, nextStatus);
+      if (!updated) {
+        res.status(404).json({ message: "Submission not found." });
+        return;
+      }
+      res.json({ kind: "shop", submission: updated });
+      return;
+    }
+
+    res.status(400).json({
+      message: "kind=recipe|restaurant|drink|shop is required.",
+    });
   });
 }

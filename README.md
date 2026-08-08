@@ -11,7 +11,7 @@ Spoon Spin is a mobile-friendly MVP for food-and-travel inspiration:
 3. Choose **Cook** for a full menu and recipes, or **Dine** to search Dutch restaurants.
 4. Share a deep link such as `/?country=bg&mode=cook`.
 
-Content lives in Postgres for countries, recipes, users, and restaurants. TypeScript modules remain the seed source for cuisines. Simple email/password login is supported.
+Content lives in **Postgres** (countries, recipes, drinks, shops, restaurants). The git repo holds UI/API code and a thin country catalog (codes/names/flags). Edit content via the admin UI or DB agents — not by committing JSON/TS menus.
 
 ## Stack
 
@@ -27,7 +27,9 @@ Content lives in Postgres for countries, recipes, users, and restaurants. TypeSc
 
 Nginx serves `dist/` and proxies `/api` to Express (`:3001`) under supervisord.
 
-See **[deploy/README.md](deploy/README.md)** for nginx + supervisor configs and `deploy/install-server.sh`. App path on the server: `/var/www/soonspin/spoonspin`.
+See **[deploy/README.md](deploy/README.md)** for nginx + supervisor configs and `deploy/install-server.sh`. App path on the server: `/var/www/spoonspin/spoonspin`.
+
+From your laptop: `npm run deploy:prod` (SSH → discard dirty `src/content/` → git pull → build → restart) — [`deploy/remote-deploy.sh`](deploy/remote-deploy.sh).
 
 ## Local setup
 
@@ -55,15 +57,18 @@ npm run dev
 | `npm run typecheck`        | TypeScript project build check         |
 | `npm test`                 | Unit / component tests                 |
 | `npm run test:e2e`         | Playwright main journey                |
-| `npm run validate:content` | Zod validation for country content |
-| `npm run content:wikipedia` | Refresh Wikipedia cuisine summaries for the catalog |
-| `npm run agent:recipes` | Enrich recipes with photos, source links, and video links |
-| `npm run agent:restaurant-photos` | Enrich restaurants with photos (Google if keyed, else Wikimedia) |
+| `npm run validate:content` | Zod validation for thin catalog stubs |
+| `npm run content:wikipedia` | Refresh Wikipedia cuisine summaries → `data/` (optional research) |
+| `npm run agent:recipes` | Enrich recipe photos/links in Postgres |
+| `npm run agent:restaurant-photos` | Enrich restaurants with photos (Postgres) |
 | `npm run agent:restaurants`| One-shot OSM harvest for chosen hubs/cuisines |
 | `npm run agent:gather`     | Incremental gather over time (resumable batches) |
-| `npm run agent:curate`     | Import reviewed restaurants + authenticity ratings |
-| `npm run agent:ratings`    | Enrich guest ratings from Google (and Tripadvisor if keyed) |
-| `npm run db:seed-content`  | Seed countries + recipes into Postgres from TS modules |
+| `npm run agent:curate`     | Import `data/curated-restaurants.json` → Postgres |
+| `npm run agent:ratings`    | Enrich guest ratings in Postgres (Google / Tripadvisor) |
+| `npm run db:export-content` | Export countries/recipes/restaurants → `data/content-dump.json` |
+| `npm run db:import-content` | Import content dump into Postgres |
+| `npm run db:seed-content`  | Alias for `db:import-content` |
+| `npm run deploy:prod`      | SSH → pull → build → restart API |
 
 ## Environment variables
 
@@ -93,13 +98,16 @@ UPDATE users SET role = 'admin' WHERE email = 'you@example.com';
 
 ## Countries & recipes in Postgres
 
-After setting `DATABASE_URL`, seed authored country menus:
+Countries, recipes, drinks, shops, and restaurants are stored in Postgres. The app loads them from `GET /api/countries` (no bundled menu fallback).
+
+Bootstrap a new environment from a dump (export from a fully seeded DB first):
 
 ```bash
-npm run db:seed-content
+npm run db:export-content   # writes data/content-dump.json (gitignored)
+npm run db:import-content   # upserts countries + recipes + restaurants
 ```
 
-The app loads countries from `GET /api/countries` (with a static TS fallback if the DB is empty). TS modules under `src/content/countries/` remain the editorial source for reseeding.
+Ongoing edits: use the admin UI or agents against `DATABASE_URL`. Do **not** run file-writing research agents on the production checkout — deploy discards local `src/content/` changes before `git pull`.
 
 ## Community suggestions
 
@@ -124,17 +132,17 @@ Dine searches a local PostgreSQL database first (default database `spoonspin`). 
 
 ### Quality curation agent
 
-Reviewed seed data lives in `src/content/restaurants/curated.json`. Import or refresh it with:
+Optional one-way import from `data/curated-restaurants.json` (gitignored):
 
 ```bash
 npm run agent:curate
 ```
 
-The agent upserts each entry as `reviewed` with an authenticity rating and notes, then prints coverage gaps for published countries. Add real restaurants only — never invent names.
+The agent upserts each entry as `reviewed` with an authenticity rating and notes. Add real restaurants only — never invent names. Prefer admin discover / add for day-to-day updates.
 
 ### Proef de Wereld research guide
 
-Edition 0.9 (Afghanistan–Mauritius) can be bulk-imported into `curated.json`:
+Edition 0.9 (Afghanistan–Mauritius) can be bulk-imported into `data/curated-restaurants.json` then Postgres:
 
 ```bash
 npm run agent:proef -- ~/Downloads/Proef_de_Wereld_onderzoekeditie_0.9.docx
@@ -162,7 +170,7 @@ npm run agent:gather -- --promote-only
 npm run agent:gather -- --reset
 ```
 
-Progress lives in `data/gather-progress.json` (gitignored). Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Sparse cuisines are harvested first. Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in `curated.json`.
+Progress lives in `data/gather-progress.json` (gitignored). Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Sparse cuisines are harvested first. Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in admin.
 
 ### Guest ratings (Google / The Fork / Tripadvisor)
 
@@ -172,9 +180,9 @@ npm run agent:ratings
 
 - **Google** — fetched automatically when `GOOGLE_PLACES_API_KEY` is set
 - **Tripadvisor** — fetched when `TRIPADVISOR_API_KEY` is set (Content API access required)
-- **The Fork** — no free public API; add `ratings.theFork` manually in `curated.json` (`score` on a `/10` scale with `"scale": 10`)
+- **The Fork** — no free public API; set `ratings.theFork` via admin / DB (`score` on a `/10` scale with `"scale": 10`)
 
-Scores are stored per source, shown in Dine, and combined into one guest rating for sorting.
+Scores are stored per source on the restaurant row, shown in Dine, and combined into one guest rating for sorting.
 
 ### Fill / refresh the OSM harvest (optional)
 
@@ -192,7 +200,7 @@ npm run agent:restaurants -- --hubs nl-major --radius-km 25
 npm run agent:restaurants -- --hubs randstad --countries fr,de,th,kr,cn,pt,ar,ng,eg,ph
 ```
 
-The harvest agent queries the free Overpass/OpenStreetMap API for specialty cuisine tags around each hub, then upserts results. Harvested rows stay **unreviewed** until you promote them via `curated.json` / `agent:curate`.
+The harvest agent queries the free Overpass/OpenStreetMap API for specialty cuisine tags around each hub, then upserts results. Harvested rows stay **unreviewed** until you promote them via admin or `agent:curate`.
 
 Hub presets: `leiden`, `randstad` (default), `nl-major`.
 
@@ -236,20 +244,19 @@ Overpass/OSM harvesting is free. Mapbox and Google Places can incur cost after f
 
 ## How to add cook-ready recipes for a country
 
-All 197 catalog countries are already spinable (with a Wikipedia cuisine summary when available). To add a full Cook menu:
+All catalog countries are spinable once present in Postgres. To add or expand a Cook menu:
 
-1. Copy the documented template in `src/content/countries/template.ts`.
-2. Create `src/content/countries/<code>.ts` with a complete `AuthoredCountry` object and `status: "published"`.
-3. Export it from `src/content/countries/published.ts` (`authoredCountries`).
-4. Run `npm run validate:content`.
+1. Sign in as admin and use **Discover / add recipe** (and drinks/shops) on the country page, or
+2. Import a content dump that already includes that country (`npm run db:import-content`).
 
-Refresh cuisine summaries from Wikipedia with:
+Optional research helpers write under gitignored `data/` (and update Postgres where applicable):
 
 ```bash
-npm run content:wikipedia
+npm run content:wikipedia   # → data/wikipedia-cuisines.json
+npm run agent:dishes        # → data/dishes-by-country.json
+npm run agent:recipes       # enriches recipe rows in Postgres
+npm run agent:cuisine-images
 ```
-
-Summaries are stored in `src/content/countries/wikipediaCuisines.json` (CC BY-SA) and shown on the country card with a link back to Wikipedia.
 
 ### Content-quality guidelines
 

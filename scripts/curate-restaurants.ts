@@ -1,9 +1,7 @@
 #!/usr/bin/env tsx
 /**
- * Quality curation agent:
- * 1. Imports reviewed restaurants from curated.json with authenticity ratings
- * 2. Imports multi-source guest ratings when present
- * 3. Prints coverage gaps per published country
+ * One-way import: load reviewed restaurants from data/curated-restaurants.json into Postgres.
+ * Does not write content files. Prefer admin tools / agents against DATABASE_URL for ongoing edits.
  *
  * Authenticity scale (1–5):
  * 5 = highly authentic specialty kitchen
@@ -22,13 +20,13 @@ import {
   getDb,
   upsertRestaurant,
 } from "../server/db/restaurants.ts";
-import { publishedCountries } from "../src/content/countries/published.ts";
+import { countryCatalog } from "../src/content/countries/catalog.ts";
 import { aggregateGuestRating } from "../src/restaurants/ratings.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const CURATED_PATH = path.join(
   rootDir,
-  "src/content/restaurants/curated.json",
+  "data/curated-restaurants.json",
 );
 
 const sourceRatingSchema = z.object({
@@ -72,6 +70,13 @@ function mapsUrl(name: string, address: string): string {
 }
 
 async function main() {
+  if (!fs.existsSync(CURATED_PATH)) {
+    console.error(`Missing ${CURATED_PATH}`);
+    console.error(
+      "Create it with agent:proef or export restaurants, then re-run.",
+    );
+    process.exit(1);
+  }
   const raw = JSON.parse(fs.readFileSync(CURATED_PATH, "utf8"));
   const curated = curatedSchema.parse(raw);
   await getDb();
@@ -108,21 +113,21 @@ async function main() {
   }
 
   const totals = await countByCuisineCode();
-  const missing = publishedCountries
+  const missing = countryCatalog
     .map((c) => c.code)
     .filter((code) => !totals[code]);
 
   console.log(`Curated import complete: ${imported} reviewed restaurants`);
-  console.log("\nReviewed coverage by cuisine:");
-  for (const country of publishedCountries) {
-    const n = totals[country.code] ?? 0;
+  console.log("\nReviewed coverage by cuisine (sample of gaps):");
+  for (const entry of countryCatalog.slice(0, 40)) {
+    const n = totals[entry.code] ?? 0;
     const marker = n > 0 ? "✓" : "·";
-    console.log(`  ${marker} ${country.code} ${country.name}: ${n}`);
+    console.log(`  ${marker} ${entry.code} ${entry.name}: ${n}`);
   }
 
   if (missing.length > 0) {
     console.log(
-      `\nCoverage gaps (add to curated.json): ${missing.join(", ")}`,
+      `\nCoverage gaps (${missing.length}): ${missing.slice(0, 30).join(", ")}${missing.length > 30 ? "…" : ""}`,
     );
   }
 

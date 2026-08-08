@@ -9,6 +9,7 @@ export const nl: Messages = {
   "app.admin": "Beheer",
   "app.fallback.unknownCountry":
     "We konden geen gepubliceerd land vinden voor “{code}”. Kies opnieuw om verder te gaan.",
+  "app.countries.loading": "Landen laden…",
   "app.announce.selected": "{name} gekozen",
   "app.spin.ariaLabel": "Draaien voor een land",
   "app.result.ariaLabel": "Resultaat voor {name}",
@@ -57,6 +58,8 @@ export const nl: Messages = {
 
   "cook.menu.heading": "Vanavond op het menu",
   "cook.suggestRecipe": "Stel een recept voor",
+  "cook.suggestDrink": "Stel een drank voor",
+  "cook.suggestShop": "Stel een winkel voor",
   "cook.incomplete.withRecipes":
     "Recepten voor {name} staan hieronder. Een volledig viergangenmenu wordt nog samengesteld.",
   "cook.incomplete.noRecipesPrefix":
@@ -112,6 +115,7 @@ export const nl: Messages = {
     "Winkels in Nederland met ingrediënten voor de keuken van {name}.",
   "cook.shops.website": "Website",
   "cook.shops.openInMaps": "Open in Maps",
+  "cook.shops.empty": "Nog geen speciaalzaken — stel er een voor die je kent.",
 
   "recipe.backToMenu": "Terug naar menu",
   "recipe.print": "Recept printen",
@@ -211,6 +215,8 @@ export const nl: Messages = {
 
   "suggest.title.recipe": "Stel een recept voor",
   "suggest.title.restaurant": "Stel een restaurant voor",
+  "suggest.title.drink": "Stel een drank voor",
+  "suggest.title.shop": "Stel een speciaalzaak voor",
   "suggest.subtitle":
     "Voor {flag} {name}. We bevestigen met een snelle zoekopdracht en voegen het meteen toe voor review.",
   "suggest.closeAria": "Sluiten",
@@ -219,6 +225,10 @@ export const nl: Messages = {
     "bijv. Banitsa, of “kaas-filodeeg als ontbijt”",
   "suggest.placeholder.restaurant":
     "bijv. restaurantnaam in Leiden, of “gezellig Bulgaars bij Den Haag”",
+  "suggest.placeholder.drink":
+    "bijv. Rakija, of een alcoholvrije yoghurt drank met munt",
+  "suggest.placeholder.shop":
+    "bijv. Toko Dun Yong Amsterdam, of een Balkan-supermarkt in Rotterdam",
   "suggest.openaiMissing.banner":
     "Voorstellen hebben OPENAI_API_KEY in .env nodig; herstart daarna npm run dev.",
   "suggest.openaiMissing.error":
@@ -231,6 +241,8 @@ export const nl: Messages = {
   "suggest.notFound.default": "Niets duidelijk genoeg om toe te voegen.",
   "suggest.addRecipe": "Recept toevoegen",
   "suggest.addRestaurant": "Restaurant toevoegen",
+  "suggest.addDrink": "Drank toevoegen",
+  "suggest.addShop": "Winkel toevoegen",
   "suggest.preview.meta": "{category} · {minutes} min · {difficulty}",
   "suggest.lookingUp": "Opzoeken…",
   "suggest.adding": "Toevoegen…",
@@ -259,7 +271,7 @@ export const nl: Messages = {
   "admin.back": "← Terug naar Spoon Spin",
   "admin.title": "Beheer review",
   "admin.subtitle":
-    "Beoordeel communityvoorstellen voor recepten en restaurants. Goedgekeurde blijven zichtbaar; afgewezen worden verborgen.",
+    "Beoordeel communityvoorstellen voor recepten, dranken, winkels en restaurants. Goedgekeurde blijven zichtbaar; afgewezen worden verborgen.",
   "admin.checkingAccess": "Toegang controleren…",
   "admin.signInPrompt": "Log in met een admin-account om inzendingen te reviewen.",
   "admin.signIn": "Inloggen",
@@ -280,6 +292,8 @@ export const nl: Messages = {
   "admin.reject": "Afwijzen",
   "admin.kind.recipe": "Recept",
   "admin.kind.restaurant": "Restaurant",
+  "admin.kind.drink": "Drank",
+  "admin.kind.shop": "Winkel",
   "admin.review.backToOverview": "← Landenoverzicht",
 
   "admin.overview.title": "Landenoverzicht",
@@ -316,7 +330,7 @@ export const nl: Messages = {
   "admin.country.overview.hint":
     "Aantallen recepten, restaurants, dranken, winkels",
   "admin.country.review": "Review",
-  "admin.country.review.hint": "Beoordeel communityvoorstellen voor recepten en restaurants",
+  "admin.country.review.hint": "Beoordeel communityvoorstellen voor recepten, dranken, winkels en restaurants",
   "admin.country.replaceImage": "Afbeelding vervangen",
   "admin.country.replaceImage.hint":
     "Laat OpenAI een gerecht kiezen en haal een Wikimedia-foto op",

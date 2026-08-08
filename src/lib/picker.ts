@@ -28,9 +28,12 @@ export function pickRandomCountry(
   recentCodes: string[] = [],
   random: () => number = Math.random,
 ): Country {
-  const published = countries.filter((c) => c.status === "published");
+  // Spin only lands on countries with a cook menu (recipes).
+  const published = countries.filter(
+    (c) => c.status === "published" && c.cookReady,
+  );
   if (published.length === 0) {
-    throw new Error("No published countries available");
+    throw new Error("No cook-ready countries available");
   }
 
   const avoid = new Set(recentCodes.slice(0, MAX_RECENT));

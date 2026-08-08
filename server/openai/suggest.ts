@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Recipe } from "../../src/types/content.ts";
+import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import type { RestaurantSubmissionPayload } from "../db/submissions.ts";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
@@ -78,6 +78,58 @@ export type RestaurantPreview = {
   confirmationNotes: string;
   restaurant: RestaurantSubmissionPayload | null;
 };
+
+export type DrinkPreview = {
+  found: boolean;
+  confirmationNotes: string;
+  drink: Omit<Drink, "id"> | null;
+};
+
+export type ShopPreview = {
+  found: boolean;
+  confirmationNotes: string;
+  shop: Omit<SpecialtyShop, "id"> | null;
+};
+
+const drinkDraftSchema = z.object({
+  found: z.boolean(),
+  confirmationNotes: z.string(),
+  drink: z
+    .object({
+      name: z.string().min(1),
+      localName: optionalString,
+      type: z.enum([
+        "beer",
+        "wine",
+        "spirit",
+        "cocktail",
+        "soft-drink",
+        "tea",
+        "coffee",
+      ]),
+      alcoholic: z.boolean(),
+      description: z.string().min(20),
+      grape: optionalString,
+      foodPairing: optionalString,
+    })
+    .nullable(),
+});
+
+const shopDraftSchema = z.object({
+  found: z.boolean(),
+  confirmationNotes: z.string(),
+  shop: z
+    .object({
+      name: z.string().min(1),
+      city: z.string().min(1),
+      address: z.string().min(1),
+      specialty: z.string().min(8),
+      website: optionalString,
+      mapsUrl: optionalString,
+      notes: optionalString,
+    })
+    .nullable(),
+});
 
 function getApiKey(): string | null {
   return process.env.OPENAI_API_KEY?.trim() || null;
@@ -275,6 +327,136 @@ JSON shape:
         place.authenticityNotes ??
         `Community suggestion for ${input.countryName} cuisine (pending review).`,
       phone: place.phone ?? undefined,
+    },
+  };
+}
+
+export async function previewDrinkSuggestion(input: {
+  countryCode: string;
+  countryName: string;
+  query: string;
+}): Promise<DrinkPreview> {
+  const raw = await chatJson(
+    `You research authentic drinks for a food app. Reply with JSON only.
+If the query is not a real drink tied to the given cuisine/culture, set found=false and drink=null.
+Prefer traditional or iconic beverages (alcoholic or non-alcoholic).
+confirmationNotes: 1-2 short sentences confirming what you found and why it fits.
+description at least 40 characters.`,
+    `Country: ${input.countryName} (${input.countryCode})
+User query (drink name or short description): ${input.query}
+
+JSON shape:
+{
+  "found": boolean,
+  "confirmationNotes": string,
+  "drink": null | {
+    "name": string,
+    "localName": string?,
+    "type": "beer"|"wine"|"spirit"|"cocktail"|"soft-drink"|"tea"|"coffee",
+    "alcoholic": boolean,
+    "description": string,
+    "grape": string?,
+    "foodPairing": string?
+  }
+}`,
+  );
+
+  const parsed = drinkDraftSchema.parse(raw);
+  if (!parsed.found || !parsed.drink) {
+    return {
+      found: false,
+      confirmationNotes: parsed.confirmationNotes,
+      drink: null,
+    };
+  }
+
+  return {
+    found: true,
+    confirmationNotes: parsed.confirmationNotes,
+    drink: {
+      ...parsed.drink,
+      description:
+        parsed.drink.description.length >= 40
+          ? parsed.drink.description
+          : `${parsed.drink.description} A traditional drink from ${input.countryName}.`,
+    },
+  };
+}
+
+export async function previewShopSuggestion(input: {
+  countryCode: string;
+  countryName: string;
+  query: string;
+}): Promise<ShopPreview> {
+  const raw = await chatJson(
+    `You research specialty grocery shops in the Netherlands that sell ingredients for a given national cuisine.
+Reply with JSON only. Prefer real shops when you know them; otherwise propose a best-effort match and mark uncertainty in confirmationNotes.
+If the query is nonsense or clearly not a shop, set found=false and shop=null.
+City and address must be in the Netherlands.
+mapsUrl should be a Google Maps search URL.
+specialty should describe what they sell for this cuisine.`,
+    `Cuisine country: ${input.countryName} (${input.countryCode})
+User query (shop name or short description): ${input.query}
+
+JSON shape:
+{
+  "found": boolean,
+  "confirmationNotes": string,
+  "shop": null | {
+    "name": string,
+    "city": string,
+    "address": string,
+    "specialty": string,
+    "website": string?,
+    "mapsUrl": string?,
+    "notes": string?
+  }
+}`,
+  );
+
+  const parsed = shopDraftSchema.parse(raw);
+  if (!parsed.found || !parsed.shop) {
+    return {
+      found: false,
+      confirmationNotes: parsed.confirmationNotes,
+      shop: null,
+    };
+  }
+
+  const shop = parsed.shop;
+  const website =
+    shop.website && /^https?:\/\//i.test(shop.website)
+      ? shop.website
+      : undefined;
+  const fallbackMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${shop.name} ${shop.address} ${shop.city} Netherlands`,
+  )}`;
+  let mapsUrl = fallbackMaps;
+  if (shop.mapsUrl && /^https?:\/\//i.test(shop.mapsUrl)) {
+    try {
+      const host = new URL(shop.mapsUrl).hostname.toLowerCase();
+      const short =
+        host === "goo.gl" ||
+        host.endsWith(".goo.gl") ||
+        host === "g.co" ||
+        host === "maps.app.goo.gl";
+      if (!short) mapsUrl = shop.mapsUrl;
+    } catch {
+      mapsUrl = fallbackMaps;
+    }
+  }
+
+  return {
+    found: true,
+    confirmationNotes: parsed.confirmationNotes,
+    shop: {
+      name: shop.name,
+      city: shop.city,
+      address: shop.address,
+      specialty: shop.specialty,
+      website,
+      mapsUrl,
+      notes: shop.notes,
     },
   };
 }

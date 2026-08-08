@@ -9,6 +9,7 @@ export const en: Messages = {
   "app.admin": "Admin",
   "app.fallback.unknownCountry":
     "We could not find a published country for “{code}”. Pick again to continue.",
+  "app.countries.loading": "Loading countries…",
   "app.announce.selected": "Selected {name}",
   "app.spin.ariaLabel": "Spinning for a country",
   "app.result.ariaLabel": "{name} result",
@@ -57,6 +58,8 @@ export const en: Messages = {
 
   "cook.menu.heading": "Tonight's menu",
   "cook.suggestRecipe": "Suggest a recipe",
+  "cook.suggestDrink": "Suggest a drink",
+  "cook.suggestShop": "Suggest a shop",
   "cook.incomplete.withRecipes":
     "Recipes for {name} are available below. A full four-course menu is still being assembled.",
   "cook.incomplete.noRecipesPrefix":
@@ -111,6 +114,7 @@ export const en: Messages = {
     "Netherlands shops that stock ingredients for {name} cooking.",
   "cook.shops.website": "Website",
   "cook.shops.openInMaps": "Open in Maps",
+  "cook.shops.empty": "No specialty shops listed yet — suggest one you know.",
 
   "recipe.backToMenu": "Back to menu",
   "recipe.print": "Print recipe",
@@ -207,6 +211,8 @@ export const en: Messages = {
 
   "suggest.title.recipe": "Suggest a recipe",
   "suggest.title.restaurant": "Suggest a restaurant",
+  "suggest.title.drink": "Suggest a drink",
+  "suggest.title.shop": "Suggest a specialty shop",
   "suggest.subtitle":
     "For {flag} {name}. We'll confirm with a quick search, then add it right away for review.",
   "suggest.closeAria": "Close",
@@ -215,6 +221,10 @@ export const en: Messages = {
     "e.g. Banitsa, or “cheese filo pastry breakfast”",
   "suggest.placeholder.restaurant":
     "e.g. Restaurant name in Leiden, or “cozy Bulgarian place near Den Haag”",
+  "suggest.placeholder.drink":
+    "e.g. Rakia, or a non-alcoholic yogurt drink with mint",
+  "suggest.placeholder.shop":
+    "e.g. Toko Dun Yong Amsterdam, or a Balkan grocery in Rotterdam",
   "suggest.openaiMissing.banner":
     "Suggestions need OPENAI_API_KEY in .env, then restart npm run dev.",
   "suggest.openaiMissing.error":
@@ -227,6 +237,8 @@ export const en: Messages = {
   "suggest.notFound.default": "Nothing clear enough to add.",
   "suggest.addRecipe": "Add recipe",
   "suggest.addRestaurant": "Add restaurant",
+  "suggest.addDrink": "Add drink",
+  "suggest.addShop": "Add shop",
   "suggest.preview.meta": "{category} · {minutes} min · {difficulty}",
   "suggest.lookingUp": "Looking up…",
   "suggest.adding": "Adding…",
@@ -255,7 +267,7 @@ export const en: Messages = {
   "admin.back": "← Back to Spoon Spin",
   "admin.title": "Admin review",
   "admin.subtitle":
-    "Review community recipe and restaurant suggestions. Approved items stay live; rejected items are hidden.",
+    "Review community suggestions for recipes, drinks, shops, and restaurants. Approved items stay live; rejected items are hidden.",
   "admin.checkingAccess": "Checking access…",
   "admin.signInPrompt": "Sign in with an admin account to review submissions.",
   "admin.signIn": "Sign in",
@@ -276,6 +288,8 @@ export const en: Messages = {
   "admin.reject": "Reject",
   "admin.kind.recipe": "Recipe",
   "admin.kind.restaurant": "Restaurant",
+  "admin.kind.drink": "Drink",
+  "admin.kind.shop": "Shop",
   "admin.review.backToOverview": "← Country overview",
 
   "admin.overview.title": "Country overview",
@@ -312,7 +326,7 @@ export const en: Messages = {
   "admin.country.overview.hint":
     "Counts of recipes, restaurants, drinks, shops",
   "admin.country.review": "Review",
-  "admin.country.review.hint": "Review community recipe and restaurant suggestions",
+  "admin.country.review.hint": "Review community recipe, drink, shop, and restaurant suggestions",
   "admin.country.replaceImage": "Replace image",
   "admin.country.replaceImage.hint":
     "Ask OpenAI for a dish, then pull a Wikimedia plate photo",

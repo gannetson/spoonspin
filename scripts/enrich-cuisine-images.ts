@@ -1,14 +1,15 @@
 #!/usr/bin/env tsx
 /**
- * Gather per-country cuisine / plate background images.
+ * Gather per-country cuisine / plate background images into Postgres
+ * and a research mirror under data/.
  *
  * Priority:
- *  1. National-dish photo from recipe enrichments (cook-ready countries)
+ *  1. National-dish photo from DB recipes / recipe enrichments
  *  2. Wikipedia cuisine page lead image
  *  3. Wikimedia Commons search for cuisine / dish plates
  *
  * Progress: data/cuisine-image-progress.json
- * Output:   src/content/countries/cuisineImages.json
+ * Output:   data/cuisine-images.json (+ countries.image_url)
  *
  * Usage:
  *   npm run agent:cuisine-images
@@ -17,17 +18,24 @@
  *   npm run agent:cuisine-images -- --all
  */
 
+import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { countryCatalog } from "../src/content/countries/catalog.ts";
-import { authoredCountries } from "../src/content/countries/published.ts";
+import {
+  getCountryFromDb,
+  listCountriesFromDb,
+  updateCountryImage,
+} from "../server/db/content.ts";
+import { closeDb, getDb } from "../server/db/restaurants.ts";
+import { getCountryRecipes } from "../src/content/countries/menuAccessors.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT_PATH = path.join(rootDir, "src/content/countries/cuisineImages.json");
+const OUT_PATH = path.join(rootDir, "data/cuisine-images.json");
 const PROGRESS_PATH = path.join(rootDir, "data/cuisine-image-progress.json");
-const WIKI_PATH = path.join(rootDir, "src/content/countries/wikipediaCuisines.json");
-const RECIPE_ENRICH_PATH = path.join(rootDir, "src/content/recipes/enrichments.json");
+const WIKI_PATH = path.join(rootDir, "data/wikipedia-cuisines.json");
+const RECIPE_ENRICH_PATH = path.join(rootDir, "data/recipe-enrichments.json");
 const USER_AGENT =
   "SpoonSpin/0.1 (https://github.com/gannetson/spoonspin; cuisine background images)";
 
@@ -129,21 +137,37 @@ async function fetchJson<T>(url: string): Promise<T | null> {
   return (await response.json()) as T;
 }
 
-function nationalDishImage(code: string): CuisineImage | null {
-  const authored = authoredCountries.find((country) => country.code === code);
-  if (!authored) return null;
+async function nationalDishImage(code: string): Promise<CuisineImage | null> {
+  const country = await getCountryFromDb(code);
+  if (country?.nationalDishId) {
+    const dish = getCountryRecipes(country).find(
+      (recipe) => recipe.id === country.nationalDishId,
+    );
+    if (isPhotoUrl(dish?.imageUrl)) {
+      return {
+        imageUrl: dish.imageUrl!,
+        imageAttribution: dish.imageAttribution,
+        source: "national-dish",
+        fetchedAt: new Date().toISOString(),
+      };
+    }
+  }
+
   const enrichments = loadJson<
     Record<string, { imageUrl?: string; imageAttribution?: string }>
   >(RECIPE_ENRICH_PATH, {});
-  const key = `${code}:${authored.nationalDishId}`;
-  const enrichment = enrichments[key];
-  if (!isPhotoUrl(enrichment?.imageUrl)) return null;
-  return {
-    imageUrl: enrichment.imageUrl,
-    imageAttribution: enrichment.imageAttribution,
-    source: "national-dish",
-    fetchedAt: new Date().toISOString(),
-  };
+  if (country?.nationalDishId) {
+    const enrichment = enrichments[`${code}:${country.nationalDishId}`];
+    if (isPhotoUrl(enrichment?.imageUrl)) {
+      return {
+        imageUrl: enrichment.imageUrl!,
+        imageAttribution: enrichment.imageAttribution,
+        source: "national-dish",
+        fetchedAt: new Date().toISOString(),
+      };
+    }
+  }
+  return null;
 }
 
 async function wikipediaCuisineImage(
@@ -229,15 +253,11 @@ async function commonsCuisineImage(
   code: string,
   name: string,
 ): Promise<CuisineImage | null> {
-  const authored = authoredCountries.find((country) => country.code === code);
-  const national = authored
-    ? [
-        authored.menu.starter,
-        authored.menu.main,
-        authored.menu.side,
-        authored.menu.dessert,
-        ...(authored.menu.moreRecipes ?? []),
-      ].find((recipe) => recipe.id === authored.nationalDishId)
+  const country = await getCountryFromDb(code);
+  const national = country?.nationalDishId
+    ? getCountryRecipes(country).find(
+        (recipe) => recipe.id === country.nationalDishId,
+      )
     : undefined;
 
   const queries = [
@@ -268,7 +288,7 @@ async function enrichCountry(
   code: string,
   name: string,
 ): Promise<CuisineImage | null> {
-  const fromDish = nationalDishImage(code);
+  const fromDish = await nationalDishImage(code);
   if (fromDish) return fromDish;
 
   const fromWiki = await wikipediaCuisineImage(code);
@@ -279,6 +299,7 @@ async function enrichCountry(
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
+  await getDb();
   const progress = loadJson<Progress>(PROGRESS_PATH, {
     completedCodes: [],
     lifetimeEnriched: 0,
@@ -287,18 +308,21 @@ async function main() {
   });
   const completed = new Set(progress.completedCodes);
   const images = loadJson<Record<string, CuisineImage>>(OUT_PATH, {});
+  const dbCountries = await listCountriesFromDb();
+  const cookReadyCodes = new Set(
+    dbCountries.filter((country) => country.cookReady).map((c) => c.code),
+  );
 
-  const authoredCodes = new Set(authoredCountries.map((country) => country.code));
   const entries = args.all
     ? countryCatalog
     : countryCatalog.filter(
-        (entry) => authoredCodes.has(entry.code) || !images[entry.code]?.imageUrl,
+        (entry) =>
+          cookReadyCodes.has(entry.code) || !images[entry.code]?.imageUrl,
       );
 
-  // Prefer cook-ready first, then the rest of the catalog.
   const ordered = [
-    ...entries.filter((entry) => authoredCodes.has(entry.code)),
-    ...entries.filter((entry) => !authoredCodes.has(entry.code)),
+    ...entries.filter((entry) => cookReadyCodes.has(entry.code)),
+    ...entries.filter((entry) => !cookReadyCodes.has(entry.code)),
   ];
 
   const pending = ordered.filter((entry) => {
@@ -316,6 +340,7 @@ async function main() {
     for (const entry of pending.slice(0, 12)) {
       console.log(`  - ${entry.code} ${entry.name}`);
     }
+    await closeDb();
     return;
   }
 
@@ -331,6 +356,11 @@ async function main() {
       const result = await enrichCountry(entry.code, entry.name);
       if (result) {
         images[entry.code] = result;
+        await updateCountryImage(
+          entry.code,
+          result.imageUrl,
+          result.imageAttribution ?? null,
+        );
         completed.add(entry.code);
         enriched += 1;
         console.log(`${result.source}`);
@@ -350,14 +380,16 @@ async function main() {
   progress.lastRunAt = new Date().toISOString();
   saveJson(OUT_PATH, images);
   saveJson(PROGRESS_PATH, progress);
+  await closeDb();
 
-  console.log(`\nWrote ${OUT_PATH}`);
+  console.log(`\nWrote ${OUT_PATH} and updated Postgres country images`);
   console.log(
     `Progress: ${Object.keys(images).length}/${countryCatalog.length} · lifetime ${progress.lifetimeEnriched}`,
   );
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
+  await closeDb();
   process.exit(1);
 });

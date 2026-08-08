@@ -3,18 +3,23 @@ import { countryCatalog, CATALOG_SIZE } from "./catalog";
 import { authoredCountries, publishedCountries } from "./published";
 import { allCountries, getCookReadyCountries } from "./buildCountries";
 import { getCountryRecipes } from "./menuAccessors";
+import {
+  getRuntimeCountry,
+  resolveCountry,
+  setRuntimeCountries,
+} from "./runtimeRegistry";
 
-const byCode = new Map(
+const catalogByCode = new Map(
   allCountries.map((country) => [country.code, country]),
 );
 
-/** All catalog countries (worldwide), ready to spin. */
+/** Thin catalog stubs (no menus). Prefer API / setRuntimeCountries for full data. */
 export function getPublishedCountries(): Country[] {
   return allCountries;
 }
 
 export function getCountryByCode(code: string): Country | undefined {
-  return byCode.get(code.toLowerCase());
+  return resolveCountry(code) ?? catalogByCode.get(code.toLowerCase());
 }
 
 export function getRecipeFromCountry(
@@ -25,12 +30,7 @@ export function getRecipeFromCountry(
 }
 
 export function isPublishedCatalogConsistent(): boolean {
-  return (
-    allCountries.length === countryCatalog.length &&
-    getCookReadyCountries().every((country) =>
-      authoredCountries.some((item) => item.code === country.code),
-    )
-  );
+  return allCountries.length === countryCatalog.length;
 }
 
 export {
@@ -40,6 +40,9 @@ export {
   authoredCountries,
   publishedCountries,
   getCookReadyCountries,
+  setRuntimeCountries,
+  getRuntimeCountry,
+  resolveCountry,
 };
 export {
   getCountryRecipes,

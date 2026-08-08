@@ -8,6 +8,8 @@ export type DrinkType =
   | "coffee";
 
 export type Drink = {
+  /** Present on community suggestions; authored drinks may omit it. */
+  id?: string;
   name: string;
   localName?: string;
   type: DrinkType;

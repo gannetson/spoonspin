@@ -56,6 +56,7 @@ export type MenuItemNationalMatch = {
  * Match a restaurant menu item against cook recipes for the cuisines it serves.
  * Prefer AI-assigned `item.cuisineCodes` (from Find menu); otherwise fall back to
  * restaurant-level codes with name matching.
+ * Recipe matching uses API-loaded countries via setRuntimeCountries.
  */
 export function matchMenuItemNationalDishes(
   item: RestaurantMenuItem,

@@ -1,6 +1,6 @@
-import type { Recipe } from "@/types/content";
+import type { Drink, Recipe, SpecialtyShop } from "@/types/content";
 
-export type SuggestionKind = "recipe" | "restaurant";
+export type SuggestionKind = "recipe" | "restaurant" | "drink" | "shop";
 
 export type RestaurantDraft = {
   name: string;
@@ -15,6 +15,9 @@ export type RestaurantDraft = {
   phone?: string;
 };
 
+export type DrinkDraft = Omit<Drink, "id">;
+export type ShopDraft = Omit<SpecialtyShop, "id">;
+
 export type RecipePreviewResponse = {
   found: boolean;
   confirmationNotes: string;
@@ -26,6 +29,24 @@ export type RestaurantPreviewResponse = {
   confirmationNotes: string;
   restaurant: RestaurantDraft | null;
 };
+
+export type DrinkPreviewResponse = {
+  found: boolean;
+  confirmationNotes: string;
+  drink: DrinkDraft | null;
+};
+
+export type ShopPreviewResponse = {
+  found: boolean;
+  confirmationNotes: string;
+  shop: ShopDraft | null;
+};
+
+export type SuggestionPreviewResponse =
+  | RecipePreviewResponse
+  | RestaurantPreviewResponse
+  | DrinkPreviewResponse
+  | ShopPreviewResponse;
 
 export type SubmissionStatus = "pending" | "approved" | "rejected";
 
@@ -54,9 +75,35 @@ export type RestaurantSubmission = {
   reviewedAt: string | null;
 };
 
+export type DrinkSubmission = {
+  id: string;
+  countryCode: string;
+  countryName: string;
+  query: string;
+  status: SubmissionStatus;
+  drink: Drink;
+  confirmationNotes: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+};
+
+export type ShopSubmission = {
+  id: string;
+  countryCode: string;
+  countryName: string;
+  query: string;
+  status: SubmissionStatus;
+  shop: SpecialtyShop;
+  confirmationNotes: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+};
+
 export type AnySubmission =
   | ({ kind: "recipe" } & RecipeSubmission)
-  | ({ kind: "restaurant" } & RestaurantSubmission);
+  | ({ kind: "restaurant" } & RestaurantSubmission)
+  | ({ kind: "drink" } & DrinkSubmission)
+  | ({ kind: "shop" } & ShopSubmission);
 
 async function readError(response: Response): Promise<string> {
   try {
@@ -91,21 +138,49 @@ export async function fetchCommunityRecipes(
   }
 }
 
+export async function fetchCommunityDrinks(
+  countryCode: string,
+): Promise<Drink[]> {
+  try {
+    const response = await fetch(
+      `/api/suggestions/drinks?countryCode=${encodeURIComponent(countryCode)}`,
+    );
+    if (!response.ok) return [];
+    const data = (await response.json()) as { drinks: Drink[] };
+    return data.drinks ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchCommunityShops(
+  countryCode: string,
+): Promise<SpecialtyShop[]> {
+  try {
+    const response = await fetch(
+      `/api/suggestions/shops?countryCode=${encodeURIComponent(countryCode)}`,
+    );
+    if (!response.ok) return [];
+    const data = (await response.json()) as { shops: SpecialtyShop[] };
+    return data.shops ?? [];
+  } catch {
+    return [];
+  }
+}
+
 export async function previewSuggestion(input: {
   kind: SuggestionKind;
   countryCode: string;
   countryName: string;
   query: string;
-}): Promise<RecipePreviewResponse | RestaurantPreviewResponse> {
+}): Promise<SuggestionPreviewResponse> {
   const response = await fetch("/api/suggestions/preview", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(input),
   });
   if (!response.ok) throw new Error(await readError(response));
-  return (await response.json()) as
-    | RecipePreviewResponse
-    | RestaurantPreviewResponse;
+  return (await response.json()) as SuggestionPreviewResponse;
 }
 
 export async function confirmSuggestion(
@@ -125,6 +200,22 @@ export async function confirmSuggestion(
         query: string;
         confirmationNotes?: string;
         restaurant: RestaurantDraft;
+      }
+    | {
+        kind: "drink";
+        countryCode: string;
+        countryName: string;
+        query: string;
+        confirmationNotes?: string;
+        drink: DrinkDraft;
+      }
+    | {
+        kind: "shop";
+        countryCode: string;
+        countryName: string;
+        query: string;
+        confirmationNotes?: string;
+        shop: ShopDraft;
       },
 ): Promise<AnySubmission> {
   const response = await fetch("/api/suggestions/create", {
@@ -135,7 +226,11 @@ export async function confirmSuggestion(
   if (!response.ok) throw new Error(await readError(response));
   const data = (await response.json()) as {
     kind: SuggestionKind;
-    submission: RecipeSubmission | RestaurantSubmission;
+    submission:
+      | RecipeSubmission
+      | RestaurantSubmission
+      | DrinkSubmission
+      | ShopSubmission;
   };
   return { kind: data.kind, ...data.submission } as AnySubmission;
 }
@@ -173,7 +268,11 @@ export async function reviewSubmission(input: {
   if (!response.ok) throw new Error(await readError(response));
   const data = (await response.json()) as {
     kind: SuggestionKind;
-    submission: RecipeSubmission | RestaurantSubmission;
+    submission:
+      | RecipeSubmission
+      | RestaurantSubmission
+      | DrinkSubmission
+      | ShopSubmission;
   };
   return { kind: data.kind, ...data.submission } as AnySubmission;
 }

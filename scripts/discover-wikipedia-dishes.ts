@@ -3,14 +3,14 @@
  * Discover notable dishes per country from Wikipedia (A→Z by country name).
  *
  * For each country:
- * 1. Open the cuisine page (from wikipediaCuisines.json when available)
+ * 1. Open the cuisine page (from data/wikipedia-cuisines.json when available)
  * 2. Prefer a "List of … dishes" page when it exists
  * 3. Extract dish links from dish-related sections
  * 4. Enrich each dish with Wikipedia summary + recipe/video search links
  *    (and a Commons photo when found)
  *
  * Progress: data/dish-discover-progress.json
- * Output:   src/content/dishes/byCountry.json
+ * Output:   data/dishes-by-country.json
  *
  * Usage:
  *   npm run agent:dishes
@@ -23,11 +23,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { countryCatalog } from "../src/content/countries/catalog.ts";
-import wikipediaCuisines from "../src/content/countries/wikipediaCuisines.json" with { type: "json" };
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT_PATH = path.join(rootDir, "src/content/dishes/byCountry.json");
+const OUT_PATH = path.join(rootDir, "data/dishes-by-country.json");
 const PROGRESS_PATH = path.join(rootDir, "data/dish-discover-progress.json");
+const WIKI_PATH = path.join(rootDir, "data/wikipedia-cuisines.json");
 const USER_AGENT =
   "SpoonSpin/0.1 (https://github.com/gannetson/spoonspin; wikipedia dish discovery)";
 
@@ -62,7 +62,18 @@ type Progress = {
   lastCountryName: string | null;
 };
 
-const wikiByCode = wikipediaCuisines as Record<string, WikiCuisine>;
+function loadWikiByCode(): Record<string, WikiCuisine> {
+  try {
+    return JSON.parse(fs.readFileSync(WIKI_PATH, "utf8")) as Record<
+      string,
+      WikiCuisine
+    >;
+  } catch {
+    return {};
+  }
+}
+
+const wikiByCode = loadWikiByCode();
 
 const SKIP_LINK =
   /^(file|image|category|wikipedia|template|help|portal|module|draft|timedtext):/i;

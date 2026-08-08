@@ -11,6 +11,24 @@ App path on the server: `/var/www/spoonspin/spoonspin`
 | [`supervisor/spoonspin.conf`](supervisor/spoonspin.conf) | `/etc/supervisor/conf.d/spoonspin.conf` |
 | [`install-server.sh`](install-server.sh) | copies configs + reloads services |
 
+## Remote deploy (from your laptop)
+
+```bash
+# once: add an SSH host alias, e.g. in ~/.ssh/config
+# Host spoonspin
+#   HostName your.server.tld
+#   User youruser
+
+chmod +x deploy/remote-deploy.sh
+npm run deploy:prod
+# or: ./deploy/remote-deploy.sh spoonspin
+# or: SPOONSPIN_SSH=user@host ./deploy/remote-deploy.sh
+```
+
+The script SSHs in, discards dirty tracked files under `src/content/` (content lives in Postgres), `git pull`s, runs `npm ci` + `npm run build`, and `supervisorctl restart spoonspin`.
+
+Content is **not** redeployed from git. Bootstrap or refresh DB content with `npm run db:import-content` (from a dump created via `npm run db:export-content`). Never run agents that rewrite tracked content files on the production checkout.
+
 ## Prerequisites (once per server)
 
 ```bash
@@ -68,9 +86,19 @@ sudo certbot --nginx -d spoonspin.nl -d www.spoonspin.nl
 
 ## Update / redeploy
 
+From your laptop (preferred):
+
+```bash
+npm run deploy:prod
+```
+
+Or on the server:
+
 ```bash
 cd /var/www/spoonspin/spoonspin
-sudo -u www-data git pull   # or pull as deploy user then chown
+# Discard local content file dirt if any agents were run here:
+git restore --source=HEAD -- src/content/ || true
+sudo -u www-data git pull
 sudo -u www-data npm ci
 sudo -u www-data npm run build
 sudo supervisorctl restart spoonspin

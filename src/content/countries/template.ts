@@ -1,9 +1,8 @@
 import type { AuthoredCountry } from "@/types/content";
 
 /**
- * TEMPLATE: add a country in its own `<code>.ts` file, export `<code>Country`,
- * complete all four menu recipes and both drinks, then add it to published.ts.
- * Keep this example out of `publishedCountries` until its content is complete.
+ * Historical authoring template. Cook menus now live in Postgres —
+ * use admin discover/add or db:import-content instead of committing country TS modules.
  */
 export const countryContentTemplate: AuthoredCountry = {
   code: "xx",

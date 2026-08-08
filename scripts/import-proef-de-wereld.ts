@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 /**
  * Import restaurants from a Proef de Wereld research-edition text export
- * into src/content/restaurants/curated.json.
+ * into data/curated-restaurants.json.
  *
  * Usage:
  *   npm run agent:proef -- /path/to/proef-de-wereld.txt
@@ -19,7 +19,7 @@ import { z } from "zod";
 import { OSM_CUISINE_BY_COUNTRY } from "../src/restaurants/osmCuisineMap.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const CURATED_PATH = path.join(rootDir, "src/content/restaurants/curated.json");
+const CURATED_PATH = path.join(rootDir, "data/curated-restaurants.json");
 const REVIEW_SOURCE = "proef-de-wereld-0.9";
 
 const curatedSchema = z.array(
@@ -230,7 +230,9 @@ function main() {
   const text = loadText(input);
   const parsed = parsePlaces(text);
   const existing = curatedSchema.parse(
-    JSON.parse(fs.readFileSync(CURATED_PATH, "utf8")),
+    fs.existsSync(CURATED_PATH)
+      ? JSON.parse(fs.readFileSync(CURATED_PATH, "utf8"))
+      : [],
   );
 
   // Replace previous Proef imports; dedupe only against non-Proef curated rows.
@@ -345,9 +347,9 @@ function main() {
   fs.writeFileSync(CURATED_PATH, `${JSON.stringify(merged, null, 2)}\n`, "utf8");
 
   console.log(`Parsed ${parsed.length} guide entries`);
-  console.log(`Added ${added.length} Netherlands restaurants to curated.json`);
+  console.log(`Added ${added.length} Netherlands restaurants to ${CURATED_PATH}`);
   console.log(`Skipped: ${JSON.stringify(skipped)}`);
-  console.log(`curated.json now has ${merged.length} places`);
+  console.log(`${CURATED_PATH} now has ${merged.length} places`);
   console.log("Next: npm run agent:curate");
 }
 

@@ -1,12 +1,10 @@
 #!/usr/bin/env tsx
 /**
- * Enrich reviewed restaurants with photos.
+ * Enrich reviewed restaurants with photos (Postgres only).
  *
  * Priority:
  * 1. Google Places photos (when GOOGLE_PLACES_API_KEY is set)
  * 2. Wikimedia Commons search fallback
- *
- * Writes photoUrl into curated.json (when listed) and Postgres.
  *
  * Usage:
  *   npm run agent:restaurant-photos
@@ -29,7 +27,6 @@ import { fetchGoogleRestaurantPhoto } from "../server/lib/googlePlacesPhoto.ts";
 import { findCommonsImage } from "../server/lib/wikimedia.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const CURATED_PATH = path.join(rootDir, "src/content/restaurants/curated.json");
 const PROGRESS_PATH = path.join(
   rootDir,
   "data/restaurant-photo-progress.json",
@@ -40,35 +37,6 @@ type Progress = {
   lifetimeEnriched: number;
   runs: number;
   lastRunAt: string | null;
-};
-
-type CuratedPlace = {
-  id: string;
-  name: string;
-  address: string;
-  city: string;
-  postcode?: string | null;
-  lat?: number | null;
-  lng?: number | null;
-  cuisineCodes: string[];
-  cuisineTags: string[];
-  website?: string | null;
-  authenticityRating: number;
-  authenticityNotes: string;
-  reviewSource: string;
-  userRating?: number;
-  reviewCount?: number;
-  ratings?: unknown;
-  photoUrl?: string;
-  photoAttribution?: string;
-};
-
-type Target = {
-  id: string;
-  name: string;
-  city: string;
-  dbRow?: StoredRestaurant;
-  curatedRow?: CuratedPlace;
 };
 
 function sleep(ms: number) {
@@ -104,38 +72,6 @@ async function fetchCommonsPhoto(
   return findCommonsImage(`${place.name} ${place.city} restaurant`);
 }
 
-function buildTargets(
-  reviewed: StoredRestaurant[],
-  curated: CuratedPlace[],
-): Target[] {
-  const byId = new Map<string, Target>();
-
-  for (const row of reviewed) {
-    byId.set(row.id, {
-      id: row.id,
-      name: row.name,
-      city: row.city,
-      dbRow: row,
-    });
-  }
-
-  for (const row of curated) {
-    const existing = byId.get(row.id);
-    if (existing) {
-      existing.curatedRow = row;
-      continue;
-    }
-    byId.set(row.id, {
-      id: row.id,
-      name: row.name,
-      city: row.city,
-      curatedRow: row,
-    });
-  }
-
-  return [...byId.values()];
-}
-
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const googleKey = process.env.GOOGLE_PLACES_API_KEY?.trim() ?? "";
@@ -146,16 +82,13 @@ async function main() {
     lastRunAt: null,
   });
   const completed = new Set(progress.completedIds);
-  const curated = loadJson<CuratedPlace[]>(CURATED_PATH, []);
-  const curatedById = new Map(curated.map((row) => [row.id, { ...row }]));
 
   await getDb();
   const reviewed = await listRestaurants({ reviewedOnly: true });
 
-  const pending = buildTargets(reviewed, curated).filter((item) => {
-    if (completed.has(item.id)) return false;
-    if (item.dbRow?.photoUrl) return false;
-    if (item.curatedRow?.photoUrl) return false;
+  const pending = reviewed.filter((row: StoredRestaurant) => {
+    if (completed.has(row.id)) return false;
+    if (row.photoUrl) return false;
     return true;
   });
 
@@ -206,19 +139,11 @@ async function main() {
         continue;
       }
 
-      if (item.dbRow) {
-        await upsertRestaurant({
-          ...item.dbRow,
-          photoUrl: photo.url,
-          photoAttribution: photo.attribution,
-        });
-      }
-
-      const curatedRow = curatedById.get(item.id);
-      if (curatedRow) {
-        curatedRow.photoUrl = photo.url;
-        curatedRow.photoAttribution = photo.attribution;
-      }
+      await upsertRestaurant({
+        ...item,
+        photoUrl: photo.url,
+        photoAttribution: photo.attribution,
+      });
 
       completed.add(item.id);
       enriched += 1;
@@ -229,11 +154,6 @@ async function main() {
     }
     await sleep(300);
   }
-
-  saveJson(
-    CURATED_PATH,
-    curated.map((row) => curatedById.get(row.id) ?? row),
-  );
 
   progress.completedIds = [...completed];
   progress.lifetimeEnriched += enriched;

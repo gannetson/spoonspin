@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countrySchema, stubCountrySchema } from "@/schemas/content";
+import { stubCountrySchema } from "@/schemas/content";
 import {
   CATALOG_SIZE,
   countryCatalog,
@@ -8,8 +8,8 @@ import {
   getPublishedCountries,
 } from "@/content/countries";
 
-describe("worldwide country content", () => {
-  it("exposes every catalog country for spinning", () => {
+describe("worldwide country catalog (thin stubs)", () => {
+  it("exposes every catalog country as a stub (menus live in Postgres)", () => {
     const spinable = getPublishedCountries();
     expect(spinable).toHaveLength(CATALOG_SIZE);
     expect(CATALOG_SIZE).toBe(197);
@@ -17,25 +17,12 @@ describe("worldwide country content", () => {
     expect(spinable.every((country) => country.status === "published")).toBe(
       true,
     );
+    expect(spinable.every((country) => !country.cookReady)).toBe(true);
+    expect(getCookReadyCountries()).toHaveLength(0);
   });
 
-  it("validates every cook-ready country against the full Zod schema", () => {
-    const cookReady = getCookReadyCountries();
-    expect(cookReady.length).toBeGreaterThanOrEqual(30);
-    for (const country of cookReady) {
-      const result = countrySchema.safeParse(country);
-      if (!result.success) {
-        throw new Error(
-          `${country.code}: ${JSON.stringify(result.error.issues, null, 2)}`,
-        );
-      }
-    }
-  });
-
-  it("validates stub countries (no cook menu yet)", () => {
-    const stubs = getPublishedCountries().filter((country) => !country.cookReady);
-    expect(stubs.length).toBeGreaterThan(100);
-    for (const country of stubs) {
+  it("validates stub countries against the stub Zod schema", () => {
+    for (const country of getPublishedCountries()) {
       const result = stubCountrySchema.safeParse(country);
       if (!result.success) {
         throw new Error(
@@ -45,14 +32,10 @@ describe("worldwide country content", () => {
     }
   });
 
-  it("resolves authored and stub countries by code", () => {
+  it("resolves catalog countries by code", () => {
     expect(getCountryByCode("bg")?.name).toBe("Bulgaria");
-    expect(getCountryByCode("bg")?.cookReady).toBe(true);
     expect(getCountryByCode("af")?.name).toBe("Afghanistan");
-    expect(getCountryByCode("af")?.cookReady).toBe(true);
     expect(getCountryByCode("xx")).toBeUndefined();
     expect(getCountryByCode("fr")?.name).toBe("France");
-    expect(getCountryByCode("gb")?.cookReady).toBe(true);
-    expect(getCountryByCode("pl")?.cookReady).toBe(true);
   });
 });

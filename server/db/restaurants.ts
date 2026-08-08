@@ -313,6 +313,36 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_restaurant_submissions_country_status
       ON restaurant_submissions (country_code, status);
+
+    CREATE TABLE IF NOT EXISTS drink_submissions (
+      id TEXT PRIMARY KEY,
+      country_code TEXT NOT NULL,
+      country_name TEXT NOT NULL,
+      query TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      drink_json JSONB NOT NULL,
+      confirmation_notes TEXT,
+      created_at TIMESTAMPTZ NOT NULL,
+      reviewed_at TIMESTAMPTZ
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_drink_submissions_country_status
+      ON drink_submissions (country_code, status);
+
+    CREATE TABLE IF NOT EXISTS shop_submissions (
+      id TEXT PRIMARY KEY,
+      country_code TEXT NOT NULL,
+      country_name TEXT NOT NULL,
+      query TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      shop_json JSONB NOT NULL,
+      confirmation_notes TEXT,
+      created_at TIMESTAMPTZ NOT NULL,
+      reviewed_at TIMESTAMPTZ
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_shop_submissions_country_status
+      ON shop_submissions (country_code, status);
   `);
 
   await db.query(`
@@ -1031,6 +1061,8 @@ export async function resetAllTables(client?: PoolClient): Promise<void> {
       restaurants,
       recipe_submissions,
       restaurant_submissions,
+      drink_submissions,
+      shop_submissions,
       sessions,
       recipes,
       countries,

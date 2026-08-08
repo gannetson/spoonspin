@@ -5,9 +5,15 @@ import {
   resetAllTables,
 } from "../../server/db/restaurants.ts";
 import {
+  insertDrinkSubmission,
   insertRecipeSubmission,
+  insertShopSubmission,
+  listVisibleDrinksForCountry,
   listVisibleRecipesForCountry,
+  listVisibleShopsForCountry,
+  setDrinkSubmissionStatus,
   setRecipeSubmissionStatus,
+  setShopSubmissionStatus,
   slugifyId,
 } from "../../server/db/submissions.ts";
 
@@ -74,5 +80,61 @@ describe("suggestion submissions", () => {
     expect(
       (await listVisibleRecipesForCountry("bg")).map((r) => r.id),
     ).not.toContain(recipe.id);
+  });
+
+  it("lists pending drinks and hides rejected ones", async () => {
+    const drink = {
+      id: "suggest-drink-test-1",
+      name: "Test Rakia",
+      type: "spirit" as const,
+      alcoholic: true,
+      description:
+        "A strong fruit brandy used only for unit tests of community drink suggestions.",
+    };
+
+    await insertDrinkSubmission({
+      id: drink.id,
+      countryCode: "bg",
+      countryName: "Bulgaria",
+      query: "rakia",
+      drink,
+    });
+
+    expect(
+      (await listVisibleDrinksForCountry("bg")).map((d) => d.id),
+    ).toContain(drink.id);
+
+    await setDrinkSubmissionStatus(drink.id, "rejected");
+    expect(
+      (await listVisibleDrinksForCountry("bg")).map((d) => d.id),
+    ).not.toContain(drink.id);
+  });
+
+  it("lists pending shops and hides rejected ones", async () => {
+    const shop = {
+      id: "suggest-shop-test-1",
+      name: "Test Toko",
+      city: "Amsterdam",
+      address: "Teststraat 1",
+      specialty: "Southeast Asian pantry staples for home cooks.",
+      mapsUrl: "https://www.google.com/maps/search/?api=1&query=Test+Toko",
+    };
+
+    await insertShopSubmission({
+      id: shop.id,
+      countryCode: "id",
+      countryName: "Indonesia",
+      query: "toko",
+      shop,
+    });
+
+    expect(
+      (await listVisibleShopsForCountry("id")).map((s) => s.id),
+    ).toContain(shop.id);
+
+    await setShopSubmissionStatus(shop.id, "rejected");
+    expect(
+      (await listVisibleShopsForCountry("id")).map((s) => s.id),
+    ).not.toContain(shop.id);
   });
 });

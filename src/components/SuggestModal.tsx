@@ -1,11 +1,13 @@
 import { useEffect, useId, useRef, useState } from "react";
 import { LoaderCircle, Plus, X } from "lucide-react";
-import type { Country, Recipe } from "@/types/content";
+import type { Country, Drink, Recipe, SpecialtyShop } from "@/types/content";
 import {
   confirmSuggestion,
   fetchSuggestionStatus,
   previewSuggestion,
+  type DrinkDraft,
   type RestaurantDraft,
+  type ShopDraft,
   type SuggestionKind,
 } from "@/suggestions/client";
 import { useT } from "@/i18n/LocaleContext";
@@ -15,7 +17,13 @@ type SuggestModalProps = {
   country: Country;
   open: boolean;
   onClose: () => void;
-  onAdded: (result: { kind: "recipe"; recipe: Recipe } | { kind: "restaurant" }) => void;
+  onAdded: (
+    result:
+      | { kind: "recipe"; recipe: Recipe }
+      | { kind: "restaurant" }
+      | { kind: "drink"; drink: Drink }
+      | { kind: "shop"; shop: SpecialtyShop },
+  ) => void;
 };
 
 type PreviewState =
@@ -30,6 +38,16 @@ type PreviewState =
       status: "ready-restaurant";
       notes: string;
       restaurant: RestaurantDraft;
+    }
+  | {
+      status: "ready-drink";
+      notes: string;
+      drink: DrinkDraft;
+    }
+  | {
+      status: "ready-shop";
+      notes: string;
+      shop: ShopDraft;
     }
   | { status: "not-found"; notes: string }
   | { status: "error"; message: string };
@@ -46,6 +64,27 @@ const COURSE_KEYS: Record<Recipe["category"], string> = {
   side: "cook.course.side",
   dessert: "cook.course.dessert",
   snack: "cook.course.snack",
+};
+
+const TITLE_KEYS: Record<SuggestionKind, string> = {
+  recipe: "suggest.title.recipe",
+  restaurant: "suggest.title.restaurant",
+  drink: "suggest.title.drink",
+  shop: "suggest.title.shop",
+};
+
+const PLACEHOLDER_KEYS: Record<SuggestionKind, string> = {
+  recipe: "suggest.placeholder.recipe",
+  restaurant: "suggest.placeholder.restaurant",
+  drink: "suggest.placeholder.drink",
+  shop: "suggest.placeholder.shop",
+};
+
+const ADD_KEYS: Record<SuggestionKind, string> = {
+  recipe: "suggest.addRecipe",
+  restaurant: "suggest.addRestaurant",
+  drink: "suggest.addDrink",
+  shop: "suggest.addShop",
 };
 
 export function SuggestModal({
@@ -91,10 +130,6 @@ export function SuggestModal({
 
   if (!open) return null;
 
-  const placeholder =
-    kind === "recipe"
-      ? t("suggest.placeholder.recipe")
-      : t("suggest.placeholder.restaurant");
   const lookupDisabled =
     preview.status === "loading" ||
     saving ||
@@ -151,6 +186,22 @@ export function SuggestModal({
         });
         return;
       }
+      if (kind === "drink" && "drink" in result && result.drink) {
+        setPreview({
+          status: "ready-drink",
+          notes: result.confirmationNotes,
+          drink: result.drink,
+        });
+        return;
+      }
+      if (kind === "shop" && "shop" in result && result.shop) {
+        setPreview({
+          status: "ready-shop",
+          notes: result.confirmationNotes,
+          shop: result.shop,
+        });
+        return;
+      }
       setPreview({
         status: "not-found",
         notes: result.confirmationNotes || t("suggest.notFound.default"),
@@ -196,6 +247,36 @@ export function SuggestModal({
         });
         onAdded({ kind: "restaurant" });
         onClose();
+        return;
+      }
+      if (preview.status === "ready-drink") {
+        const submission = await confirmSuggestion({
+          kind: "drink",
+          countryCode: country.code,
+          countryName: country.name,
+          query: trimmed,
+          confirmationNotes: preview.notes,
+          drink: preview.drink,
+        });
+        if (submission.kind === "drink") {
+          onAdded({ kind: "drink", drink: submission.drink });
+        }
+        onClose();
+        return;
+      }
+      if (preview.status === "ready-shop") {
+        const submission = await confirmSuggestion({
+          kind: "shop",
+          countryCode: country.code,
+          countryName: country.name,
+          query: trimmed,
+          confirmationNotes: preview.notes,
+          shop: preview.shop,
+        });
+        if (submission.kind === "shop") {
+          onAdded({ kind: "shop", shop: submission.shop });
+        }
+        onClose();
       }
     } catch (error) {
       setPreview({
@@ -227,9 +308,7 @@ export function SuggestModal({
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 id={titleId} className="font-display text-3xl text-ink">
-              {kind === "recipe"
-                ? t("suggest.title.recipe")
-                : t("suggest.title.restaurant")}
+              {t(TITLE_KEYS[kind])}
             </h2>
             <p className="mt-1 text-sm text-ink-soft">
               {t("suggest.subtitle", {
@@ -257,7 +336,7 @@ export function SuggestModal({
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           rows={3}
-          placeholder={placeholder}
+          placeholder={t(PLACEHOLDER_KEYS[kind])}
           className="mt-2 w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-ink"
         />
 
@@ -318,19 +397,11 @@ export function SuggestModal({
                 difficulty: t(DIFFICULTY_KEYS[preview.recipe.difficulty]),
               })}
             </p>
-            <button
-              type="button"
+            <ConfirmButton
+              saving={saving}
+              label={t(ADD_KEYS.recipe)}
               onClick={() => void runConfirm()}
-              disabled={saving}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-5 text-sm font-semibold text-cream hover:bg-tomato-deep disabled:opacity-60"
-            >
-              {saving ? (
-                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <Plus className="size-4" aria-hidden="true" />
-              )}
-              {saving ? t("suggest.adding") : t("suggest.addRecipe")}
-            </button>
+            />
           </div>
         ) : null}
 
@@ -349,22 +420,77 @@ export function SuggestModal({
                 {preview.restaurant.authenticityNotes}
               </p>
             ) : null}
-            <button
-              type="button"
+            <ConfirmButton
+              saving={saving}
+              label={t(ADD_KEYS.restaurant)}
               onClick={() => void runConfirm()}
-              disabled={saving}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-5 text-sm font-semibold text-cream hover:bg-tomato-deep disabled:opacity-60"
-            >
-              {saving ? (
-                <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
-              ) : (
-                <Plus className="size-4" aria-hidden="true" />
-              )}
-              {saving ? t("suggest.adding") : t("suggest.addRestaurant")}
-            </button>
+            />
+          </div>
+        ) : null}
+
+        {preview.status === "ready-drink" ? (
+          <div className="mt-4 space-y-3 rounded-2xl bg-parchment p-4">
+            <p className="text-sm text-ink-soft">{preview.notes}</p>
+            <p className="font-display text-2xl text-ink">{preview.drink.name}</p>
+            <p className="text-sm text-ink-soft">{preview.drink.description}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-stamp">
+              {preview.drink.type}
+              {preview.drink.alcoholic ? " · alcoholic" : " · non-alcoholic"}
+            </p>
+            <ConfirmButton
+              saving={saving}
+              label={t(ADD_KEYS.drink)}
+              onClick={() => void runConfirm()}
+            />
+          </div>
+        ) : null}
+
+        {preview.status === "ready-shop" ? (
+          <div className="mt-4 space-y-3 rounded-2xl bg-parchment p-4">
+            <p className="text-sm text-ink-soft">{preview.notes}</p>
+            <p className="font-display text-2xl text-ink">{preview.shop.name}</p>
+            <p className="text-sm text-ink-soft">
+              {preview.shop.address}
+              {preview.shop.city ? ` · ${preview.shop.city}` : ""}
+            </p>
+            <p className="text-sm font-semibold text-ink">
+              {preview.shop.specialty}
+            </p>
+            <ConfirmButton
+              saving={saving}
+              label={t(ADD_KEYS.shop)}
+              onClick={() => void runConfirm()}
+            />
           </div>
         ) : null}
       </div>
     </div>
+  );
+}
+
+function ConfirmButton({
+  saving,
+  label,
+  onClick,
+}: {
+  saving: boolean;
+  label: string;
+  onClick: () => void;
+}) {
+  const t = useT();
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={saving}
+      className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-5 text-sm font-semibold text-cream hover:bg-tomato-deep disabled:opacity-60"
+    >
+      {saving ? (
+        <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+      ) : (
+        <Plus className="size-4" aria-hidden="true" />
+      )}
+      {saving ? t("suggest.adding") : label}
+    </button>
   );
 }

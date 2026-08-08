@@ -178,7 +178,11 @@ export function AdminPage() {
                     <h2 className="mt-1 font-display text-2xl text-ink">
                       {item.kind === "recipe"
                         ? item.recipe.name
-                        : item.restaurant.name}
+                        : item.kind === "restaurant"
+                          ? item.restaurant.name
+                          : item.kind === "drink"
+                            ? item.drink.name
+                            : item.shop.name}
                     </h2>
                     <p className="mt-1 text-sm text-ink-soft">
                       {t("admin.queryPrefix", { query: item.query })}
@@ -193,11 +197,23 @@ export function AdminPage() {
                         {item.recipe.category} · {item.recipe.description.slice(0, 140)}
                         …
                       </p>
-                    ) : (
+                    ) : null}
+                    {item.kind === "restaurant" ? (
                       <p className="mt-2 text-sm text-ink-soft">
                         {item.restaurant.address} · {item.restaurant.city}
                       </p>
-                    )}
+                    ) : null}
+                    {item.kind === "drink" ? (
+                      <p className="mt-2 text-sm text-ink-soft">
+                        {item.drink.type} · {item.drink.description.slice(0, 140)}
+                        …
+                      </p>
+                    ) : null}
+                    {item.kind === "shop" ? (
+                      <p className="mt-2 text-sm text-ink-soft">
+                        {item.shop.address} · {item.shop.city} · {item.shop.specialty}
+                      </p>
+                    ) : null}
                     <p className="mt-2 text-xs text-ink-soft">
                       {t("admin.submitted", {
                         datetime: new Date(item.createdAt).toLocaleString(),

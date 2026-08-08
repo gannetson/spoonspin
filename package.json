@@ -31,7 +31,10 @@
     "agent:ratings": "tsx --tsconfig tsconfig.app.json scripts/enrich-ratings.ts",
     "agent:review-links": "tsx --tsconfig tsconfig.app.json scripts/enrich-review-links.ts",
     "db:rebuild-cuisines": "tsx --tsconfig tsconfig.app.json scripts/rebuild-cuisine-codes.ts",
-    "db:seed-content": "tsx --tsconfig tsconfig.app.json scripts/seed-content.ts"
+    "db:export-content": "tsx --tsconfig tsconfig.app.json scripts/export-content.ts",
+    "db:import-content": "tsx --tsconfig tsconfig.app.json scripts/import-content.ts",
+    "db:seed-content": "tsx --tsconfig tsconfig.app.json scripts/seed-content.ts",
+    "deploy:prod": "./deploy/remote-deploy.sh"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

@@ -3,7 +3,7 @@
  *
  * Usage: npm run content:wikipedia
  *
- * Writes src/content/countries/wikipediaCuisines.json
+ * Writes data/wikipedia-cuisines.json
  * Uses the Wikipedia REST summary API (CC BY-SA).
  */
 
@@ -13,7 +13,7 @@ import { fileURLToPath } from "node:url";
 import { countryCatalog } from "../src/content/countries/catalog";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = join(__dirname, "../src/content/countries/wikipediaCuisines.json");
+const OUT = join(__dirname, "../data/wikipedia-cuisines.json");
 const USER_AGENT =
   "SpoonSpin/0.1 (https://github.com/gannetson/spoonspin; cuisine summaries)";
 

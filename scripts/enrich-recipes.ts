@@ -1,12 +1,13 @@
 #!/usr/bin/env tsx
 /**
- * Enrich cook-ready recipes with:
+ * Enrich cook-ready recipes in Postgres with:
  * - Dish photos (Wikimedia Commons / Wikipedia lead image)
  * - Links to Wikipedia / Wikibooks Cookbook / Google recipe search
  * - YouTube cooking-video search links
  *
+ * Also writes a research mirror to data/recipe-enrichments.json.
+ *
  * Progress: data/recipe-enrich-progress.json
- * Output:   src/content/recipes/enrichments.json
  *
  * Usage:
  *   npm run agent:recipes
@@ -16,14 +17,20 @@
  *   npm run agent:recipes -- --status
  */
 
+import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { authoredCountries } from "../src/content/countries/published.ts";
+import {
+  listCountriesFromDb,
+  updateRecipeFields,
+} from "../server/db/content.ts";
+import { closeDb, getDb } from "../server/db/restaurants.ts";
+import { getCountryRecipes } from "../src/content/countries/menuAccessors.ts";
 import type { RecipeEnrichment } from "../src/content/recipes/enrichments.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT_PATH = path.join(rootDir, "src/content/recipes/enrichments.json");
+const OUT_PATH = path.join(rootDir, "data/recipe-enrichments.json");
 const PROGRESS_PATH = path.join(rootDir, "data/recipe-enrich-progress.json");
 const USER_AGENT =
   "SpoonSpin/0.1 (https://github.com/gannetson/spoonspin; recipe media enricher)";
@@ -127,17 +134,12 @@ function hasBadOrMissingPhoto(extra?: RecipeEnrichment): boolean {
   return !isPhotoUrl(extra.imageUrl);
 }
 
-function listJobs(): Job[] {
+async function listJobs(): Promise<Job[]> {
+  const countries = await listCountriesFromDb();
   const jobs: Job[] = [];
-  for (const country of authoredCountries) {
-    const recipes = [
-      country.menu.starter,
-      country.menu.main,
-      country.menu.side,
-      country.menu.dessert,
-      ...(country.menu.moreRecipes ?? []),
-    ];
-    for (const recipe of recipes) {
+  for (const country of countries) {
+    if (!country.cookReady && getCountryRecipes(country).length === 0) continue;
+    for (const recipe of getCountryRecipes(country)) {
       jobs.push({
         id: `${country.code}:${recipe.id}`,
         countryCode: country.code,
@@ -399,7 +401,8 @@ async function enrichJob(
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const jobs = listJobs();
+  await getDb();
+  const jobs = await listJobs();
   const progress = loadJson<Progress>(PROGRESS_PATH, {
     completedIds: [],
     lifetimeEnriched: 0,
@@ -452,6 +455,7 @@ async function main() {
     for (const job of pending.slice(0, 10)) {
       console.log(`  - ${job.id} (${job.recipeName})`);
     }
+    await closeDb();
     return;
   }
 
@@ -468,12 +472,19 @@ async function main() {
       const keepPhoto =
         args.forceLinks && !args.forceBad && isPhotoUrl(existing?.imageUrl);
       const result = await enrichJob(job, { keepPhoto, existing });
-      enrichments[job.id] = {
+      const merged: RecipeEnrichment = {
         ...existing,
         ...result,
         imageUrl: result.imageUrl ?? existing?.imageUrl,
         imageAttribution: result.imageAttribution ?? existing?.imageAttribution,
       };
+      enrichments[job.id] = merged;
+      await updateRecipeFields(job.countryCode, job.recipeId, {
+        imageUrl: merged.imageUrl,
+        imageAttribution: merged.imageAttribution,
+        sourceUrl: merged.sourceUrl,
+        videoUrl: merged.videoUrl,
+      });
       completed.add(job.id);
       enriched += 1;
       const sourceKind = result.sourceUrl?.includes("wikibooks")
@@ -504,14 +515,16 @@ async function main() {
   progress.lastRunAt = new Date().toISOString();
   saveJson(OUT_PATH, enrichments);
   saveJson(PROGRESS_PATH, progress);
+  await closeDb();
 
-  console.log(`\nWrote ${OUT_PATH}`);
+  console.log(`\nWrote ${OUT_PATH} and updated Postgres recipes`);
   console.log(
     `Progress: ${completed.size}/${jobs.length} · lifetime ${progress.lifetimeEnriched}`,
   );
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
+  await closeDb();
   process.exit(1);
 });

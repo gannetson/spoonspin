@@ -1,6 +1,5 @@
 import type { Country } from "@/types/content";
-import { getRecipeEnrichment } from "../recipes/enrichments";
-import cuisineImagesJson from "./cuisineImages.json" with { type: "json" };
+import { getCountryRecipes } from "./menuAccessors";
 
 export type CuisineImage = {
   imageUrl: string;
@@ -9,20 +8,18 @@ export type CuisineImage = {
   fetchedAt?: string;
 };
 
-const cuisineImages = cuisineImagesJson as Record<string, CuisineImage>;
-
-export function getCuisineImage(countryCode: string): CuisineImage | undefined {
-  return cuisineImages[countryCode.toLowerCase()];
+function isImageUrl(url: string | undefined): url is string {
+  return Boolean(url && /\.(jpe?g|png|webp|gif)(\?|$)/i.test(url));
 }
 
-function resolvedCuisineUrl(country: Pick<Country, "code" | "imageUrl">): string | undefined {
-  if (country.imageUrl && /\.(jpe?g|png|webp|gif)(\?|$)/i.test(country.imageUrl)) {
-    return country.imageUrl;
-  }
-  return getCuisineImage(country.code)?.imageUrl;
+function resolvedCuisineUrl(
+  country: Pick<Country, "code" | "imageUrl">,
+): string | undefined {
+  if (isImageUrl(country.imageUrl)) return country.imageUrl;
+  return undefined;
 }
 
-/** Country card / cuisine atmosphere — plate of that country's food when available. */
+/** Country card / cuisine atmosphere — plate from DB `imageUrl` when available. */
 export function cuisineBannerUrl(
   country: Pick<Country, "code" | "imageUrl">,
 ): string | null {
@@ -30,14 +27,14 @@ export function cuisineBannerUrl(
 }
 
 /**
- * Tonight's menu banner — prefer national-dish plate, then country cuisine image.
+ * Tonight's menu banner — prefer national-dish plate on the country payload, then country image.
  */
 export function cookBannerUrl(country: Country): string | null {
   if (country.nationalDishId) {
-    const dish = getRecipeEnrichment(country.code, country.nationalDishId);
-    if (dish?.imageUrl && /\.(jpe?g|png|webp|gif)(\?|$)/i.test(dish.imageUrl)) {
-      return dish.imageUrl;
-    }
+    const dish = getCountryRecipes(country).find(
+      (recipe) => recipe.id === country.nationalDishId,
+    );
+    if (isImageUrl(dish?.imageUrl)) return dish.imageUrl;
   }
   return resolvedCuisineUrl(country) ?? null;
 }
@@ -47,8 +44,4 @@ export function dineBannerUrl(
   country: Pick<Country, "code" | "imageUrl">,
 ): string | null {
   return resolvedCuisineUrl(country) ?? null;
-}
-
-export function listCuisineImages(): Record<string, CuisineImage> {
-  return cuisineImages;
 }

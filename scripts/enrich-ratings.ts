@@ -1,71 +1,28 @@
 #!/usr/bin/env tsx
 /**
- * Enrich curated restaurants with guest ratings from:
+ * Enrich reviewed restaurants in Postgres with guest ratings from:
  * - Google Places (GOOGLE_PLACES_API_KEY) — primary
  * - Tripadvisor Content API (TRIPADVISOR_API_KEY) — optional
- * - The Fork — no free public API; keep values already in curated.json
+ * - The Fork — no free public API; keep values already in ratings_json
  *
- * Writes ratings back into curated.json and upserts Postgres.
+ * Writes ratings to Postgres only (no curated.json).
+ *
+ * Usage:
+ *   npm run agent:ratings
  */
 import "dotenv/config";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { z } from "zod";
 import {
   closeDb,
   getDb,
+  listRestaurants,
   upsertRestaurant,
+  type StoredRestaurant,
 } from "../server/db/restaurants.ts";
 import {
   aggregateGuestRating,
   type RestaurantRatings,
   type SourceRating,
 } from "../src/restaurants/ratings.ts";
-
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const CURATED_PATH = path.join(
-  rootDir,
-  "src/content/restaurants/curated.json",
-);
-
-const sourceRatingSchema = z.object({
-  score: z.number().min(0).max(10),
-  count: z.number().int().min(0).optional(),
-  scale: z.union([z.literal(5), z.literal(10)]).optional(),
-  url: z.string().url().optional(),
-  fetchedAt: z.string().optional(),
-});
-
-const curatedSchema = z.array(
-  z.object({
-    id: z.string(),
-    name: z.string(),
-    address: z.string(),
-    city: z.string(),
-    postcode: z.string().nullable().optional(),
-    lat: z.number().nullable().optional(),
-    lng: z.number().nullable().optional(),
-    cuisineCodes: z.array(z.string()),
-    cuisineTags: z.array(z.string()),
-    website: z.string().url().nullable().optional(),
-    authenticityRating: z.number(),
-    authenticityNotes: z.string(),
-    reviewSource: z.string(),
-    userRating: z.number().optional(),
-    reviewCount: z.number().optional(),
-    ratings: z
-      .object({
-        google: sourceRatingSchema.optional(),
-        theFork: sourceRatingSchema.optional(),
-        tripadvisor: sourceRatingSchema.optional(),
-        openTable: sourceRatingSchema.optional(),
-      })
-      .optional(),
-  }),
-);
-
-type CuratedPlace = z.infer<typeof curatedSchema>[number];
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -94,7 +51,7 @@ function namesLikelyMatch(a: string, b: string): boolean {
 }
 
 async function fetchGoogleRating(
-  place: CuratedPlace,
+  place: StoredRestaurant,
   apiKey: string,
 ): Promise<SourceRating | null> {
   const textQuery = `${place.name} restaurant ${place.city} Netherlands`;
@@ -148,7 +105,7 @@ async function fetchGoogleRating(
 }
 
 async function fetchTripadvisorRating(
-  place: CuratedPlace,
+  place: StoredRestaurant,
   apiKey: string,
 ): Promise<SourceRating | null> {
   const url = new URL(
@@ -215,10 +172,6 @@ async function fetchTripadvisorRating(
   };
 }
 
-function mapsUrl(name: string, address: string): string {
-  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${name} ${address}`)}`;
-}
-
 async function main() {
   const googleKey = process.env.GOOGLE_PLACES_API_KEY?.trim();
   const tripadvisorKey = process.env.TRIPADVISOR_API_KEY?.trim();
@@ -230,19 +183,17 @@ async function main() {
     process.exit(1);
   }
 
-  const curated = curatedSchema.parse(
-    JSON.parse(fs.readFileSync(CURATED_PATH, "utf8")),
-  );
   await getDb();
+  const places = await listRestaurants({ reviewedOnly: true });
 
   let googleHits = 0;
   let tripadvisorHits = 0;
   let failures = 0;
 
-  for (const [index, place] of curated.entries()) {
+  for (const [index, place] of places.entries()) {
     const ratings: RestaurantRatings = { ...(place.ratings ?? {}) };
     process.stdout.write(
-      `[${index + 1}/${curated.length}] ${place.name} (${place.city})… `,
+      `[${index + 1}/${places.length}] ${place.name} (${place.city})… `,
     );
 
     try {
@@ -277,28 +228,9 @@ async function main() {
     }
 
     const aggregated = aggregateGuestRating(ratings);
-    place.ratings = ratings;
-    if (aggregated.rating != null) place.userRating = aggregated.rating;
-    if (aggregated.reviewCount != null) place.reviewCount = aggregated.reviewCount;
 
     await upsertRestaurant({
-      id: place.id,
-      name: place.name,
-      address: place.address,
-      city: place.city,
-      postcode: place.postcode ?? null,
-      lat: place.lat ?? null,
-      lng: place.lng ?? null,
-      cuisineCodes: place.cuisineCodes,
-      cuisineTags: place.cuisineTags,
-      website: place.website ?? null,
-      source: "curated",
-      osmId: place.id,
-      mapsUrl: mapsUrl(place.name, place.address),
-      reviewed: true,
-      authenticityRating: place.authenticityRating,
-      authenticityNotes: place.authenticityNotes,
-      reviewSource: place.reviewSource,
+      ...place,
       ratings,
       userRating: aggregated.rating ?? null,
       reviewCount: aggregated.reviewCount ?? null,
@@ -307,19 +239,18 @@ async function main() {
     process.stdout.write("\n");
   }
 
-  fs.writeFileSync(CURATED_PATH, `${JSON.stringify(curated, null, 2)}\n`);
   await closeDb();
 
   console.log(
     `\nDone. Google hits: ${googleHits}, Tripadvisor hits: ${tripadvisorHits}, failures: ${failures}`,
   );
   console.log(
-    "The Fork: keep/edit ratings.theFork in curated.json (no free public API).",
+    `Updated ${places.length} reviewed restaurants in Postgres.`,
   );
-  console.log(`Updated ${CURATED_PATH}`);
 }
 
-main().catch((error) => {
+main().catch(async (error) => {
   console.error(error);
+  await closeDb();
   process.exit(1);
 });

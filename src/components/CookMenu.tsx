@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { ExternalLink, MapPin, Plus, Store } from "lucide-react";
-import type { Country, Drink, Recipe, RecipeCategory } from "@/types/content";
+import type { Country, Drink, Recipe, RecipeCategory, SpecialtyShop } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import {
   drinkMatchesAlcohol,
@@ -22,11 +22,16 @@ import {
   useAdminItemBusy,
 } from "@/admin/itemActions";
 import { useT } from "@/i18n/LocaleContext";
+import type { SuggestionKind } from "@/suggestions/client";
 
 type CookMenuProps = {
   country: Country;
   communityRecipes: Recipe[];
+  communityDrinks: Drink[];
+  communityShops: SpecialtyShop[];
   onCommunityRecipesChange: (recipes: Recipe[]) => void;
+  onCommunityDrinksChange: (drinks: Drink[]) => void;
+  onCommunityShopsChange: (shops: SpecialtyShop[]) => void;
   onCountryUpdated: (country: Country) => void;
   onOpenRecipe: (recipe: Recipe) => void;
 };
@@ -91,7 +96,11 @@ const ALCOHOL_FILTER_KEYS: Record<AlcoholFilter, string> = {
 export function CookMenu({
   country,
   communityRecipes,
+  communityDrinks,
+  communityShops,
   onCommunityRecipesChange,
+  onCommunityDrinksChange,
+  onCommunityShopsChange,
   onCountryUpdated,
   onOpenRecipe,
 }: CookMenuProps) {
@@ -102,7 +111,7 @@ export function CookMenu({
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [dietFilter, setDietFilter] = useState<DietFilter>("all");
   const [alcoholFilter, setAlcoholFilter] = useState<AlcoholFilter>("all");
-  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [suggestKind, setSuggestKind] = useState<SuggestionKind | null>(null);
 
   const authoredRecipes = useMemo(() => getCountryRecipes(country), [country]);
   const recipes = useMemo(() => {
@@ -112,11 +121,45 @@ export function CookMenu({
       ...communityRecipes.filter((recipe) => !seen.has(recipe.id)),
     ];
   }, [authoredRecipes, communityRecipes]);
-  const drinks = useMemo(() => getCountryDrinks(country), [country]);
-  const shops = useMemo(() => getSpecialtyShops(country), [country]);
-  const communityIds = useMemo(
+  const authoredDrinks = useMemo(() => getCountryDrinks(country), [country]);
+  const drinks = useMemo(() => {
+    const seen = new Set(
+      authoredDrinks.map((drink) => drink.id ?? `${drink.name}|${drink.type}`),
+    );
+    return [
+      ...authoredDrinks,
+      ...communityDrinks.filter((drink) => {
+        const key = drink.id ?? `${drink.name}|${drink.type}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      }),
+    ];
+  }, [authoredDrinks, communityDrinks]);
+  const authoredShops = useMemo(() => getSpecialtyShops(country), [country]);
+  const shops = useMemo(() => {
+    const seen = new Set(authoredShops.map((shop) => shop.id));
+    return [
+      ...authoredShops,
+      ...communityShops.filter((shop) => !seen.has(shop.id)),
+    ];
+  }, [authoredShops, communityShops]);
+  const communityRecipeIds = useMemo(
     () => new Set(communityRecipes.map((recipe) => recipe.id)),
     [communityRecipes],
+  );
+  const communityDrinkKeys = useMemo(
+    () =>
+      new Set(
+        communityDrinks.map(
+          (drink) => drink.id ?? `${drink.name}|${drink.type}`,
+        ),
+      ),
+    [communityDrinks],
+  );
+  const communityShopIds = useMemo(
+    () => new Set(communityShops.map((shop) => shop.id)),
+    [communityShops],
   );
   const bannerUrl = cookBannerUrl(country);
 
@@ -155,15 +198,35 @@ export function CookMenu({
     label: t(ALCOHOL_FILTER_KEYS[value]),
   }));
 
-  const suggestButton = (
-    <button
-      type="button"
-      onClick={() => setSuggestOpen(true)}
-      className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
-    >
-      <Plus aria-hidden="true" className="size-4" />
-      {t("cook.suggestRecipe")}
-    </button>
+  function suggestButton(kind: SuggestionKind, labelKey: string) {
+    return (
+      <button
+        type="button"
+        onClick={() => setSuggestKind(kind)}
+        className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+      >
+        <Plus aria-hidden="true" className="size-4" />
+        {t(labelKey)}
+      </button>
+    );
+  }
+
+  const suggestModal = (
+    <SuggestModal
+      kind={suggestKind ?? "recipe"}
+      country={country}
+      open={suggestKind != null}
+      onClose={() => setSuggestKind(null)}
+      onAdded={(result) => {
+        if (result.kind === "recipe") {
+          onCommunityRecipesChange([result.recipe, ...communityRecipes]);
+        } else if (result.kind === "drink") {
+          onCommunityDrinksChange([result.drink, ...communityDrinks]);
+        } else if (result.kind === "shop") {
+          onCommunityShopsChange([result.shop, ...communityShops]);
+        }
+      }}
+    />
   );
 
   if (!country.cookReady || !country.menu) {
@@ -196,7 +259,7 @@ export function CookMenu({
             <h2 id="menu-heading" className="font-display text-3xl text-ink sm:text-4xl">
               {t("cook.menu.heading")}
             </h2>
-            {suggestButton}
+            {suggestButton("recipe", "cook.suggestRecipe")}
           </div>
           <p className="max-w-2xl text-ink-soft">
             {authoredRecipes.length > 0 ? (
@@ -271,10 +334,10 @@ export function CookMenu({
           ) : null}
         </div>
         <SuggestModal
-          kind="recipe"
+          kind={suggestKind ?? "recipe"}
           country={country}
-          open={suggestOpen}
-          onClose={() => setSuggestOpen(false)}
+          open={suggestKind != null}
+          onClose={() => setSuggestKind(null)}
           onAdded={(result) => {
             if (result.kind === "recipe") {
               onCommunityRecipesChange([result.recipe, ...communityRecipes]);
@@ -324,7 +387,7 @@ export function CookMenu({
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {suggestButton}
+        {suggestButton("recipe", "cook.suggestRecipe")}
       </div>
 
       <div className="space-y-3 rounded-2xl bg-cream p-4 ring-1 ring-ink/10">
@@ -346,7 +409,7 @@ export function CookMenu({
       <ul className="grid gap-3">
         {filteredRecipes.map((recipe) => {
           const isNational = recipe.id === country.nationalDishId;
-          const isCommunity = communityIds.has(recipe.id);
+          const isCommunity = communityRecipeIds.has(recipe.id);
           return (
             <RecipeCard
               key={recipe.id}
@@ -390,12 +453,15 @@ export function CookMenu({
               {t("cook.drinks.subtitle")}
             </p>
           </div>
-          <FilterRow
-            label={t("cook.filter.drinks")}
-            options={alcoholFilters}
-            value={alcoholFilter}
-            onChange={setAlcoholFilter}
-          />
+          <div className="flex flex-col items-stretch gap-3 sm:items-end">
+            {suggestButton("drink", "cook.suggestDrink")}
+            <FilterRow
+              label={t("cook.filter.drinks")}
+              options={alcoholFilters}
+              value={alcoholFilter}
+              onChange={setAlcoholFilter}
+            />
+          </div>
         </div>
 
         {drinkSections.map((section) => (
@@ -404,11 +470,17 @@ export function CookMenu({
               {t(`cook.drinks.section.${section.id}` as const)}
             </h4>
             <ul className="grid gap-3 sm:grid-cols-2">
-              {section.drinks.map((item) => (
-                <li key={`${section.id}-${item.name}-${item.type}`}>
-                  <DrinkCard drink={item} />
-                </li>
-              ))}
+              {section.drinks.map((item) => {
+                const key = item.id ?? `${item.name}|${item.type}`;
+                return (
+                  <li key={`${section.id}-${key}`}>
+                    <DrinkCard
+                      drink={item}
+                      community={communityDrinkKeys.has(key)}
+                    />
+                  </li>
+                );
+              })}
             </ul>
           </div>
         ))}
@@ -418,20 +490,28 @@ export function CookMenu({
         ) : null}
       </div>
 
-      {shops.length > 0 ? (
-        <div className="space-y-3">
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h3 className="font-display text-2xl text-ink">{t("cook.shops.heading")}</h3>
             <p className="text-sm text-ink-soft">
               {t("cook.shops.subtitle", { name: country.name })}
             </p>
           </div>
+          {suggestButton("shop", "cook.suggestShop")}
+        </div>
+        {shops.length > 0 ? (
           <ul className="grid gap-3">
             {shops.map((shop) => (
               <li
                 key={shop.id}
                 className="relative rounded-2xl bg-cream p-5 ring-1 ring-ink/10"
               >
+                {communityShopIds.has(shop.id) ? (
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
+                    {t("cook.communitySuggestion")}
+                  </p>
+                ) : null}
                 {isAdmin ? (
                   <AdminItemMenu
                     className="absolute right-3 top-3"
@@ -501,25 +581,23 @@ export function CookMenu({
               </li>
             ))}
           </ul>
-        </div>
-      ) : null}
+        ) : (
+          <p className="text-sm text-ink-soft">{t("cook.shops.empty")}</p>
+        )}
+      </div>
 
-      <SuggestModal
-        kind="recipe"
-        country={country}
-        open={suggestOpen}
-        onClose={() => setSuggestOpen(false)}
-        onAdded={(result) => {
-          if (result.kind === "recipe") {
-            onCommunityRecipesChange([result.recipe, ...communityRecipes]);
-          }
-        }}
-      />
+      {suggestModal}
     </section>
   );
 }
 
-function DrinkCard({ drink }: { drink: Drink }) {
+function DrinkCard({
+  drink,
+  community = false,
+}: {
+  drink: Drink;
+  community?: boolean;
+}) {
   const t = useT();
 
   return (
@@ -535,6 +613,11 @@ function DrinkCard({ drink }: { drink: Drink }) {
         </div>
       ) : null}
       <div className="min-w-0 flex-1">
+        {community ? (
+          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
+            {t("cook.communitySuggestion")}
+          </p>
+        ) : null}
         <p className="font-semibold text-ink">
           {drink.name}
           {drink.localName ? (

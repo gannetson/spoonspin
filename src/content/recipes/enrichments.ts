@@ -1,5 +1,4 @@
 import type { Recipe } from "@/types/content";
-import enrichmentsJson from "./enrichments.json" with { type: "json" };
 
 export type RecipeEnrichment = {
   imageUrl?: string;
@@ -9,34 +8,25 @@ export type RecipeEnrichment = {
   fetchedAt?: string;
 };
 
-const enrichments = enrichmentsJson as Record<string, RecipeEnrichment>;
-
+/** Enrichments now live on recipe rows in Postgres. */
 export function recipeEnrichmentKey(countryCode: string, recipeId: string): string {
   return `${countryCode.toLowerCase()}:${recipeId}`;
 }
 
 export function getRecipeEnrichment(
-  countryCode: string,
-  recipeId: string,
+  _countryCode: string,
+  _recipeId: string,
 ): RecipeEnrichment | undefined {
-  return enrichments[recipeEnrichmentKey(countryCode, recipeId)];
+  return undefined;
 }
 
 export function applyRecipeEnrichment(
-  countryCode: string,
+  _countryCode: string,
   recipe: Recipe,
 ): Recipe {
-  const extra = getRecipeEnrichment(countryCode, recipe.id);
-  if (!extra) return recipe;
-  return {
-    ...recipe,
-    imageUrl: extra.imageUrl ?? recipe.imageUrl,
-    imageAttribution: extra.imageAttribution ?? recipe.imageAttribution,
-    sourceUrl: extra.sourceUrl ?? recipe.sourceUrl,
-    videoUrl: extra.videoUrl ?? recipe.videoUrl,
-  };
+  return recipe;
 }
 
 export function listRecipeEnrichments(): Record<string, RecipeEnrichment> {
-  return enrichments;
+  return {};
 }
