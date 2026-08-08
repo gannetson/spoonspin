@@ -84,10 +84,13 @@ export function discoverRecipes(code: string, query?: string) {
 }
 
 export function addRecipes(code: string, recipes: Array<Recipe | DishCandidate>) {
-  return postAdmin<{ country: Country; added: number }>(
-    `/api/admin/countries/${encodeURIComponent(code)}/recipes`,
-    { recipes },
-  );
+  return postAdmin<{
+    country: Country;
+    added: number;
+    enrichmentQueued?: number;
+  }>(`/api/admin/countries/${encodeURIComponent(code)}/recipes`, {
+    recipes,
+  });
 }
 
 export function discoverRestaurants(code: string, query?: string) {

@@ -419,8 +419,10 @@ export const nl: Messages = {
   "admin.discover.addSelected": "Geselecteerde toevoegen ({count})",
   "admin.discover.adding": "Toevoegen…",
   "admin.discover.done": "Klaar",
-  "admin.discover.added.recipe": "{count} recept toegevoegd.",
-  "admin.discover.added.recipes": "{count} recepten toegevoegd.",
+  "admin.discover.added.recipe":
+    "{count} recept toegevoegd. Details en afbeelding laden op de achtergrond.",
+  "admin.discover.added.recipes":
+    "{count} recepten toegevoegd. Details en afbeeldingen laden op de achtergrond.",
   "admin.discover.added.restaurant":
     "{count} restaurant toegevoegd. Verrijking (menu, tekst, scores, beeld) draait op de achtergrond.",
   "admin.discover.added.restaurants":

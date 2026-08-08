@@ -92,7 +92,7 @@ fi
 
 echo "==> health check"
 sleep 1
-curl -fsS "http://127.0.0.1:${API_PORT:-3001}/api/health" \
+curl -fsS "http://127.0.0.1:${API_PORT:-3007}/api/health" \
   || curl -fsS "http://127.0.0.1:3007/api/health" \
   || echo "(health check skipped — set API_PORT if needed)"
 

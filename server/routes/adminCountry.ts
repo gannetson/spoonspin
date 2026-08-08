@@ -39,7 +39,6 @@ import {
   discoverCountryShops,
   discoverItemImageQueries,
   enrichDrinkWithImage,
-  expandDishCandidates,
   isOpenAiConfigured,
   researchRestaurantMenu,
   researchRestaurantScores,
@@ -54,6 +53,7 @@ import {
 } from "../lib/googlePlacesPhoto.ts";
 import { lookupGoogleRestaurant } from "../lib/googlePlacesLookup.ts";
 import { scheduleRestaurantEnrichments } from "../lib/restaurantEnrichmentQueue.ts";
+import { scheduleRecipeEnrichments } from "../lib/recipeEnrichmentQueue.ts";
 import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import type { Restaurant } from "../../src/restaurants/types.ts";
 import { getCountryDrinks } from "../../src/content/countries/menuAccessors.ts";
@@ -368,19 +368,26 @@ export function registerAdminCountryRoutes(
           return;
         }
 
-        const fullRecipes: Recipe[] = [];
-        const candidates: Array<{
-          id: string;
-          name: string;
-          localName?: string;
-          description: string;
-          category: Recipe["category"];
+        const toInsert: Recipe[] = [];
+        const enrichmentJobs: Array<{
+          countryCode: string;
+          countryName: string;
+          recipeId: string;
+          candidate?: {
+            id: string;
+            name: string;
+            localName?: string;
+            description: string;
+            category: Recipe["category"];
+          };
         }> = [];
+
         for (const recipe of parsed.data.recipes) {
+          const id = recipe.id?.trim() || slugify(recipe.name) || "dish";
           if (isFullRecipe(recipe)) {
-            fullRecipes.push({
+            const full: Recipe = {
               ...recipe,
-              id: recipe.id?.trim() || slugify(recipe.name) || "dish",
+              id,
               localName: recipe.localName ?? undefined,
               substitutions: recipe.substitutions ?? undefined,
               servingSuggestion: recipe.servingSuggestion ?? undefined,
@@ -393,30 +400,85 @@ export function registerAdminCountryRoutes(
                 ...ingredient,
                 note: ingredient.note ?? undefined,
               })),
-            });
+            };
+            toInsert.push(full);
+            if (!full.imageUrl?.trim()) {
+              enrichmentJobs.push({
+                countryCode: country.code,
+                countryName: country.name,
+                recipeId: id,
+              });
+            }
           } else {
-            candidates.push({
-              id: recipe.id?.trim() || slugify(recipe.name) || "dish",
+            // Stub immediately; expand + image run in the background.
+            toInsert.push({
+              id,
               name: recipe.name,
               localName: recipe.localName ?? undefined,
               description: recipe.description,
               category: recipe.category,
+              servings: 4,
+              prepMinutes: 20,
+              cookMinutes: 30,
+              difficulty: "medium",
+              dietaryLabels: [],
+              ingredients: [
+                { name: "Details loading", quantity: 1, unit: "portion" },
+                { name: "See enrichment", quantity: 1, unit: "portion" },
+              ],
+              steps: [
+                "Full recipe details are being generated in the background.",
+                "Ingredients and steps will update automatically shortly.",
+                "Refresh the country page if this placeholder is still visible.",
+              ],
+            });
+            enrichmentJobs.push({
+              countryCode: country.code,
+              countryName: country.name,
+              recipeId: id,
+              candidate: {
+                id,
+                name: recipe.name,
+                localName: recipe.localName ?? undefined,
+                description: recipe.description,
+                category: recipe.category,
+              },
             });
           }
         }
 
-        if (candidates.length > 0) {
-          if (!openaiRequired(res)) return;
-          const expanded = await expandDishCandidates({
-            countryCode: country.code,
-            countryName: country.name,
-            dishes: candidates,
-          });
-          fullRecipes.push(...expanded);
-        }
+        // Expand needs OpenAI; stubs still queue when configured.
+        const needsExpand = enrichmentJobs.some((job) => job.candidate);
+        if (needsExpand && !openaiRequired(res)) return;
 
-        const updated = await appendMoreRecipes(country.code, fullRecipes);
-        res.json({ country: updated, added: fullRecipes.length });
+        const { country: updated, inserted } = await appendMoreRecipes(
+          country.code,
+          toInsert,
+        );
+
+        // Remap jobs to final IDs (append may suffix on collision).
+        const jobs = inserted.flatMap((recipe, index) => {
+          const planned = enrichmentJobs[index];
+          if (!planned) return [];
+          if (!planned.candidate && recipe.imageUrl?.trim()) return [];
+          return [
+            {
+              countryCode: country.code,
+              countryName: country.name,
+              recipeId: recipe.id,
+              candidate: planned.candidate
+                ? { ...planned.candidate, id: recipe.id }
+                : undefined,
+            },
+          ];
+        });
+
+        const enrichmentQueued = scheduleRecipeEnrichments(jobs);
+        res.json({
+          country: updated,
+          added: inserted.length,
+          enrichmentQueued,
+        });
       } catch (error) {
         console.error("Add recipes failed", error);
         res.status(500).json({

@@ -13,6 +13,7 @@ import {
   type DishCandidate,
   type DiscoveredRestaurant,
 } from "@/admin/countryTools";
+import { fetchCountry } from "@/content/client";
 import { useT } from "@/i18n/LocaleContext";
 
 export type AdminDiscoverKind =
@@ -195,6 +196,21 @@ export function AdminDiscoverModal({
             count: result.added,
           }),
         });
+        // Soft-refresh while expand + images finish in the background.
+        if ((result.enrichmentQueued ?? 0) > 0) {
+          const code = country.code;
+          void (async () => {
+            for (const delayMs of [4_000, 10_000, 20_000]) {
+              await new Promise((resolve) => setTimeout(resolve, delayMs));
+              try {
+                const refreshed = await fetchCountry(code);
+                if (refreshed) onCountryUpdated(refreshed);
+              } catch {
+                /* ignore transient refresh errors */
+              }
+            }
+          })();
+        }
       } else if (kind === "restaurants") {
         const restaurants = picked.map(
           (entry) => (entry as Extract<Item, { kind: "restaurants" }>).item,

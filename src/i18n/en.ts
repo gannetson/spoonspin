@@ -412,8 +412,10 @@ export const en: Messages = {
   "admin.discover.addSelected": "Add selected ({count})",
   "admin.discover.adding": "Adding…",
   "admin.discover.done": "Done",
-  "admin.discover.added.recipe": "Added {count} recipe.",
-  "admin.discover.added.recipes": "Added {count} recipes.",
+  "admin.discover.added.recipe":
+    "Added {count} recipe. Full details and image are loading in the background.",
+  "admin.discover.added.recipes":
+    "Added {count} recipes. Full details and images are loading in the background.",
   "admin.discover.added.restaurant":
     "Added {count} restaurant. Enrichment (menu, text, scores, image) is running in the background.",
   "admin.discover.added.restaurants":

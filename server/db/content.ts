@@ -374,7 +374,7 @@ function slugifyId(value: string): string {
 export async function appendMoreRecipes(
   countryCode: string,
   recipes: Recipe[],
-): Promise<Country | undefined> {
+): Promise<{ country: Country | undefined; inserted: Recipe[] }> {
   const db = await ensureDb();
   const code = countryCode.toLowerCase();
   const existing = new Set(await listRecipeIdsForCountry(code));
@@ -384,6 +384,7 @@ export async function appendMoreRecipes(
     [code],
   );
   let sortOrder = Number(maxSort.rows[0]?.n ?? -1) + 1;
+  const inserted: Recipe[] = [];
 
   for (const recipe of recipes) {
     let id = recipe.id?.trim() || slugifyId(recipe.name) || `dish-${sortOrder}`;
@@ -391,6 +392,7 @@ export async function appendMoreRecipes(
       id = `${id}-${sortOrder}`;
     }
     existing.add(id);
+    const saved: Recipe = { ...recipe, id };
     await db.query(
       `INSERT INTO recipes (
         country_code, id, menu_slot, sort_order, name, local_name, description,
@@ -429,30 +431,31 @@ export async function appendMoreRecipes(
         code,
         id,
         sortOrder,
-        recipe.name,
-        recipe.localName ?? null,
-        recipe.description,
-        recipe.category,
-        recipe.servings,
-        recipe.prepMinutes,
-        recipe.cookMinutes,
-        recipe.difficulty,
-        JSON.stringify(recipe.dietaryLabels),
-        JSON.stringify(recipe.ingredients),
-        JSON.stringify(recipe.steps),
-        recipe.substitutions ? JSON.stringify(recipe.substitutions) : null,
-        recipe.servingSuggestion ?? null,
-        recipe.drinkPairing ?? null,
-        recipe.imageUrl ?? null,
-        recipe.imageAttribution ?? null,
-        recipe.sourceUrl ?? null,
-        recipe.videoUrl ?? null,
+        saved.name,
+        saved.localName ?? null,
+        saved.description,
+        saved.category,
+        saved.servings,
+        saved.prepMinutes,
+        saved.cookMinutes,
+        saved.difficulty,
+        JSON.stringify(saved.dietaryLabels),
+        JSON.stringify(saved.ingredients),
+        JSON.stringify(saved.steps),
+        saved.substitutions ? JSON.stringify(saved.substitutions) : null,
+        saved.servingSuggestion ?? null,
+        saved.drinkPairing ?? null,
+        saved.imageUrl ?? null,
+        saved.imageAttribution ?? null,
+        saved.sourceUrl ?? null,
+        saved.videoUrl ?? null,
       ],
     );
+    inserted.push(saved);
     sortOrder += 1;
   }
 
-  return getCountryFromDb(code);
+  return { country: await getCountryFromDb(code), inserted };
 }
 
 export async function getRecipeRow(
