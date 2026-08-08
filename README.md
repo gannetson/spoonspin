@@ -23,6 +23,12 @@ Content lives in Postgres for countries, recipes, users, and restaurants. TypeSc
 - Lucide React icons
 - Express API for restaurant search (Google Places and/or Mapbox; secrets stay server-side)
 
+## Production (spoonspin.nl)
+
+Nginx serves `dist/` and proxies `/api` to Express (`:3001`) under supervisord.
+
+See **[deploy/README.md](deploy/README.md)** for nginx + supervisor configs and `deploy/install-server.sh`. App path on the server: `/var/www/soonspin/spoonspin`.
+
 ## Local setup
 
 Requirements: Node.js 20+ (22 recommended).
@@ -42,6 +48,7 @@ npm run dev
 | -------------------------- | -------------------------------------- |
 | `npm run dev`              | API + Vite client together             |
 | `npm run build`            | Typecheck + production bundle          |
+| `npm start`                | Production API (`tsx server/index.ts`) |
 | `npm run preview`          | Preview the production client build    |
 | `npm run lint`             | Lint with oxlint                       |
 | `npm run format`           | Format with Prettier                   |
@@ -279,5 +286,5 @@ Other countries show a Wikipedia cuisine overview (when found) and support Dine;
 - Sparse cuisines (e.g. Bulgaria, Senegal, Egypt, Philippines) may still fall back to Mapbox/Google when no reviewed entry exists.
 - Restaurant data lives in Postgres (`DATABASE_URL`, default database `spoonspin`) and is not committed; run `npm run agent:curate` (and optionally `npm run agent:restaurants`) on each machine.
 - In-memory live-provider cache resets when the API process restarts.
-- Production hosting should run the Express API alongside the static Vite build (or put the API behind the same origin `/api` proxy).
+- Production: nginx + supervisord configs live under [`deploy/`](deploy/); see [`deploy/README.md`](deploy/README.md).
 - A few small countries lack a dedicated Wikipedia cuisine article; those still spin with a short fallback blurb.

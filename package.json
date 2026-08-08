@@ -8,6 +8,7 @@
     "dev:client": "vite --port 5173 --strictPort",
     "server": "tsx server/index.ts",
     "server:watch": "tsx watch server/index.ts",
+    "start": "tsx server/index.ts",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "lint": "oxlint .",
@@ -42,6 +43,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
+    "tsx": "^4.23.9",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -66,7 +68,6 @@
     "oxlint": "^1.75.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
-    "tsx": "^4.23.9",
     "typescript": "~6.0.2",
     "vite": "^8.2.0",
     "vitest": "^4.1.10"
