@@ -63,6 +63,11 @@ cp .env.example .env
 #   # If the API runs as www-data, create a matching DB role, e.g.:
 #   #   sudo -u postgres createuser www-data
 #   #   sudo -u postgres createdb -O www-data spoonspin
+#   # If tables were created by another role (e.g. spoonspin) while the app
+#   # connects as www-data, migrations fail with "must be owner of table …".
+#   # Fix ownership once (replace roles as needed):
+#   #   sudo -u postgres psql spoonspin -c "REASSIGN OWNED BY spoonspin TO www-data;"
+#   #   sudo -u postgres psql spoonspin -c "ALTER DATABASE spoonspin OWNER TO www-data;"
 #   API_PORT=3007
 #   OPENAI_API_KEY=...
 #   GOOGLE_PLACES_API_KEY=...

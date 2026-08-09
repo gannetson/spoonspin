@@ -241,8 +241,39 @@ export async function getDb(): Promise<Pool> {
   return ensureDb();
 }
 
+function isInsufficientPrivilege(error: unknown): boolean {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code: unknown }).code === "42501",
+  );
+}
+
+/**
+ * Run additive DDL. If the app DB role is not the table owner (common after
+ * imports / role mismatches on production), skip and warn instead of taking
+ * down every request that calls ensureDb().
+ */
+async function migrateSql(db: Pool, sql: string): Promise<void> {
+  try {
+    await db.query(sql);
+  } catch (error) {
+    if (isInsufficientPrivilege(error)) {
+      console.warn(
+        "DB migration skipped (insufficient privilege / not table owner):",
+        error instanceof Error ? error.message : error,
+      );
+      return;
+    }
+    throw error;
+  }
+}
+
 async function migrate(db: Pool) {
-  await db.query(`
+  await migrateSql(
+    db,
+    `
     CREATE TABLE IF NOT EXISTS restaurants (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL,
@@ -280,9 +311,12 @@ async function migrate(db: Pool) {
 
     ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS price_level INTEGER;
     ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS menu_json JSONB;
-  `);
+  `,
+  );
 
-  await db.query(`
+  await migrateSql(
+    db,
+    `
     CREATE TABLE IF NOT EXISTS recipe_submissions (
       id TEXT PRIMARY KEY,
       country_code TEXT NOT NULL,
@@ -343,9 +377,14 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_shop_submissions_country_status
       ON shop_submissions (country_code, status);
-  `);
+  `,
+  );
 
-  await db.query(`
+  // Split ownership-sensitive DDL so one privilege failure cannot abort later
+  // CREATE TABLE IF NOT EXISTS steps in the same batch.
+  await migrateSql(
+    db,
+    `
     CREATE TABLE IF NOT EXISTS users (
       id TEXT PRIMARY KEY,
       email TEXT NOT NULL UNIQUE,
@@ -356,7 +395,12 @@ async function migrate(db: Pool) {
       CONSTRAINT users_role_check
         CHECK (role IN ('member', 'editor', 'admin'))
     );
+  `,
+  );
 
+  await migrateSql(
+    db,
+    `
     ALTER TABLE users
       ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'member';
 
@@ -372,6 +416,16 @@ async function migrate(db: Pool) {
     CREATE UNIQUE INDEX IF NOT EXISTS idx_users_email_lower
       ON users (LOWER(email));
 
+    ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+
+    ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
+  `,
+  );
+
+  await migrateSql(
+    db,
+    `
     CREATE TABLE IF NOT EXISTS sessions (
       token TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -381,9 +435,12 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions (expires_at);
+  `,
+  );
 
-    ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
-
+  await migrateSql(
+    db,
+    `
     CREATE TABLE IF NOT EXISTS oauth_accounts (
       provider TEXT NOT NULL,
       provider_user_id TEXT NOT NULL,
@@ -393,13 +450,20 @@ async function migrate(db: Pool) {
       CONSTRAINT oauth_accounts_provider_check
         CHECK (provider IN ('google', 'apple'))
     );
+  `,
+  );
 
+  await migrateSql(
+    db,
+    `
     CREATE INDEX IF NOT EXISTS idx_oauth_accounts_user_id
       ON oauth_accounts (user_id);
+  `,
+  );
 
-    ALTER TABLE users
-      ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
-
+  await migrateSql(
+    db,
+    `
     UPDATE users u
     SET last_login_at = s.max_created
     FROM (
@@ -409,7 +473,12 @@ async function migrate(db: Pool) {
     ) s
     WHERE u.id = s.user_id
       AND u.last_login_at IS NULL;
+  `,
+  );
 
+  await migrateSql(
+    db,
+    `
     CREATE TABLE IF NOT EXISTS countries (
       code TEXT PRIMARY KEY,
       slug TEXT NOT NULL,
@@ -497,7 +566,8 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_user_tags_user_country
       ON user_tags (user_id, country_code);
-  `);
+  `,
+  );
 }
 
 function asStringArray(value: unknown): string[] {
