@@ -5,7 +5,11 @@ const IMAGE_EXT = /\.(jpe?g|png|webp|gif)(\?|$)/i;
 const IMAGE_MIME = /^image\/(jpeg|png|webp|gif)$/i;
 
 type CommonsSearch = {
-  query?: { search?: Array<{ title: string }> };
+  query?: {
+    search?: Array<{ title: string }>;
+    searchinfo?: { totalhits?: number };
+  };
+  continue?: { sroffset?: number };
 };
 
 type CommonsImageInfo = {
@@ -161,6 +165,58 @@ export async function findCommonsImageCandidates(
   }
 
   return out;
+}
+
+/** Paginated Commons search (stable order for admin picker). */
+export async function searchCommonsImagesPage(
+  query: string,
+  options?: ImageLookupOptions & { offset?: number; limit?: number },
+): Promise<{
+  results: Array<{ url: string; attribution: string; title: string }>;
+  nextOffset: number | null;
+  totalHits: number | null;
+}> {
+  const trimmed = query.trim();
+  if (!trimmed) {
+    return { results: [], nextOffset: null, totalHits: 0 };
+  }
+  const limit = Math.min(24, Math.max(1, options?.limit ?? 12));
+  const offset = Math.max(0, options?.offset ?? 0);
+  const params = new URLSearchParams({
+    action: "query",
+    list: "search",
+    srsearch: trimmed,
+    srnamespace: "6",
+    srlimit: String(limit),
+    sroffset: String(offset),
+    format: "json",
+    origin: "*",
+  });
+  const search = await fetchJson<CommonsSearch>(
+    `https://commons.wikimedia.org/w/api.php?${params}`,
+  );
+  const hits = search?.query?.search ?? [];
+  const results: Array<{ url: string; attribution: string; title: string }> =
+    [];
+
+  for (const hit of hits) {
+    if (!hit?.title) continue;
+    const resolved = await resolveCommonsTitle(hit.title);
+    if (!resolved) continue;
+    if (isExcluded(resolved.url, options?.excludeUrls)) continue;
+    results.push({ ...resolved, title: hit.title });
+  }
+
+  const nextOffset =
+    typeof search?.continue?.sroffset === "number"
+      ? search.continue.sroffset
+      : null;
+  const totalHits =
+    typeof search?.query?.searchinfo?.totalhits === "number"
+      ? search.query.searchinfo.totalhits
+      : null;
+
+  return { results, nextOffset, totalHits };
 }
 
 export async function findCommonsImage(

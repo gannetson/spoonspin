@@ -21,6 +21,7 @@ import {
   selectRecipeForDinner,
   updateCountryDrink,
   updateCountryImage,
+  updateCountryText,
   updateRecipeFields,
   updateRecipeImage,
   updateSpecialtyShop,
@@ -47,6 +48,7 @@ import {
   discoverCountryShops,
   discoverItemImageQueries,
   composeDinnerSuggestion,
+  drinkImageSearchQueries,
   enrichDrinkWithImage,
   isOpenAiConfigured,
   researchRestaurantMenu,
@@ -308,6 +310,45 @@ export function registerAdminCountryRoutes(
         console.error("Replace country image failed", error);
         res.status(500).json({
           message: publicErrorMessage(error, "Could not replace country image."),
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/countries/:code/text",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      const parsed = z
+        .object({
+          introduction: z.string().trim().min(20).max(4000),
+        })
+        .safeParse(req.body);
+      if (!parsed.success) {
+        res.status(400).json({
+          message: "Enter country text of at least 20 characters.",
+        });
+        return;
+      }
+      try {
+        const updated = await updateCountryText(
+          String(req.params.code ?? ""),
+          parsed.data.introduction,
+        );
+        if (!updated) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        res.json({ country: updated });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Could not update text.";
+        const status = message.includes("at least") ? 400 : 500;
+        if (status === 500) {
+          console.error("Update country text failed", error);
+        }
+        res.status(status).json({
+          message: publicErrorMessage(error, "Could not update country text."),
         });
       }
     },
@@ -1134,9 +1175,10 @@ export function registerAdminCountryRoutes(
         });
         const queries = [
           ...discovered.searchQueries,
+          ...drinkImageSearchQueries(drink, country.name),
           `${drink.name} drink`,
-          `${drink.name} ${country.name}`,
-          `${drink.localName ?? drink.name} bottle`,
+          `${drink.localName ?? drink.name} drink bottle`,
+          `${drink.name} ${country.name} drink`,
         ];
         const image = await findCuisineImageFromQueries(queries, {
           excludeUrls: [drink.imageUrl],
@@ -1323,9 +1365,10 @@ export function registerAdminCountryRoutes(
         });
         const queries = [
           ...discovered.searchQueries,
-          `${recipe.name} food`,
-          `${recipe.name} ${country.name}`,
-          `${recipe.localName ?? recipe.name} dish`,
+          `${recipe.name} dish`,
+          `${recipe.name} food plate`,
+          `${recipe.name} ${country.name} cuisine dish`,
+          `${recipe.localName ?? recipe.name} dish food`,
         ];
         const image = await findCuisineImageFromQueries(queries, {
           excludeUrls: [recipe.imageUrl],

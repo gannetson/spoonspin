@@ -76,6 +76,23 @@ export function replaceCountryImage(code: string) {
   }>(`/api/admin/countries/${encodeURIComponent(code)}/replace-image`);
 }
 
+export async function updateCountryText(code: string, introduction: string) {
+  const response = await fetch(
+    `/api/admin/countries/${encodeURIComponent(code)}/text`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ introduction }),
+    },
+  );
+  const data = await readJson<{ country: Country }>(response);
+  if (!response.ok) {
+    throw new Error(data.message ?? "Could not update country text.");
+  }
+  return data;
+}
+
 export function discoverRecipes(code: string, query?: string) {
   return postAdmin<{ notes: string; recipes: DishCandidate[] }>(
     `/api/admin/countries/${encodeURIComponent(code)}/discover/recipes`,
@@ -326,4 +343,87 @@ export function findRestaurantScores(id: string, countryName: string) {
   }>(`/api/admin/restaurants/${encodeURIComponent(id)}/find-scores`, {
     countryName,
   });
+}
+
+export type AdminImageTarget =
+  | { kind: "country"; countryCode: string }
+  | { kind: "recipe"; countryCode: string; recipeId: string }
+  | { kind: "drink"; countryCode: string; drinkKey: string }
+  | { kind: "restaurant"; restaurantId: string };
+
+export type AdminImageSearchResult = {
+  url: string;
+  attribution: string;
+  title: string;
+};
+
+export async function searchAdminImages(input: {
+  q: string;
+  offset?: number;
+  limit?: number;
+}) {
+  const params = new URLSearchParams({
+    q: input.q,
+    offset: String(input.offset ?? 0),
+    limit: String(input.limit ?? 12),
+  });
+  const response = await fetch(`/api/admin/images/search?${params}`, {
+    credentials: "include",
+  });
+  const data = await readJson<{
+    results: AdminImageSearchResult[];
+    nextOffset: number | null;
+    totalHits: number | null;
+    offset: number;
+    limit: number;
+  }>(response);
+  if (!response.ok) {
+    throw new Error(data.message ?? "Image search failed.");
+  }
+  return data;
+}
+
+export function setAdminImage(input: {
+  target: AdminImageTarget;
+  imageUrl: string;
+  imageAttribution?: string | null;
+}) {
+  return postAdmin<{
+    country?: Country;
+    recipe?: Recipe | null;
+    drink?: Drink;
+    restaurant?: import("@/restaurants/types").Restaurant;
+    imageUrl: string;
+    imageAttribution?: string | null;
+  }>("/api/admin/images/set", input);
+}
+
+export async function uploadAdminImage(input: {
+  target: AdminImageTarget;
+  file: File;
+  imageAttribution?: string;
+}) {
+  const form = new FormData();
+  form.append("image", input.file);
+  form.append("target", JSON.stringify(input.target));
+  if (input.imageAttribution) {
+    form.append("imageAttribution", input.imageAttribution);
+  }
+  const response = await fetch("/api/admin/images/upload", {
+    method: "POST",
+    credentials: "include",
+    body: form,
+  });
+  const data = await readJson<{
+    country?: Country;
+    recipe?: Recipe | null;
+    drink?: Drink;
+    restaurant?: import("@/restaurants/types").Restaurant;
+    imageUrl: string;
+    imageAttribution?: string | null;
+  }>(response);
+  if (!response.ok) {
+    throw new Error(data.message ?? "Image upload failed.");
+  }
+  return data;
 }

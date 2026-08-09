@@ -9,11 +9,13 @@ import {
 import { cuisineFlagsFor } from "@/restaurants/cuisineFlags";
 import { formatDistanceKm } from "@/lib/haversine";
 import { AdminItemMenu, type AdminItemAction } from "@/components/AdminItemMenu";
+import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { useT } from "@/i18n/LocaleContext";
 
 type RestaurantCardProps = {
   restaurant: Restaurant;
+  countryCode: string;
   onOpen: () => void;
   isAdmin?: boolean;
   adminBusy?: boolean;
@@ -24,6 +26,7 @@ type RestaurantCardProps = {
 
 export function RestaurantCard({
   restaurant,
+  countryCode,
   onOpen,
   isAdmin = false,
   adminBusy = false,
@@ -41,13 +44,14 @@ export function RestaurantCard({
 
   return (
     <li>
-      <div className="group relative flex cursor-pointer overflow-hidden rounded-2xl bg-cream text-ink ring-1 ring-ink/10 transition hover:ring-tomato/35">
-        <button
-          type="button"
-          onClick={onOpen}
-          aria-label={t("dine.openRestaurantAria", { name: restaurant.name })}
-          className="relative h-32 w-28 shrink-0 cursor-pointer self-stretch sm:h-auto sm:w-40"
-        >
+      <div className="group relative overflow-hidden rounded-2xl bg-cream text-ink ring-1 ring-ink/10 transition hover:ring-tomato/35">
+        <div className="relative flex cursor-pointer">
+          <button
+            type="button"
+            onClick={onOpen}
+            aria-label={t("dine.openRestaurantAria", { name: restaurant.name })}
+            className="relative h-32 w-28 shrink-0 cursor-pointer self-stretch sm:h-auto sm:w-40"
+          >
           {photoUrl ? (
             <img
               src={photoUrl}
@@ -222,6 +226,16 @@ export function RestaurantCard({
             onAction={onAdminAction}
           />
         ) : null}
+        </div>
+        <div className="border-t border-ink/10 px-4 py-2.5">
+          <ItemTagBar
+            entityType="restaurant"
+            entityId={restaurant.id}
+            entityName={restaurant.name}
+            countryCode={countryCode}
+            variant="compact"
+          />
+        </div>
       </div>
     </li>
   );

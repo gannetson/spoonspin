@@ -4,6 +4,7 @@ dist-ssr
 *.local
 .env
 data/
+uploads/
 coverage
 playwright-report
 test-results
@@ -12,3 +13,6 @@ test-results
 !.vscode/extensions.json
 .idea
 *.log
+
+
+*.sql

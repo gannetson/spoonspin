@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/auth/AuthContext";
+import { useAuthModal } from "@/auth/AuthModalContext";
 import {
   getRecipeFromCountry,
   setRuntimeCountries,
@@ -17,7 +18,7 @@ import { CountrySelect } from "@/components/CountrySelect";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
 import { HomeHero } from "@/components/HomeHero";
-import { AdminCountryMenu } from "@/components/AdminCountryMenu";
+import { AdminNavMenu } from "@/components/AdminNavMenu";
 import { RecipeView } from "@/components/RecipeView";
 import { RestaurantView } from "@/components/RestaurantView";
 import { ShareButton } from "@/components/ShareButton";
@@ -29,6 +30,7 @@ import {
 } from "@/suggestions/client";
 import type { Restaurant } from "@/restaurants/types";
 import { useT } from "@/i18n/LocaleContext";
+import { TagsProvider } from "@/tags/TagsContext";
 
 export type AppMode = "choose" | "cook" | "dine";
 
@@ -56,6 +58,7 @@ function findCountry(
 export default function App() {
   const t = useT();
   const { user, logout, loading: authLoading } = useAuth();
+  const { openAuth } = useAuthModal();
   const [searchParams, setSearchParams] = useSearchParams();
   const [published, setPublished] = useState<Country[]>([]);
   const [countriesLoading, setCountriesLoading] = useState(true);
@@ -340,18 +343,17 @@ export default function App() {
         >
           {!authLoading && user ? (
             <>
-              <span className="max-w-[12rem] truncate text-sm opacity-90">
+              <Link
+                to="/profile"
+                className={`max-w-[12rem] truncate text-sm font-semibold underline-offset-2 hover:underline ${
+                  showHome ? "text-cream" : "text-ink"
+                }`}
+                title={t("app.profile")}
+              >
                 {user.name || user.email}
-              </span>
+              </Link>
               {user.role === "admin" ? (
-                <AdminCountryMenu
-                  country={selectedCountry && !spinning ? selectedCountry : null}
-                  onCountryUpdated={handleCountryUpdated}
-                  onRestaurantsAdded={() =>
-                    setDineRefreshKey((value) => value + 1)
-                  }
-                  tone={switcherTone}
-                />
+                <AdminNavMenu tone={switcherTone} />
               ) : null}
               <button
                 type="button"
@@ -364,14 +366,15 @@ export default function App() {
               </button>
             </>
           ) : !authLoading ? (
-            <Link
-              to="/login"
+            <button
+              type="button"
+              onClick={() => openAuth({ mode: "login" })}
               className={`rounded-full px-3 py-1.5 text-sm font-semibold underline-offset-2 hover:underline ${
                 showHome ? "text-cream" : "text-tomato"
               }`}
             >
               {t("app.signIn")}
-            </Link>
+            </button>
           ) : null}
           {selectedCountry ? (
             <ShareButton
@@ -435,6 +438,7 @@ export default function App() {
         ) : null}
 
         {selectedCountry ? (
+          <TagsProvider countryCode={selectedCountry.code}>
           <section
             className="space-y-6"
             aria-label={t("app.result.ariaLabel", {
@@ -447,6 +451,7 @@ export default function App() {
               spinning={spinning}
               spinningCountry={spinNames[0]}
               onSpin={pickCountry}
+              onCountryUpdated={handleCountryUpdated}
             />
 
             <div className="flex flex-wrap items-end gap-4">
@@ -529,9 +534,14 @@ export default function App() {
                 country={selectedCountry}
                 onOpenRestaurant={openRestaurant}
                 refreshKey={dineRefreshKey}
+                onCountryUpdated={handleCountryUpdated}
+                onRestaurantsAdded={() =>
+                  setDineRefreshKey((value) => value + 1)
+                }
               />
             ) : null}
           </section>
+          </TagsProvider>
         ) : null}
       </main>
     </div>

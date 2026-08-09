@@ -1330,15 +1330,37 @@ export async function discoverItemImageQueries(input: {
   title: string;
   detail?: string;
 }): Promise<{ notes: string; searchQueries: string[] }> {
+  const subject =
+    input.kind === "drink"
+      ? "drink"
+      : input.kind === "recipe"
+        ? "dish"
+        : "restaurant";
+  const guidance =
+    input.kind === "drink"
+      ? `Emphasize that we are looking for a DRINK (beverage), not food.
+Prefer bottle, glass, cup, can, or poured-drink photos.
+Do not suggest queries that would find plated meals, food close-ups, ingredients-only shots, or restaurant interiors.
+Every search query must clearly target a drink photo (include words like drink, bottle, glass, cocktail, beer, wine, tea, or coffee as appropriate).`
+      : input.kind === "recipe"
+        ? `Emphasize that we are looking for a DISH (plated food), not a drink.
+Prefer plated meal or cooked-food photos.
+Do not suggest queries that would find bottles, beverage glasses, cans, or drink pours.
+Every search query must clearly target a food dish photo (include words like dish, food, plate, or cuisine as appropriate).`
+        : `Emphasize that we are looking for a RESTAURANT venue photo.
+Prefer the restaurant exterior, dining room, or storefront.
+Do not suggest logos, maps, or unrelated stock food shots.`;
+
   const raw = await chatJson(
     `You help find Wikimedia Commons photos.
-Reply with JSON only. Prefer real photo search queries, not logos or maps.`,
-    `Kind: ${input.kind}
+Reply with JSON only. Prefer real photo search queries, not logos or maps.
+${guidance}`,
+    `Kind: ${input.kind} (${subject})
 Country/cuisine: ${input.countryName}
 Title: ${input.title}
 Detail: ${input.detail ?? "none"}
 
-Suggest 3–5 Wikimedia Commons search queries for a good photo.
+Suggest 3–5 Wikimedia Commons search queries for a good photo of this ${subject}.
 
 JSON shape:
 {

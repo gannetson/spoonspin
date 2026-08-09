@@ -10,7 +10,7 @@ import {
 
 export { isGooglePlacesConfigured };
 
-function normalizeName(value: string): string {
+export function normalizeName(value: string): string {
   return value
     .toLowerCase()
     .normalize("NFD")
@@ -19,7 +19,7 @@ function normalizeName(value: string): string {
     .trim();
 }
 
-function namesLikelyMatch(a: string, b: string): boolean {
+export function namesLikelyMatch(a: string, b: string): boolean {
   const left = normalizeName(a);
   const right = normalizeName(b);
   if (!left || !right) return false;
@@ -32,17 +32,30 @@ function namesLikelyMatch(a: string, b: string): boolean {
   return overlap / rightTokens.length >= 0.6;
 }
 
-function extractCity(formattedAddress: string): string | undefined {
-  // "Street 1, 1234 AB City, Netherlands"
+export function extractCity(formattedAddress: string): string | undefined {
+  // With country: "Street 1, 1234 AB City, Netherlands"
+  // Without country (common with regionCode=NL): "Street 1, 1234 AB City"
   const parts = formattedAddress.split(",").map((p) => p.trim());
   if (parts.length < 2) return undefined;
-  const beforeCountry = parts[parts.length - 2] ?? "";
-  const withoutPostcode = beforeCountry.replace(/^\d{4}\s*[A-Z]{2}\s+/i, "").trim();
-  return withoutPostcode || beforeCountry || undefined;
+  const last = parts[parts.length - 1] ?? "";
+  const cityPart = /nederland|netherlands|\bnl\b/i.test(last)
+    ? (parts[parts.length - 2] ?? "")
+    : last;
+  const withoutPostcode = cityPart.replace(/^\d{4}\s*[A-Z]{2}\s+/i, "").trim();
+  return withoutPostcode || cityPart || undefined;
 }
 
-function isInNetherlands(formattedAddress: string): boolean {
-  return /nederland|netherlands|\bnl\b/i.test(formattedAddress);
+/** Dutch postcode: 4 digits + 2 letters (e.g. 1075 XN). */
+const DUTCH_POSTCODE = /\b\d{4}\s*[A-Z]{2}\b/i;
+
+/**
+ * Places Text Search with regionCode=NL often omits the country from
+ * formattedAddress ("… Amsterdam" instead of "… Amsterdam, Netherlands").
+ * Accept explicit country labels or a Dutch postcode.
+ */
+export function isInNetherlands(formattedAddress: string): boolean {
+  if (/nederland|netherlands|\bnl\b/i.test(formattedAddress)) return true;
+  return DUTCH_POSTCODE.test(formattedAddress);
 }
 
 export type GooglePlaceMatch = {
@@ -60,24 +73,22 @@ export type GooglePlaceMatch = {
   reviewCount?: number;
 };
 
-export async function lookupGoogleRestaurant(place: {
-  name: string;
-  city: string;
-  address?: string | null;
-}): Promise<GooglePlaceMatch | null> {
-  const apiKey = getGooglePlacesApiKey();
-  if (!apiKey) return null;
+type PlacesSearchHit = {
+  id?: string;
+  displayName?: { text?: string };
+  formattedAddress?: string;
+  location?: { latitude?: number; longitude?: number };
+  websiteUri?: string;
+  googleMapsUri?: string;
+  nationalPhoneNumber?: string;
+  rating?: number;
+  userRatingCount?: number;
+};
 
-  const textQuery = [
-    place.name,
-    "restaurant",
-    place.address,
-    place.city,
-    "Netherlands",
-  ]
-    .filter(Boolean)
-    .join(" ");
-
+async function searchGooglePlaces(
+  apiKey: string,
+  textQuery: string,
+): Promise<PlacesSearchHit[]> {
   const response = await fetch(
     "https://places.googleapis.com/v1/places:searchText",
     {
@@ -111,21 +122,15 @@ export async function lookupGoogleRestaurant(place: {
     throw new Error(`Google search ${response.status}: ${body.slice(0, 200)}`);
   }
 
-  const data = (await response.json()) as {
-    places?: Array<{
-      id?: string;
-      displayName?: { text?: string };
-      formattedAddress?: string;
-      location?: { latitude?: number; longitude?: number };
-      websiteUri?: string;
-      googleMapsUri?: string;
-      nationalPhoneNumber?: string;
-      rating?: number;
-      userRatingCount?: number;
-    }>;
-  };
+  const data = (await response.json()) as { places?: PlacesSearchHit[] };
+  return data.places ?? [];
+}
 
-  const candidates = (data.places ?? []).filter(
+function pickNetherlandsMatch(
+  places: PlacesSearchHit[],
+  name: string,
+): PlacesSearchHit | null {
+  const candidates = places.filter(
     (candidate) =>
       candidate.id &&
       candidate.displayName?.text &&
@@ -133,24 +138,26 @@ export async function lookupGoogleRestaurant(place: {
       isInNetherlands(candidate.formattedAddress),
   );
 
-  const match =
+  return (
     candidates.find((candidate) =>
-      namesLikelyMatch(place.name, candidate.displayName?.text ?? ""),
-    ) ?? null;
+      namesLikelyMatch(name, candidate.displayName?.text ?? ""),
+    ) ?? null
+  );
+}
 
-  if (!match?.id || !match.displayName?.text || !match.formattedAddress) {
-    return null;
-  }
-
-  const postcodeMatch = match.formattedAddress.match(/\b(\d{4}\s*[A-Z]{2})\b/i);
+function toMatch(
+  match: PlacesSearchHit,
+  fallbackCity: string,
+): GooglePlaceMatch {
+  const formattedAddress = match.formattedAddress!;
+  const postcodeMatch = formattedAddress.match(/\b(\d{4}\s*[A-Z]{2})\b/i);
   const city =
-    extractCity(match.formattedAddress) ??
-    (place.city.trim() || "Netherlands");
+    extractCity(formattedAddress) ?? (fallbackCity.trim() || "Netherlands");
 
   return {
-    placeId: match.id,
-    name: match.displayName.text,
-    address: match.formattedAddress.split(",")[0]?.trim() || match.formattedAddress,
+    placeId: match.id!,
+    name: match.displayName!.text!,
+    address: formattedAddress.split(",")[0]?.trim() || formattedAddress,
     city,
     postcode: postcodeMatch?.[1]?.replace(/\s+/g, " ").toUpperCase(),
     lat: match.location?.latitude,
@@ -161,4 +168,38 @@ export async function lookupGoogleRestaurant(place: {
     rating: match.rating,
     reviewCount: match.userRatingCount,
   };
+}
+
+export async function lookupGoogleRestaurant(place: {
+  name: string;
+  city: string;
+  address?: string | null;
+}): Promise<GooglePlaceMatch | null> {
+  const apiKey = getGooglePlacesApiKey();
+  if (!apiKey) return null;
+
+  const city = place.city.trim();
+  const address = place.address?.trim() || "";
+
+  // Prefer name + city first — LLM-suggested street addresses are often wrong
+  // and poison Text Search when included.
+  const queries = [
+    [place.name, "restaurant", city, "Netherlands"].filter(Boolean).join(" "),
+    address
+      ? [place.name, "restaurant", address, city, "Netherlands"]
+          .filter(Boolean)
+          .join(" ")
+      : null,
+  ].filter((query, index, all): query is string => {
+    if (!query) return false;
+    return all.indexOf(query) === index;
+  });
+
+  for (const textQuery of queries) {
+    const places = await searchGooglePlaces(apiKey, textQuery);
+    const match = pickNetherlandsMatch(places, place.name);
+    if (match) return toMatch(match, city);
+  }
+
+  return null;
 }

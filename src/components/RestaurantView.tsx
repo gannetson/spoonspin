@@ -19,11 +19,13 @@ import type {
   RestaurantMenuItemCategory,
 } from "@/restaurants/types";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
+import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import {
   handleRestaurantAdminAction,
   useAdminItemBusy,
 } from "@/admin/itemActions";
+import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
 type RestaurantViewProps = {
@@ -73,6 +75,7 @@ export function RestaurantView({
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
+  const { openSelectImage } = useSelectImage();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(
     initialRestaurant?.id === restaurantId ? initialRestaurant : null,
   );
@@ -189,6 +192,7 @@ export function RestaurantView({
                   countryName: country.name,
                   countryCode: country.code,
                   restaurant,
+                  openSelectImage,
                   onUpdated: (next) => {
                     setRestaurant(next);
                     onUpdated?.(next);
@@ -248,6 +252,13 @@ export function RestaurantView({
           </header>
         </div>
       </div>
+
+      <ItemTagBar
+        entityType="restaurant"
+        entityId={restaurant.id}
+        entityName={restaurant.name}
+        countryCode={country.code}
+      />
 
       <div className="space-y-6">
         {(restaurant.authenticityRating != null ||

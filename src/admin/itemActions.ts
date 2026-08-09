@@ -20,6 +20,7 @@ import {
   selectDrinkForDinner,
   selectRecipeForDinner,
 } from "@/admin/countryTools";
+import type { OpenSelectImageOptions } from "@/admin/SelectImageContext";
 import type { AdminItemAction } from "@/components/AdminItemMenu";
 
 function drinkAdminKey(drink: Drink): string {
@@ -64,6 +65,7 @@ export async function handleRecipeAdminAction(input: {
   onCountryUpdated: (country: Country) => void;
   onCommunityRecipesChange?: (recipes: Recipe[]) => void;
   onRemoved?: () => void;
+  openSelectImage?: (options: OpenSelectImageOptions) => void;
 }): Promise<string> {
   const { action, country, recipe } = input;
   const community = input.communityRecipes ?? [];
@@ -79,6 +81,31 @@ export async function handleRecipeAdminAction(input: {
     );
     input.onRemoved?.();
     return "Removed";
+  }
+  if (action === "select-image") {
+    if (!input.openSelectImage) {
+      throw new Error("Select image is not available.");
+    }
+    input.openSelectImage({
+      target: {
+        kind: "recipe",
+        countryCode: country.code,
+        recipeId: recipe.id,
+      },
+      label: recipe.name,
+      defaultQuery: `${recipe.name} dish ${country.name}`,
+      onApplied: (result) => {
+        if (result.country) input.onCountryUpdated(result.country);
+        if (result.recipe) {
+          input.onCommunityRecipesChange?.(
+            community.map((item) =>
+              item.id === recipe.id ? result.recipe! : item,
+            ),
+          );
+        }
+      },
+    });
+    return "";
   }
   if (action === "replace-image") {
     const result = await replaceRecipeImage(country.code, recipe.id);
@@ -115,6 +142,7 @@ export async function handleDrinkAdminAction(input: {
   country: Country;
   drink: Drink;
   onCountryUpdated: (country: Country) => void;
+  openSelectImage?: (options: OpenSelectImageOptions) => void;
 }): Promise<string> {
   const { action, country, drink } = input;
   const key = drinkAdminKey(drink);
@@ -126,6 +154,24 @@ export async function handleDrinkAdminAction(input: {
     const result = await removeDrink(country.code, key);
     if (result.country) input.onCountryUpdated(result.country);
     return "Removed";
+  }
+  if (action === "select-image") {
+    if (!input.openSelectImage) {
+      throw new Error("Select image is not available.");
+    }
+    input.openSelectImage({
+      target: {
+        kind: "drink",
+        countryCode: country.code,
+        drinkKey: key,
+      },
+      label: drink.name,
+      defaultQuery: `${drink.name} drink ${country.name}`,
+      onApplied: (result) => {
+        if (result.country) input.onCountryUpdated(result.country);
+      },
+    });
+    return "";
   }
   if (action === "replace-image") {
     const result = await replaceDrinkImage(country.code, key);
@@ -148,42 +194,78 @@ export async function handleDrinkAdminAction(input: {
 export async function handleDinnerCourseAdminAction(input: {
   action: AdminItemAction;
   country: Country;
-  recipeId: string;
-  recipeName: string;
+  recipe: Recipe;
+  communityRecipes?: Recipe[];
   onCountryUpdated: (country: Country) => void;
+  onCommunityRecipesChange?: (recipes: Recipe[]) => void;
+  openSelectImage?: (options: OpenSelectImageOptions) => void;
 }): Promise<string> {
-  if (input.action !== "remove") {
-    throw new Error("Unsupported dinner course action.");
+  const { action, country, recipe } = input;
+  const community = input.communityRecipes ?? [];
+
+  if (action === "remove") {
+    if (
+      !window.confirm(`Remove “${recipe.name}” from tonight’s dinner?`)
+    ) {
+      return "";
+    }
+    const result = await removeDinnerCourse(country.code, recipe.id);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Removed from dinner";
   }
+
   if (
-    !window.confirm(
-      `Remove “${input.recipeName}” from tonight’s dinner?`,
-    )
+    action === "replace-image" ||
+    action === "select-image" ||
+    action === "replace-text"
   ) {
-    return "";
+    return handleRecipeAdminAction({
+      action,
+      country,
+      recipe,
+      communityRecipes: community,
+      onCountryUpdated: input.onCountryUpdated,
+      onCommunityRecipesChange: input.onCommunityRecipesChange,
+      openSelectImage: input.openSelectImage,
+    });
   }
-  const result = await removeDinnerCourse(input.country.code, input.recipeId);
-  if (result.country) input.onCountryUpdated(result.country);
-  return "Removed from dinner";
+
+  throw new Error("Unsupported dinner course action.");
 }
 
 export async function handleDinnerDrinkAdminAction(input: {
   action: AdminItemAction;
   country: Country;
-  drinkName: string;
+  drink: Drink;
   onCountryUpdated: (country: Country) => void;
+  openSelectImage?: (options: OpenSelectImageOptions) => void;
 }): Promise<string> {
-  if (input.action !== "remove") {
-    throw new Error("Unsupported dinner drink action.");
+  const { action, country, drink } = input;
+
+  if (action === "remove") {
+    if (!window.confirm(`Remove “${drink.name}” from tonight’s dinner?`)) {
+      return "";
+    }
+    const result = await removeDinnerDrink(country.code, drink.name);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Removed from dinner";
   }
+
   if (
-    !window.confirm(`Remove “${input.drinkName}” from tonight’s dinner?`)
+    action === "replace-image" ||
+    action === "select-image" ||
+    action === "replace-text"
   ) {
-    return "";
+    return handleDrinkAdminAction({
+      action,
+      country,
+      drink,
+      onCountryUpdated: input.onCountryUpdated,
+      openSelectImage: input.openSelectImage,
+    });
   }
-  const result = await removeDinnerDrink(input.country.code, input.drinkName);
-  if (result.country) input.onCountryUpdated(result.country);
-  return "Removed from dinner";
+
+  throw new Error("Unsupported dinner drink action.");
 }
 
 export async function handleShopAdminAction(input: {
@@ -193,7 +275,7 @@ export async function handleShopAdminAction(input: {
   onCountryUpdated: (country: Country) => void;
 }): Promise<string> {
   const { action, country, shop } = input;
-  if (action === "replace-image") {
+  if (action === "replace-image" || action === "select-image") {
     throw new Error("Shops do not have images.");
   }
   if (action === "remove") {
@@ -216,6 +298,7 @@ export async function handleRestaurantAdminAction(input: {
   restaurant: Restaurant;
   onUpdated: (restaurant: Restaurant) => void;
   onRemoved: (id: string) => void;
+  openSelectImage?: (options: OpenSelectImageOptions) => void;
 }): Promise<string> {
   const { action, countryName, countryCode, restaurant } = input;
   if (action === "remove") {
@@ -227,6 +310,20 @@ export async function handleRestaurantAdminAction(input: {
     await removeRestaurant(restaurant.id);
     input.onRemoved(restaurant.id);
     return "Removed";
+  }
+  if (action === "select-image") {
+    if (!input.openSelectImage) {
+      throw new Error("Select image is not available.");
+    }
+    input.openSelectImage({
+      target: { kind: "restaurant", restaurantId: restaurant.id },
+      label: restaurant.name,
+      defaultQuery: `${restaurant.name} ${restaurant.city} restaurant`,
+      onApplied: (result) => {
+        if (result.restaurant) input.onUpdated(result.restaurant);
+      },
+    });
+    return "";
   }
   if (action === "replace-image") {
     const result = await replaceRestaurantImage(restaurant.id, countryName);

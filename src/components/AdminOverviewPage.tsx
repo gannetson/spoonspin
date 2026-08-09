@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ClipboardList, LoaderCircle, LogIn } from "lucide-react";
+import { ClipboardList, LoaderCircle, LogIn, Users } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
+import { useAuthModal } from "@/auth/AuthModalContext";
 import {
   fetchAdminOverview,
   type AdminCountryOverviewRow,
@@ -28,6 +29,7 @@ function compareRows(
 export function AdminOverviewPage() {
   const t = useT();
   const { user, loading: authLoading } = useAuth();
+  const { openAuth } = useAuthModal();
   const [data, setData] = useState<AdminOverviewResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -90,13 +92,22 @@ export function AdminOverviewPage() {
             {t("admin.back")}
           </Link>
           {isAdmin ? (
-            <Link
-              to="/admin/review"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-cream"
-            >
-              <ClipboardList className="size-4" aria-hidden="true" />
-              {t("admin.overview.toReview")}
-            </Link>
+            <div className="flex flex-wrap gap-2">
+              <Link
+                to="/admin/users"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink/10 px-4 text-sm font-semibold text-ink"
+              >
+                <Users className="size-4" aria-hidden="true" />
+                {t("admin.overview.toUsers")}
+              </Link>
+              <Link
+                to="/admin/review"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-cream"
+              >
+                <ClipboardList className="size-4" aria-hidden="true" />
+                {t("admin.overview.toReview")}
+              </Link>
+            </div>
           ) : null}
         </div>
 
@@ -120,13 +131,14 @@ export function AdminOverviewPage() {
         {!authLoading && !user ? (
           <div className="mt-8 rounded-2xl bg-cream p-5 ring-1 ring-ink/10">
             <p className="text-ink-soft">{t("admin.signInPrompt")}</p>
-            <Link
-              to="/login?next=/admin"
+            <button
+              type="button"
+              onClick={() => openAuth({ mode: "login" })}
               className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-5 font-semibold text-cream"
             >
               <LogIn className="size-4" aria-hidden="true" />
               {t("admin.signIn")}
-            </Link>
+            </button>
           </div>
         ) : null}
 

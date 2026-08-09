@@ -382,6 +382,34 @@ async function migrate(db: Pool) {
     CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions (user_id);
     CREATE INDEX IF NOT EXISTS idx_sessions_expires_at ON sessions (expires_at);
 
+    ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL;
+
+    CREATE TABLE IF NOT EXISTS oauth_accounts (
+      provider TEXT NOT NULL,
+      provider_user_id TEXT NOT NULL,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      PRIMARY KEY (provider, provider_user_id),
+      CONSTRAINT oauth_accounts_provider_check
+        CHECK (provider IN ('google', 'apple'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_oauth_accounts_user_id
+      ON oauth_accounts (user_id);
+
+    ALTER TABLE users
+      ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;
+
+    UPDATE users u
+    SET last_login_at = s.max_created
+    FROM (
+      SELECT user_id, MAX(created_at) AS max_created
+      FROM sessions
+      GROUP BY user_id
+    ) s
+    WHERE u.id = s.user_id
+      AND u.last_login_at IS NULL;
+
     CREATE TABLE IF NOT EXISTS countries (
       code TEXT PRIMARY KEY,
       slug TEXT NOT NULL,
@@ -439,6 +467,36 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_recipes_country_slot
       ON recipes (country_code, menu_slot, sort_order);
+
+    CREATE TABLE IF NOT EXISTS user_tags (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      entity_type TEXT NOT NULL,
+      entity_id TEXT NOT NULL,
+      entity_name TEXT NOT NULL,
+      country_code TEXT NOT NULL,
+      intent TEXT NOT NULL,
+      rating INTEGER,
+      review_text TEXT,
+      photo_urls JSONB NOT NULL DEFAULT '[]'::jsonb,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      CONSTRAINT user_tags_entity_type_check
+        CHECK (entity_type IN ('recipe', 'drink', 'restaurant')),
+      CONSTRAINT user_tags_intent_check
+        CHECK (intent IN ('want', 'did')),
+      CONSTRAINT user_tags_rating_check
+        CHECK (rating IS NULL OR (rating >= 0 AND rating <= 5))
+    );
+
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_user_tags_unique_item
+      ON user_tags (user_id, entity_type, entity_id, country_code);
+
+    CREATE INDEX IF NOT EXISTS idx_user_tags_user_intent
+      ON user_tags (user_id, intent);
+
+    CREATE INDEX IF NOT EXISTS idx_user_tags_user_country
+      ON user_tags (user_id, country_code);
   `);
 }
 

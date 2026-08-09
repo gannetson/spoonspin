@@ -20,7 +20,7 @@ type SuggestModalProps = {
   onAdded: (
     result:
       | { kind: "recipe"; recipe: Recipe }
-      | { kind: "restaurant" }
+      | { kind: "restaurant"; restaurant: { id: string; name: string } }
       | { kind: "drink"; drink: Drink }
       | { kind: "shop"; shop: SpecialtyShop },
   ) => void;
@@ -237,7 +237,7 @@ export function SuggestModal({
         return;
       }
       if (preview.status === "ready-restaurant") {
-        await confirmSuggestion({
+        const submission = await confirmSuggestion({
           kind: "restaurant",
           countryCode: country.code,
           countryName: country.name,
@@ -245,7 +245,18 @@ export function SuggestModal({
           confirmationNotes: preview.notes,
           restaurant: preview.restaurant,
         });
-        onAdded({ kind: "restaurant" });
+        if (submission.kind === "restaurant") {
+          const id =
+            submission.restaurantRowId?.trim() ||
+            `user:${preview.restaurant.name}`;
+          onAdded({
+            kind: "restaurant",
+            restaurant: {
+              id,
+              name: submission.restaurant.name || preview.restaurant.name,
+            },
+          });
+        }
         onClose();
         return;
       }

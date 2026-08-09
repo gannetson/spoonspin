@@ -4,11 +4,13 @@ import type { Country, Drink, Recipe } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { formatQuantity, scaleIngredients } from "@/lib/scaleIngredients";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
+import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import {
   handleRecipeAdminAction,
   useAdminItemBusy,
 } from "@/admin/itemActions";
+import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
 type RecipeViewProps = {
@@ -40,6 +42,7 @@ export function RecipeView({
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
+  const { openSelectImage } = useSelectImage();
   const [servings, setServings] = useState(recipe.servings);
   const scaled = useMemo(
     () => scaleIngredients(recipe.ingredients, recipe.servings, servings),
@@ -80,6 +83,7 @@ export function RecipeView({
             label={recipe.name}
             tone="dark"
             showSelectForDinner
+            replaceImageHintKey="admin.item.replaceImage.dish.hint"
             busy={Boolean(busy[adminKey])}
             status={status[adminKey]}
             error={error[adminKey]}
@@ -93,6 +97,7 @@ export function RecipeView({
                   onCountryUpdated,
                   onCommunityRecipesChange,
                   onRemoved: onBack,
+                  openSelectImage,
                 }),
               );
             }}
@@ -133,6 +138,13 @@ export function RecipeView({
             <p className="mt-1 text-lg text-ink-soft">{recipe.localName}</p>
           ) : null}
           <p className="mt-4 max-w-2xl text-ink-soft">{recipe.description}</p>
+          <ItemTagBar
+            className="mt-4"
+            entityType="recipe"
+            entityId={recipe.id}
+            entityName={recipe.name}
+            countryCode={country.code}
+          />
           {recipe.imageAttribution ? (
             <p className="mt-2 text-xs text-ink-soft/80">{recipe.imageAttribution}</p>
           ) : null}

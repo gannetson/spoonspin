@@ -16,8 +16,15 @@ import {
 import { cookBannerUrl } from "@/content/countries/cuisineImages";
 import { SuggestModal } from "@/components/SuggestModal";
 import { RecipeCard } from "@/components/RecipeCard";
+import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
+import { AdminCookMenu } from "@/components/AdminCookMenu";
+import {
+  SuggestedItemReview,
+  reviewTargetFromSuggestion,
+  type SuggestReviewTarget,
+} from "@/components/SuggestedItemReview";
 import {
   handleDinnerCourseAdminAction,
   handleDinnerDrinkAdminAction,
@@ -26,8 +33,10 @@ import {
   handleShopAdminAction,
   useAdminItemBusy,
 } from "@/admin/itemActions";
+import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 import type { SuggestionKind } from "@/suggestions/client";
+import { drinkEntityId } from "@/tags/types";
 
 type CookMenuProps = {
   country: Country;
@@ -125,11 +134,15 @@ export function CookMenu({
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
+  const { openSelectImage } = useSelectImage();
   const [tab, setTab] = useState<CookTab>("dinner");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [dietFilter, setDietFilter] = useState<DietFilter>("all");
   const [alcoholFilter, setAlcoholFilter] = useState<AlcoholFilter>("all");
   const [suggestKind, setSuggestKind] = useState<SuggestionKind | null>(null);
+  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(
+    null,
+  );
 
   const authoredRecipes = useMemo(() => getCountryRecipes(country), [country]);
   const recipes = useMemo(() => {
@@ -237,58 +250,93 @@ export function CookMenu({
   }
 
   const suggestModal = (
-    <SuggestModal
-      kind={suggestKind ?? "recipe"}
-      country={country}
-      open={suggestKind != null}
-      onClose={() => setSuggestKind(null)}
-      onAdded={(result) => {
-        if (result.kind === "recipe") {
-          onCommunityRecipesChange([result.recipe, ...communityRecipes]);
-        } else if (result.kind === "drink") {
-          onCommunityDrinksChange([result.drink, ...communityDrinks]);
-        } else if (result.kind === "shop") {
-          onCommunityShopsChange([result.shop, ...communityShops]);
-        }
-      }}
-    />
+    <>
+      <SuggestModal
+        kind={suggestKind ?? "recipe"}
+        country={country}
+        open={suggestKind != null}
+        onClose={() => setSuggestKind(null)}
+        onAdded={(result) => {
+          if (result.kind === "recipe") {
+            onCommunityRecipesChange([result.recipe, ...communityRecipes]);
+            setReviewTarget(
+              reviewTargetFromSuggestion({
+                kind: "recipe",
+                countryCode: country.code,
+                recipe: result.recipe,
+              }),
+            );
+          } else if (result.kind === "drink") {
+            onCommunityDrinksChange([result.drink, ...communityDrinks]);
+            setReviewTarget(
+              reviewTargetFromSuggestion({
+                kind: "drink",
+                countryCode: country.code,
+                drink: result.drink,
+              }),
+            );
+          } else if (result.kind === "shop") {
+            onCommunityShopsChange([result.shop, ...communityShops]);
+          }
+        }}
+      />
+      <SuggestedItemReview
+        target={reviewTarget}
+        onClose={() => setReviewTarget(null)}
+      />
+    </>
   );
 
   return (
     <section aria-labelledby="menu-heading" className="space-y-6">
-      <div className="relative overflow-hidden rounded-[2rem]">
-        {bannerUrl ? (
-          <img
-            src={bannerUrl}
-            alt=""
-            className="h-40 w-full object-cover sm:h-52"
-          />
-        ) : (
-          <div className="h-40 w-full sm:h-52">
-            <MediaPlaceholder
-              labelKey="media.placeholder.country"
-              tone="dark"
+      <div className="relative rounded-[2rem]">
+        <div className="relative overflow-hidden rounded-[2rem]">
+          {bannerUrl ? (
+            <img
+              src={bannerUrl}
+              alt=""
+              className="h-40 w-full object-cover sm:h-52"
             />
+          ) : (
+            <div className="h-40 w-full sm:h-52">
+              <MediaPlaceholder
+                labelKey="media.placeholder.country"
+                tone="dark"
+              />
+            </div>
+          )}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/55 to-ink/20"
+          />
+        </div>
+        <div className="pointer-events-none absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h2
+                id="menu-heading"
+                className="font-display text-3xl text-cream sm:text-5xl"
+              >
+                {t("cook.menu.heading")}
+              </h2>
+              <p className="mt-2 max-w-lg text-cream/85">
+                {t("cook.banner.summary", {
+                  recipeCount: recipes.length,
+                  drinkCount: drinks.length,
+                  name: country.name,
+                })}
+              </p>
+            </div>
+            {isAdmin ? (
+              <div className="pointer-events-auto relative z-30">
+                <AdminCookMenu
+                  country={country}
+                  onCountryUpdated={onCountryUpdated}
+                  tone="dark"
+                />
+              </div>
+            ) : null}
           </div>
-        )}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/55 to-ink/20"
-        />
-        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-          <h2
-            id="menu-heading"
-            className="font-display text-3xl text-cream sm:text-5xl"
-          >
-            {t("cook.menu.heading")}
-          </h2>
-          <p className="mt-2 max-w-lg text-cream/85">
-            {t("cook.banner.summary", {
-              recipeCount: recipes.length,
-              drinkCount: drinks.length,
-              name: country.name,
-            })}
-          </p>
         </div>
       </div>
 
@@ -350,10 +398,10 @@ export function CookMenu({
                     >
                       {isAdmin ? (
                         <AdminItemMenu
-                          className="absolute right-3 top-3"
+                          className="absolute right-3 top-3 z-10"
                           label={recipe.name}
-                          removeOnly
                           removeHintKey="admin.item.removeFromDinner.hint"
+                          replaceImageHintKey="admin.item.replaceImage.dish.hint"
                           busy={Boolean(busy[`dinner-course:${course.recipeId}`])}
                           status={status[`dinner-course:${course.recipeId}`]}
                           error={error[`dinner-course:${course.recipeId}`]}
@@ -362,9 +410,11 @@ export function CookMenu({
                               handleDinnerCourseAdminAction({
                                 action,
                                 country,
-                                recipeId: course.recipeId,
-                                recipeName: recipe.name,
+                                recipe,
+                                communityRecipes,
                                 onCountryUpdated,
+                                onCommunityRecipesChange,
+                                openSelectImage,
                               }),
                             );
                           }}
@@ -433,9 +483,39 @@ export function CookMenu({
                           key={suggestion.drinkName}
                           className="relative flex gap-4 pr-12"
                         >
-                          {isAdmin ? (
+                          {isAdmin && drink ? (
                             <AdminItemMenu
-                              className="absolute right-0 top-0"
+                              className="absolute right-0 top-0 z-10"
+                              label={drink.name}
+                              removeHintKey="admin.item.removeFromDinner.hint"
+                              selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
+                              replaceImageHintKey="admin.item.replaceImage.drink.hint"
+                              busy={Boolean(
+                                busy[`dinner-drink:${suggestion.drinkName}`],
+                              )}
+                              status={
+                                status[`dinner-drink:${suggestion.drinkName}`]
+                              }
+                              error={
+                                error[`dinner-drink:${suggestion.drinkName}`]
+                              }
+                              onAction={(action) => {
+                                void run(
+                                  `dinner-drink:${suggestion.drinkName}`,
+                                  () =>
+                                    handleDinnerDrinkAdminAction({
+                                      action,
+                                      country,
+                                      drink,
+                                      onCountryUpdated,
+                                      openSelectImage,
+                                    }),
+                                );
+                              }}
+                            />
+                          ) : isAdmin ? (
+                            <AdminItemMenu
+                              className="absolute right-0 top-0 z-10"
                               label={suggestion.drinkName}
                               removeOnly
                               removeHintKey="admin.item.removeFromDinner.hint"
@@ -455,7 +535,12 @@ export function CookMenu({
                                     handleDinnerDrinkAdminAction({
                                       action,
                                       country,
-                                      drinkName: suggestion.drinkName,
+                                      drink: {
+                                        name: suggestion.drinkName,
+                                        type: "soft-drink",
+                                        alcoholic: false,
+                                        description: "",
+                                      },
                                       onCountryUpdated,
                                     }),
                                 );
@@ -554,6 +639,7 @@ export function CookMenu({
                 <RecipeCard
                   key={recipe.id}
                   recipe={recipe}
+                  countryCode={country.code}
                   variant={
                     isDinner
                       ? "dinner"
@@ -577,6 +663,7 @@ export function CookMenu({
                         communityRecipes,
                         onCountryUpdated,
                         onCommunityRecipesChange,
+                        openSelectImage,
                       }),
                     );
                   }}
@@ -625,6 +712,7 @@ export function CookMenu({
                     <li key={`${section.id}-${key}`}>
                       <DrinkCard
                         drink={item}
+                        countryCode={country.code}
                         community={communityDrinkKeys.has(key)}
                         isAdmin={isAdmin}
                         adminBusy={Boolean(busy[`drink:${key}`])}
@@ -637,6 +725,7 @@ export function CookMenu({
                               country,
                               drink: item,
                               onCountryUpdated,
+                              openSelectImage,
                             }),
                           );
                         }}
@@ -761,6 +850,7 @@ export function CookMenu({
 
 function DrinkCard({
   drink,
+  countryCode,
   community = false,
   isAdmin = false,
   adminBusy = false,
@@ -769,6 +859,7 @@ function DrinkCard({
   onAdminAction,
 }: {
   drink: Drink;
+  countryCode: string;
   community?: boolean;
   isAdmin?: boolean;
   adminBusy?: boolean;
@@ -777,15 +868,18 @@ function DrinkCard({
   onAdminAction?: (action: import("@/components/AdminItemMenu").AdminItemAction) => void;
 }) {
   const t = useT();
+  const entityId = drinkEntityId(drink);
 
   return (
-    <article className="relative flex gap-3 rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4">
+    <article className="relative flex flex-col gap-3 rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4">
+      <div className="relative flex gap-3">
       {isAdmin && onAdminAction ? (
         <AdminItemMenu
           className="absolute right-2 top-2"
           label={drink.name}
           showSelectForDinner
           selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
+          replaceImageHintKey="admin.item.replaceImage.drink.hint"
           busy={adminBusy}
           status={adminStatus}
           error={adminError}
@@ -839,6 +933,14 @@ function DrinkCard({
           </p>
         ) : null}
       </div>
+      </div>
+      <ItemTagBar
+        entityType="drink"
+        entityId={entityId}
+        entityName={drink.name}
+        countryCode={countryCode}
+        variant="compact"
+      />
     </article>
   );
 }

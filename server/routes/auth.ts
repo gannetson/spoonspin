@@ -1,11 +1,25 @@
 import type { Request, Response, NextFunction } from "express";
 import { z } from "zod";
 import {
+  appOrigin,
+  clearOAuthCookies,
+  finishGoogleOAuth,
+  getAuthProviders,
+  isGoogleOAuthConfigured,
+  OAUTH_NEXT_COOKIE,
+  OAUTH_STATE_COOKIE,
+  OAUTH_VERIFIER_COOKIE,
+  oauthCookieOptions,
+  safeNextPath,
+  startGoogleOAuth,
+} from "../auth/oauth.ts";
+import {
   SESSION_COOKIE,
   authenticateUser,
   createSession,
   createUser,
   deleteSession,
+  findOrCreateOAuthUser,
   getUserBySessionToken,
   type PublicUser,
 } from "../db/users.ts";
@@ -62,11 +76,91 @@ function setSessionCookie(res: Response, token: string, expiresAt: Date) {
   });
 }
 
+function oauthErrorRedirect(nextPath: string): string {
+  const params = new URLSearchParams({ error: "oauth" });
+  if (nextPath !== "/") params.set("next", nextPath);
+  return `${appOrigin()}/login?${params.toString()}`;
+}
+
 export function registerAuthRoutes(app: import("express").Express): void {
   app.get("/api/auth/me", async (req, res) => {
     const token = req.cookies?.[SESSION_COOKIE] as string | undefined;
     const user = await getUserBySessionToken(token);
     res.json({ user });
+  });
+
+  app.get("/api/auth/providers", (_req, res) => {
+    res.json(getAuthProviders());
+  });
+
+  app.get("/api/auth/google", (req, res) => {
+    const nextPath = safeNextPath(
+      typeof req.query.next === "string" ? req.query.next : null,
+    );
+    if (!isGoogleOAuthConfigured()) {
+      res.redirect(oauthErrorRedirect(nextPath));
+      return;
+    }
+    try {
+      const { url, state, codeVerifier } = startGoogleOAuth();
+      const cookieOpts = oauthCookieOptions();
+      res.cookie(OAUTH_STATE_COOKIE, state, cookieOpts);
+      res.cookie(OAUTH_VERIFIER_COOKIE, codeVerifier, cookieOpts);
+      res.cookie(OAUTH_NEXT_COOKIE, nextPath, cookieOpts);
+      res.redirect(url.toString());
+    } catch (error) {
+      console.error("[auth] google start failed", error);
+      res.redirect(oauthErrorRedirect(nextPath));
+    }
+  });
+
+  app.get("/api/auth/google/callback", async (req, res) => {
+    const nextPath = safeNextPath(
+      (req.cookies?.[OAUTH_NEXT_COOKIE] as string | undefined) ?? null,
+    );
+    const expectedState = req.cookies?.[OAUTH_STATE_COOKIE] as
+      | string
+      | undefined;
+    const codeVerifier = req.cookies?.[OAUTH_VERIFIER_COOKIE] as
+      | string
+      | undefined;
+    const state =
+      typeof req.query.state === "string" ? req.query.state : undefined;
+    const code =
+      typeof req.query.code === "string" ? req.query.code : undefined;
+    const oauthError =
+      typeof req.query.error === "string" ? req.query.error : undefined;
+
+    clearOAuthCookies(res);
+
+    if (oauthError || !code || !state || !expectedState || !codeVerifier) {
+      res.redirect(oauthErrorRedirect(nextPath));
+      return;
+    }
+    if (state !== expectedState) {
+      res.redirect(oauthErrorRedirect(nextPath));
+      return;
+    }
+
+    try {
+      const profile = await finishGoogleOAuth({ code, codeVerifier });
+      if (!profile.emailVerified || !profile.email) {
+        res.redirect(oauthErrorRedirect(nextPath));
+        return;
+      }
+      const user = await findOrCreateOAuthUser({
+        provider: "google",
+        providerUserId: profile.providerUserId,
+        email: profile.email,
+        name: profile.name,
+      });
+      const session = await createSession(user.id);
+      setSessionCookie(res, session.token, session.expiresAt);
+      res.redirect(`${appOrigin()}${nextPath}`);
+    } catch (error) {
+      console.error("[auth] google callback failed", error);
+      res.redirect(oauthErrorRedirect(nextPath));
+    }
   });
 
   app.post("/api/auth/register", async (req, res) => {

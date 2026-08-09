@@ -4,6 +4,7 @@ import {
   ClipboardList,
   FilePenLine,
   ImagePlus,
+  Images,
   LoaderCircle,
   MoreVertical,
   Star,
@@ -15,6 +16,7 @@ import { useT } from "@/i18n/LocaleContext";
 export type AdminItemAction =
   | "remove"
   | "replace-image"
+  | "select-image"
   | "replace-text"
   | "find-menu"
   | "find-scores"
@@ -184,6 +186,7 @@ export function AdminItemMenu({
               </span>
             </button>
             {!removeOnly && showReplaceImage ? (
+              <>
               <button
                 type="button"
                 role="menuitem"
@@ -204,6 +207,23 @@ export function AdminItemMenu({
                   </span>
                 </span>
               </button>
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => run("select-image")}
+                className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
+              >
+                <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
+                <span>
+                  <span className="block font-semibold text-ink">
+                    {t("admin.item.selectImage")}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-soft">
+                    {t("admin.item.selectImage.hint")}
+                  </span>
+                </span>
+              </button>
+              </>
             ) : null}
             {!removeOnly && showReplaceText ? (
             <button

@@ -25,11 +25,18 @@ import {
 import { dineBannerUrl } from "@/content/countries/cuisineImages";
 import { SuggestModal } from "@/components/SuggestModal";
 import { RestaurantCard } from "@/components/RestaurantCard";
+import { AdminDineMenu } from "@/components/AdminDineMenu";
+import {
+  SuggestedItemReview,
+  reviewTargetFromSuggestion,
+  type SuggestReviewTarget,
+} from "@/components/SuggestedItemReview";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import {
   handleRestaurantAdminAction,
   useAdminItemBusy,
 } from "@/admin/itemActions";
+import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
 type DineSearchProps = {
@@ -37,6 +44,8 @@ type DineSearchProps = {
   onOpenRestaurant: (restaurant: Restaurant) => void;
   /** Bump to force a fresh search (e.g. after admin add). */
   refreshKey?: number;
+  onCountryUpdated?: (country: Country) => void;
+  onRestaurantsAdded?: () => void;
 };
 
 type ViewState =
@@ -77,11 +86,14 @@ export function DineSearch({
   country,
   onOpenRestaurant,
   refreshKey = 0,
+  onCountryUpdated,
+  onRestaurantsAdded,
 }: DineSearchProps) {
   const t = useT();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
+  const { openSelectImage } = useSelectImage();
   const inputId = useId();
   const sortId = useId();
   const rememberId = useId();
@@ -102,6 +114,9 @@ export function DineSearch({
   const [sortMode, setSortMode] = useState<RestaurantSortMode>("default");
   const [state, setState] = useState<ViewState>({ status: "idle" });
   const [suggestOpen, setSuggestOpen] = useState(false);
+  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(
+    null,
+  );
 
   const searchRef = useRef({
     country,
@@ -306,15 +321,27 @@ export function DineSearch({
           className="absolute inset-0 bg-gradient-to-r from-ink/85 via-ink/55 to-ink/20"
         />
         <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8">
-          <h2
-            id="dine-heading"
-            className="font-display text-3xl text-cream sm:text-5xl"
-          >
-            {t("dine.heading")}
-          </h2>
-          <p className="mt-2 max-w-lg text-cream/85">
-            {t("dine.subtitle", { name: country.name })}
-          </p>
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h2
+                id="dine-heading"
+                className="font-display text-3xl text-cream sm:text-5xl"
+              >
+                {t("dine.heading")}
+              </h2>
+              <p className="mt-2 max-w-lg text-cream/85">
+                {t("dine.subtitle", { name: country.name })}
+              </p>
+            </div>
+            {isAdmin && onCountryUpdated && onRestaurantsAdded ? (
+              <AdminDineMenu
+                country={country}
+                onCountryUpdated={onCountryUpdated}
+                onRestaurantsAdded={onRestaurantsAdded}
+                tone="dark"
+              />
+            ) : null}
+          </div>
         </div>
       </div>
 
@@ -480,6 +507,7 @@ export function DineSearch({
               <RestaurantCard
                 key={restaurant.id}
                 restaurant={restaurant}
+                countryCode={country.code}
                 onOpen={() => onOpenRestaurant(restaurant)}
                 isAdmin={isAdmin}
                 adminBusy={Boolean(busy[`restaurant:${restaurant.id}`])}
@@ -492,6 +520,7 @@ export function DineSearch({
                       countryName: country.name,
                       countryCode: country.code,
                       restaurant,
+                      openSelectImage,
                       onUpdated: (next) => {
                         setState((prev) => {
                           if (prev.status !== "ready") return prev;
@@ -540,9 +569,22 @@ export function DineSearch({
         country={country}
         open={suggestOpen}
         onClose={() => setSuggestOpen(false)}
-        onAdded={() => {
+        onAdded={(result) => {
           void runSearch();
+          if (result.kind === "restaurant") {
+            setReviewTarget(
+              reviewTargetFromSuggestion({
+                kind: "restaurant",
+                countryCode: country.code,
+                restaurant: result.restaurant,
+              }),
+            );
+          }
         }}
+      />
+      <SuggestedItemReview
+        target={reviewTarget}
+        onClose={() => setReviewTarget(null)}
       />
     </section>
   );

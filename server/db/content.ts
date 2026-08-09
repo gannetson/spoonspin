@@ -359,6 +359,37 @@ export async function updateCountryImage(
   return getCountryFromDb(code);
 }
 
+export async function updateCountryText(
+  code: string,
+  introduction: string,
+): Promise<Country | undefined> {
+  const text = introduction.trim();
+  if (text.length < 20) {
+    throw new Error("Country text must be at least 20 characters.");
+  }
+  const existing = await getCountryFromDb(code);
+  if (!existing) return undefined;
+
+  const wikipedia = existing.wikipedia
+    ? { ...existing.wikipedia, summary: text }
+    : null;
+
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE countries
+     SET introduction = $2,
+         wikipedia = $3,
+         updated_at = NOW()
+     WHERE code = $1`,
+    [
+      code.toLowerCase(),
+      text,
+      wikipedia ? JSON.stringify(wikipedia) : null,
+    ],
+  );
+  return getCountryFromDb(code);
+}
+
 export async function listRecipeIdsForCountry(
   countryCode: string,
 ): Promise<string[]> {

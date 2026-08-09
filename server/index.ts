@@ -22,8 +22,11 @@ import { createMapboxProvider } from "./providers/mapbox.ts";
 import type { LiveRestaurantProvider } from "./providers/types.ts";
 import { registerAuthRoutes } from "./routes/auth.ts";
 import { registerAdminCountryRoutes } from "./routes/adminCountry.ts";
+import { registerAdminImageRoutes } from "./routes/adminImages.ts";
+import { registerAdminUserRoutes } from "./routes/adminUsers.ts";
 import { registerContentRoutes } from "./routes/content.ts";
 import { registerSuggestionRoutes } from "./routes/suggestions.ts";
+import { getUploadsRoot, registerMeRoutes } from "./routes/me.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
 
 // Load .env from the project root even when cwd differs (e.g. supervisor).
@@ -86,8 +89,13 @@ app.get("/api/health", async (_req, res) => {
 
 registerAuthRoutes(app);
 registerContentRoutes(app);
+registerAdminUserRoutes(app);
 registerAdminCountryRoutes(app);
+registerAdminImageRoutes(app);
 registerSuggestionRoutes(app);
+registerMeRoutes(app);
+
+app.use("/uploads", express.static(getUploadsRoot()));
 
 app.get("/api/restaurants/:id", async (req, res) => {
   try {

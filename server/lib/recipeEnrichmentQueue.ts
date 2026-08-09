@@ -160,9 +160,10 @@ async function enrichImage(
   });
   const queries = [
     ...discovered.searchQueries,
-    `${recipe.name} food`,
-    `${recipe.name} ${countryName}`,
-    `${recipe.localName ?? recipe.name} dish`,
+    `${recipe.name} dish`,
+    `${recipe.name} food plate`,
+    `${recipe.name} ${countryName} cuisine dish`,
+    `${recipe.localName ?? recipe.name} dish food`,
   ];
   const image = await findCuisineImageFromQueries(queries, {
     excludeUrls: [recipe.imageUrl],

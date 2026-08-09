@@ -1,5 +1,7 @@
 import { ExternalLink } from "lucide-react";
 import type { Country } from "@/types/content";
+import { useAuth } from "@/auth/AuthContext";
+import { AdminCountryHeroMenu } from "@/components/AdminCountryHeroMenu";
 import { SpinSpoonButton } from "@/components/SpinSpoonButton";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { cuisineBannerUrl } from "@/content/countries/cuisineImages";
@@ -10,6 +12,7 @@ type CountryCardProps = {
   spinning?: boolean;
   spinningCountry?: { flag: string; name: string };
   onSpin: () => void;
+  onCountryUpdated?: (country: Country) => void;
 };
 
 export function CountryCard({
@@ -17,8 +20,11 @@ export function CountryCard({
   spinning = false,
   spinningCountry,
   onSpin,
+  onCountryUpdated,
 }: CountryCardProps) {
   const t = useT();
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
   const flag = spinning ? (spinningCountry?.flag ?? "🌍") : country.flag;
   const name = spinning ? (spinningCountry?.name ?? "…") : country.name;
   const description = country.wikipedia?.summary ?? country.introduction;
@@ -47,6 +53,14 @@ export function CountryCard({
           aria-hidden="true"
           className="absolute inset-0 bg-gradient-to-t from-ink/90 via-ink/40 to-ink/10"
         />
+        {isAdmin && onCountryUpdated && !spinning ? (
+          <div className="absolute right-3 top-3 z-20 sm:right-5 sm:top-5">
+            <AdminCountryHeroMenu
+              country={country}
+              onCountryUpdated={onCountryUpdated}
+            />
+          </div>
+        ) : null}
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
           <div>
             <p className="text-sm uppercase tracking-[0.18em] text-cream/75">

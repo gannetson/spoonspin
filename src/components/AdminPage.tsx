@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Check, LoaderCircle, LogIn, X } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
+import { useAuthModal } from "@/auth/AuthModalContext";
 import { useT } from "@/i18n/LocaleContext";
 import {
   fetchAdminSubmissions,
@@ -13,6 +14,7 @@ import {
 export function AdminPage() {
   const t = useT();
   const { user, loading: authLoading } = useAuth();
+  const { openAuth } = useAuthModal();
   const [statusFilter, setStatusFilter] = useState<SubmissionStatus | "all">(
     "pending",
   );
@@ -86,9 +88,19 @@ export function AdminPage() {
     <div className="passport-grid min-h-screen">
       <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link to="/admin" className="text-sm font-semibold text-tomato hover:underline">
-            {t("admin.review.backToOverview")}
-          </Link>
+          <div className="flex flex-wrap items-center gap-3">
+            <Link to="/admin" className="text-sm font-semibold text-tomato hover:underline">
+              {t("admin.review.backToOverview")}
+            </Link>
+            {isAdmin ? (
+              <Link
+                to="/admin/users"
+                className="text-sm font-semibold text-ink-soft hover:underline"
+              >
+                {t("admin.overview.toUsers")}
+              </Link>
+            ) : null}
+          </div>
         </div>
         <h1 className="mt-4 font-display text-5xl text-ink">{t("admin.title")}</h1>
         <p className="mt-2 max-w-2xl text-ink-soft">{t("admin.subtitle")}</p>
@@ -103,13 +115,14 @@ export function AdminPage() {
         {!authLoading && !user ? (
           <div className="mt-8 rounded-2xl bg-cream p-5 ring-1 ring-ink/10">
             <p className="text-ink-soft">{t("admin.signInPrompt")}</p>
-            <Link
-              to="/login?next=/admin/review"
+            <button
+              type="button"
+              onClick={() => openAuth({ mode: "login" })}
               className="mt-4 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-ink px-5 font-semibold text-cream"
             >
               <LogIn className="size-4" aria-hidden="true" />
               {t("admin.signIn")}
-            </Link>
+            </button>
           </div>
         ) : null}
 
