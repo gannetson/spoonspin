@@ -31,6 +31,7 @@
     "agent:ratings": "tsx --tsconfig tsconfig.app.json scripts/enrich-ratings.ts",
     "agent:review-links": "tsx --tsconfig tsconfig.app.json scripts/enrich-review-links.ts",
     "agent:compose-dinners": "tsx --tsconfig tsconfig.app.json scripts/compose-dinners.ts",
+    "agent:complete-menus": "tsx --tsconfig tsconfig.app.json scripts/complete-cook-menus.ts",
     "db:rebuild-cuisines": "tsx --tsconfig tsconfig.app.json scripts/rebuild-cuisine-codes.ts",
     "db:export-content": "tsx --tsconfig tsconfig.app.json scripts/export-content.ts",
     "db:import-content": "tsx --tsconfig tsconfig.app.json scripts/import-content.ts",
