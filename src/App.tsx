@@ -440,14 +440,13 @@ export default function App() {
         ) : null}
 
         {showHome ? (
-          <>
-            <HomeHero
-              countries={published}
-              onPick={pickCountry}
-              onSelectCountry={selectCountry}
-            />
+          <HomeHero
+            countries={published}
+            onPick={pickCountry}
+            onSelectCountry={selectCountry}
+          >
             <HomeProgressCards />
-          </>
+          </HomeHero>
         ) : null}
 
         {selectedCountry ? (

@@ -1,11 +1,13 @@
 import {
   useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
   type KeyboardEvent,
 } from "react";
+import { createPortal } from "react-dom";
 import type { Country } from "@/types/content";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -17,6 +19,12 @@ type CountrySelectProps = {
   label?: string;
   /** Use on dark photo backgrounds (hero). */
   tone?: "light" | "dark";
+};
+
+type MenuPosition = {
+  top: number;
+  left: number;
+  width: number;
 };
 
 function countryLabel(country: Country) {
@@ -43,6 +51,7 @@ export function CountrySelect({
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
+  const [position, setPosition] = useState<MenuPosition | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -57,6 +66,23 @@ export function CountrySelect({
     );
   }, [query, sorted]);
 
+  function updatePosition() {
+    const input = inputRef.current;
+    if (!input) return;
+    const rect = input.getBoundingClientRect();
+    const maxHeight = 256;
+    const gap = 4;
+    let top = rect.bottom + gap;
+    if (top + maxHeight > window.innerHeight - 8) {
+      top = Math.max(8, rect.top - gap - maxHeight);
+    }
+    setPosition({
+      top,
+      left: rect.left,
+      width: rect.width,
+    });
+  }
+
   useEffect(() => {
     if (!open) {
       setQuery(selected ? countryLabel(selected) : "");
@@ -64,15 +90,35 @@ export function CountrySelect({
     }
   }, [open, selected]);
 
+  useLayoutEffect(() => {
+    if (!open) {
+      setPosition(null);
+      return;
+    }
+    updatePosition();
+  }, [open, filtered.length]);
+
   useEffect(() => {
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
+      const target = event.target as Node;
+      if (
+        rootRef.current?.contains(target) ||
+        listRef.current?.contains(target)
+      ) {
+        return;
       }
+      setOpen(false);
     };
+    const onReposition = () => updatePosition();
     document.addEventListener("pointerdown", onPointerDown);
-    return () => document.removeEventListener("pointerdown", onPointerDown);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
   }, [open]);
 
   useEffect(() => {
@@ -162,6 +208,55 @@ export function CountrySelect({
       ? `${listboxId}-option-${filtered[activeIndex].code}`
       : undefined;
 
+  const listbox =
+    open && position
+      ? createPortal(
+          <ul
+            ref={listRef}
+            id={listboxId}
+            role="listbox"
+            aria-label={t("country.select.listAria")}
+            style={{
+              top: position.top,
+              left: position.left,
+              width: position.width,
+            }}
+            className="fixed z-[90] max-h-64 overflow-auto rounded-2xl border-2 border-ink/10 bg-cream py-1 shadow-xl"
+          >
+            {filtered.length === 0 ? (
+              <li className="px-4 py-3 text-sm text-ink-soft">
+                {t("country.select.noMatch")}
+              </li>
+            ) : (
+              filtered.map((country, index) => {
+                const isActive = index === activeIndex;
+                const isSelected = country.code === value;
+                return (
+                  <li
+                    key={country.code}
+                    id={`${listboxId}-option-${country.code}`}
+                    role="option"
+                    aria-selected={isSelected}
+                    data-index={index}
+                    className={`cursor-pointer px-4 py-2.5 text-base text-ink ${
+                      isActive ? "bg-stamp/15" : "hover:bg-parchment-deep/60"
+                    } ${isSelected ? "font-medium" : ""}`}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      choose(country);
+                    }}
+                  >
+                    {countryLabel(country)}
+                  </li>
+                );
+              })
+            )}
+          </ul>,
+          document.body,
+        )
+      : null;
+
   return (
     <div ref={rootRef} className="relative flex w-full max-w-sm flex-col gap-2">
       <label
@@ -214,45 +309,7 @@ export function CountrySelect({
         </span>
       </div>
 
-      {open ? (
-        <ul
-          ref={listRef}
-          id={listboxId}
-          role="listbox"
-          aria-label={t("country.select.listAria")}
-          className="absolute top-full z-20 mt-1 max-h-64 w-full overflow-auto rounded-2xl border-2 border-ink/10 bg-cream py-1 shadow-lg"
-        >
-          {filtered.length === 0 ? (
-            <li className="px-4 py-3 text-sm text-ink-soft">
-              {t("country.select.noMatch")}
-            </li>
-          ) : (
-            filtered.map((country, index) => {
-              const isActive = index === activeIndex;
-              const isSelected = country.code === value;
-              return (
-                <li
-                  key={country.code}
-                  id={`${listboxId}-option-${country.code}`}
-                  role="option"
-                  aria-selected={isSelected}
-                  data-index={index}
-                  className={`cursor-pointer px-4 py-2.5 text-base text-ink ${
-                    isActive ? "bg-stamp/15" : "hover:bg-parchment-deep/60"
-                  } ${isSelected ? "font-medium" : ""}`}
-                  onMouseEnter={() => setActiveIndex(index)}
-                  onMouseDown={(event) => {
-                    event.preventDefault();
-                    choose(country);
-                  }}
-                >
-                  {countryLabel(country)}
-                </li>
-              );
-            })
-          )}
-        </ul>
-      ) : null}
+      {listbox}
     </div>
   );
 }

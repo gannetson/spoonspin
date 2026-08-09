@@ -58,7 +58,7 @@ export function HomeProgressCards() {
   return (
     <section
       aria-label={t("home.progress.aria")}
-      className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6"
+      className="mx-auto w-full max-w-5xl px-4 pt-2 sm:px-6"
     >
       <ul className="grid gap-4 sm:grid-cols-2">
         {showDigested ? (

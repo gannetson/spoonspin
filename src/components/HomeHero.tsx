@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import type { Country } from "@/types/content";
 import { CountrySelect } from "@/components/CountrySelect";
 import { SpinSpoonButton } from "@/components/SpinSpoonButton";
@@ -8,32 +9,40 @@ type HomeHeroProps = {
   countries: Country[];
   onPick: () => void;
   onSelectCountry: (code: string) => void;
+  children?: ReactNode;
 };
 
-export function HomeHero({ countries, onPick, onSelectCountry }: HomeHeroProps) {
+export function HomeHero({
+  countries,
+  onPick,
+  onSelectCountry,
+  children,
+}: HomeHeroProps) {
   const t = useT();
 
   return (
-    <section
-      aria-labelledby="hero-heading"
-      className="relative isolate min-h-[min(92vh,52rem)] overflow-hidden"
-    >
-      <img
-        src={images.hero}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 size-full object-cover animate-hero-drift"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/35"
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-r from-ink/70 via-transparent to-transparent"
-      />
+    <div className="relative isolate min-h-screen">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <img
+          src={images.hero}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 size-full object-cover animate-hero-drift"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/40"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 bg-gradient-to-r from-ink/65 via-ink/25 to-transparent"
+        />
+      </div>
 
-      <div className="relative z-10 mx-auto flex min-h-[min(92vh,52rem)] w-full max-w-5xl flex-col justify-end px-4 pb-14 pt-16 sm:px-6 sm:pb-20">
+      <section
+        aria-labelledby="hero-heading"
+        className="relative z-10 mx-auto flex min-h-[min(88vh,48rem)] w-full max-w-5xl flex-col justify-end px-4 pb-10 pt-20 sm:px-6 sm:pb-14"
+      >
         <p className="animate-rise-in font-display text-[clamp(3.5rem,14vw,8.5rem)] leading-[0.85] text-cream">
           {t("app.brand")}
         </p>
@@ -47,7 +56,7 @@ export function HomeHero({ countries, onPick, onSelectCountry }: HomeHeroProps) 
           {t("hero.subtitle")}
         </p>
 
-        <div className="animate-fade-in mt-10 flex flex-col items-stretch gap-6 sm:max-w-md">
+        <div className="animate-fade-in relative z-30 mt-10 flex flex-col items-stretch gap-6 sm:max-w-md">
           <SpinSpoonButton spinning={false} onClick={onPick} size="lg" />
           <div className="rounded-2xl bg-cream/10 p-3 backdrop-blur-sm ring-1 ring-cream/20">
             <CountrySelect
@@ -58,7 +67,11 @@ export function HomeHero({ countries, onPick, onSelectCountry }: HomeHeroProps) 
             />
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+
+      {children ? (
+        <div className="relative z-10 pb-12">{children}</div>
+      ) : null}
+    </div>
   );
 }

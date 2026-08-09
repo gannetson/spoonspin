@@ -4,8 +4,8 @@ const u = (id: string, params = "w=1400&q=80&auto=format&fit=crop") =>
   `https://images.unsplash.com/${id}?${params}`;
 
 export const images = {
-  /** Full-bleed home hero — shared table feast */
-  hero: u("photo-1414235077428-338989a2e8c0", "w=2000&q=80&auto=format&fit=crop"),
+  /** Full-bleed home hero — worldly grilled meze / market feast */
+  hero: u("photo-1555939594-58d7cb561ad1", "w=2000&q=80&auto=format&fit=crop"),
   /** Cook mode — hands preparing food */
   cook: u("photo-1556910103-1c02745aae4d"),
   /** Dine mode — restaurant dining room */
