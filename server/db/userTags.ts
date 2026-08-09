@@ -223,6 +223,10 @@ export async function getUserTagSummary(userId: string): Promise<TagSummary> {
          COUNT(*)::int AS total,
          COUNT(*) FILTER (WHERE intent = 'want')::int AS want,
          COUNT(*) FILTER (WHERE intent = 'did')::int AS did,
+         COUNT(*) FILTER (
+           WHERE intent = 'did'
+             AND entity_type IN ('recipe', 'restaurant')
+         )::int AS dishes_digested,
          COUNT(*) FILTER (WHERE entity_type = 'recipe')::int AS recipe,
          COUNT(*) FILTER (WHERE entity_type = 'drink')::int AS drink,
          COUNT(*) FILTER (WHERE entity_type = 'restaurant')::int AS restaurant
@@ -244,6 +248,7 @@ export async function getUserTagSummary(userId: string): Promise<TagSummary> {
     countryCodes,
     countriesPlanned,
     plannedCountryCodes,
+    dishesDigested: Number(counts.dishes_digested ?? 0),
     counts: {
       total: Number(counts.total ?? 0),
       want: Number(counts.want ?? 0),

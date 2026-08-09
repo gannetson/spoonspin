@@ -30,6 +30,25 @@ export const nl: Messages = {
   "hero.subtitle":
     "Draai de globe, land op een keuken, en kook thuis of eet uit in Nederland.",
 
+  "home.progress.aria": "Jouw proefvoortgang",
+  "home.progress.digested":
+    "Je hebt {dishes} gerechten uit {countries} landen geproefd.",
+  "home.progress.digested.one":
+    "Je hebt {dishes} gerecht uit {countries} landen geproefd.",
+  "home.progress.digested.oneCountry":
+    "Je hebt {dishes} gerechten uit {countries} land geproefd.",
+  "home.progress.digested.oneEach":
+    "Je hebt {dishes} gerecht uit {countries} land geproefd.",
+  "home.progress.plannedTitle": "Op je lijst",
+  "home.progress.planned":
+    "Je hebt {items} borden gepland in {countries} landen.",
+  "home.progress.planned.one":
+    "Je hebt {items} bord gepland in {countries} landen.",
+  "home.progress.planned.oneCountry":
+    "Je hebt {items} borden gepland in {countries} land.",
+  "home.progress.planned.oneEach":
+    "Je hebt {items} bord gepland in {countries} land.",
+
   "spin.ariaLabel": "Draai de lepel",
   "spin.ariaLabel.spinning": "Aan het draaien",
   "spin.label": "Draai de lepel!",

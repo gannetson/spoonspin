@@ -21,6 +21,8 @@ export type TagSummary = {
   /** Distinct countries with at least one “want to” tag. */
   countriesPlanned: number;
   plannedCountryCodes: string[];
+  /** Did tags on recipes + restaurants (passport “dishes”). */
+  dishesDigested: number;
   counts: {
     total: number;
     want: number;

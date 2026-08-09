@@ -30,6 +30,25 @@ export const en: Messages = {
   "hero.subtitle":
     "Spin the globe, land on a cuisine, then cook at home or dine out in the Netherlands.",
 
+  "home.progress.aria": "Your tasting progress",
+  "home.progress.digested":
+    "You’ve tasted {dishes} dishes from {countries} countries.",
+  "home.progress.digested.one":
+    "You’ve tasted {dishes} dish from {countries} countries.",
+  "home.progress.digested.oneCountry":
+    "You’ve tasted {dishes} dishes from {countries} country.",
+  "home.progress.digested.oneEach":
+    "You’ve tasted {dishes} dish from {countries} country.",
+  "home.progress.plannedTitle": "On your list",
+  "home.progress.planned":
+    "You’ve planned {items} plates across {countries} countries.",
+  "home.progress.planned.one":
+    "You’ve planned {items} plate across {countries} countries.",
+  "home.progress.planned.oneCountry":
+    "You’ve planned {items} plates across {countries} country.",
+  "home.progress.planned.oneEach":
+    "You’ve planned {items} plate across {countries} country.",
+
   "spin.ariaLabel": "Spin the spoon",
   "spin.ariaLabel.spinning": "Spinning",
   "spin.label": "Spin the spoon!",

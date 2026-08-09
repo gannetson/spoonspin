@@ -18,6 +18,7 @@ import { CountrySelect } from "@/components/CountrySelect";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
 import { HomeHero } from "@/components/HomeHero";
+import { HomeProgressCards } from "@/components/HomeProgressCards";
 import { AdminNavMenu } from "@/components/AdminNavMenu";
 import { RecipeView } from "@/components/RecipeView";
 import { RestaurantView } from "@/components/RestaurantView";
@@ -439,11 +440,14 @@ export default function App() {
         ) : null}
 
         {showHome ? (
-          <HomeHero
-            countries={published}
-            onPick={pickCountry}
-            onSelectCountry={selectCountry}
-          />
+          <>
+            <HomeHero
+              countries={published}
+              onPick={pickCountry}
+              onSelectCountry={selectCountry}
+            />
+            <HomeProgressCards />
+          </>
         ) : null}
 
         {selectedCountry ? (
