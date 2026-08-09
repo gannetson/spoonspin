@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowLeft, ExternalLink, PlayCircle, Printer } from "lucide-react";
 import type { Country, Drink, Recipe } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
+import { isEditorOrAdmin } from "@/auth/roles";
 import { formatQuantity, scaleIngredients } from "@/lib/scaleIngredients";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
@@ -10,6 +11,7 @@ import {
   handleRecipeAdminAction,
   useAdminItemBusy,
 } from "@/admin/itemActions";
+import { useEditRecipe } from "@/admin/EditRecipeContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -40,9 +42,10 @@ export function RecipeView({
 }: RecipeViewProps) {
   const t = useT();
   const { user } = useAuth();
-  const isAdmin = user?.role === "admin";
+  const canEditRecipe = isEditorOrAdmin(user?.role);
   const { busy, status, error, run } = useAdminItemBusy();
   const { openSelectImage } = useSelectImage();
+  const { openEditRecipe } = useEditRecipe();
   const [servings, setServings] = useState(recipe.servings);
   const scaled = useMemo(
     () => scaleIngredients(recipe.ingredients, recipe.servings, servings),
@@ -77,12 +80,13 @@ export function RecipeView({
           aria-hidden="true"
           className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/25 to-transparent"
         />
-        {isAdmin ? (
+        {canEditRecipe ? (
           <AdminItemMenu
             className="absolute right-4 top-4"
             label={recipe.name}
             tone="dark"
             showSelectForDinner
+            showEditText
             replaceImageHintKey="admin.item.replaceImage.dish.hint"
             busy={Boolean(busy[adminKey])}
             status={status[adminKey]}
@@ -98,6 +102,7 @@ export function RecipeView({
                   onCommunityRecipesChange,
                   onRemoved: onBack,
                   openSelectImage,
+                  openEditRecipe,
                 }),
               );
             }}

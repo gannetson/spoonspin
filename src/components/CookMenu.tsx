@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ExternalLink, MapPin, Plus, Store, UtensilsCrossed } from "lucide-react";
 import type { Country, Drink, Recipe, RecipeCategory, SpecialtyShop } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
+import { isEditorOrAdmin } from "@/auth/roles";
 import {
   dinnerRecipeIdSet,
   drinkMatchesAlcohol,
@@ -33,6 +34,7 @@ import {
   handleShopAdminAction,
   useAdminItemBusy,
 } from "@/admin/itemActions";
+import { useEditRecipe } from "@/admin/EditRecipeContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 import type { SuggestionKind } from "@/suggestions/client";
@@ -133,8 +135,10 @@ export function CookMenu({
   const t = useT();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
+  const canEditRecipe = isEditorOrAdmin(user?.role);
   const { busy, status, error, run } = useAdminItemBusy();
   const { openSelectImage } = useSelectImage();
+  const { openEditRecipe } = useEditRecipe();
   const [tab, setTab] = useState<CookTab>("dinner");
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
   const [dietFilter, setDietFilter] = useState<DietFilter>("all");
@@ -396,10 +400,11 @@ export function CookMenu({
                         imageLeft ? "" : "md:[&>figure]:order-2"
                       }`}
                     >
-                      {isAdmin ? (
+                      {canEditRecipe ? (
                         <AdminItemMenu
                           className="absolute right-3 top-3 z-10"
                           label={recipe.name}
+                          showEditText
                           removeHintKey="admin.item.removeFromDinner.hint"
                           replaceImageHintKey="admin.item.replaceImage.dish.hint"
                           busy={Boolean(busy[`dinner-course:${course.recipeId}`])}
@@ -415,6 +420,7 @@ export function CookMenu({
                                 onCountryUpdated,
                                 onCommunityRecipesChange,
                                 openSelectImage,
+                                openEditRecipe,
                               }),
                             );
                           }}
@@ -650,7 +656,8 @@ export function CookMenu({
                           : "default"
                   }
                   onOpen={() => onOpenRecipe(recipe)}
-                  isAdmin={isAdmin}
+                  isAdmin={canEditRecipe}
+                  showEditText
                   adminBusy={Boolean(busy[`recipe:${recipe.id}`])}
                   adminStatus={status[`recipe:${recipe.id}`]}
                   adminError={error[`recipe:${recipe.id}`]}
@@ -664,6 +671,7 @@ export function CookMenu({
                         onCountryUpdated,
                         onCommunityRecipesChange,
                         openSelectImage,
+                        openEditRecipe,
                       }),
                     );
                   }}

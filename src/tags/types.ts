@@ -18,6 +18,9 @@ export type UserTag = {
 export type TagSummary = {
   countriesTasted: number;
   countryCodes: string[];
+  /** Distinct countries with at least one “want to” tag. */
+  countriesPlanned: number;
+  plannedCountryCodes: string[];
   counts: {
     total: number;
     want: number;

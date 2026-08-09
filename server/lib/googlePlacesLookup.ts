@@ -1,6 +1,6 @@
 /**
- * Look up a restaurant via Google Places Text Search (Places API New).
- * Used to verify discover candidates exist before offering them to admins.
+ * Look up / search restaurants via Google Places Text Search (Places API New).
+ * Used for admin discover, community suggestions, and name verification.
  */
 
 import {
@@ -58,6 +58,48 @@ export function isInNetherlands(formattedAddress: string): boolean {
   return DUTCH_POSTCODE.test(formattedAddress);
 }
 
+/** Directory / delivery aggregators — never store as the official website. */
+const DIRECTORY_WEBSITE_HOSTS = [
+  "tripadvisor.",
+  "thefork.",
+  "thuisbezorgd.",
+  "ubereats.",
+  "uber.com",
+  "deliveroo.",
+  "justeattakeaway.",
+  "just-eat.",
+  "yelp.",
+  "facebook.com",
+  "instagram.com",
+  "maps.google.",
+  "google.com/maps",
+  "goo.gl",
+  "maps.app.goo.gl",
+];
+
+export function isDirectoryOrDeliveryWebsite(
+  url: string | undefined,
+): boolean {
+  if (!url?.trim()) return false;
+  try {
+    const parsed = new URL(url.trim());
+    const hostPath = `${parsed.hostname}${parsed.pathname}`.toLowerCase();
+    return DIRECTORY_WEBSITE_HOSTS.some((fragment) =>
+      hostPath.includes(fragment),
+    );
+  } catch {
+    return true;
+  }
+}
+
+export function officialWebsiteOrUndefined(
+  url: string | undefined,
+): string | undefined {
+  if (!url?.trim() || !/^https?:\/\//i.test(url.trim())) return undefined;
+  if (isDirectoryOrDeliveryWebsite(url)) return undefined;
+  return url.trim();
+}
+
 export type GooglePlaceMatch = {
   placeId: string;
   name: string;
@@ -72,6 +114,24 @@ export type GooglePlaceMatch = {
   rating?: number;
   reviewCount?: number;
 };
+
+/** Places-grounded venue used by admin discover and suggestions. */
+export type GroundedPlace = GooglePlaceMatch & {
+  /** Alias or query that found this place. */
+  matchedQuery?: string;
+  source: "google" | "osm";
+};
+
+export const NL_DISCOVER_CITIES = [
+  "Amsterdam",
+  "Rotterdam",
+  "Den Haag",
+  "Utrecht",
+  "Leiden",
+  "Eindhoven",
+  "Groningen",
+  "Maastricht",
+] as const;
 
 type PlacesSearchHit = {
   id?: string;
@@ -88,7 +148,18 @@ type PlacesSearchHit = {
 async function searchGooglePlaces(
   apiKey: string,
   textQuery: string,
+  options?: { maxResultCount?: number; includedType?: string },
 ): Promise<PlacesSearchHit[]> {
+  const body: Record<string, unknown> = {
+    textQuery,
+    languageCode: "en",
+    regionCode: "NL",
+    maxResultCount: options?.maxResultCount ?? 5,
+  };
+  if (options?.includedType) {
+    body.includedType = options.includedType;
+  }
+
   const response = await fetch(
     "https://places.googleapis.com/v1/places:searchText",
     {
@@ -108,18 +179,13 @@ async function searchGooglePlaces(
           "places.userRatingCount",
         ].join(","),
       },
-      body: JSON.stringify({
-        textQuery,
-        languageCode: "en",
-        regionCode: "NL",
-        maxResultCount: 5,
-      }),
+      body: JSON.stringify(body),
     },
   );
 
   if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Google search ${response.status}: ${body.slice(0, 200)}`);
+    const text = await response.text();
+    throw new Error(`Google search ${response.status}: ${text.slice(0, 200)}`);
   }
 
   const data = (await response.json()) as { places?: PlacesSearchHit[] };
@@ -162,11 +228,31 @@ function toMatch(
     postcode: postcodeMatch?.[1]?.replace(/\s+/g, " ").toUpperCase(),
     lat: match.location?.latitude,
     lng: match.location?.longitude,
-    website: match.websiteUri,
+    website: officialWebsiteOrUndefined(match.websiteUri),
     mapsUrl: match.googleMapsUri,
     phone: match.nationalPhoneNumber,
     rating: match.rating,
     reviewCount: match.userRatingCount,
+  };
+}
+
+function hitToGrounded(
+  hit: PlacesSearchHit,
+  matchedQuery: string,
+): GroundedPlace | null {
+  if (
+    !hit.id ||
+    !hit.displayName?.text ||
+    !hit.formattedAddress ||
+    !isInNetherlands(hit.formattedAddress)
+  ) {
+    return null;
+  }
+  const base = toMatch(hit, extractCity(hit.formattedAddress) ?? "Netherlands");
+  return {
+    ...base,
+    matchedQuery,
+    source: "google",
   };
 }
 
@@ -202,4 +288,122 @@ export async function lookupGoogleRestaurant(place: {
   }
 
   return null;
+}
+
+/**
+ * Free-text search for a restaurant suggestion query.
+ * Retries with a city bias when the query mentions a known NL city.
+ */
+export async function searchGoogleRestaurantsByQuery(
+  query: string,
+): Promise<GroundedPlace[]> {
+  const apiKey = getGooglePlacesApiKey();
+  if (!apiKey) return [];
+
+  const trimmed = query.trim();
+  if (!trimmed) return [];
+
+  const cityHint = NL_DISCOVER_CITIES.find((city) =>
+    new RegExp(`\\b${city.replace(/\s+/g, "\\s+")}\\b`, "i").test(trimmed),
+  );
+
+  const queries = [
+    `${trimmed} restaurant Netherlands`,
+    cityHint ? `${trimmed} restaurant ${cityHint} Netherlands` : null,
+    `${trimmed} restaurant in Netherlands`,
+  ].filter((value, index, all): value is string => {
+    if (!value) return false;
+    return all.indexOf(value) === index;
+  });
+
+  const byId = new Map<string, GroundedPlace>();
+  for (const textQuery of queries) {
+    try {
+      const hits = await searchGooglePlaces(apiKey, textQuery, {
+        maxResultCount: 8,
+        includedType: "restaurant",
+      });
+      for (const hit of hits) {
+        const grounded = hitToGrounded(hit, textQuery);
+        if (!grounded) continue;
+        if (!byId.has(grounded.placeId)) {
+          byId.set(grounded.placeId, grounded);
+        }
+      }
+      if (byId.size > 0) break;
+    } catch (error) {
+      console.warn(`Places query search failed for "${textQuery}"`, error);
+    }
+  }
+
+  const results = [...byId.values()];
+  results.sort((a, b) => {
+    const aMatch = namesLikelyMatch(trimmed, a.name) ? 1 : 0;
+    const bMatch = namesLikelyMatch(trimmed, b.name) ? 1 : 0;
+    if (aMatch !== bMatch) return bMatch - aMatch;
+    return (b.reviewCount ?? 0) - (a.reviewCount ?? 0);
+  });
+  return results;
+}
+
+/**
+ * Cuisine discovery: Text Search for each alias × city across the Netherlands.
+ */
+export async function searchGoogleRestaurantsByCuisine(input: {
+  aliases: string[];
+  cities?: string[];
+  focus?: string;
+  maxPerQuery?: number;
+}): Promise<GroundedPlace[]> {
+  const apiKey = getGooglePlacesApiKey();
+  if (!apiKey) return [];
+
+  const aliases = input.aliases
+    .map((alias) => alias.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  if (aliases.length === 0) return [];
+
+  const cities = (input.cities?.length ? input.cities : [...NL_DISCOVER_CITIES])
+    .map((city) => city.trim())
+    .filter(Boolean);
+  const focus = input.focus?.trim();
+  const maxPerQuery = input.maxPerQuery ?? 8;
+  const byId = new Map<string, GroundedPlace>();
+
+  for (const city of cities) {
+    const batch = await Promise.all(
+      aliases.map(async (alias) => {
+        const textQuery = focus
+          ? `${alias} restaurant ${focus} in ${city}, Netherlands`
+          : `${alias} restaurant in ${city}, Netherlands`;
+        try {
+          const hits = await searchGooglePlaces(apiKey, textQuery, {
+            maxResultCount: maxPerQuery,
+            includedType: "restaurant",
+          });
+          return hits
+            .map((hit) => hitToGrounded(hit, textQuery))
+            .filter((place): place is GroundedPlace => Boolean(place));
+        } catch (error) {
+          console.warn(`Places cuisine search failed for "${textQuery}"`, error);
+          return [] as GroundedPlace[];
+        }
+      }),
+    );
+    for (const place of batch.flat()) {
+      const existing = byId.get(place.placeId);
+      if (!existing) {
+        byId.set(place.placeId, place);
+        continue;
+      }
+      if ((place.reviewCount ?? 0) > (existing.reviewCount ?? 0)) {
+        byId.set(place.placeId, place);
+      }
+    }
+  }
+
+  return [...byId.values()].sort(
+    (a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0),
+  );
 }

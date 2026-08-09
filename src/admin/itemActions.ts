@@ -20,6 +20,7 @@ import {
   selectDrinkForDinner,
   selectRecipeForDinner,
 } from "@/admin/countryTools";
+import type { OpenEditRecipeOptions } from "@/admin/EditRecipeContext";
 import type { OpenSelectImageOptions } from "@/admin/SelectImageContext";
 import type { AdminItemAction } from "@/components/AdminItemMenu";
 
@@ -66,9 +67,29 @@ export async function handleRecipeAdminAction(input: {
   onCommunityRecipesChange?: (recipes: Recipe[]) => void;
   onRemoved?: () => void;
   openSelectImage?: (options: OpenSelectImageOptions) => void;
+  openEditRecipe?: (options: OpenEditRecipeOptions) => void;
 }): Promise<string> {
   const { action, country, recipe } = input;
   const community = input.communityRecipes ?? [];
+
+  if (action === "edit-text") {
+    if (!input.openEditRecipe) {
+      throw new Error("Edit recipe is not available.");
+    }
+    input.openEditRecipe({
+      country,
+      recipe,
+      onApplied: (result) => {
+        if (result.country) input.onCountryUpdated(result.country);
+        input.onCommunityRecipesChange?.(
+          community.map((item) =>
+            item.id === recipe.id ? result.recipe : item,
+          ),
+        );
+      },
+    });
+    return "";
+  }
 
   if (action === "remove") {
     if (!window.confirm(`Remove “${recipe.name}”? This cannot be undone.`)) {
@@ -199,6 +220,7 @@ export async function handleDinnerCourseAdminAction(input: {
   onCountryUpdated: (country: Country) => void;
   onCommunityRecipesChange?: (recipes: Recipe[]) => void;
   openSelectImage?: (options: OpenSelectImageOptions) => void;
+  openEditRecipe?: (options: OpenEditRecipeOptions) => void;
 }): Promise<string> {
   const { action, country, recipe } = input;
   const community = input.communityRecipes ?? [];
@@ -217,6 +239,7 @@ export async function handleDinnerCourseAdminAction(input: {
   if (
     action === "replace-image" ||
     action === "select-image" ||
+    action === "edit-text" ||
     action === "replace-text"
   ) {
     return handleRecipeAdminAction({
@@ -227,6 +250,7 @@ export async function handleDinnerCourseAdminAction(input: {
       onCountryUpdated: input.onCountryUpdated,
       onCommunityRecipesChange: input.onCommunityRecipesChange,
       openSelectImage: input.openSelectImage,
+      openEditRecipe: input.openEditRecipe,
     });
   }
 

@@ -172,7 +172,7 @@ export function AdminDiscoverModal({
     });
   }
 
-  async function saveSelected() {
+  async function saveSelected(options?: { review?: boolean }) {
     if (state.status !== "ready") return;
     const picked = state.items.filter((item) => selected.has(item.key));
     if (picked.length === 0) {
@@ -215,14 +215,30 @@ export function AdminDiscoverModal({
         const restaurants = picked.map(
           (entry) => (entry as Extract<Item, { kind: "restaurants" }>).item,
         );
-        const result = await addRestaurants(country.code, restaurants);
+        const withReview = options?.review === true;
+        const result = await addRestaurants(country.code, restaurants, {
+          review: withReview,
+        });
         onRestaurantsAdded?.();
         setState({
           status: "saved",
-          message: t(addedMessageKey("restaurants", result.added), {
-            count: result.added,
-          }),
+          message: t(
+            withReview
+              ? result.added === 1
+                ? "admin.discover.added.restaurant.reviewed"
+                : "admin.discover.added.restaurants.reviewed"
+              : addedMessageKey("restaurants", result.added),
+            { count: result.added },
+          ),
         });
+        if ((result.enrichmentQueued ?? 0) > 0) {
+          void (async () => {
+            for (const delayMs of [4_000, 10_000, 20_000]) {
+              await new Promise((resolve) => setTimeout(resolve, delayMs));
+              onRestaurantsAdded?.();
+            }
+          })();
+        }
       } else if (kind === "drinks") {
         const drinks = picked.map(
           (entry) => (entry as Extract<Item, { kind: "drinks" }>).item,
@@ -263,7 +279,7 @@ export function AdminDiscoverModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/50 p-4 sm:items-center"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-4 sm:items-center"
       onClick={onClose}
       role="presentation"
     >
@@ -385,18 +401,63 @@ export function AdminDiscoverModal({
                                     {t("admin.discover.restaurants.verified")}
                                   </span>
                                 ) : null}
+                                {entry.item.confidence ? (
+                                  <span className="ml-2 text-xs font-medium uppercase tracking-wide text-ink-soft">
+                                    {t("admin.discover.restaurants.confidence", {
+                                      level: entry.item.confidence,
+                                    })}
+                                  </span>
+                                ) : null}
                               </span>
                               <span className="mt-1 block text-sm text-ink-soft">
                                 {entry.item.address}, {entry.item.city}
+                                {entry.item.cuisine
+                                  ? ` · ${entry.item.cuisine}`
+                                  : null}
                                 {entry.item.authenticityRating != null
                                   ? ` · ${t("admin.discover.restaurants.authenticity", {
                                       rating: entry.item.authenticityRating,
                                     })}`
                                   : null}
                               </span>
-                              {entry.item.authenticityNotes ? (
+                              {entry.item.cuisineEvidence ||
+                              entry.item.authenticityNotes ? (
                                 <span className="mt-1 block text-sm text-ink-soft">
-                                  {entry.item.authenticityNotes}
+                                  {entry.item.cuisineEvidence ||
+                                    entry.item.authenticityNotes}
+                                </span>
+                              ) : null}
+                              {entry.item.website ||
+                              entry.item.evidenceSourceUrl ? (
+                                <span className="mt-1 block text-sm text-ink-soft">
+                                  {entry.item.website ? (
+                                    <a
+                                      href={entry.item.website}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="font-semibold text-tomato underline-offset-2 hover:underline"
+                                    >
+                                      {t("admin.discover.restaurants.website")}
+                                    </a>
+                                  ) : null}
+                                  {entry.item.website &&
+                                  entry.item.evidenceSourceUrl &&
+                                  entry.item.evidenceSourceUrl !==
+                                    entry.item.website
+                                    ? " · "
+                                    : null}
+                                  {entry.item.evidenceSourceUrl &&
+                                  entry.item.evidenceSourceUrl !==
+                                    entry.item.website ? (
+                                    <a
+                                      href={entry.item.evidenceSourceUrl}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      className="font-semibold text-tomato underline-offset-2 hover:underline"
+                                    >
+                                      {t("admin.discover.restaurants.evidence")}
+                                    </a>
+                                  ) : null}
                                 </span>
                               ) : null}
                             </>
@@ -468,16 +529,43 @@ export function AdminDiscoverModal({
         <div className="shrink-0 border-t border-ink/10 px-5 py-4 sm:px-7">
           {state.status === "ready" ? (
             <div className="flex flex-wrap gap-3">
-              <button
-                type="button"
-                onClick={() => void saveSelected()}
-                disabled={saving || selected.size === 0}
-                className="inline-flex min-h-12 items-center rounded-full bg-ink px-5 font-semibold text-cream disabled:opacity-60"
-              >
-                {saving
-                  ? t("admin.discover.adding")
-                  : t("admin.discover.addSelected", { count: selected.size })}
-              </button>
+              {kind === "restaurants" ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => void saveSelected({ review: false })}
+                    disabled={saving || selected.size === 0}
+                    className="inline-flex min-h-12 items-center rounded-full bg-ink px-5 font-semibold text-cream disabled:opacity-60"
+                  >
+                    {saving
+                      ? t("admin.discover.adding")
+                      : t("admin.discover.add", { count: selected.size })}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void saveSelected({ review: true })}
+                    disabled={saving || selected.size === 0}
+                    className="inline-flex min-h-12 items-center rounded-full bg-tomato px-5 font-semibold text-cream disabled:opacity-60"
+                  >
+                    {saving
+                      ? t("admin.discover.adding")
+                      : t("admin.discover.addAndReview", {
+                          count: selected.size,
+                        })}
+                  </button>
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => void saveSelected()}
+                  disabled={saving || selected.size === 0}
+                  className="inline-flex min-h-12 items-center rounded-full bg-ink px-5 font-semibold text-cream disabled:opacity-60"
+                >
+                  {saving
+                    ? t("admin.discover.adding")
+                    : t("admin.discover.addSelected", { count: selected.size })}
+                </button>
+              )}
               <button
                 type="button"
                 onClick={onClose}

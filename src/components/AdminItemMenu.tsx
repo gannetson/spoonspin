@@ -17,6 +17,7 @@ export type AdminItemAction =
   | "remove"
   | "replace-image"
   | "select-image"
+  | "edit-text"
   | "replace-text"
   | "find-menu"
   | "find-scores"
@@ -27,6 +28,8 @@ type AdminItemMenuProps = {
   /** Hide replace-image for items without photos (e.g. specialty shops). */
   showReplaceImage?: boolean;
   showReplaceText?: boolean;
+  /** Manual sectioned recipe copy editor. */
+  showEditText?: boolean;
   /** Recipe/drink: add to the Dinner tab composition. */
   showSelectForDinner?: boolean;
   /** Only show the remove action (e.g. dinner membership). */
@@ -53,6 +56,7 @@ export function AdminItemMenu({
   label,
   showReplaceImage = true,
   showReplaceText = true,
+  showEditText = false,
   showSelectForDinner = false,
   removeOnly = false,
   removeHintKey = "admin.item.remove.hint",
@@ -224,6 +228,24 @@ export function AdminItemMenu({
                 </span>
               </button>
               </>
+            ) : null}
+            {!removeOnly && showEditText ? (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => run("edit-text")}
+                className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
+              >
+                <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
+                <span>
+                  <span className="block font-semibold text-ink">
+                    {t("admin.item.editRecipe")}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-soft">
+                    {t("admin.item.editRecipe.hint")}
+                  </span>
+                </span>
+              </button>
             ) : null}
             {!removeOnly && showReplaceText ? (
             <button

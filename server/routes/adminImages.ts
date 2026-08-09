@@ -3,7 +3,7 @@ import path from "node:path";
 import type { Express } from "express";
 import multer from "multer";
 import { z } from "zod";
-import { requireAdmin, type AuthedRequest } from "./auth.ts";
+import { requireEditorOrAdmin, type AuthedRequest } from "./auth.ts";
 import {
   getCountryFromDb,
   getRecipeRow,
@@ -21,6 +21,7 @@ import {
   updateRestaurantPhoto,
 } from "../db/restaurants.ts";
 import { searchCommonsImagesPage } from "../lib/wikimedia.ts";
+import { fetchWebsiteImageCandidates } from "../lib/websiteImages.ts";
 import { getCountryDrinks } from "../../src/content/countries/menuAccessors.ts";
 import { stableMapsUrl } from "../../src/restaurants/utils.ts";
 import type { Recipe } from "../../src/types/content.ts";
@@ -251,10 +252,23 @@ function statusFromError(error: unknown): number {
   return 500;
 }
 
+function editorMayOnlyEditRecipes(
+  req: AuthedRequest,
+  res: import("express").Response,
+  targetKind: string,
+): boolean {
+  if (req.user?.role === "admin") return true;
+  if (req.user?.role === "editor" && targetKind === "recipe") return true;
+  res.status(403).json({
+    message: "Editors can only change recipe images.",
+  });
+  return false;
+}
+
 export function registerAdminImageRoutes(app: Express): void {
   app.get(
     "/api/admin/images/search",
-    requireAdmin,
+    requireEditorOrAdmin,
     async (req: AuthedRequest, res) => {
       try {
         const q = String(req.query.q ?? "").trim();
@@ -263,15 +277,60 @@ export function registerAdminImageRoutes(app: Express): void {
           24,
           Math.max(1, Number(req.query.limit ?? 12) || 12),
         );
+        const restaurantId = String(req.query.restaurantId ?? "").trim();
+
+        let websiteResults: Array<{
+          url: string;
+          attribution: string;
+          title: string;
+        }> = [];
+        if (restaurantId && offset === 0) {
+          try {
+            const restaurant = await getRestaurantById(restaurantId);
+            if (restaurant?.website) {
+              websiteResults = await fetchWebsiteImageCandidates(
+                restaurant.website,
+                {
+                  restaurantName: restaurant.name,
+                  excludeUrls: [restaurant.photoUrl],
+                },
+              );
+            }
+          } catch (error) {
+            console.warn("Restaurant website image prepend failed", error);
+          }
+        }
+
         if (!q) {
-          res.json({ results: [], nextOffset: null, totalHits: 0, offset, limit });
+          res.json({
+            results: websiteResults.slice(0, limit),
+            nextOffset: null,
+            totalHits: websiteResults.length,
+            offset,
+            limit,
+          });
           return;
         }
-        const page = await searchCommonsImagesPage(q, { offset, limit });
+
+        const commonsLimit = Math.max(1, limit - websiteResults.length);
+        const page = await searchCommonsImagesPage(q, {
+          offset,
+          limit: commonsLimit,
+        });
+        const seen = new Set(websiteResults.map((item) => item.url));
+        const commonsResults = page.results.filter((item) => {
+          if (seen.has(item.url)) return false;
+          seen.add(item.url);
+          return true;
+        });
+        const results = [...websiteResults, ...commonsResults].slice(0, limit);
+        const totalHits =
+          (page.totalHits ?? commonsResults.length) + websiteResults.length;
+
         res.json({
-          results: page.results,
+          results,
           nextOffset: page.nextOffset,
-          totalHits: page.totalHits,
+          totalHits,
           offset,
           limit,
         });
@@ -289,7 +348,7 @@ export function registerAdminImageRoutes(app: Express): void {
 
   app.post(
     "/api/admin/images/set",
-    requireAdmin,
+    requireEditorOrAdmin,
     async (req: AuthedRequest, res) => {
       try {
         const parsed = setImageSchema.safeParse(req.body);
@@ -298,6 +357,7 @@ export function registerAdminImageRoutes(app: Express): void {
           return;
         }
         const { target, imageUrl, imageAttribution } = parsed.data;
+        if (!editorMayOnlyEditRecipes(req, res, target.kind)) return;
         const result = await applyImage(target, imageUrl, imageAttribution);
         res.json(result);
       } catch (error) {
@@ -312,7 +372,7 @@ export function registerAdminImageRoutes(app: Express): void {
 
   app.post(
     "/api/admin/images/upload",
-    requireAdmin,
+    requireEditorOrAdmin,
     (req: AuthedRequest, res, next) => {
       upload.single("image")(req, res, (err) => {
         if (err) {
@@ -350,6 +410,14 @@ export function registerAdminImageRoutes(app: Express): void {
             // ignore
           }
           res.status(400).json({ message: "Invalid image target." });
+          return;
+        }
+        if (!editorMayOnlyEditRecipes(req, res, targetParsed.data.kind)) {
+          try {
+            fs.unlinkSync(file.path);
+          } catch {
+            // ignore
+          }
           return;
         }
 

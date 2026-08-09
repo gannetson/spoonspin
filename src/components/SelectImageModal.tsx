@@ -47,6 +47,8 @@ export function SelectImageModal({
   const [applyBusy, setApplyBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
+  const restaurantId =
+    target.kind === "restaurant" ? target.restaurantId : undefined;
 
   useEffect(() => {
     if (!open) return;
@@ -59,10 +61,15 @@ export function SelectImageModal({
     setSearched(false);
     setApplyBusy(false);
     const q = defaultQuery.trim();
-    if (!q) return;
+    if (!q && !restaurantId) return;
     let cancelled = false;
     setSearchBusy(true);
-    void searchAdminImages({ q, offset: 0, limit: PAGE_SIZE })
+    void searchAdminImages({
+      q,
+      offset: 0,
+      limit: PAGE_SIZE,
+      restaurantId,
+    })
       .then((page) => {
         if (cancelled) return;
         setResults(page.results);
@@ -86,7 +93,7 @@ export function SelectImageModal({
     return () => {
       cancelled = true;
     };
-  }, [open, defaultQuery, t]);
+  }, [open, defaultQuery, restaurantId, t]);
 
   useEffect(() => {
     if (!open) return;
@@ -99,7 +106,7 @@ export function SelectImageModal({
 
   async function runSearch(nextOffsetValue = 0) {
     const q = query.trim();
-    if (!q) {
+    if (!q && !restaurantId) {
       setError(t("admin.selectImage.searchRequired"));
       return;
     }
@@ -110,6 +117,7 @@ export function SelectImageModal({
         q,
         offset: nextOffsetValue,
         limit: PAGE_SIZE,
+        restaurantId,
       });
       setResults(page.results);
       setOffset(page.offset);
@@ -171,7 +179,7 @@ export function SelectImageModal({
 
   return (
     <div
-      className="fixed inset-0 z-[90] flex items-end justify-center bg-ink/50 p-4 sm:items-center"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-4 sm:items-center"
       onClick={() => {
         if (!applyBusy) onClose();
       }}

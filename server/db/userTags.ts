@@ -200,13 +200,21 @@ export async function setTagPhotoUrls(
 
 export async function getUserTagSummary(userId: string): Promise<TagSummary> {
   const db = await ensureDb();
-  const [countryResult, countResult] = await Promise.all([
+  const [countryResult, plannedResult, countResult] = await Promise.all([
     db.query(
       `SELECT DISTINCT LOWER(country_code) AS code
        FROM user_tags
        WHERE user_id = $1
          AND intent = 'did'
          AND entity_type IN ('recipe', 'restaurant')
+       ORDER BY code`,
+      [userId],
+    ),
+    db.query(
+      `SELECT DISTINCT LOWER(country_code) AS code
+       FROM user_tags
+       WHERE user_id = $1
+         AND intent = 'want'
        ORDER BY code`,
       [userId],
     ),
@@ -225,13 +233,17 @@ export async function getUserTagSummary(userId: string): Promise<TagSummary> {
   ]);
 
   const countryCodes = countryResult.rows.map((row) => String(row.code));
+  const plannedCountryCodes = plannedResult.rows.map((row) => String(row.code));
   const countriesTasted = countryCodes.length;
+  const countriesPlanned = plannedCountryCodes.length;
   const progress = resolveLevelProgress(countriesTasted);
   const counts = countResult.rows[0] ?? {};
 
   return {
     countriesTasted,
     countryCodes,
+    countriesPlanned,
+    plannedCountryCodes,
     counts: {
       total: Number(counts.total ?? 0),
       want: Number(counts.want ?? 0),

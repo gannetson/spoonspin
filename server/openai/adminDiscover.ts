@@ -4,8 +4,11 @@ import { countryCatalog } from "../../src/content/countries/catalog.ts";
 import { OSM_CUISINE_BY_COUNTRY } from "../../src/restaurants/osmCuisineMap.ts";
 import {
   isGooglePlacesConfigured,
-  lookupGoogleRestaurant,
+  officialWebsiteOrUndefined,
+  searchGoogleRestaurantsByCuisine,
+  type GroundedPlace,
 } from "../lib/googlePlacesLookup.ts";
+import { searchOsmRestaurantsForCountry } from "../lib/osmRestaurantSearch.ts";
 import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
 import { chatJson, isOpenAiConfigured } from "./suggest.ts";
 
@@ -83,23 +86,7 @@ const recipesDiscoverSchema = z.object({
   recipes: z.array(dishCandidateSchema).min(1).max(20),
 });
 
-const restaurantItemSchema = z.object({
-  name: z.string().min(1),
-  address: z.string().min(1),
-  city: z.string().min(1),
-  postcode: optionalString,
-  website: optionalString,
-  mapsUrl: optionalString,
-  lat: optionalNumber,
-  lng: optionalNumber,
-  authenticityNotes: optionalString,
-  phone: optionalString,
-});
-
-const restaurantsDiscoverSchema = z.object({
-  notes: z.string(),
-  restaurants: z.array(restaurantItemSchema).min(1).max(20),
-});
+const restaurantConfidenceSchema = z.enum(["high", "medium", "low"]);
 
 const restaurantVerifyItemSchema = z.object({
   name: z.string().min(1),
@@ -107,13 +94,79 @@ const restaurantVerifyItemSchema = z.object({
   accept: z.boolean(),
   authenticityRating: z.coerce.number().min(1).max(5),
   authenticityNotes: z.string().min(20),
+  cuisineEvidence: optionalString,
+  evidenceSourceUrl: optionalString,
+  confidence: restaurantConfidenceSchema.optional(),
   reason: optionalString,
 });
 
 const restaurantsVerifySchema = z.object({
   notes: z.string(),
-  verifications: z.array(restaurantVerifyItemSchema).min(1).max(20),
+  verifications: z.array(restaurantVerifyItemSchema).max(24),
 });
+
+function confidenceToRating(
+  confidence: "high" | "medium" | "low" | undefined,
+): number {
+  if (confidence === "high") return 5;
+  if (confidence === "medium") return 4;
+  return 3;
+}
+
+const WEAK_NAME_RE =
+  /\b(hotel|ibis|hilton|marriott|nh hotel|novotel|all.?you.?can.?eat|ayce|buffet|catering|supermarket|toko\s+online)\b/i;
+
+function looksWeakCandidate(name: string): boolean {
+  return WEAK_NAME_RE.test(name);
+}
+
+function confidenceFromPlaces(place: GroundedPlace): "high" | "medium" {
+  const reviews = place.reviewCount ?? 0;
+  const rating = place.rating ?? 0;
+  if (reviews >= 40 && rating >= 4.2) return "high";
+  if (reviews >= 10 && rating >= 3.8) return "high";
+  return "medium";
+}
+
+function groundedToDiscovered(
+  place: GroundedPlace,
+  cuisine: string,
+): DiscoveredRestaurant | null {
+  if (looksWeakCandidate(place.name)) return null;
+  if (!place.address?.trim() || place.address === "Netherlands") return null;
+  const confidence = confidenceFromPlaces(place);
+  const cuisineEvidence =
+    place.source === "google"
+      ? `Google Places match${place.matchedQuery ? ` for “${place.matchedQuery}”` : ""}${
+          place.rating != null
+            ? ` · ${place.rating.toFixed(1)}★ (${place.reviewCount ?? 0} reviews)`
+            : ""
+        }.`
+      : `OpenStreetMap cuisine tag match near ${place.city}.`;
+  const mapsUrl = stableMapsUrl(place.mapsUrl, {
+    name: place.name,
+    address: place.address,
+    city: place.city,
+  });
+  return {
+    name: place.name,
+    address: place.address,
+    city: place.city,
+    postcode: place.postcode,
+    website: officialWebsiteOrUndefined(place.website),
+    mapsUrl,
+    lat: place.lat,
+    lng: place.lng,
+    cuisine,
+    cuisineEvidence,
+    evidenceSourceUrl: officialWebsiteOrUndefined(place.website) ?? mapsUrl,
+    confidence,
+    authenticityNotes: cuisineEvidence,
+    authenticityRating: confidenceToRating(confidence),
+    phone: place.phone,
+    verified: place.source === "google",
+  };
+}
 
 const shopItemSchema = z.object({
   name: z.string().min(1),
@@ -210,6 +263,10 @@ export type DiscoveredRestaurant = {
   mapsUrl: string;
   lat?: number;
   lng?: number;
+  cuisine?: string;
+  cuisineEvidence?: string;
+  evidenceSourceUrl?: string;
+  confidence?: "high" | "medium" | "low";
   authenticityNotes?: string;
   authenticityRating?: number;
   phone?: string;
@@ -347,146 +404,110 @@ export async function discoverCountryRestaurants(input: {
   countryCode: string;
   countryName: string;
   query?: string;
+  cuisineAliases?: string[];
 }): Promise<{ notes: string; restaurants: DiscoveredRestaurant[] }> {
-  const focus = input.query?.trim()
-    ? `Focus on: ${input.query.trim()}`
-    : "Prefer family-run or chef-driven specialists that mainly serve this cuisine.";
-
-  const raw = await chatJson(
-    `You research REAL restaurants in the Netherlands that specialise in one national cuisine.
-Reply with JSON only.
-
-Strict rules:
-- Only name places you are confident actually exist at that address today.
-- Prefer authentic specialists (national/regional cuisine as the main offering), not generic "world food", all-you-can-eat, hotel restaurants, or casual chains.
-- Reject fusion-only, pan-Asian (unless the cuisine IS pan-Asian), pizza/kebab takeaways, and places whose menu is mostly Dutch/international.
-- City must be in the Netherlands. Give a real street address when known.
-- Never invent goo.gl or short Maps links — omit mapsUrl if unsure.
-- Prefer quality over quantity: fewer authentic places beat a long weak list.
-- If unsure a place is a true specialist for this cuisine, omit it.`,
-    `Cuisine country: ${input.countryName} (${input.countryCode})
-${focus}
-
-Return up to 10 specialist restaurants you are confident about.
-
-JSON shape:
-{
-  "notes": string,
-  "restaurants": [{
-    "name": string,
-    "address": string,
-    "city": string,
-    "postcode": string?,
-    "website": string?,
-    "mapsUrl": string?,
-    "lat": number?,
-    "lng": number?,
-    "authenticityNotes": string?,
-    "phone": string?
-  }]
-}`,
-  );
-
-  const parsed = restaurantsDiscoverSchema.parse(raw);
-  const placesConfigured = isGooglePlacesConfigured();
-
-  // 1) Ground each candidate in Google Places (existence + address).
-  const grounded: DiscoveredRestaurant[] = [];
-  let placesMisses = 0;
-  for (const place of parsed.restaurants) {
-    let match: Awaited<ReturnType<typeof lookupGoogleRestaurant>> = null;
-    if (placesConfigured) {
-      try {
-        match = await lookupGoogleRestaurant({
-          name: place.name,
-          city: place.city,
-          address: place.address,
-        });
-      } catch (error) {
-        console.warn(
-          `Places verify failed for ${place.name} (${place.city})`,
-          error,
-        );
-      }
-    }
-
-    if (placesConfigured && !match) {
-      placesMisses += 1;
-      continue;
-    }
-
-    const name = match?.name ?? place.name;
-    const address = match?.address ?? place.address;
-    const city = match?.city ?? place.city;
-    const website =
-      match?.website && /^https?:\/\//i.test(match.website)
-        ? match.website
-        : place.website && /^https?:\/\//i.test(place.website)
-          ? place.website
-          : undefined;
-    const mapsUrl = stableMapsUrl(match?.mapsUrl ?? place.mapsUrl, {
-      name,
-      address,
-      city,
-    });
-
-    grounded.push({
-      name,
-      address,
-      city,
-      postcode: match?.postcode ?? place.postcode,
-      website,
-      mapsUrl,
-      lat: match?.lat ?? place.lat,
-      lng: match?.lng ?? place.lng,
-      authenticityNotes: place.authenticityNotes,
-      phone: match?.phone ?? place.phone,
-      verified: Boolean(match),
-    });
+  if (!isGooglePlacesConfigured()) {
+    throw new Error(
+      "GOOGLE_PLACES_API_KEY is not configured. Restaurant discover needs Google Places.",
+    );
   }
+
+  const cuisine = input.countryName;
+  const aliasSet = new Set<string>();
+  for (const alias of input.cuisineAliases ?? []) {
+    const trimmed = alias.trim();
+    if (trimmed) aliasSet.add(trimmed);
+  }
+  aliasSet.add(`${cuisine} restaurant`);
+  aliasSet.add(`${cuisine} restaurant Nederland`);
+  const aliases = [...aliasSet].slice(0, 8);
+  const focus = input.query?.trim() || undefined;
+
+  const placesHits = await searchGoogleRestaurantsByCuisine({
+    aliases,
+    focus,
+    maxPerQuery: 8,
+  });
+
+  let osmHits: GroundedPlace[] = [];
+  try {
+    osmHits = await searchOsmRestaurantsForCountry({
+      countryCode: input.countryCode,
+    });
+  } catch (error) {
+    console.warn("OSM restaurant supplement failed", error);
+  }
+
+  const byKey = new Map<string, GroundedPlace>();
+  for (const place of placesHits) {
+    byKey.set(place.placeId, place);
+  }
+  for (const place of osmHits) {
+    // Prefer Google when both sources find the same name+city.
+    const nameCity = `${place.name.trim().toLowerCase()}|${place.city.trim().toLowerCase()}`;
+    const already = [...byKey.values()].some(
+      (existing) =>
+        `${existing.name.trim().toLowerCase()}|${existing.city.trim().toLowerCase()}` ===
+        nameCity,
+    );
+    if (!already) byKey.set(place.placeId, place);
+  }
+
+  const grounded = [...byKey.values()]
+    .map((place) => groundedToDiscovered(place, cuisine))
+    .filter((place): place is DiscoveredRestaurant => Boolean(place));
+
+  const parts = [
+    `Found ${placesHits.length} Google Places hit(s) across major Dutch cities` +
+      (osmHits.length > 0 ? ` and ${osmHits.length} OSM specialty match(es)` : "") +
+      ` for ${cuisine}.`,
+  ];
+  if (focus) parts.push(`Focus: ${focus}.`);
 
   if (grounded.length === 0) {
     return {
-      notes: placesConfigured
-        ? `${parsed.notes} None of the candidates could be verified on Google Places in the Netherlands (${placesMisses} rejected). Try a tighter city or specialist focus.`
-        : `${parsed.notes} No candidates survived filtering. Set GOOGLE_PLACES_API_KEY to verify places, or try a different focus.`,
+      notes: `${parts.join(" ")} No suitable specialists remained after filtering. Try a city name in the focus field.`,
       restaurants: [],
     };
   }
 
-  // 2) Authenticity gate — drop false positives / weak matches.
-  const verification = await verifyRestaurantAuthenticity({
-    countryCode: input.countryCode,
-    countryName: input.countryName,
-    restaurants: grounded,
-  });
-
-  const rejected = grounded.length - verification.restaurants.length;
-  const parts = [parsed.notes, verification.notes].filter(Boolean);
-  if (!placesConfigured) {
-    parts.push(
-      "GOOGLE_PLACES_API_KEY is not set — candidates were authenticity-checked only. Set the key to verify places exist in Google.",
-    );
-  }
-  if (placesConfigured && placesMisses > 0) {
-    parts.push(
-      `Dropped ${placesMisses} candidate(s) that Google Places could not confirm in the Netherlands.`,
-    );
-  }
-  if (rejected > 0) {
-    parts.push(
-      `Dropped ${rejected} candidate(s) that failed the authenticity check.`,
-    );
-  }
-  if (verification.restaurants.length === 0) {
-    parts.push(
-      "No authentic specialists remained after verification. Try another city or a more specific query.",
-    );
+  // Soft OpenAI authenticity filter when configured — cannot invent new names.
+  if (isOpenAiConfigured()) {
+    try {
+      const verification = await verifyRestaurantAuthenticity({
+        countryCode: input.countryCode,
+        countryName: input.countryName,
+        restaurants: grounded.slice(0, 20),
+      });
+      const rejected = grounded.length - verification.restaurants.length;
+      if (verification.notes) parts.push(verification.notes);
+      if (rejected > 0) {
+        parts.push(
+          `Dropped ${rejected} candidate(s) that failed the authenticity check.`,
+        );
+      }
+      if (verification.restaurants.length === 0) {
+        parts.push(
+          "No authentic specialists remained after verification. Showing unfiltered Places/OSM hits instead.",
+        );
+        return {
+          notes: parts.join(" "),
+          restaurants: grounded.slice(0, 16),
+        };
+      }
+      return {
+        notes: parts.join(" "),
+        restaurants: verification.restaurants.slice(0, 16),
+      };
+    } catch (error) {
+      console.warn("Authenticity verify failed; returning Places/OSM list", error);
+      parts.push("Authenticity check skipped due to an error.");
+    }
   }
 
   return {
     notes: parts.join(" "),
-    restaurants: verification.restaurants,
+    restaurants: grounded.slice(0, 16),
   };
 }
 
@@ -500,20 +521,34 @@ async function verifyRestaurantAuthenticity(input: {
   }
 
   const listing = input.restaurants
-    .map(
-      (place, index) =>
-        `${index + 1}. ${place.name} — ${place.address}, ${place.city}` +
-        (place.website ? ` — ${place.website}` : ""),
-    )
+    .map((place, index) => {
+      const parts = [
+        `${index + 1}. ${place.name} — ${place.address}, ${place.city}`,
+        place.website ? `website: ${place.website}` : "website: (none)",
+        place.cuisineEvidence
+          ? `claimed evidence: ${place.cuisineEvidence}`
+          : null,
+        place.evidenceSourceUrl
+          ? `evidence source: ${place.evidenceSourceUrl}`
+          : null,
+        place.confidence ? `claimed confidence: ${place.confidence}` : null,
+      ];
+      return parts.filter(Boolean).join(" | ");
+    })
     .join("\n");
 
   const raw = await chatJson(
-    `You verify whether restaurants in the Netherlands are authentic specialists for a given national cuisine.
+    `You verify whether restaurants in the Netherlands are genuine specialists for a given national cuisine.
 Reply with JSON only.
 
-Accept only when the place mainly serves that cuisine (or a closely related regional cuisine diners would expect under that flag).
-Reject: wrong cuisine, generic Asian/Mediterranean, fusion-first concepts, hotel restaurants, chains with token dishes, closed/unknown venues, or places you are not confident about.
-authenticityRating 1–5 (only accept if rating >= 3). authenticityNotes must explain why it is (or is not) authentic.`,
+Accept only when the place mainly serves that cuisine (or a closely related regional cuisine diners would expect under that flag), is currently operating, and has a real NL address.
+Reject: wrong cuisine, incidental single-dish mentions, caterers, supermarkets, recipe sites, closed venues, directory-only listings, fusion-first concepts, hotel restaurants, chains with token dishes, or anything you are not confident about.
+Prefer fewer accepts over uncertain ones.
+confidence: "high" | "medium" | "low" — only accept high or medium.
+authenticityRating 1–5 (only accept if rating >= 4).
+cuisineEvidence: short note citing menu/About/description proof.
+evidenceSourceUrl: official page URL if known, otherwise null (never invent; never use Tripadvisor/TheFork/Thuisbezorgd/Uber Eats).
+authenticityNotes: 1–3 sentences explaining the accept/reject.`,
     `Cuisine country: ${input.countryName} (${input.countryCode})
 
 Candidates:
@@ -530,6 +565,9 @@ JSON shape:
     "accept": boolean,
     "authenticityRating": number,
     "authenticityNotes": string,
+    "cuisineEvidence": string?,
+    "evidenceSourceUrl": string | null,
+    "confidence": "high" | "medium" | "low",
     "reason": string?
   }]
 }`,
@@ -555,9 +593,28 @@ JSON shape:
       );
     }
     if (!verdict?.accept) continue;
-    if (verdict.authenticityRating < 3) continue;
+    if (verdict.confidence === "low") continue;
+    if (verdict.authenticityRating < 4) continue;
+    const confidence =
+      verdict.confidence === "high" || verdict.confidence === "medium"
+        ? verdict.confidence
+        : place.confidence === "high"
+          ? "high"
+          : "medium";
+    const cuisineEvidence =
+      verdict.cuisineEvidence?.trim() ||
+      place.cuisineEvidence ||
+      verdict.authenticityNotes;
+    const evidenceSourceUrl =
+      officialWebsiteOrUndefined(verdict.evidenceSourceUrl) ??
+      place.evidenceSourceUrl ??
+      place.website;
     accepted.push({
       ...place,
+      website: officialWebsiteOrUndefined(place.website),
+      cuisineEvidence,
+      evidenceSourceUrl,
+      confidence,
       authenticityRating: Math.round(verdict.authenticityRating * 10) / 10,
       authenticityNotes: verdict.authenticityNotes,
       verified: true,

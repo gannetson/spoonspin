@@ -59,6 +59,11 @@ cd spoonspin
 cp .env.example .env
 # edit .env — must include:
 #   NODE_ENV=production
+#   APP_URL=https://spoonspin.nl
+#   # Google OAuth: add https://spoonspin.nl/api/auth/google/callback
+#   # as an Authorized redirect URI on the Web client, and set:
+#   #   GOOGLE_CLIENT_ID=...
+#   #   GOOGLE_CLIENT_SECRET=...
 #   DATABASE_URL=postgresql:///spoonspin   # peer/trust via Unix socket (no password)
 #   # If the API runs as www-data, create a matching DB role, e.g.:
 #   #   sudo -u postgres createuser www-data
@@ -79,6 +84,13 @@ npm run build
 sudo chown -R www-data:www-data /var/www/spoonspin
 sudo chmod 640 /var/www/spoonspin/spoonspin/.env
 ```
+
+## Runtime notes
+
+- Supervisor must run **Node 20+** (Web Crypto). If Google login fails with `crypto is not defined`, the process is still on Ubuntu’s Node 18 — put a newer Node first in the supervisor `PATH` (see `deploy/supervisor/spoonspin.conf`).
+- DB tables must be owned by the app OS role (`www-data` for peer auth). If migrations log `must be owner of table …`, run:
+  `sudo -u postgres psql spoonspin -c 'REASSIGN OWNED BY gannetson TO "www-data";'`
+- Set `APP_URL=https://spoonspin.nl` and register `https://spoonspin.nl/api/auth/google/callback` in Google Cloud Console.
 
 ## Install nginx + supervisor
 

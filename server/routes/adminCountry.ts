@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { createHash } from "node:crypto";
-import { requireAdmin, type AuthedRequest } from "./auth.ts";
+import {
+  requireAdmin,
+  requireEditorOrAdmin,
+  type AuthedRequest,
+} from "./auth.ts";
 import {
   appendMoreDrinks,
   appendMoreRecipes,
@@ -40,6 +44,7 @@ import {
   findVisibleCommunityRecipe,
   updateCommunityRecipe,
 } from "../db/submissions.ts";
+import { isGooglePlacesConfigured } from "../lib/googlePlacesLookup.ts";
 import {
   discoverCountryDrinks,
   discoverCountryImageQueries,
@@ -60,6 +65,7 @@ import {
   rewriteShopText,
 } from "../openai/adminDiscover.ts";
 import { findCuisineImageFromQueries, sameImageUrl } from "../lib/wikimedia.ts";
+import { fetchBestWebsiteRestaurantPhoto } from "../lib/websiteImages.ts";
 import {
   fetchGoogleRestaurantPhoto,
   isGooglePlacesConfigured,
@@ -111,6 +117,41 @@ const recipeSchema = z.object({
   videoUrl: z.string().nullish(),
 });
 
+/** Manual copy edits — partial; omit unchanged fields. */
+const recipeCopyPatchSchema = z
+  .object({
+    localName: z.string().max(200).nullish(),
+    description: z.string().min(20).max(8000).optional(),
+    dietaryLabels: z.array(z.string().min(1).max(80)).max(24).optional(),
+    ingredients: z
+      .array(
+        z.object({
+          name: z.string().min(1),
+          quantity: z.number().positive(),
+          unit: z.string().min(1),
+          note: z.string().max(200).nullish(),
+        }),
+      )
+      .min(2)
+      .optional(),
+    steps: z.array(z.string().min(8).max(2000)).min(3).optional(),
+    substitutions: z.array(z.string().min(1).max(500)).max(40).nullish(),
+    servingSuggestion: z.string().max(2000).nullish(),
+    drinkPairing: z.string().max(2000).nullish(),
+  })
+  .refine(
+    (value) =>
+      value.localName !== undefined ||
+      value.description !== undefined ||
+      value.dietaryLabels !== undefined ||
+      value.ingredients !== undefined ||
+      value.steps !== undefined ||
+      value.substitutions !== undefined ||
+      value.servingSuggestion !== undefined ||
+      value.drinkPairing !== undefined,
+    { message: "Provide at least one recipe field to update." },
+  );
+
 const restaurantSchema = z.object({
   name: z.string().min(1),
   address: z.string().min(1),
@@ -120,6 +161,10 @@ const restaurantSchema = z.object({
   mapsUrl: z.string().nullish(),
   lat: z.number().nullish(),
   lng: z.number().nullish(),
+  cuisine: z.string().nullish(),
+  cuisineEvidence: z.string().nullish(),
+  evidenceSourceUrl: z.string().nullish(),
+  confidence: z.enum(["high", "medium", "low"]).nullish(),
   authenticityNotes: z.string().nullish(),
   authenticityRating: z.number().min(1).max(5).nullish(),
   phone: z.string().nullish(),
@@ -202,6 +247,17 @@ function openaiRequired(
   if (isOpenAiConfigured()) return true;
   res.status(503).json({
     message: "OPENAI_API_KEY is not configured.",
+  });
+  return false;
+}
+
+function placesRequired(
+  res: import("express").Response,
+): boolean {
+  if (isGooglePlacesConfigured()) return true;
+  res.status(503).json({
+    message:
+      "GOOGLE_PLACES_API_KEY is not configured. Restaurant discover needs Google Places.",
   });
   return false;
 }
@@ -547,7 +603,7 @@ export function registerAdminCountryRoutes(
     "/api/admin/countries/:code/discover/restaurants",
     requireAdmin,
     async (req: AuthedRequest, res) => {
-      if (!openaiRequired(res)) return;
+      if (!placesRequired(res)) return;
       const parsed = querySchema.safeParse(req.body ?? {});
       if (!parsed.success) {
         res.status(400).json({ message: "Invalid request." });
@@ -563,6 +619,7 @@ export function registerAdminCountryRoutes(
           countryCode: country.code,
           countryName: country.name,
           query: parsed.data.query,
+          cuisineAliases: country.cuisineAliases,
         });
         res.json(result);
       } catch (error) {
@@ -579,7 +636,11 @@ export function registerAdminCountryRoutes(
     requireAdmin,
     async (req: AuthedRequest, res) => {
       const parsed = z
-        .object({ restaurants: z.array(restaurantSchema).min(1).max(50) })
+        .object({
+          restaurants: z.array(restaurantSchema).min(1).max(50),
+          /** Queue menu/text/scores/image enrichment after save. */
+          review: z.boolean().optional(),
+        })
         .safeParse(req.body);
       if (!parsed.success) {
         res
@@ -593,6 +654,7 @@ export function registerAdminCountryRoutes(
           res.status(404).json({ message: "Country not found." });
           return;
         }
+        const shouldReview = parsed.data.review === true;
 
         let added = 0;
         const enrichmentJobs: Array<{
@@ -621,7 +683,7 @@ export function registerAdminCountryRoutes(
           let address = place.address;
           let city = place.city;
           let postcode = place.postcode ?? null;
-          let website = place.website ?? null;
+          let website = place.website?.trim() || null;
           let phone = place.phone ?? null;
           let mapsUrl = stableMapsUrl(place.mapsUrl, {
             name: place.name,
@@ -660,11 +722,27 @@ export function registerAdminCountryRoutes(
             }
           }
 
+          // Never persist directory/delivery aggregators as the venue website.
+          if (
+            website &&
+            /tripadvisor\.|thefork\.|thuisbezorgd\.|ubereats\.|deliveroo\.|justeattakeaway\.|facebook\.com|instagram\.com/i.test(
+              website,
+            )
+          ) {
+            website = null;
+          }
+
           const restaurantId = `admin-${key}`;
           const authenticityRating =
             place.authenticityRating != null && place.authenticityRating >= 3
               ? place.authenticityRating
-              : 4;
+              : place.confidence === "high"
+                ? 5
+                : 4;
+          const authenticityNotes =
+            place.authenticityNotes?.trim() ||
+            place.cuisineEvidence?.trim() ||
+            `Admin-added specialist for ${country.name} cuisine.`;
           await upsertRestaurant({
             id: restaurantId,
             osmId: `admin:${key}`,
@@ -685,27 +763,30 @@ export function registerAdminCountryRoutes(
             mapsUrl,
             reviewed: true,
             authenticityRating,
-            authenticityNotes:
-              place.authenticityNotes ??
-              `Admin-added specialist for ${country.name} cuisine.`,
+            authenticityNotes,
             reviewedAt: new Date().toISOString(),
             reviewSource: verified
               ? "admin-discover-verified"
               : "admin-discover",
           });
-          enrichmentJobs.push({
-            restaurantId,
-            countryCode: country.code,
-            countryName: country.name,
-          });
+          if (shouldReview) {
+            enrichmentJobs.push({
+              restaurantId,
+              countryCode: country.code,
+              countryName: country.name,
+            });
+          }
           added += 1;
         }
 
-        const enrichmentQueued = scheduleRestaurantEnrichments(enrichmentJobs);
+        const enrichmentQueued = shouldReview
+          ? scheduleRestaurantEnrichments(enrichmentJobs)
+          : 0;
         res.json({
           added,
           countryCode: country.code,
           enrichmentQueued,
+          reviewed: shouldReview,
         });
       } catch (error) {
         console.error("Add restaurants failed", error);
@@ -992,7 +1073,7 @@ export function registerAdminCountryRoutes(
 
   app.delete(
     "/api/admin/countries/:code/recipes/:recipeId",
-    requireAdmin,
+    requireEditorOrAdmin,
     async (req: AuthedRequest, res) => {
       try {
         const code = String(req.params.code ?? "");
@@ -1027,7 +1108,7 @@ export function registerAdminCountryRoutes(
 
   app.post(
     "/api/admin/countries/:code/recipes/:recipeId/select-for-dinner",
-    requireAdmin,
+    requireEditorOrAdmin,
     async (req: AuthedRequest, res) => {
       try {
         const code = String(req.params.code ?? "");
@@ -1335,7 +1416,7 @@ export function registerAdminCountryRoutes(
 
   app.post(
     "/api/admin/countries/:code/recipes/:recipeId/replace-image",
-    requireAdmin,
+    requireEditorOrAdmin,
     async (req: AuthedRequest, res) => {
       if (!openaiRequired(res)) return;
       try {
@@ -1420,7 +1501,7 @@ export function registerAdminCountryRoutes(
 
   app.post(
     "/api/admin/countries/:code/recipes/:recipeId/replace-text",
-    requireAdmin,
+    requireEditorOrAdmin,
     async (req: AuthedRequest, res) => {
       if (!openaiRequired(res)) return;
       try {
@@ -1474,6 +1555,98 @@ export function registerAdminCountryRoutes(
             error instanceof Error
               ? error.message
               : "Could not replace recipe text.",
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/countries/:code/recipes/:recipeId",
+    requireEditorOrAdmin,
+    async (req: AuthedRequest, res) => {
+      const parsed = recipeCopyPatchSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        res.status(400).json({
+          message:
+            parsed.error.issues[0]?.message ?? "Invalid recipe edit payload.",
+        });
+        return;
+      }
+      try {
+        const code = String(req.params.code ?? "");
+        const recipeId = String(req.params.recipeId ?? "");
+        const country = await getCountryFromDb(code);
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+
+        const authored = await getRecipeRow(code, recipeId);
+        const community = authored
+          ? null
+          : await findVisibleCommunityRecipe(code, recipeId);
+        const existing = authored?.recipe ?? community?.recipe;
+        if (!existing) {
+          res.status(404).json({ message: "Recipe not found." });
+          return;
+        }
+
+        const body = parsed.data;
+        const patch: Partial<Recipe> = {};
+        if (body.localName !== undefined) {
+          patch.localName = body.localName?.trim() || undefined;
+        }
+        if (body.description !== undefined) {
+          patch.description = body.description.trim();
+        }
+        if (body.dietaryLabels !== undefined) {
+          patch.dietaryLabels = body.dietaryLabels.map((label) => label.trim());
+        }
+        if (body.ingredients !== undefined) {
+          patch.ingredients = body.ingredients.map((item) => ({
+            name: item.name.trim(),
+            quantity: item.quantity,
+            unit: item.unit.trim(),
+            note: item.note?.trim() || undefined,
+          }));
+        }
+        if (body.steps !== undefined) {
+          patch.steps = body.steps.map((step) => step.trim());
+        }
+        if (body.substitutions !== undefined) {
+          patch.substitutions =
+            body.substitutions == null
+              ? undefined
+              : body.substitutions.map((item) => item.trim()).filter(Boolean);
+        }
+        if (body.servingSuggestion !== undefined) {
+          patch.servingSuggestion =
+            body.servingSuggestion?.trim() || undefined;
+        }
+        if (body.drinkPairing !== undefined) {
+          patch.drinkPairing = body.drinkPairing?.trim() || undefined;
+        }
+
+        let updatedRecipe: Recipe | null = null;
+        if (authored) {
+          updatedRecipe = await updateRecipeFields(code, recipeId, patch);
+        } else if (community) {
+          updatedRecipe = await updateCommunityRecipe(code, recipeId, {
+            ...community.recipe,
+            ...patch,
+            id: community.recipe.id,
+          });
+        }
+
+        res.json({
+          country: await getCountryFromDb(code),
+          recipe: updatedRecipe,
+        });
+      } catch (error) {
+        console.error("Patch recipe failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error ? error.message : "Could not update recipe.",
         });
       }
     },
@@ -1597,14 +1770,14 @@ export function registerAdminCountryRoutes(
             ? req.body.countryName.trim()
             : "world";
 
-        // Prefer Google Places (real venue photo) over Wikimedia/OpenAI guesses.
+        // Prefer Google Places, then the restaurant website, then Wikimedia.
         let image: {
           url: string;
           attribution: string;
           query: string;
         } | null = null;
         let notes = "Found via Google Places.";
-        let source: "google" | "wikimedia" = "google";
+        let source: "google" | "website" | "wikimedia" = "google";
 
         try {
           image = await fetchGoogleRestaurantPhoto({
@@ -1617,11 +1790,29 @@ export function registerAdminCountryRoutes(
           console.warn("Google restaurant photo failed", error);
         }
 
+        if (!image && restaurant.website) {
+          source = "website";
+          notes = isGooglePlacesConfigured()
+            ? "No Google photo matched; used the restaurant website."
+            : "GOOGLE_PLACES_API_KEY not set; used the restaurant website.";
+          try {
+            image = await fetchBestWebsiteRestaurantPhoto({
+              website: restaurant.website,
+              restaurantName: restaurant.name,
+              excludeUrls: [restaurant.photoUrl],
+            });
+          } catch (error) {
+            console.warn("Restaurant website photo failed", error);
+          }
+        }
+
         if (!image) {
           source = "wikimedia";
-          notes = isGooglePlacesConfigured()
-            ? "No Google photo matched; tried Wikimedia Commons."
-            : "GOOGLE_PLACES_API_KEY not set; tried Wikimedia Commons.";
+          notes = restaurant.website
+            ? "No Google or website photo matched; tried Wikimedia Commons."
+            : isGooglePlacesConfigured()
+              ? "No Google photo matched; tried Wikimedia Commons."
+              : "GOOGLE_PLACES_API_KEY not set; tried Wikimedia Commons.";
           const queries = [
             `${restaurant.name} ${restaurant.city} restaurant`,
             `${restaurant.name} restaurant Netherlands`,
@@ -1651,7 +1842,7 @@ export function registerAdminCountryRoutes(
         if (!image) {
           res.status(404).json({
             message: isGooglePlacesConfigured()
-              ? "Could not find a Google or Wikimedia photo for this restaurant."
+              ? "Could not find a Google, website, or Wikimedia photo for this restaurant."
               : "Could not find a photo. Set GOOGLE_PLACES_API_KEY for best results.",
             notes,
           });

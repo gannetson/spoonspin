@@ -1,4 +1,5 @@
 import { config as loadEnv } from "dotenv";
+import "./cryptoPolyfill.ts";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import cors from "cors";
@@ -28,6 +29,7 @@ import { registerContentRoutes } from "./routes/content.ts";
 import { registerSuggestionRoutes } from "./routes/suggestions.ts";
 import { getUploadsRoot, registerMeRoutes } from "./routes/me.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
+import { warnIfOAuthMisconfigured } from "./auth/oauth.ts";
 
 // Load .env from the project root even when cwd differs (e.g. supervisor).
 loadEnv({
@@ -62,6 +64,8 @@ type CacheEntry = {
 const cache = new Map<string, CacheEntry>();
 
 const app = express();
+// Nginx terminates TLS and sets X-Forwarded-*; needed for correct OAuth origins.
+app.set("trust proxy", 1);
 app.use(
   cors({
     origin: true,
@@ -304,6 +308,7 @@ const server = app.listen(PORT, () => {
       : "OpenAI suggestions: set OPENAI_API_KEY to enable Look up & confirm",
   );
   console.log("Admin review: /admin (requires signed-in admin user)");
+  warnIfOAuthMisconfigured();
   if (!provider) {
     console.log(
       "No live restaurant provider configured — set MAPBOX_ACCESS_TOKEN or GOOGLE_PLACES_API_KEY for fallback.",

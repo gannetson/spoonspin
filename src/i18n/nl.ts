@@ -7,7 +7,8 @@ export const nl: Messages = {
   "app.signIn": "Inloggen",
   "app.signOut": "Uitloggen",
   "app.admin": "Beheer",
-  "app.profile": "Mijn bord",
+  "app.profile": "Hapjes verteerd",
+  "app.planned": "Geplande borden",
   "app.fallback.unknownCountry":
     "We konden geen gepubliceerd land vinden voor “{code}”. Kies opnieuw om verder te gaan.",
   "app.countries.loading": "Landen laden…",
@@ -233,12 +234,14 @@ export const nl: Messages = {
   "suggest.title.shop": "Stel een speciaalzaak voor",
   "suggest.subtitle":
     "Voor {flag} {name}. We bevestigen met een snelle zoekopdracht en voegen het meteen toe voor review.",
+  "suggest.subtitle.restaurant":
+    "Voor {flag} {name}. We zoeken het adres op via Google Places en voegen alleen een geverifieerd Nederlands adres toe.",
   "suggest.closeAria": "Sluiten",
   "suggest.queryLabel": "Naam of korte omschrijving",
   "suggest.placeholder.recipe":
     "bijv. Banitsa, of “kaas-filodeeg als ontbijt”",
   "suggest.placeholder.restaurant":
-    "bijv. restaurantnaam in Leiden, of “gezellig Bulgaars bij Den Haag”",
+    "bijv. exacte restaurantnaam en stad (Amsterdam, Rotterdam…)",
   "suggest.placeholder.drink":
     "bijv. Rakija, of een alcoholvrije yoghurt drank met munt",
   "suggest.placeholder.shop":
@@ -247,6 +250,10 @@ export const nl: Messages = {
     "Voorstellen hebben OPENAI_API_KEY in .env nodig; herstart daarna npm run dev.",
   "suggest.openaiMissing.error":
     "Zet OPENAI_API_KEY in je .env en herstart npm run dev.",
+  "suggest.placesMissing.banner":
+    "Restaurantvoorstellen hebben GOOGLE_PLACES_API_KEY in .env nodig; herstart daarna npm run dev.",
+  "suggest.placesMissing.error":
+    "Zet GOOGLE_PLACES_API_KEY in je .env en herstart npm run dev.",
   "suggest.lookupConfirm": "Opzoeken & bevestigen",
   "suggest.cancel": "Annuleren",
   "suggest.error.queryTooShort": "Typ eerst een naam of korte omschrijving.",
@@ -442,7 +449,7 @@ export const nl: Messages = {
   "admin.selectImage.eyebrow": "Afbeelding",
   "admin.selectImage.title": "Afbeelding kiezen voor {label}",
   "admin.selectImage.subtitle":
-    "Zoek op Wikimedia Commons, kies een foto, of upload er een.",
+    "Zoek op Wikimedia Commons, kies een foto, of upload er een. Bij restaurants worden foto’s van de eigen website meegenomen als die beschikbaar zijn.",
   "admin.selectImage.close": "Sluiten",
   "admin.selectImage.searchHeading": "Afbeeldingen zoeken",
   "admin.selectImage.searchLabel": "Zoekopdracht",
@@ -461,8 +468,47 @@ export const nl: Messages = {
   "admin.selectImage.uploadHint":
     "JPEG, PNG of WebP tot 5 MB. Wordt meteen toegepast.",
   "admin.selectImage.upload": "Bestand kiezen",
+  "admin.item.editRecipe": "Recept bewerken",
+  "admin.item.editRecipe.hint":
+    "Bewerk handmatig beschrijving, ingrediënten, stappen en meer",
   "admin.item.replaceText": "Tekst vervangen",
   "admin.item.replaceText.hint": "Onderzoek en werk de tekst bij",
+  "admin.recipe.edit.eyebrow": "Recept",
+  "admin.recipe.edit.title": "{name} bewerken",
+  "admin.recipe.edit.subtitle":
+    "Werk tekstvelden bij. Naam, tijden en categorie blijven zoals ze zijn.",
+  "admin.recipe.edit.close": "Sluiten",
+  "admin.recipe.edit.section.description": "Beschrijving",
+  "admin.recipe.edit.section.ingredients": "Ingrediënten",
+  "admin.recipe.edit.section.steps": "Stappen",
+  "admin.recipe.edit.section.extras": "Extra",
+  "admin.recipe.edit.localName": "Lokale naam",
+  "admin.recipe.edit.description": "Beschrijving",
+  "admin.recipe.edit.ingredient.name": "Ingrediënt",
+  "admin.recipe.edit.ingredient.qty": "Hvh",
+  "admin.recipe.edit.ingredient.unit": "Eenheid",
+  "admin.recipe.edit.ingredient.note": "Notitie (optioneel)",
+  "admin.recipe.edit.ingredient.add": "Ingrediënt toevoegen",
+  "admin.recipe.edit.ingredient.remove": "Ingrediënt verwijderen",
+  "admin.recipe.edit.steps": "Stappen (één per regel)",
+  "admin.recipe.edit.steps.hint": "Minimaal drie stappen; één instructie per regel.",
+  "admin.recipe.edit.dietary": "Dieetlabels",
+  "admin.recipe.edit.dietary.hint":
+    "Kommagescheiden, bijv. vegetarisch, glutenvrij",
+  "admin.recipe.edit.substitutions": "Vervangingen",
+  "admin.recipe.edit.listHint": "Eén item per regel.",
+  "admin.recipe.edit.serving": "Serveersuggestie",
+  "admin.recipe.edit.pairing": "Drankpairing",
+  "admin.recipe.edit.save": "Wijzigingen opslaan",
+  "admin.recipe.edit.saving": "Opslaan…",
+  "admin.recipe.edit.cancel": "Annuleren",
+  "admin.recipe.edit.error.description":
+    "Beschrijving moet minstens 20 tekens zijn.",
+  "admin.recipe.edit.error.ingredients": "Voeg minstens twee ingrediënten toe.",
+  "admin.recipe.edit.error.steps": "Voeg minstens drie stappen toe (één per regel).",
+  "admin.recipe.edit.error.ingredientRow":
+    "Elk ingrediënt heeft een naam, positieve hoeveelheid en eenheid nodig.",
+  "admin.recipe.edit.error.save": "Kon receptwijzigingen niet opslaan.",
   "admin.item.selectForDinner": "Selecteer voor diner",
   "admin.item.selectForDinner.hint":
     "Gebruik dit gerecht als dinergang voor zijn categorie (vervangt de huidige)",
@@ -484,13 +530,16 @@ export const nl: Messages = {
     "Geen gerechten teruggekregen. Probeer een andere focus.",
   "admin.discover.restaurants.title": "Restaurants zoeken",
   "admin.discover.restaurants.hint":
-    "Zoek authentieke specialisten in Nederland. Elk resultaat wordt geverifieerd (Google Places + authenticiteit) voordat het verschijnt.",
+    "Resultaten komen uit Google Places Text Search in grote Nederlandse steden, plus OpenStreetMap-keukentags—niet uit AI-verzinsels. Alleen locaties met een straatadres in NL. Directorysites worden niet als website gebruikt.",
   "admin.discover.restaurants.placeholder":
-    "bijv. specialisten in Amsterdam, familiebedrijf, zeer authentiek",
+    "Optionele focus: bijv. Amsterdam, familiebedrijf, vegan",
   "admin.discover.restaurants.empty":
-    "Geen geverifieerde restaurants. Probeer een andere stad of een strakkere specialistfocus.",
+    "Geen Places/OSM-restaurants. Probeer een stadsnaam in het focusveld.",
   "admin.discover.restaurants.verified": "Geverifieerd",
+  "admin.discover.restaurants.confidence": "{level} vertrouwen",
   "admin.discover.restaurants.authenticity": "Authenticiteit {rating}/5",
+  "admin.discover.restaurants.website": "Website",
+  "admin.discover.restaurants.evidence": "Bewijs",
   "admin.discover.shops.title": "Speciaalzaken zoeken",
   "admin.discover.shops.hint":
     "Zoek winkels met ingrediënten in Nederland en kies welke je toevoegt.",
@@ -519,16 +568,20 @@ export const nl: Messages = {
   "admin.discover.resultsCount": "{count} resultaat",
   "admin.discover.resultsCountPlural": "{count} resultaten",
   "admin.discover.addSelected": "Geselecteerde toevoegen ({count})",
+  "admin.discover.add": "Toevoegen ({count})",
+  "admin.discover.addAndReview": "Toevoegen + review ({count})",
   "admin.discover.adding": "Toevoegen…",
   "admin.discover.done": "Klaar",
   "admin.discover.added.recipe":
     "{count} recept toegevoegd. Details en afbeelding laden op de achtergrond.",
   "admin.discover.added.recipes":
     "{count} recepten toegevoegd. Details en afbeeldingen laden op de achtergrond.",
-  "admin.discover.added.restaurant":
-    "{count} restaurant toegevoegd. Verrijking (menu, tekst, scores, beeld) draait op de achtergrond.",
-  "admin.discover.added.restaurants":
-    "{count} restaurants toegevoegd. Verrijking (menu, tekst, scores, beeld) draait op de achtergrond.",
+  "admin.discover.added.restaurant": "{count} restaurant toegevoegd.",
+  "admin.discover.added.restaurants": "{count} restaurants toegevoegd.",
+  "admin.discover.added.restaurant.reviewed":
+    "{count} restaurant toegevoegd en review ingepland (menu, scores, foto).",
+  "admin.discover.added.restaurants.reviewed":
+    "{count} restaurants toegevoegd en review ingepland (menu, scores, foto).",
   "admin.discover.added.shop": "{count} winkel toegevoegd.",
   "admin.discover.added.shops": "{count} winkels toegevoegd.",
   "admin.discover.added.drink": "{count} drank toegevoegd.",
@@ -661,17 +714,22 @@ export const nl: Messages = {
   "levels.kingOfCuisines": "Koning der keukens",
   "levels.none": "Hongerige ontdekker",
 
-  "profile.title": "Mijn bord",
-  "profile.userTitle": "Bord van {name}",
+  "profile.title": "Hapjes verteerd",
+  "profile.userTitle": "Digest van {name}",
   "profile.unknownUser": "Lid",
-  "profile.subtitle": "Landen die je kookte of bezocht — en alles wat je tagde.",
+  "profile.subtitle":
+    "Landen die je thuis kookte of uitprobeerde — je proefpaspoort.",
   "profile.subtitleOther":
-    "Landen die {name} kookte of bezocht — en alles wat ze tagden.",
+    "Landen die {name} thuis kookte of uitprobeerde.",
+  "profile.plannedLinkHint": "Nog iets in gedachten? Bekijk",
   "profile.adminOnly": "Alleen admins kunnen borden van andere leden bekijken.",
   "profile.backToUsers": "Gebruikers",
-  "profile.emptyOther": "{name} heeft nog niets getagd.",
+  "profile.emptyOther":
+    "{name} heeft nog geen gekookte of geprobeerde gerechten gelogd.",
+  "profile.levelHeading": "Level {level}: {title}",
   "profile.countriesTasted": "{count} / {total} landen geproefd",
-  "profile.nextLevel": "Volgende: {title} bij {threshold}",
+  "profile.nextLevel":
+    "Hierna — Level {level}: {title} (bij {threshold} landen)",
   "profile.maxLevel": "Je hebt de wereld geproefd — Koning der keukens!",
   "profile.filter.intent": "Status",
   "profile.filter.all": "Alles",
@@ -685,14 +743,29 @@ export const nl: Messages = {
   "profile.filter.countryAll": "Alle landen",
   "profile.filter.rating": "Min. rating",
   "profile.filter.ratingAny": "Alle",
-  "profile.empty": "Nog niets getagd. Draai een land en tik op Wil / Gedaan bij een recept, drank of restaurant.",
+  "profile.empty":
+    "Nog niets geproefd. Draai een land en markeer een recept of restaurant als geprobeerd.",
   "profile.loading": "Je bord laden…",
   "profile.signInPrompt": "Log in om bij te houden wat je kookte, dronk en probeerde.",
   "profile.openItem": "Openen",
   "profile.noReview": "Nog geen review",
   "profile.levelLabel": "Level",
   "profile.countriesHeading": "Landen op je paspoort",
-  "profile.tagsHeading": "Jouw tags",
+  "profile.tagsHeading": "Verteerde hapjes",
+
+  "planned.title": "Geplande borden",
+  "planned.eyebrow": "Verlanglijst",
+  "planned.subtitle":
+    "Recepten, dranken en restaurants die je als Wil markeerde — tellen nog niet als geproefd.",
+  "planned.countriesPlanned": "{count} landen gepland",
+  "planned.countriesHeading": "Landen op je lijst",
+  "planned.tagsHeading": "Wil-tags",
+  "planned.empty":
+    "Nog niets gepland. Draai een land en tik op Wil bij een recept, drank of restaurant.",
+  "planned.loading": "Geplande borden laden…",
+  "planned.signInPrompt":
+    "Log in om gerechten en plekken te bewaren die je wilt proberen.",
+  "planned.notOnPassport": "Deze tellen niet mee voor je proefpaspoort op",
 
   "meta.description":
     "Spoon Spin — ontdek willekeurig een land, kook het eten of eet uit in Nederland.",

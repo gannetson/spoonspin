@@ -7,17 +7,27 @@ import { fetchAdminUserProfile } from "@/admin/users";
 import { countryCatalog } from "@/content/countries/catalog";
 import { useT } from "@/i18n/LocaleContext";
 import { fetchMyTagSummary, fetchMyTags } from "@/tags/client";
-import { CUISINE_LEVELS, resolveLevelProgress } from "@/tags/levels";
-import type { TagEntityType, TagIntent, TagSummary, UserTag } from "@/tags/types";
+import { levelArtSrc, resolveLevelProgress } from "@/tags/levels";
+import type { TagEntityType, TagSummary, UserTag } from "@/tags/types";
 
-type IntentFilter = "all" | TagIntent;
 type TypeFilter = "all" | TagEntityType;
+
+export type PlatePageVariant = "tasted" | "planned";
 
 const catalogByCode = new Map(
   countryCatalog.map((entry) => [entry.code.toLowerCase(), entry]),
 );
 
-export function ProfilePage() {
+type ProfilePageProps = {
+  /** tasted = Dishes digested (did only); planned = Planned plates (want only). */
+  variant?: PlatePageVariant;
+};
+
+export function PlannedPlatesPage() {
+  return <ProfilePage variant="planned" />;
+}
+
+export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
   const t = useT();
   const { userId: routeUserId } = useParams<{ userId?: string }>();
   const { user, loading: authLoading } = useAuth();
@@ -29,14 +39,19 @@ export function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [intentFilter, setIntentFilter] = useState<IntentFilter>("all");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [countryFilter, setCountryFilter] = useState("all");
   const [minRating, setMinRating] = useState<number | null>(null);
 
+  const isPlanned = variant === "planned";
+  const intent = isPlanned ? "want" : "did";
+
   const viewingOther =
-    Boolean(routeUserId) && Boolean(user) && routeUserId !== user?.id;
-  const isOwnProfile = !routeUserId || routeUserId === user?.id;
+    !isPlanned &&
+    Boolean(routeUserId) &&
+    Boolean(user) &&
+    routeUserId !== user?.id;
+  const isOwnProfile = isPlanned || !routeUserId || routeUserId === user?.id;
   const canViewOther = user?.role === "admin";
 
   useEffect(() => {
@@ -60,19 +75,22 @@ export function ProfilePage() {
     let cancelled = false;
     setLoading(true);
     setError(null);
+    setTypeFilter("all");
+    setCountryFilter("all");
+    setMinRating(null);
 
     async function load() {
       try {
         if (viewingOther && routeUserId) {
           const data = await fetchAdminUserProfile(routeUserId);
           if (cancelled) return;
-          setTags(data.tags);
+          setTags(data.tags.filter((tag) => tag.intent === "did"));
           setSummary(data.summary);
           setProfileName(data.user.name);
           setProfileEmail(data.user.email);
         } else {
           const [list, nextSummary] = await Promise.all([
-            fetchMyTags(),
+            fetchMyTags({ intent }),
             fetchMyTagSummary(),
           ]);
           if (cancelled) return;
@@ -83,7 +101,13 @@ export function ProfilePage() {
         }
       } catch (err) {
         if (cancelled) return;
-        setError(err instanceof Error ? err.message : t("profile.loading"));
+        setError(
+          err instanceof Error
+            ? err.message
+            : isPlanned
+              ? t("planned.loading")
+              : t("profile.loading"),
+        );
         setTags([]);
         setSummary(null);
       } finally {
@@ -101,12 +125,13 @@ export function ProfilePage() {
     routeUserId,
     viewingOther,
     canViewOther,
+    intent,
+    isPlanned,
     t,
   ]);
 
   const filtered = useMemo(() => {
     return tags.filter((tag) => {
-      if (intentFilter !== "all" && tag.intent !== intentFilter) return false;
       if (typeFilter !== "all" && tag.entityType !== typeFilter) return false;
       if (
         countryFilter !== "all" &&
@@ -114,12 +139,12 @@ export function ProfilePage() {
       ) {
         return false;
       }
-      if (minRating != null) {
+      if (!isPlanned && minRating != null) {
         if (tag.rating == null || tag.rating < minRating) return false;
       }
       return true;
     });
-  }, [tags, intentFilter, typeFilter, countryFilter, minRating]);
+  }, [tags, typeFilter, countryFilter, minRating, isPlanned]);
 
   const countriesInTags = useMemo(() => {
     const codes = new Set(tags.map((tag) => tag.countryCode));
@@ -134,20 +159,33 @@ export function ProfilePage() {
     ? t(progress.current.titleKey)
     : t("levels.none");
   const nextTitle = progress.next ? t(progress.next.titleKey) : null;
+  const levelArt = levelArtSrc(progress.current?.id ?? "none");
+  const nextLevelNumber = progress.next
+    ? progress.levelNumber + 1
+    : null;
+
+  const plannedCountryCodes = summary?.plannedCountryCodes ?? [];
+  const countriesPlanned = summary?.countriesPlanned ?? 0;
 
   const displayName =
     profileName?.trim() ||
     profileEmail ||
-    (isOwnProfile ? t("profile.title") : t("profile.unknownUser"));
+    (isOwnProfile
+      ? isPlanned
+        ? t("planned.title")
+        : t("profile.title")
+      : t("profile.unknownUser"));
 
-  const pageTitle = isOwnProfile
-    ? t("profile.title")
-    : t("profile.userTitle", { name: displayName });
+  const pageTitle = isPlanned
+    ? t("planned.title")
+    : isOwnProfile
+      ? t("profile.title")
+      : t("profile.userTitle", { name: displayName });
 
   if (authLoading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16 text-ink-soft">
-        {t("profile.loading")}
+        {isPlanned ? t("planned.loading") : t("profile.loading")}
       </div>
     );
   }
@@ -156,8 +194,12 @@ export function ProfilePage() {
     return (
       <div className="min-h-screen bg-parchment text-ink">
         <main className="mx-auto max-w-md px-4 py-16 text-center">
-          <h1 className="font-display text-3xl">{t("profile.title")}</h1>
-          <p className="mt-3 text-ink-soft">{t("profile.signInPrompt")}</p>
+          <h1 className="font-display text-3xl">
+            {isPlanned ? t("planned.title") : t("profile.title")}
+          </h1>
+          <p className="mt-3 text-ink-soft">
+            {isPlanned ? t("planned.signInPrompt") : t("profile.signInPrompt")}
+          </p>
           <button
             type="button"
             onClick={() => openAuth({ mode: "login" })}
@@ -203,77 +245,142 @@ export function ProfilePage() {
             <ArrowLeft className="size-4" aria-hidden="true" />
             {viewingOther ? t("profile.backToUsers") : t("app.brand")}
           </Link>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
-              {t("profile.levelLabel")}
+              {isPlanned ? t("planned.eyebrow") : t("profile.levelLabel")}
             </p>
             <h1 className="truncate font-display text-2xl">{pageTitle}</h1>
             {viewingOther && profileEmail ? (
               <p className="truncate text-sm text-ink-soft">{profileEmail}</p>
             ) : null}
           </div>
+          {isOwnProfile ? (
+            <Link
+              to={isPlanned ? "/profile" : "/planned"}
+              className="shrink-0 rounded-full border border-ink/15 px-3 py-1.5 text-sm font-semibold hover:border-tomato hover:text-tomato"
+            >
+              {isPlanned ? t("app.profile") : t("app.planned")}
+            </Link>
+          ) : null}
         </div>
       </header>
 
       <main className="mx-auto max-w-3xl space-y-8 px-4 py-8">
-        <section className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream p-6 shadow-sm sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stamp">
-            {levelTitle}
-          </p>
-          <h2 className="mt-1 font-display text-3xl sm:text-4xl">
-            {t("profile.countriesTasted", {
-              count: progress.countriesTasted,
-              total: progress.totalCountries,
-            })}
-          </h2>
-          <p className="mt-2 text-sm text-ink-soft">
-            {isOwnProfile
-              ? t("profile.subtitle")
-              : t("profile.subtitleOther", { name: displayName })}
-          </p>
+        {isPlanned ? (
+          <section className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream p-6 shadow-sm sm:p-8">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stamp">
+              {t("planned.eyebrow")}
+            </p>
+            <h2 className="mt-1 font-display text-3xl sm:text-4xl">
+              {t("planned.countriesPlanned", {
+                count: countriesPlanned,
+              })}
+            </h2>
+            <p className="mt-2 text-sm text-ink-soft">{t("planned.subtitle")}</p>
+            <p className="mt-4 text-sm text-ink-soft">
+              {t("planned.notOnPassport")}{" "}
+              <Link to="/profile" className="font-semibold text-tomato underline">
+                {t("app.profile")}
+              </Link>
+              .
+            </p>
+          </section>
+        ) : (
+          <section className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream p-6 shadow-sm sm:p-8">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+              <img
+                src={levelArt}
+                alt=""
+                width={128}
+                height={128}
+                className="size-28 shrink-0 rounded-3xl bg-parchment object-cover ring-1 ring-ink/10 sm:size-32"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stamp">
+                  {t("profile.levelLabel")}
+                </p>
+                <h2 className="mt-1 font-display text-3xl leading-tight sm:text-4xl">
+                  {progress.levelNumber > 0
+                    ? t("profile.levelHeading", {
+                        level: progress.levelNumber,
+                        title: levelTitle,
+                      })
+                    : levelTitle}
+                </h2>
+                <p className="mt-2 text-base font-semibold text-ink">
+                  {t("profile.countriesTasted", {
+                    count: progress.countriesTasted,
+                    total: progress.totalCountries,
+                  })}
+                </p>
+                <p className="mt-1 text-sm text-ink-soft">
+                  {isOwnProfile
+                    ? t("profile.subtitle")
+                    : t("profile.subtitleOther", { name: displayName })}
+                </p>
+                {isOwnProfile ? (
+                  <p className="mt-2 text-sm text-ink-soft">
+                    {t("profile.plannedLinkHint")}{" "}
+                    <Link
+                      to="/planned"
+                      className="font-semibold text-tomato underline"
+                    >
+                      {t("app.planned")}
+                    </Link>
+                    .
+                  </p>
+                ) : null}
+              </div>
+            </div>
 
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-parchment">
-            <div
-              className="h-full rounded-full bg-tomato transition-all"
-              style={{ width: `${Math.round(progress.progressToNext * 100)}%` }}
-            />
-          </div>
-          <p className="mt-2 text-sm font-semibold text-ink">
-            {progress.next && nextTitle
-              ? t("profile.nextLevel", {
-                  title: nextTitle,
-                  threshold: progress.next.threshold,
-                })
-              : t("profile.maxLevel")}
-          </p>
+            <div className="mt-6">
+              <div className="h-3 overflow-hidden rounded-full bg-parchment">
+                <div
+                  className="h-full rounded-full bg-tomato transition-all"
+                  style={{
+                    width: `${Math.round(progress.progressToNext * 100)}%`,
+                  }}
+                />
+              </div>
+              {progress.next && nextTitle && nextLevelNumber != null ? (
+                <div className="mt-3 flex items-center gap-3">
+                  <img
+                    src={levelArtSrc(progress.next.id)}
+                    alt=""
+                    width={48}
+                    height={48}
+                    className="size-12 shrink-0 rounded-2xl bg-parchment object-cover ring-1 ring-ink/10"
+                  />
+                  <p className="text-sm font-semibold text-ink">
+                    {t("profile.nextLevel", {
+                      level: nextLevelNumber,
+                      title: nextTitle,
+                      threshold: progress.next.threshold,
+                    })}
+                  </p>
+                </div>
+              ) : (
+                <p className="mt-3 text-sm font-semibold text-ink">
+                  {t("profile.maxLevel")}
+                </p>
+              )}
+            </div>
+          </section>
+        )}
 
-          <ul className="mt-4 flex flex-wrap gap-2">
-            {CUISINE_LEVELS.map((level) => {
-              const unlocked = progress.countriesTasted >= level.threshold;
-              return (
-                <li
-                  key={level.id}
-                  className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
-                    unlocked
-                      ? "bg-tomato/15 text-tomato"
-                      : "bg-parchment text-ink-soft"
-                  }`}
-                  title={`${level.threshold}`}
-                >
-                  {t(level.titleKey)}
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-
-        {summary && summary.countryCodes.length > 0 ? (
+        {(isPlanned ? plannedCountryCodes : summary?.countryCodes ?? [])
+          .length > 0 ? (
           <section>
             <h2 className="mb-3 font-display text-2xl">
-              {t("profile.countriesHeading")}
+              {isPlanned
+                ? t("planned.countriesHeading")
+                : t("profile.countriesHeading")}
             </h2>
             <ul className="flex flex-wrap gap-2">
-              {summary.countryCodes.map((code) => {
+              {(isPlanned
+                ? plannedCountryCodes
+                : summary?.countryCodes ?? []
+              ).map((code) => {
                 const entry = catalogByCode.get(code);
                 if (!entry) return null;
                 return (
@@ -293,19 +400,11 @@ export function ProfilePage() {
         ) : null}
 
         <section className="space-y-4">
-          <h2 className="font-display text-2xl">{t("profile.tagsHeading")}</h2>
+          <h2 className="font-display text-2xl">
+            {isPlanned ? t("planned.tagsHeading") : t("profile.tagsHeading")}
+          </h2>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-            <FilterPills
-              label={t("profile.filter.intent")}
-              value={intentFilter}
-              onChange={setIntentFilter}
-              options={[
-                { value: "all", label: t("profile.filter.all") },
-                { value: "want", label: t("profile.filter.want") },
-                { value: "did", label: t("profile.filter.did") },
-              ]}
-            />
             <FilterPills
               label={t("profile.filter.type")}
               value={typeFilter}
@@ -314,7 +413,10 @@ export function ProfilePage() {
                 { value: "all", label: t("profile.filter.all") },
                 { value: "recipe", label: t("profile.filter.recipe") },
                 { value: "drink", label: t("profile.filter.drink") },
-                { value: "restaurant", label: t("profile.filter.restaurant") },
+                {
+                  value: "restaurant",
+                  label: t("profile.filter.restaurant"),
+                },
               ]}
             />
             <label className="block text-sm">
@@ -334,39 +436,45 @@ export function ProfilePage() {
                 ))}
               </select>
             </label>
-            <label className="block text-sm">
-              <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-soft">
-                {t("profile.filter.rating")}
-              </span>
-              <select
-                value={minRating == null ? "any" : String(minRating)}
-                onChange={(event) => {
-                  const value = event.target.value;
-                  setMinRating(value === "any" ? null : Number(value));
-                }}
-                className="rounded-full border border-ink/15 bg-cream px-3 py-1.5 text-sm font-semibold"
-              >
-                <option value="any">{t("profile.filter.ratingAny")}</option>
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n} value={n}>
-                    {n}+
-                  </option>
-                ))}
-              </select>
-            </label>
+            {!isPlanned ? (
+              <label className="block text-sm">
+                <span className="mb-1 block text-xs font-semibold uppercase tracking-wide text-ink-soft">
+                  {t("profile.filter.rating")}
+                </span>
+                <select
+                  value={minRating == null ? "any" : String(minRating)}
+                  onChange={(event) => {
+                    const value = event.target.value;
+                    setMinRating(value === "any" ? null : Number(value));
+                  }}
+                  className="rounded-full border border-ink/15 bg-cream px-3 py-1.5 text-sm font-semibold"
+                >
+                  <option value="any">{t("profile.filter.ratingAny")}</option>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <option key={n} value={n}>
+                      {n}+
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
           </div>
 
           {loading ? (
-            <p className="text-ink-soft">{t("profile.loading")}</p>
+            <p className="text-ink-soft">
+              {isPlanned ? t("planned.loading") : t("profile.loading")}
+            </p>
           ) : error ? (
             <p className="font-semibold text-tomato" role="alert">
               {error}
             </p>
           ) : filtered.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-stamp/40 bg-cream/60 p-5 text-ink-soft">
-              {isOwnProfile
-                ? t("profile.empty")
-                : t("profile.emptyOther", { name: displayName })}
+              {isPlanned
+                ? t("planned.empty")
+                : isOwnProfile
+                  ? t("profile.empty")
+                  : t("profile.emptyOther", { name: displayName })}
             </p>
           ) : (
             <ul className="grid gap-3">
@@ -394,8 +502,10 @@ export function ProfilePage() {
                           ) : (
                             tag.countryCode.toUpperCase()
                           )}{" "}
-                          · {t(`profile.filter.${tag.entityType}`)} ·{" "}
-                          {t(`profile.filter.${tag.intent}`)}
+                          · {t(`profile.filter.${tag.entityType}`)}
+                          {!isPlanned ? (
+                            <> · {t(`profile.filter.${tag.intent}`)}</>
+                          ) : null}
                         </p>
                         <h3 className="mt-1 font-display text-xl">
                           {tag.entityName}

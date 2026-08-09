@@ -345,12 +345,21 @@ export default function App() {
             <>
               <Link
                 to="/profile"
-                className={`max-w-[12rem] truncate text-sm font-semibold underline-offset-2 hover:underline ${
+                className={`text-sm font-semibold underline-offset-2 hover:underline ${
                   showHome ? "text-cream" : "text-ink"
                 }`}
                 title={t("app.profile")}
               >
-                {user.name || user.email}
+                {t("app.profile")}
+              </Link>
+              <Link
+                to="/planned"
+                className={`text-sm font-semibold underline-offset-2 hover:underline ${
+                  showHome ? "text-cream/90" : "text-ink-soft"
+                }`}
+                title={t("app.planned")}
+              >
+                {t("app.planned")}
               </Link>
               {user.role === "admin" ? (
                 <AdminNavMenu tone={switcherTone} />

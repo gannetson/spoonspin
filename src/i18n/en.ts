@@ -7,7 +7,8 @@ export const en: Messages = {
   "app.signIn": "Sign in",
   "app.signOut": "Sign out",
   "app.admin": "Admin",
-  "app.profile": "My plate",
+  "app.profile": "Dishes digested",
+  "app.planned": "Planned plates",
   "app.fallback.unknownCountry":
     "We could not find a published country for “{code}”. Pick again to continue.",
   "app.countries.loading": "Loading countries…",
@@ -229,12 +230,14 @@ export const en: Messages = {
   "suggest.title.shop": "Suggest a specialty shop",
   "suggest.subtitle":
     "For {flag} {name}. We'll confirm with a quick search, then add it right away for review.",
+  "suggest.subtitle.restaurant":
+    "For {flag} {name}. We look up the place on Google Places and only add a verified Netherlands address.",
   "suggest.closeAria": "Close",
   "suggest.queryLabel": "Name or short description",
   "suggest.placeholder.recipe":
     "e.g. Banitsa, or “cheese filo pastry breakfast”",
   "suggest.placeholder.restaurant":
-    "e.g. Restaurant name in Leiden, or “cozy Bulgarian place near Den Haag”",
+    "e.g. Exact restaurant name and city (Amsterdam, Rotterdam…)",
   "suggest.placeholder.drink":
     "e.g. Rakia, or a non-alcoholic yogurt drink with mint",
   "suggest.placeholder.shop":
@@ -243,6 +246,10 @@ export const en: Messages = {
     "Suggestions need OPENAI_API_KEY in .env, then restart npm run dev.",
   "suggest.openaiMissing.error":
     "Add OPENAI_API_KEY to your .env, then restart npm run dev.",
+  "suggest.placesMissing.banner":
+    "Restaurant suggestions need GOOGLE_PLACES_API_KEY in .env, then restart npm run dev.",
+  "suggest.placesMissing.error":
+    "Add GOOGLE_PLACES_API_KEY to your .env, then restart npm run dev.",
   "suggest.lookupConfirm": "Look up & confirm",
   "suggest.cancel": "Cancel",
   "suggest.error.queryTooShort": "Type a name or short description first.",
@@ -438,7 +445,7 @@ export const en: Messages = {
   "admin.selectImage.eyebrow": "Image",
   "admin.selectImage.title": "Select image for {label}",
   "admin.selectImage.subtitle":
-    "Search Wikimedia Commons, pick a photo, or upload one.",
+    "Search Wikimedia Commons, pick a photo, or upload one. For restaurants, photos from the venue website are included when available.",
   "admin.selectImage.close": "Close",
   "admin.selectImage.searchHeading": "Search images",
   "admin.selectImage.searchLabel": "Search query",
@@ -457,8 +464,44 @@ export const en: Messages = {
   "admin.selectImage.uploadHint":
     "JPEG, PNG, or WebP up to 5 MB. Applied immediately.",
   "admin.selectImage.upload": "Choose file",
+  "admin.item.editRecipe": "Edit recipe",
+  "admin.item.editRecipe.hint": "Manually edit description, ingredients, steps, and more",
   "admin.item.replaceText": "Replace text",
   "admin.item.replaceText.hint": "Research and update the copy",
+  "admin.recipe.edit.eyebrow": "Recipe",
+  "admin.recipe.edit.title": "Edit {name}",
+  "admin.recipe.edit.subtitle":
+    "Update copy fields. Name, times, and category stay as they are.",
+  "admin.recipe.edit.close": "Close",
+  "admin.recipe.edit.section.description": "Description",
+  "admin.recipe.edit.section.ingredients": "Ingredients",
+  "admin.recipe.edit.section.steps": "Steps",
+  "admin.recipe.edit.section.extras": "Extras",
+  "admin.recipe.edit.localName": "Local name",
+  "admin.recipe.edit.description": "Description",
+  "admin.recipe.edit.ingredient.name": "Ingredient",
+  "admin.recipe.edit.ingredient.qty": "Qty",
+  "admin.recipe.edit.ingredient.unit": "Unit",
+  "admin.recipe.edit.ingredient.note": "Note (optional)",
+  "admin.recipe.edit.ingredient.add": "Add ingredient",
+  "admin.recipe.edit.ingredient.remove": "Remove ingredient",
+  "admin.recipe.edit.steps": "Steps (one per line)",
+  "admin.recipe.edit.steps.hint": "At least three steps; one instruction per line.",
+  "admin.recipe.edit.dietary": "Dietary labels",
+  "admin.recipe.edit.dietary.hint": "Comma-separated, e.g. vegetarian, gluten-free",
+  "admin.recipe.edit.substitutions": "Substitutions",
+  "admin.recipe.edit.listHint": "One item per line.",
+  "admin.recipe.edit.serving": "Serving suggestion",
+  "admin.recipe.edit.pairing": "Drink pairing",
+  "admin.recipe.edit.save": "Save changes",
+  "admin.recipe.edit.saving": "Saving…",
+  "admin.recipe.edit.cancel": "Cancel",
+  "admin.recipe.edit.error.description": "Description needs at least 20 characters.",
+  "admin.recipe.edit.error.ingredients": "Add at least two ingredients.",
+  "admin.recipe.edit.error.steps": "Add at least three steps (one per line).",
+  "admin.recipe.edit.error.ingredientRow":
+    "Each ingredient needs a name, positive quantity, and unit.",
+  "admin.recipe.edit.error.save": "Could not save recipe edits.",
   "admin.item.selectForDinner": "Select for dinner",
   "admin.item.selectForDinner.hint":
     "Use this dish as the dinner course for its category (replaces the current one)",
@@ -479,13 +522,16 @@ export const en: Messages = {
   "admin.discover.recipes.empty": "No dishes returned. Try a different focus.",
   "admin.discover.restaurants.title": "Find restaurants",
   "admin.discover.restaurants.hint":
-    "Search for authentic specialists in the Netherlands. Each result is verified (Google Places + authenticity) before listing.",
+    "Results come from Google Places Text Search across major Dutch cities, plus OpenStreetMap cuisine tags—not AI invention. Only venues with a street-level NL address are listed. Directory sites are never used as the website.",
   "admin.discover.restaurants.placeholder":
-    "e.g. Amsterdam specialists, family-run, highly authentic",
+    "Optional focus: e.g. Amsterdam, family-run, vegan",
   "admin.discover.restaurants.empty":
-    "No verified restaurants returned. Try a different city or a tighter specialist focus.",
+    "No Places/OSM restaurants returned. Try a city name in the focus field.",
   "admin.discover.restaurants.verified": "Verified",
+  "admin.discover.restaurants.confidence": "{level} confidence",
   "admin.discover.restaurants.authenticity": "Authenticity {rating}/5",
+  "admin.discover.restaurants.website": "Website",
+  "admin.discover.restaurants.evidence": "Evidence",
   "admin.discover.shops.title": "Find specialty shops",
   "admin.discover.shops.hint":
     "Query for ingredient shops in the Netherlands, then pick which to add.",
@@ -512,16 +558,20 @@ export const en: Messages = {
   "admin.discover.resultsCount": "{count} result",
   "admin.discover.resultsCountPlural": "{count} results",
   "admin.discover.addSelected": "Add selected ({count})",
+  "admin.discover.add": "Add ({count})",
+  "admin.discover.addAndReview": "Add + review ({count})",
   "admin.discover.adding": "Adding…",
   "admin.discover.done": "Done",
   "admin.discover.added.recipe":
     "Added {count} recipe. Full details and image are loading in the background.",
   "admin.discover.added.recipes":
     "Added {count} recipes. Full details and images are loading in the background.",
-  "admin.discover.added.restaurant":
-    "Added {count} restaurant. Enrichment (menu, text, scores, image) is running in the background.",
-  "admin.discover.added.restaurants":
-    "Added {count} restaurants. Enrichment (menu, text, scores, image) is running in the background.",
+  "admin.discover.added.restaurant": "Added {count} restaurant.",
+  "admin.discover.added.restaurants": "Added {count} restaurants.",
+  "admin.discover.added.restaurant.reviewed":
+    "Added {count} restaurant and queued review (menu, scores, image).",
+  "admin.discover.added.restaurants.reviewed":
+    "Added {count} restaurants and queued review (menu, scores, image).",
   "admin.discover.added.shop": "Added {count} shop.",
   "admin.discover.added.shops": "Added {count} shops.",
   "admin.discover.added.drink": "Added {count} drink.",
@@ -654,17 +704,21 @@ export const en: Messages = {
   "levels.kingOfCuisines": "King of Cuisines",
   "levels.none": "Hungry explorer",
 
-  "profile.title": "My plate",
-  "profile.userTitle": "{name}'s plate",
+  "profile.title": "Dishes digested",
+  "profile.userTitle": "{name}'s digests",
   "profile.unknownUser": "Member",
-  "profile.subtitle": "Countries you’ve cooked or dined — and everything you’ve tagged.",
+  "profile.subtitle":
+    "Countries you’ve cooked at home or tried out — your tasting passport.",
   "profile.subtitleOther":
-    "Countries {name} has cooked or dined — and everything they’ve tagged.",
+    "Countries {name} has cooked at home or tried out.",
+  "profile.plannedLinkHint": "Still planning a dish or night out? See",
   "profile.adminOnly": "Only admins can view other members’ plates.",
   "profile.backToUsers": "Users",
-  "profile.emptyOther": "{name} hasn’t tagged anything yet.",
+  "profile.emptyOther": "{name} hasn’t logged any cooked or tried dishes yet.",
+  "profile.levelHeading": "Level {level}: {title}",
   "profile.countriesTasted": "{count} / {total} countries tasted",
-  "profile.nextLevel": "Next: {title} at {threshold}",
+  "profile.nextLevel":
+    "Next up — Level {level}: {title} (at {threshold} countries)",
   "profile.maxLevel": "You’ve tasted the world — King of Cuisines!",
   "profile.filter.intent": "Status",
   "profile.filter.all": "All",
@@ -678,14 +732,28 @@ export const en: Messages = {
   "profile.filter.countryAll": "All countries",
   "profile.filter.rating": "Min rating",
   "profile.filter.ratingAny": "Any",
-  "profile.empty": "Nothing tagged yet. Spin a country, then tap Want to / Did on a recipe, drink, or restaurant.",
+  "profile.empty":
+    "Nothing tasted yet. Spin a country, then mark a recipe or restaurant as tried.",
   "profile.loading": "Loading your plate…",
   "profile.signInPrompt": "Sign in to track what you’ve cooked, drunk, and tried.",
   "profile.openItem": "Open",
   "profile.noReview": "No review yet",
   "profile.levelLabel": "Level",
   "profile.countriesHeading": "Countries on your passport",
-  "profile.tagsHeading": "Your tags",
+  "profile.tagsHeading": "Digested dishes",
+
+  "planned.title": "Planned plates",
+  "planned.eyebrow": "Wishlist",
+  "planned.subtitle":
+    "Recipes, drinks, and restaurants you’ve marked Want to — not counted as tasted yet.",
+  "planned.countriesPlanned": "{count} countries planned",
+  "planned.countriesHeading": "Countries on your list",
+  "planned.tagsHeading": "Want-to tags",
+  "planned.empty":
+    "Nothing planned yet. Spin a country and tap Want to on a recipe, drink, or restaurant.",
+  "planned.loading": "Loading planned plates…",
+  "planned.signInPrompt": "Sign in to save dishes and places you want to try.",
+  "planned.notOnPassport": "These don’t count toward your tasting passport on",
 
   "meta.description":
     "Spoon Spin — randomly discover a country, then cook its food or dine out in the Netherlands.",

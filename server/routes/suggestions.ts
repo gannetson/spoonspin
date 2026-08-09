@@ -20,6 +20,11 @@ import {
   type SubmissionStatus,
 } from "../db/submissions.ts";
 import {
+  isGooglePlacesConfigured,
+  lookupGoogleRestaurant,
+  officialWebsiteOrUndefined,
+} from "../lib/googlePlacesLookup.ts";
+import {
   isOpenAiConfigured,
   previewDrinkSuggestion,
   previewRecipeSuggestion,
@@ -160,7 +165,10 @@ export function registerSuggestionRoutes(
   app: import("express").Express,
 ): void {
   app.get("/api/suggestions/status", (_req, res) => {
-    res.json({ openaiConfigured: isOpenAiConfigured() });
+    res.json({
+      openaiConfigured: isOpenAiConfigured(),
+      placesConfigured: isGooglePlacesConfigured(),
+    });
   });
 
   app.get("/api/suggestions/recipes", async (req, res) => {
@@ -197,17 +205,25 @@ export function registerSuggestionRoutes(
   });
 
   app.post("/api/suggestions/preview", async (req, res) => {
-    if (!isOpenAiConfigured()) {
+    const parsed = previewBodySchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: "Enter a short name or description." });
+      return;
+    }
+
+    if (parsed.data.kind === "restaurant") {
+      if (!isGooglePlacesConfigured()) {
+        res.status(503).json({
+          message:
+            "Restaurant suggestions need GOOGLE_PLACES_API_KEY in the server .env. Add a key and restart the API.",
+        });
+        return;
+      }
+    } else if (!isOpenAiConfigured()) {
       res.status(503).json({
         message:
           "Suggestions need OPENAI_API_KEY in the server .env. Add a key and restart the API.",
       });
-      return;
-    }
-
-    const parsed = previewBodySchema.safeParse(req.body);
-    if (!parsed.success) {
-      res.status(400).json({ message: "Enter a short name or description." });
       return;
     }
 
@@ -325,23 +341,41 @@ export function registerSuggestionRoutes(
       }
 
       const incoming = parsed.data.restaurant;
+      if (!isGooglePlacesConfigured()) {
+        res.status(503).json({
+          message:
+            "Restaurant suggestions need GOOGLE_PLACES_API_KEY in the server .env.",
+        });
+        return;
+      }
+      const verified = await lookupGoogleRestaurant({
+        name: incoming.name,
+        city: incoming.city,
+        address: incoming.address,
+      });
+      if (!verified) {
+        res.status(400).json({
+          message: "Could not verify address on Google Places.",
+        });
+        return;
+      }
       const mapsUrl =
-        incoming.mapsUrl && incoming.mapsUrl.length > 0
-          ? incoming.mapsUrl
+        verified.mapsUrl && verified.mapsUrl.length > 0
+          ? verified.mapsUrl
           : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-              `${incoming.name} ${incoming.address} ${incoming.city} Netherlands`,
+              `${verified.name} ${verified.address} ${verified.city} Netherlands`,
             )}`;
       const place: RestaurantSubmissionPayload = {
-        name: incoming.name,
-        address: incoming.address,
-        city: incoming.city,
-        postcode: incoming.postcode,
-        website: incoming.website,
+        name: verified.name,
+        address: verified.address,
+        city: verified.city,
+        postcode: verified.postcode,
+        website: officialWebsiteOrUndefined(verified.website),
         mapsUrl,
-        lat: incoming.lat ?? undefined,
-        lng: incoming.lng ?? undefined,
+        lat: verified.lat,
+        lng: verified.lng,
         authenticityNotes: incoming.authenticityNotes,
-        phone: incoming.phone,
+        phone: verified.phone ?? incoming.phone,
       };
       const rowId = slugifyId("user", place.name);
       const code = parsed.data.countryCode.toLowerCase();

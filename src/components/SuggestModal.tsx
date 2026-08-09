@@ -101,6 +101,7 @@ export function SuggestModal({
   const [preview, setPreview] = useState<PreviewState>({ status: "idle" });
   const [saving, setSaving] = useState(false);
   const [openaiConfigured, setOpenaiConfigured] = useState<boolean | null>(null);
+  const [placesConfigured, setPlacesConfigured] = useState<boolean | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -108,9 +109,13 @@ export function SuggestModal({
     setPreview({ status: "idle" });
     setSaving(false);
     setOpenaiConfigured(null);
+    setPlacesConfigured(null);
     let cancelled = false;
     void fetchSuggestionStatus().then((status) => {
-      if (!cancelled) setOpenaiConfigured(status.openaiConfigured);
+      if (!cancelled) {
+        setOpenaiConfigured(status.openaiConfigured);
+        setPlacesConfigured(status.placesConfigured);
+      }
     });
     const timer = window.setTimeout(() => inputRef.current?.focus(), 50);
     return () => {
@@ -130,10 +135,12 @@ export function SuggestModal({
 
   if (!open) return null;
 
+  const lookupReady =
+    kind === "restaurant"
+      ? placesConfigured === true
+      : openaiConfigured === true;
   const lookupDisabled =
-    preview.status === "loading" ||
-    saving ||
-    openaiConfigured === false;
+    preview.status === "loading" || saving || !lookupReady;
 
   async function runPreview() {
     const trimmed = query.trim();
@@ -144,7 +151,14 @@ export function SuggestModal({
       });
       return;
     }
-    if (openaiConfigured === false) {
+    if (kind === "restaurant" && placesConfigured === false) {
+      setPreview({
+        status: "error",
+        message: t("suggest.placesMissing.error"),
+      });
+      return;
+    }
+    if (kind !== "restaurant" && openaiConfigured === false) {
       setPreview({
         status: "error",
         message: t("suggest.openaiMissing.error"),
@@ -304,7 +318,7 @@ export function SuggestModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-ink/55 p-4 sm:items-center"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-4 sm:items-center"
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
@@ -322,10 +336,15 @@ export function SuggestModal({
               {t(TITLE_KEYS[kind])}
             </h2>
             <p className="mt-1 text-sm text-ink-soft">
-              {t("suggest.subtitle", {
-                flag: country.flag,
-                name: country.name,
-              })}
+              {t(
+                kind === "restaurant"
+                  ? "suggest.subtitle.restaurant"
+                  : "suggest.subtitle",
+                {
+                  flag: country.flag,
+                  name: country.name,
+                },
+              )}
             </p>
           </div>
           <button
@@ -351,7 +370,15 @@ export function SuggestModal({
           className="mt-2 w-full rounded-2xl border border-ink/15 bg-white px-4 py-3 text-ink"
         />
 
-        {openaiConfigured === false ? (
+        {kind === "restaurant" && placesConfigured === false ? (
+          <p
+            role="status"
+            className="mt-3 rounded-2xl border border-tomato/30 bg-white px-4 py-3 text-sm text-tomato"
+          >
+            {t("suggest.placesMissing.banner")}
+          </p>
+        ) : null}
+        {kind !== "restaurant" && openaiConfigured === false ? (
           <p
             role="status"
             className="mt-3 rounded-2xl border border-tomato/30 bg-white px-4 py-3 text-sm text-tomato"

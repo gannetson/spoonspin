@@ -1,6 +1,12 @@
 import { z } from "zod";
 import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import type { RestaurantSubmissionPayload } from "../db/submissions.ts";
+import {
+  isGooglePlacesConfigured,
+  namesLikelyMatch,
+  officialWebsiteOrUndefined,
+  searchGoogleRestaurantsByQuery,
+} from "../lib/googlePlacesLookup.ts";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
@@ -44,25 +50,6 @@ const recipeDraftSchema = z.object({
         .transform((v) => v ?? undefined),
       servingSuggestion: optionalString,
       drinkPairing: optionalString,
-    })
-    .nullable(),
-});
-
-const restaurantDraftSchema = z.object({
-  found: z.boolean(),
-  confirmationNotes: z.string(),
-  restaurant: z
-    .object({
-      name: z.string().min(1),
-      address: z.string().min(1),
-      city: z.string().min(1),
-      postcode: optionalString,
-      website: optionalString,
-      mapsUrl: optionalString,
-      lat: z.coerce.number().nullish().transform((v) => v ?? undefined),
-      lng: z.coerce.number().nullish().transform((v) => v ?? undefined),
-      authenticityNotes: optionalString,
-      phone: optionalString,
     })
     .nullable(),
 });
@@ -251,82 +238,79 @@ export async function previewRestaurantSuggestion(input: {
   countryName: string;
   query: string;
 }): Promise<RestaurantPreview> {
-  const raw = await chatJson(
-    `You research restaurants in the Netherlands that serve a given national cuisine.
-Reply with JSON only. Prefer real places when you know them; otherwise propose a best-effort match from the query and mark uncertainty in confirmationNotes.
-If the query is nonsense or clearly not a restaurant, set found=false and restaurant=null.
-mapsUrl should be a Google Maps search URL for the place in the Netherlands.
-City should be in the Netherlands.`,
-    `Cuisine country: ${input.countryName} (${input.countryCode})
-User query (restaurant name or short description): ${input.query}
-
-JSON shape:
-{
-  "found": boolean,
-  "confirmationNotes": string,
-  "restaurant": null | {
-    "name": string,
-    "address": string,
-    "city": string,
-    "postcode": string?,
-    "website": string?,
-    "mapsUrl": string?,
-    "lat": number?,
-    "lng": number?,
-    "authenticityNotes": string?,
-    "phone": string?
+  if (!isGooglePlacesConfigured()) {
+    throw new Error(
+      "GOOGLE_PLACES_API_KEY is not configured. Restaurant suggestions need Google Places.",
+    );
   }
-}`,
-  );
 
-  const parsed = restaurantDraftSchema.parse(raw);
-  if (!parsed.found || !parsed.restaurant) {
+  const query = input.query.trim();
+  const hits = await searchGoogleRestaurantsByQuery(query);
+  const match =
+    hits.find((place) => namesLikelyMatch(query, place.name)) ?? hits[0];
+
+  if (!match) {
     return {
       found: false,
-      confirmationNotes: parsed.confirmationNotes,
+      confirmationNotes:
+        "Could not verify this restaurant in the Netherlands on Google Places. Try the exact name and city.",
       restaurant: null,
     };
   }
 
-  const place = parsed.restaurant;
-  const website =
-    place.website && /^https?:\/\//i.test(place.website)
-      ? place.website
-      : undefined;
-  const fallbackMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    `${place.name} ${place.address} ${place.city} Netherlands`,
-  )}`;
-  let mapsUrl = fallbackMaps;
-  if (place.mapsUrl && /^https?:\/\//i.test(place.mapsUrl)) {
+  const mapsUrl =
+    match.mapsUrl && /^https?:\/\//i.test(match.mapsUrl)
+      ? match.mapsUrl
+      : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          `${match.name} ${match.address} ${match.city} Netherlands`,
+        )}`;
+
+  let authenticityNotes = `Verified on Google Places for ${input.countryName} cuisine (pending review).`;
+  let confirmationNotes = `Found “${match.name}” in ${match.city} with a verified Netherlands address from Google Places.`;
+
+  if (isOpenAiConfigured()) {
     try {
-      const host = new URL(place.mapsUrl).hostname.toLowerCase();
-      const short =
-        host === "goo.gl" ||
-        host.endsWith(".goo.gl") ||
-        host === "g.co" ||
-        host === "maps.app.goo.gl";
-      if (!short) mapsUrl = place.mapsUrl;
-    } catch {
-      mapsUrl = fallbackMaps;
+      const raw = await chatJson(
+        `You write a short cuisine-fit note for a restaurant already verified on Google Places.
+Reply with JSON only. Do not invent a different name, address, or city.
+authenticityNotes: 1-2 sentences on whether this place plausibly serves the given national cuisine.
+confirmationNotes: 1 short sentence confirming the Places match for the user.`,
+        `Cuisine country: ${input.countryName} (${input.countryCode})
+User query: ${query}
+Verified place: ${match.name}, ${match.address}, ${match.city}
+
+JSON shape:
+{
+  "confirmationNotes": string,
+  "authenticityNotes": string
+}`,
+      );
+      const notesSchema = z.object({
+        confirmationNotes: z.string().min(1),
+        authenticityNotes: z.string().min(1),
+      });
+      const notes = notesSchema.parse(raw);
+      confirmationNotes = notes.confirmationNotes.trim();
+      authenticityNotes = notes.authenticityNotes.trim();
+    } catch (error) {
+      console.warn("Restaurant suggestion notes failed; using Places defaults", error);
     }
   }
 
   return {
     found: true,
-    confirmationNotes: parsed.confirmationNotes,
+    confirmationNotes,
     restaurant: {
-      name: place.name,
-      address: place.address,
-      city: place.city,
-      postcode: place.postcode ?? undefined,
-      website,
+      name: match.name,
+      address: match.address,
+      city: match.city,
+      postcode: match.postcode,
+      website: officialWebsiteOrUndefined(match.website),
       mapsUrl,
-      lat: place.lat ?? undefined,
-      lng: place.lng ?? undefined,
-      authenticityNotes:
-        place.authenticityNotes ??
-        `Community suggestion for ${input.countryName} cuisine (pending review).`,
-      phone: place.phone ?? undefined,
+      lat: match.lat,
+      lng: match.lng,
+      authenticityNotes,
+      phone: match.phone,
     },
   };
 }

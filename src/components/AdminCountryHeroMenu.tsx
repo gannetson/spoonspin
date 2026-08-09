@@ -1,4 +1,12 @@
-import { useEffect, useId, useRef, useState, type FormEvent } from "react";
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
+import { createPortal } from "react-dom";
 import {
   ChevronDown,
   FilePenLine,
@@ -17,6 +25,11 @@ type AdminCountryHeroMenuProps = {
   onCountryUpdated: (country: Country) => void;
 };
 
+type MenuPosition = {
+  top: number;
+  left: number;
+};
+
 function countryDisplayText(country: Country): string {
   return (country.wikipedia?.summary ?? country.introduction).trim();
 }
@@ -31,7 +44,13 @@ export function AdminCountryHeroMenu({
   const menuId = useId();
   const textTitleId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState<MenuPosition | null>(null);
+  const [statusPosition, setStatusPosition] = useState<MenuPosition | null>(
+    null,
+  );
   const [textOpen, setTextOpen] = useState(false);
   const [textDraft, setTextDraft] = useState("");
   const [textBusy, setTextBusy] = useState(false);
@@ -40,23 +59,82 @@ export function AdminCountryHeroMenu({
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  function updatePosition() {
+    const button = buttonRef.current;
+    if (!button) return;
+    const rect = button.getBoundingClientRect();
+    const panelWidth = 288;
+    const gap = 8;
+    const left = Math.min(
+      Math.max(8, rect.right - panelWidth),
+      window.innerWidth - panelWidth - 8,
+    );
+    let top = rect.bottom + gap;
+    const panelHeight = panelRef.current?.offsetHeight ?? 220;
+    if (top + panelHeight > window.innerHeight - 8) {
+      top = Math.max(8, rect.top - gap - panelHeight);
+    }
+    setPosition({ top, left });
+  }
+
+  function updateStatusPosition() {
+    const button = buttonRef.current;
+    if (!button || (!imageBusy && !status && !error)) {
+      setStatusPosition(null);
+      return;
+    }
+    const rect = button.getBoundingClientRect();
+    const toastWidth = 256;
+    const left = Math.min(
+      Math.max(8, rect.right - toastWidth),
+      window.innerWidth - toastWidth - 8,
+    );
+    setStatusPosition({ top: rect.bottom + 4, left });
+  }
+
+  useLayoutEffect(() => {
+    if (!open) {
+      setPosition(null);
+      return;
+    }
+    updatePosition();
+  }, [open]);
+
+  useLayoutEffect(() => {
+    updateStatusPosition();
+  }, [imageBusy, status, error]);
+
   useEffect(() => {
-    if (!open) return;
+    if (!open && !imageBusy && !status && !error) return;
     function onPointer(event: MouseEvent) {
-      if (!rootRef.current?.contains(event.target as Node)) {
-        setOpen(false);
+      if (!open) return;
+      const target = event.target as Node;
+      if (
+        rootRef.current?.contains(target) ||
+        panelRef.current?.contains(target)
+      ) {
+        return;
       }
+      setOpen(false);
     }
     function onKey(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
     }
+    function onReposition() {
+      if (open) updatePosition();
+      updateStatusPosition();
+    }
     window.addEventListener("mousedown", onPointer);
     window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
     return () => {
       window.removeEventListener("mousedown", onPointer);
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
     };
-  }, [open]);
+  }, [open, imageBusy, status, error]);
 
   useEffect(() => {
     if (!textOpen) return;
@@ -130,9 +208,102 @@ export function AdminCountryHeroMenu({
     }
   }
 
+  const menu =
+    open && position
+      ? createPortal(
+          <div
+            ref={panelRef}
+            id={menuId}
+            role="menu"
+            style={{ top: position.top, left: position.left }}
+            className="fixed z-[80] w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border border-ink/10 bg-cream text-ink shadow-xl"
+          >
+            <button
+              type="button"
+              role="menuitem"
+              disabled={imageBusy}
+              onClick={() => void onReplaceImage()}
+              className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment disabled:opacity-60"
+            >
+              <ImagePlus className="mt-0.5 size-4 shrink-0 text-tomato" />
+              <span>
+                <span className="block font-semibold text-ink">
+                  {t("admin.country.replaceImage")}
+                </span>
+                <span className="mt-0.5 block text-xs text-ink-soft">
+                  {t("admin.country.replaceImage.hint")}
+                </span>
+              </span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => onSelectImage()}
+              className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
+            >
+              <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
+              <span>
+                <span className="block font-semibold text-ink">
+                  {t("admin.country.selectImage")}
+                </span>
+                <span className="mt-0.5 block text-xs text-ink-soft">
+                  {t("admin.country.selectImage.hint")}
+                </span>
+              </span>
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              onClick={openEditText}
+              className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
+            >
+              <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
+              <span>
+                <span className="block font-semibold text-ink">
+                  {t("admin.country.editText")}
+                </span>
+                <span className="mt-0.5 block text-xs text-ink-soft">
+                  {t("admin.country.editText.hint")}
+                </span>
+              </span>
+            </button>
+          </div>,
+          document.body,
+        )
+      : null;
+
+  const statusToast =
+    (imageBusy || status || error) && statusPosition
+      ? createPortal(
+          <div
+            style={{ top: statusPosition.top, left: statusPosition.left }}
+            className="fixed z-[80] w-max max-w-[16rem] rounded-lg border border-ink/10 bg-cream px-3 py-2 text-sm text-ink shadow-md"
+          >
+            {imageBusy ? (
+              <span className="inline-flex items-center gap-2 text-ink-soft">
+                <LoaderCircle className="size-4 animate-spin" />
+                {t("admin.country.findingImage")}
+              </span>
+            ) : null}
+            {status ? (
+              <span role="status" className="text-ink-soft">
+                {status}
+              </span>
+            ) : null}
+            {error ? (
+              <span role="alert" className="text-tomato">
+                {error}
+              </span>
+            ) : null}
+          </div>,
+          document.body,
+        )
+      : null;
+
   return (
-    <div ref={rootRef} className="relative">
+    <div ref={rootRef} className="relative z-30">
       <button
+        ref={buttonRef}
         type="button"
         aria-haspopup="menu"
         aria-expanded={open}
@@ -147,88 +318,12 @@ export function AdminCountryHeroMenu({
         />
       </button>
 
-      {imageBusy || status || error ? (
-        <div className="absolute right-0 top-full z-20 mt-1 w-max max-w-[16rem] rounded-lg border border-ink/10 bg-cream px-3 py-2 text-sm text-ink shadow-md">
-          {imageBusy ? (
-            <span className="inline-flex items-center gap-2 text-ink-soft">
-              <LoaderCircle className="size-4 animate-spin" />
-              {t("admin.country.findingImage")}
-            </span>
-          ) : null}
-          {status ? (
-            <span role="status" className="text-ink-soft">
-              {status}
-            </span>
-          ) : null}
-          {error ? (
-            <span role="alert" className="text-tomato">
-              {error}
-            </span>
-          ) : null}
-        </div>
-      ) : null}
-
-      {open ? (
-        <div
-          id={menuId}
-          role="menu"
-          className="absolute right-0 z-50 mt-2 w-72 overflow-hidden rounded-2xl border border-ink/10 bg-cream text-ink shadow-lg"
-        >
-          <button
-            type="button"
-            role="menuitem"
-            disabled={imageBusy}
-            onClick={() => void onReplaceImage()}
-            className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment disabled:opacity-60"
-          >
-            <ImagePlus className="mt-0.5 size-4 shrink-0 text-tomato" />
-            <span>
-              <span className="block font-semibold text-ink">
-                {t("admin.country.replaceImage")}
-              </span>
-              <span className="mt-0.5 block text-xs text-ink-soft">
-                {t("admin.country.replaceImage.hint")}
-              </span>
-            </span>
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            onClick={() => onSelectImage()}
-            className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
-          >
-            <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
-            <span>
-              <span className="block font-semibold text-ink">
-                {t("admin.country.selectImage")}
-              </span>
-              <span className="mt-0.5 block text-xs text-ink-soft">
-                {t("admin.country.selectImage.hint")}
-              </span>
-            </span>
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            onClick={openEditText}
-            className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
-          >
-            <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
-            <span>
-              <span className="block font-semibold text-ink">
-                {t("admin.country.editText")}
-              </span>
-              <span className="mt-0.5 block text-xs text-ink-soft">
-                {t("admin.country.editText.hint")}
-              </span>
-            </span>
-          </button>
-        </div>
-      ) : null}
+      {menu}
+      {statusToast}
 
       {textOpen ? (
         <div
-          className="fixed inset-0 z-[70] flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4"
+          className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4"
           role="presentation"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget && !textBusy) {

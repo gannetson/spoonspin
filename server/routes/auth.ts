@@ -5,6 +5,7 @@ import {
   clearOAuthCookies,
   finishGoogleOAuth,
   getAuthProviders,
+  googleRedirectUri,
   isGoogleOAuthConfigured,
   OAUTH_NEXT_COOKIE,
   OAUTH_STATE_COOKIE,
@@ -66,6 +67,26 @@ export async function requireAdmin(
   next();
 }
 
+/** Editors and admins — recipe item tools (edit, images, remove, AI rewrite). */
+export async function requireEditorOrAdmin(
+  req: AuthedRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  const token = req.cookies?.[SESSION_COOKIE] as string | undefined;
+  const user = await getUserBySessionToken(token);
+  if (!user) {
+    res.status(401).json({ message: "Please sign in." });
+    return;
+  }
+  if (user.role !== "admin" && user.role !== "editor") {
+    res.status(403).json({ message: "Editor or admin access required." });
+    return;
+  }
+  req.user = user;
+  next();
+}
+
 function setSessionCookie(res: Response, token: string, expiresAt: Date) {
   res.cookie(SESSION_COOKIE, token, {
     httpOnly: true,
@@ -76,10 +97,10 @@ function setSessionCookie(res: Response, token: string, expiresAt: Date) {
   });
 }
 
-function oauthErrorRedirect(nextPath: string): string {
+function oauthErrorRedirect(req: Request, nextPath: string): string {
   const params = new URLSearchParams({ error: "oauth" });
   if (nextPath !== "/") params.set("next", nextPath);
-  return `${appOrigin()}/login?${params.toString()}`;
+  return `${appOrigin(req)}/login?${params.toString()}`;
 }
 
 export function registerAuthRoutes(app: import("express").Express): void {
@@ -98,11 +119,11 @@ export function registerAuthRoutes(app: import("express").Express): void {
       typeof req.query.next === "string" ? req.query.next : null,
     );
     if (!isGoogleOAuthConfigured()) {
-      res.redirect(oauthErrorRedirect(nextPath));
+      res.redirect(oauthErrorRedirect(req, nextPath));
       return;
     }
     try {
-      const { url, state, codeVerifier } = startGoogleOAuth();
+      const { url, state, codeVerifier } = startGoogleOAuth(req);
       const cookieOpts = oauthCookieOptions();
       res.cookie(OAUTH_STATE_COOKIE, state, cookieOpts);
       res.cookie(OAUTH_VERIFIER_COOKIE, codeVerifier, cookieOpts);
@@ -110,7 +131,7 @@ export function registerAuthRoutes(app: import("express").Express): void {
       res.redirect(url.toString());
     } catch (error) {
       console.error("[auth] google start failed", error);
-      res.redirect(oauthErrorRedirect(nextPath));
+      res.redirect(oauthErrorRedirect(req, nextPath));
     }
   });
 
@@ -134,18 +155,30 @@ export function registerAuthRoutes(app: import("express").Express): void {
     clearOAuthCookies(res);
 
     if (oauthError || !code || !state || !expectedState || !codeVerifier) {
-      res.redirect(oauthErrorRedirect(nextPath));
+      console.warn("[auth] google callback rejected", {
+        oauthError: oauthError ?? null,
+        hasCode: Boolean(code),
+        hasState: Boolean(state),
+        hasExpectedState: Boolean(expectedState),
+        hasCodeVerifier: Boolean(codeVerifier),
+        origin: appOrigin(req),
+        redirectUri: googleRedirectUri(req),
+      });
+      res.redirect(oauthErrorRedirect(req, nextPath));
       return;
     }
     if (state !== expectedState) {
-      res.redirect(oauthErrorRedirect(nextPath));
+      console.warn("[auth] google callback state mismatch", {
+        origin: appOrigin(req),
+      });
+      res.redirect(oauthErrorRedirect(req, nextPath));
       return;
     }
 
     try {
-      const profile = await finishGoogleOAuth({ code, codeVerifier });
+      const profile = await finishGoogleOAuth({ code, codeVerifier }, req);
       if (!profile.emailVerified || !profile.email) {
-        res.redirect(oauthErrorRedirect(nextPath));
+        res.redirect(oauthErrorRedirect(req, nextPath));
         return;
       }
       const user = await findOrCreateOAuthUser({
@@ -156,10 +189,10 @@ export function registerAuthRoutes(app: import("express").Express): void {
       });
       const session = await createSession(user.id);
       setSessionCookie(res, session.token, session.expiresAt);
-      res.redirect(`${appOrigin()}${nextPath}`);
+      res.redirect(`${appOrigin(req)}${nextPath}`);
     } catch (error) {
       console.error("[auth] google callback failed", error);
-      res.redirect(oauthErrorRedirect(nextPath));
+      res.redirect(oauthErrorRedirect(req, nextPath));
     }
   });
 

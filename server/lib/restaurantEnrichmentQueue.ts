@@ -21,6 +21,7 @@ import {
   isGooglePlacesConfigured,
 } from "./googlePlacesPhoto.ts";
 import { findCuisineImageFromQueries } from "./wikimedia.ts";
+import { fetchBestWebsiteRestaurantPhoto } from "./websiteImages.ts";
 
 export type RestaurantEnrichmentJob = {
   restaurantId: string;
@@ -121,6 +122,17 @@ async function enrichImage(
     });
   } catch (error) {
     console.warn(`[enrich] Google photo failed ${restaurantId}`, error);
+  }
+
+  if (!image && restaurant.website) {
+    try {
+      image = await fetchBestWebsiteRestaurantPhoto({
+        website: restaurant.website,
+        restaurantName: restaurant.name,
+      });
+    } catch (error) {
+      console.warn(`[enrich] website photo failed ${restaurantId}`, error);
+    }
   }
 
   if (!image) {

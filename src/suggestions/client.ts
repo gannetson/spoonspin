@@ -117,10 +117,20 @@ async function readError(response: Response): Promise<string> {
 
 export async function fetchSuggestionStatus(): Promise<{
   openaiConfigured: boolean;
+  placesConfigured: boolean;
 }> {
   const response = await fetch("/api/suggestions/status");
-  if (!response.ok) return { openaiConfigured: false };
-  return (await response.json()) as { openaiConfigured: boolean };
+  if (!response.ok) {
+    return { openaiConfigured: false, placesConfigured: false };
+  }
+  const data = (await response.json()) as {
+    openaiConfigured?: boolean;
+    placesConfigured?: boolean;
+  };
+  return {
+    openaiConfigured: Boolean(data.openaiConfigured),
+    placesConfigured: Boolean(data.placesConfigured),
+  };
 }
 
 export async function fetchCommunityRecipes(

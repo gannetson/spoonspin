@@ -15,6 +15,10 @@ export type DiscoveredRestaurant = {
   mapsUrl: string;
   lat?: number;
   lng?: number;
+  cuisine?: string;
+  cuisineEvidence?: string;
+  evidenceSourceUrl?: string;
+  confidence?: "high" | "medium" | "low";
   authenticityNotes?: string;
   authenticityRating?: number;
   phone?: string;
@@ -117,13 +121,19 @@ export function discoverRestaurants(code: string, query?: string) {
   );
 }
 
-export function addRestaurants(code: string, restaurants: DiscoveredRestaurant[]) {
+export function addRestaurants(
+  code: string,
+  restaurants: DiscoveredRestaurant[],
+  options?: { review?: boolean },
+) {
   return postAdmin<{
     added: number;
     countryCode: string;
     enrichmentQueued?: number;
+    reviewed?: boolean;
   }>(`/api/admin/countries/${encodeURIComponent(code)}/restaurants`, {
     restaurants,
+    review: options?.review === true,
   });
 }
 
@@ -211,6 +221,45 @@ export function replaceRecipeText(code: string, recipeId: string) {
   }>(
     `/api/admin/countries/${encodeURIComponent(code)}/recipes/${encodeURIComponent(recipeId)}/replace-text`,
   );
+}
+
+export type RecipeCopyPatch = {
+  localName?: string | null;
+  description?: string;
+  dietaryLabels?: string[];
+  ingredients?: Recipe["ingredients"];
+  steps?: string[];
+  substitutions?: string[] | null;
+  servingSuggestion?: string | null;
+  drinkPairing?: string | null;
+};
+
+export async function patchRecipeFields(
+  code: string,
+  recipeId: string,
+  patch: RecipeCopyPatch,
+) {
+  const response = await fetch(
+    `/api/admin/countries/${encodeURIComponent(code)}/recipes/${encodeURIComponent(recipeId)}`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    },
+  );
+  const data = await readJson<{
+    country?: Country;
+    recipe?: Recipe | null;
+    message?: string;
+  }>(response);
+  if (!response.ok) {
+    throw new Error(data.message ?? "Could not update recipe.");
+  }
+  return data as {
+    country: Country | undefined;
+    recipe: Recipe | null;
+  };
 }
 
 export function selectRecipeForDinner(code: string, recipeId: string) {
@@ -361,12 +410,17 @@ export async function searchAdminImages(input: {
   q: string;
   offset?: number;
   limit?: number;
+  /** When set, prepend photos scraped from this restaurant's website. */
+  restaurantId?: string;
 }) {
   const params = new URLSearchParams({
     q: input.q,
     offset: String(input.offset ?? 0),
     limit: String(input.limit ?? 12),
   });
+  if (input.restaurantId) {
+    params.set("restaurantId", input.restaurantId);
+  }
   const response = await fetch(`/api/admin/images/search?${params}`, {
     credentials: "include",
   });

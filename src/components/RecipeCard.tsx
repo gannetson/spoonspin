@@ -26,6 +26,7 @@ type RecipeCardProps = {
   variant?: "default" | "national" | "community" | "simple" | "dinner";
   showMeta?: boolean;
   isAdmin?: boolean;
+  showEditText?: boolean;
   adminBusy?: boolean;
   adminStatus?: string | null;
   adminError?: string | null;
@@ -39,6 +40,7 @@ export function RecipeCard({
   variant = "default",
   showMeta = true,
   isAdmin = false,
+  showEditText = false,
   adminBusy = false,
   adminStatus = null,
   adminError = null,
@@ -165,6 +167,7 @@ export function RecipeCard({
               label={recipe.name}
               tone="light"
               showSelectForDinner
+              showEditText={showEditText}
               replaceImageHintKey="admin.item.replaceImage.dish.hint"
               busy={adminBusy}
               status={adminStatus}
