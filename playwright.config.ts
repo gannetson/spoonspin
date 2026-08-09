@@ -15,7 +15,7 @@ export default defineConfig({
   webServer: [
     {
       command: `${nvmPrefix} npm run server`,
-      url: "http://127.0.0.1:3001/api/health",
+      url: "http://127.0.0.1:3007/api/health",
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },

@@ -35,7 +35,7 @@ loadEnv({
   override: false,
 });
 
-const PORT = Number(process.env.API_PORT ?? 3001);
+const PORT = Number(process.env.API_PORT ?? 3007);
 const GOOGLE_API_KEY = process.env.GOOGLE_PLACES_API_KEY?.trim();
 const MAPBOX_TOKEN = process.env.MAPBOX_ACCESS_TOKEN?.trim();
 const PROVIDER_PREF = (process.env.RESTAURANT_PROVIDER ?? "auto").toLowerCase();

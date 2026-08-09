@@ -25,7 +25,7 @@ Content lives in **Postgres** (countries, recipes, drinks, shops, restaurants). 
 
 ## Production (spoonspin.nl)
 
-Nginx serves `dist/` and proxies `/api` to Express (`:3001`) under supervisord.
+Nginx serves `dist/` and proxies `/api` to Express (`:3007`) under supervisord.
 
 See **[deploy/README.md](deploy/README.md)** for nginx + supervisor configs and `deploy/install-server.sh`. App path on the server: `/var/www/spoonspin/spoonspin`.
 
@@ -42,7 +42,7 @@ npm run dev
 ```
 
 - Web app: http://localhost:5173
-- API: http://localhost:3001
+- API: http://localhost:3007
 
 ### Required commands
 
@@ -84,7 +84,7 @@ Copy `.env.example` to `.env`:
 | `RESTAURANT_PROVIDER`   | No                           | `auto` (default), `mapbox`, or `google` |
 | `RESTAURANT_LIVE_FALLBACK` | No                        | Set `1` to allow Mapbox/Google when curated DB has no match (off by default) |
 | `DATABASE_URL`          | No                           | Defaults to `postgresql://localhost:5432/spoonspin` |
-| `API_PORT`              | No                           | Defaults to `3001`                      |
+| `API_PORT`              | No                           | Defaults to `3007`                      |
 
 Never put provider secrets in Vite `VITE_*` variables or client code.
 
