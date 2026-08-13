@@ -11,6 +11,7 @@ import {
   type SuggestionKind,
 } from "@/suggestions/client";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
 
 type SuggestModalProps = {
   kind: SuggestionKind;
@@ -318,7 +319,7 @@ export function SuggestModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-4 sm:items-center"
+      className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-4 sm:items-center`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
@@ -332,7 +333,7 @@ export function SuggestModal({
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 id={titleId} className="font-display text-3xl text-ink">
+            <h2 id={titleId} className="font-display text-3xl text-burgundy">
               {t(TITLE_KEYS[kind])}
             </h2>
             <p className="mt-1 text-sm text-ink-soft">
@@ -425,7 +426,7 @@ export function SuggestModal({
         {preview.status === "ready-recipe" ? (
           <div className="mt-4 space-y-3 rounded-2xl bg-parchment p-4">
             <p className="text-sm text-ink-soft">{preview.notes}</p>
-            <p className="font-display text-2xl text-ink">{preview.recipe.name}</p>
+            <p className="font-display text-2xl text-burgundy">{preview.recipe.name}</p>
             <p className="text-sm text-ink-soft">{preview.recipe.description}</p>
             <p className="text-xs font-semibold uppercase tracking-wide text-stamp">
               {t("suggest.preview.meta", {
@@ -446,7 +447,7 @@ export function SuggestModal({
         {preview.status === "ready-restaurant" ? (
           <div className="mt-4 space-y-3 rounded-2xl bg-parchment p-4">
             <p className="text-sm text-ink-soft">{preview.notes}</p>
-            <p className="font-display text-2xl text-ink">
+            <p className="font-display text-2xl text-burgundy">
               {preview.restaurant.name}
             </p>
             <p className="text-sm text-ink-soft">
@@ -469,7 +470,7 @@ export function SuggestModal({
         {preview.status === "ready-drink" ? (
           <div className="mt-4 space-y-3 rounded-2xl bg-parchment p-4">
             <p className="text-sm text-ink-soft">{preview.notes}</p>
-            <p className="font-display text-2xl text-ink">{preview.drink.name}</p>
+            <p className="font-display text-2xl text-burgundy">{preview.drink.name}</p>
             <p className="text-sm text-ink-soft">{preview.drink.description}</p>
             <p className="text-xs font-semibold uppercase tracking-wide text-stamp">
               {preview.drink.type}
@@ -486,7 +487,7 @@ export function SuggestModal({
         {preview.status === "ready-shop" ? (
           <div className="mt-4 space-y-3 rounded-2xl bg-parchment p-4">
             <p className="text-sm text-ink-soft">{preview.notes}</p>
-            <p className="font-display text-2xl text-ink">{preview.shop.name}</p>
+            <p className="font-display text-2xl text-burgundy">{preview.shop.name}</p>
             <p className="text-sm text-ink-soft">
               {preview.shop.address}
               {preview.shop.city ? ` · ${preview.shop.city}` : ""}

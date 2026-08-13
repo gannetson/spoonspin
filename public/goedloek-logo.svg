@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="GoedLoek">
+  <rect width="512" height="512" rx="48" fill="#F7F1E6"/>
+
+  <!-- G: ochre, thicker toward the base -->
+  <path
+    fill="#C9A227"
+    d="
+      M 206 92
+      C 128 92 74 152 74 240
+      C 74 348 140 412 228 412
+      L 286 412
+      L 286 340
+      L 228 340
+      C 176 340 148 298 148 240
+      C 148 190 176 152 220 152
+      C 252 152 274 168 286 196
+      L 352 170
+      C 330 116 276 92 206 92
+      Z
+    "
+  />
+  <path
+    fill="#C9A227"
+    d="
+      M 204 244
+      L 286 244
+      L 286 328
+      L 216 328
+      C 200 328 192 310 192 292
+      C 192 262 200 244 216 244
+      Z
+    "
+  />
+
+  <!-- L: burgundy, stem + foot heavier at the bottom -->
+  <path
+    fill="#6B1E2E"
+    d="
+      M 340 92
+      L 398 92
+      L 432 328
+      L 468 328
+      L 476 412
+      L 292 412
+      L 300 328
+      L 368 328
+      Z
+    "
+  />
+</svg>

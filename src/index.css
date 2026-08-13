@@ -7,11 +7,13 @@
   --color-parchment-deep: #dde3df;
   --color-ink: #14201c;
   --color-ink-soft: #3d4f48;
-  --color-tomato: #e03e2f;
-  --color-tomato-deep: #b82e22;
+  --color-burgundy: #6b1e2e;
+  --color-tomato: #b52217;
+  --color-tomato-deep: #9f190e;
   --color-saffron: #e8a317;
   --color-saffron-soft: #f5d48a;
-  --color-ochre: #f3e6cf;
+  --color-ochre: #fae9ba;
+  --color-ochre-soft: #f3e6cf;
   --color-cream: #f8faf8;
   --color-stamp: #2a6b5a;
 }
@@ -44,11 +46,24 @@
   h1,
   h2,
   h3,
+  h4,
   .font-display {
     font-family: var(--font-display);
     font-weight: 800;
     letter-spacing: -0.04em;
     line-height: 0.95;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-burgundy);
+  }
+
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
   }
 
   :focus-visible {
@@ -128,6 +143,16 @@
     }
   }
 
+  @keyframes nudge-bounce {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
   .animate-spoon-spin {
     animation: spoon-spin 0.7s linear infinite;
     transform-origin: center;
@@ -135,6 +160,10 @@
 
   .animate-wiggle {
     animation: wiggle 0.35s ease-in-out infinite;
+  }
+
+  .animate-nudge-bounce {
+    animation: nudge-bounce 1.1s ease-in-out infinite;
   }
 
   .animate-hero-drift {
@@ -155,5 +184,13 @@
 
   .animate-rise-in-delay-2 {
     animation: rise-in 0.75s cubic-bezier(0.22, 1, 0.36, 1) 0.24s both;
+  }
+
+  .flag-glow {
+    filter:
+      drop-shadow(0 0 0.5px #fff)
+      drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+      drop-shadow(0 0 6px rgba(255, 255, 255, 0.75))
+      drop-shadow(0 1px 8px rgba(255, 255, 255, 0.45));
   }
 }

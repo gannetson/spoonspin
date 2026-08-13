@@ -293,7 +293,7 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                 alt=""
                 width={128}
                 height={128}
-                className="size-28 shrink-0 rounded-3xl bg-parchment object-cover ring-1 ring-ink/10 sm:size-32"
+                className="size-28 shrink-0 object-contain sm:size-32"
               />
               <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stamp">
@@ -349,7 +349,7 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                     alt=""
                     width={48}
                     height={48}
-                    className="size-12 shrink-0 rounded-2xl bg-parchment object-cover ring-1 ring-ink/10"
+                    className="size-12 shrink-0 object-contain"
                   />
                   <p className="text-sm font-semibold text-ink">
                     {t("profile.nextLevel", {
@@ -389,7 +389,9 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                       to={`/?country=${code}&mode=cook`}
                       className="inline-flex items-center gap-1.5 rounded-full bg-cream px-3 py-1.5 text-sm font-semibold ring-1 ring-ink/10 hover:ring-tomato/40"
                     >
-                      <span aria-hidden="true">{entry.flag}</span>
+                      <span aria-hidden="true" className="flag-glow">
+                        {entry.flag}
+                      </span>
                       {entry.name}
                     </Link>
                   </li>
@@ -426,7 +428,7 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
               <select
                 value={countryFilter}
                 onChange={(event) => setCountryFilter(event.target.value)}
-                className="rounded-full border border-ink/15 bg-cream px-3 py-1.5 text-sm font-semibold"
+                className="rounded-full border border-burgundy/20 bg-cream px-3 py-1.5 text-sm font-semibold text-burgundy"
               >
                 <option value="all">{t("profile.filter.countryAll")}</option>
                 {countriesInTags.map((entry) => (
@@ -447,7 +449,7 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                     const value = event.target.value;
                     setMinRating(value === "any" ? null : Number(value));
                   }}
-                  className="rounded-full border border-ink/15 bg-cream px-3 py-1.5 text-sm font-semibold"
+                  className="rounded-full border border-burgundy/20 bg-cream px-3 py-1.5 text-sm font-semibold text-burgundy"
                 >
                   <option value="any">{t("profile.filter.ratingAny")}</option>
                   {[1, 2, 3, 4, 5].map((n) => (
@@ -496,7 +498,9 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
                           {country ? (
                             <>
-                              <span aria-hidden="true">{country.flag}</span>{" "}
+                              <span aria-hidden="true" className="flag-glow">
+                                {country.flag}
+                              </span>{" "}
                               {country.name}
                             </>
                           ) : (
@@ -585,8 +589,8 @@ function FilterPills<T extends string>({
             onClick={() => onChange(option.value)}
             className={`rounded-full px-3 py-1.5 text-sm font-semibold transition ${
               value === option.value
-                ? "bg-ink text-cream"
-                : "bg-cream text-ink ring-1 ring-ink/10 hover:ring-tomato/40"
+                ? "bg-burgundy text-cream"
+                : "bg-cream text-burgundy ring-1 ring-burgundy/15 hover:ring-tomato/40"
             }`}
           >
             {option.label}

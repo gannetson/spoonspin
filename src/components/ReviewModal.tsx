@@ -1,6 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Camera, LoaderCircle, Star, X } from "lucide-react";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
 import type { TagEntityType, UserTag } from "@/tags/types";
 
 type ReviewModalProps = {
@@ -124,7 +125,7 @@ export function ReviewModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4"
+      className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4`}
       role="presentation"
       onClick={onClose}
     >
@@ -142,7 +143,7 @@ export function ReviewModal({
             </p>
             <h2
               id={titleId}
-              className="font-display text-2xl leading-tight text-ink"
+              className="font-display text-2xl leading-tight text-burgundy"
             >
               {t("review.title", { name: entityName })}
             </h2>
@@ -159,8 +160,8 @@ export function ReviewModal({
                   onClick={() => onRatingChange(0)}
                   className={`mr-0.5 rounded px-1 py-0.5 text-[0.65rem] font-bold transition ${
                     rating === 0
-                      ? "bg-ink text-cream"
-                      : "text-ink/40 hover:bg-parchment hover:text-ink"
+                      ? "bg-burgundy text-cream"
+                      : "text-burgundy/40 hover:bg-parchment hover:text-burgundy"
                   }`}
                 >
                   0

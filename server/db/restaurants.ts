@@ -79,6 +79,8 @@ export type RestaurantUpsert = {
 let pool: Pool | null = null;
 let poolUrl: string | null = null;
 let migratedForUrl: string | null = null;
+/** In-flight migration so concurrent ensureDb() callers share one DDL run. */
+let migrateInFlight: Promise<void> | null = null;
 
 export function getDatabaseUrl(): string {
   return (
@@ -223,6 +225,7 @@ export async function closeDb(): Promise<void> {
     pool = null;
     poolUrl = null;
     migratedForUrl = null;
+    migrateInFlight = null;
   }
 }
 
@@ -231,8 +234,18 @@ export async function ensureDb(): Promise<Pool> {
   const url = getDatabaseUrl();
   const db = getPool(url);
   if (migratedForUrl === url) return db;
-  await migrate(db);
-  migratedForUrl = url;
+
+  if (!migrateInFlight) {
+    migrateInFlight = migrate(db)
+      .then(() => {
+        migratedForUrl = url;
+      })
+      .finally(() => {
+        migrateInFlight = null;
+      });
+  }
+
+  await migrateInFlight;
   return db;
 }
 
@@ -503,6 +516,7 @@ async function migrate(db: Pool) {
     ALTER TABLE countries ADD COLUMN IF NOT EXISTS image_url TEXT;
     ALTER TABLE countries ADD COLUMN IF NOT EXISTS image_attribution TEXT;
     ALTER TABLE countries ADD COLUMN IF NOT EXISTS dinner_json JSONB;
+    ALTER TABLE countries ADD COLUMN IF NOT EXISTS order_options JSONB NOT NULL DEFAULT '[]'::jsonb;
 
     CREATE INDEX IF NOT EXISTS idx_countries_cook_ready
       ON countries (cook_ready);
@@ -566,6 +580,44 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_user_tags_user_country
       ON user_tags (user_id, country_code);
+  `,
+  );
+
+  await migrateSql(
+    db,
+    `
+    CREATE TABLE IF NOT EXISTS api_request_logs (
+      id TEXT PRIMARY KEY,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      method TEXT NOT NULL,
+      path TEXT NOT NULL,
+      status INTEGER NOT NULL,
+      duration_ms INTEGER NOT NULL,
+      ip TEXT NOT NULL,
+      user_agent TEXT,
+      user_id TEXT
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_api_request_logs_created_at
+      ON api_request_logs (created_at);
+    CREATE INDEX IF NOT EXISTS idx_api_request_logs_ip_created
+      ON api_request_logs (ip, created_at);
+    CREATE INDEX IF NOT EXISTS idx_api_request_logs_path_created
+      ON api_request_logs (path, created_at);
+
+    CREATE TABLE IF NOT EXISTS product_events (
+      id TEXT PRIMARY KEY,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      event_type TEXT NOT NULL,
+      ip TEXT NOT NULL,
+      user_id TEXT,
+      meta JSONB NOT NULL DEFAULT '{}'::jsonb
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_product_events_created_at
+      ON product_events (created_at);
+    CREATE INDEX IF NOT EXISTS idx_product_events_type_created
+      ON product_events (event_type, created_at);
   `,
   );
 }

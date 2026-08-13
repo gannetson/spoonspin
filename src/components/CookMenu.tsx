@@ -319,7 +319,7 @@ export function CookMenu({
             <div className="min-w-0">
               <h2
                 id="menu-heading"
-                className="font-display text-3xl text-cream sm:text-5xl"
+                className="font-display text-3xl text-ochre sm:text-5xl"
               >
                 {t("cook.menu.heading")}
               </h2>
@@ -332,7 +332,7 @@ export function CookMenu({
               </p>
             </div>
             {isAdmin ? (
-              <div className="pointer-events-auto relative z-30">
+              <div className="pointer-events-auto relative">
                 <AdminCookMenu
                   country={country}
                   onCountryUpdated={onCountryUpdated}
@@ -360,8 +360,8 @@ export function CookMenu({
               onClick={() => setTab(value)}
               className={`min-h-11 rounded-xl px-4 text-sm font-semibold transition ${
                 active
-                  ? "bg-ink text-cream"
-                  : "text-ink hover:bg-ink/5"
+                  ? "bg-burgundy text-cream"
+                  : "text-burgundy hover:bg-burgundy/5"
               }`}
             >
               {t(`cook.tabs.${value}`)}
@@ -379,7 +379,7 @@ export function CookMenu({
                   <UtensilsCrossed aria-hidden="true" className="size-4" />
                   {t("cook.dinner.kicker")}
                 </p>
-                <h3 className="max-w-3xl font-display text-4xl leading-tight text-ink sm:text-5xl">
+                <h3 className="max-w-3xl font-display text-4xl leading-tight text-burgundy sm:text-5xl">
                   {dinner.title}
                 </h3>
                 <p className="max-w-2xl text-lg leading-relaxed text-ink-soft">
@@ -447,7 +447,7 @@ export function CookMenu({
                             course: t(COURSE_KEYS[course.role]),
                           })}
                         </p>
-                        <h4 className="font-display text-3xl text-ink">
+                        <h4 className="font-display text-3xl text-burgundy">
                           {recipe.name}
                           {recipe.localName ? (
                             <span className="mt-1 block font-sans text-base font-normal text-ink-soft">
@@ -472,8 +472,8 @@ export function CookMenu({
               </div>
 
               {dinner.drinks.length > 0 ? (
-                <footer className="space-y-5 border-t border-ink/10 bg-ochre/40 px-6 py-8 sm:px-10">
-                  <h4 className="font-display text-3xl text-ink">
+                <footer className="space-y-5 border-t border-ink/10 bg-ochre-soft/40 px-6 py-8 sm:px-10">
+                  <h4 className="font-display text-3xl text-burgundy">
                     {t("cook.dinner.drinksHeading")}
                   </h4>
                   <div className="grid gap-6 sm:grid-cols-2">
@@ -569,7 +569,7 @@ export function CookMenu({
                             )}
                           </div>
                           <div className="min-w-0">
-                            <p className="font-display text-xl text-ink">
+                            <p className="font-display text-xl text-burgundy">
                               {drink?.name ?? suggestion.drinkName}
                               {drink?.localName ? (
                                 <span className="ml-2 font-sans text-sm font-normal text-ink-soft">
@@ -692,7 +692,7 @@ export function CookMenu({
         <div role="tabpanel" className="space-y-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h3 className="font-display text-2xl text-ink">
+              <h3 className="font-display text-2xl text-burgundy">
                 {t("cook.drinks.heading")}
               </h3>
               <p className="text-sm text-ink-soft">{t("cook.drinks.subtitle")}</p>
@@ -755,7 +755,7 @@ export function CookMenu({
         <div role="tabpanel" className="space-y-3">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <h3 className="font-display text-2xl text-ink">
+              <h3 className="font-display text-2xl text-burgundy">
                 {t("cook.shops.heading")}
               </h3>
               <p className="text-sm text-ink-soft">
@@ -798,7 +798,7 @@ export function CookMenu({
                   ) : null}
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className={isAdmin ? "pr-12" : undefined}>
-                      <p className="inline-flex items-center gap-2 font-display text-xl text-ink">
+                      <p className="inline-flex items-center gap-2 font-display text-xl text-burgundy">
                         <Store aria-hidden="true" className="size-5" />
                         {shop.name}
                       </p>
@@ -976,8 +976,8 @@ function FilterRow<T extends string>({
             onClick={() => onChange(option.value)}
             className={`min-h-10 rounded-full px-3 text-sm font-semibold transition ${
               active
-                ? "bg-ink text-cream"
-                : "border border-ink/15 bg-white text-ink hover:border-tomato hover:text-tomato"
+                ? "bg-burgundy text-cream"
+                : "border border-burgundy/20 bg-white text-burgundy hover:border-tomato hover:text-tomato"
             }`}
           >
             {option.label}

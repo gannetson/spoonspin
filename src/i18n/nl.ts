@@ -19,12 +19,38 @@ export const nl: Messages = {
   "app.mode.cook.descriptionReady": "Kook een typisch menu thuis",
   "app.mode.cook.descriptionSoon": "Recepten komen eraan — overzicht beschikbaar",
   "app.mode.dine": "Uit eten",
-  "app.mode.dine.description": "Vind restaurants in Nederland",
+  "app.mode.dine.description": "Eet buiten de deur of bestel bezorging in Nederland",
   "app.countrySelect.labelResult": "Of kies een land",
   "app.share.title": "Spoon Spin: {name}",
   "app.lang.en": "EN",
   "app.lang.nl": "NL",
   "app.lang.switchAria": "Taal",
+
+  "cookie.banner.title": "Cookies & affiliate-tracking",
+  "cookie.banner.body":
+    "We gebruiken noodzakelijke cookies om je ingelogd te houden. Met jouw toestemming gebruiken we ook marketingcookies, zodat bestellinks naar Thuisbezorgd.nl via ons affiliateprogramma gevolgd kunnen worden. Die commissie helpt Spoonspin te financieren en draaiende te houden — zonder toestemming blijven die links ongevolgd en verdienen we er niets aan.",
+  "cookie.banner.accept": "Marketingcookies accepteren",
+  "cookie.banner.reject": "Alleen noodzakelijk",
+  "cookie.banner.privacyLink": "Privacy & cookies",
+
+  "privacy.back": "Terug naar Spoonspin",
+  "privacy.title": "Privacy & cookies",
+  "privacy.intro":
+    "Op deze pagina staat welke cookies en vergelijkbare technieken Spoonspin gebruikt, en hoe je je voorkeur kunt wijzigen.",
+  "privacy.necessary.title": "Noodzakelijke cookies",
+  "privacy.necessary.body":
+    "Sessie- en inlogcookies (bijvoorbeeld spoonspin_session en kortlevende OAuth-cookies) zijn nodig voor login en accountfuncties. Die staan altijd aan.",
+  "privacy.marketing.title": "Marketing- / affiliatecookies",
+  "privacy.marketing.body":
+    "Als je accepteert, gaan bestellinks naar Thuisbezorgd.nl via Awin, zodat een klik kan worden toegeschreven als je binnen het cookievenster van 7 dagen bestelt. Affiliatecommissies helpen Spoonspin te financieren. Kies je alleen noodzakelijk, dan openen links Thuisbezorgd.nl direct zonder affiliate-tracking.",
+  "privacy.analytics.title": "First-party analytics",
+  "privacy.analytics.body":
+    "We bewaren beperkte serverlogs van verzoeken en productevents (bijvoorbeeld IP en user-agent, ongeveer 30 dagen bewaard) om de dienst te laten werken en te verbeteren. Dit zijn geen third-party advertentietrackers.",
+  "privacy.preference.title": "Jouw voorkeur",
+  "privacy.preference.current": "Huidige keuze: {status}",
+  "privacy.preference.undecided": "Nog niet gekozen",
+  "privacy.preference.accepted": "Marketingcookies geaccepteerd",
+  "privacy.preference.essential": "Alleen noodzakelijke cookies",
 
   "hero.heading": "Waar ga je vandaag eten?",
   "hero.subtitle":
@@ -57,6 +83,7 @@ export const nl: Messages = {
   "spin.hint.lg.spinning": "Houd je vorken vast",
   "spin.hint.sm": "Probeer een ander",
   "spin.hint.sm.spinning": "Nog eens…",
+  "spin.nudge": "Klik hier om je reis te beginnen.",
   "spin.flag.choosing": "Kiezen…",
   "spin.flag.finding": "Land zoeken…",
 
@@ -178,17 +205,52 @@ export const nl: Messages = {
   "dine.heading": "Uit eten in Nederland",
   "dine.subtitle":
     "Vind beoordeelde restaurants met keuken uit {name} binnen ongeveer 100 km.",
+  "dine.subtitle.out":
+    "Vind beoordeelde restaurants met keuken uit {name} binnen ongeveer 100 km.",
+  "dine.subtitle.home":
+    "Samengestelde bezorg- en afhaalopties voor keuken uit {name}.",
+  "dine.tabs.label": "Uit eten-secties",
+  "dine.tabs.out": "Uit eten",
+  "dine.tabs.home": "Thuis bestellen",
+  "dine.order.heading": "Thuis bestellen",
+  "dine.order.subtitle":
+    "Samengestelde plekken om eten uit {name} te laten bezorgen of af te halen.",
+  "dine.order.note":
+    "Filter op plaats als opties een stad hebben. Beschikbaarheid hangt nog steeds af van je adres op het platform.",
+  "dine.order.empty":
+    "Nog geen samengestelde bestelopties voor {name}. Stel een plek voor waar jij bestelt, of blader hieronder op een platform.",
+  "dine.order.open": "Bestellen",
+  "dine.order.browsePlatforms": "Platforms bekijken",
+  "dine.order.platformLabel": "Bezorgen",
+  "dine.order.platform.thuisbezorgd": "Thuisbezorgd.nl",
+  "dine.order.platform.ubereats": "Uber Eats",
+  "dine.order.platform.deliveroo": "Deliveroo (gestopt in NL)",
+  "dine.order.platform.direct": "Direct bestellen",
+  "dine.order.platform.other": "Anders",
+  "dine.order.signatureDish": "Probeer: {dish}",
+  "dine.order.thuisbezorgd.title": "Thuisbezorgd.nl",
+  "dine.order.thuisbezorgd.hint":
+    "Open de keukenpagina voor {name} op Thuisbezorgd.nl — vul daar je adres in om te zien wie bezorgt.",
+  "dine.order.thuisbezorgd.cta": "Open Thuisbezorgd.nl",
+  "dine.order.ubereats.title": "Uber Eats",
+  "dine.order.ubereats.hint":
+    "Bekijk restaurants met {name} op Uber Eats bij {query}. Vul op Uber je adres in om bezorging te bevestigen.",
+  "dine.order.ubereats.cta": "Open Uber Eats",
   "dine.suggestRestaurant": "Stel een restaurant voor",
+  "dine.suggestOrder": "Stel een bestelplek voor",
   "dine.searchingNear": "Zoeken bij {location}",
+  "dine.orderingNear": "Bestellen bij {location}",
   "dine.changeLocation": "Locatie wijzigen",
   "dine.cityOrPostcode": "Plaats of postcode",
   "dine.cityOrPostcode.placeholder": "bijv. Leiden of 2312",
   "dine.searchRestaurants": "Zoek restaurants",
+  "dine.setLocation": "Gebruik deze locatie",
   "dine.useMyLocation": "Gebruik mijn locatie",
   "dine.rememberCity": "Onthoud plaats voor andere landen",
   "dine.locationUnsupported": "Locatie wordt niet ondersteund in deze browser.",
   "dine.locationDenied":
     "We konden je locatie niet gebruiken. Je kunt nog steeds op plaats of postcode zoeken.",
+  "dine.locationRequired": "Vul een plaats of postcode in.",
   "dine.searching": "Restaurants zoeken…",
   "dine.retry": "Opnieuw",
   "dine.empty.default":
@@ -349,6 +411,7 @@ export const nl: Messages = {
   "admin.overview.empty": "Geen landen komen overeen met deze zoekopdracht.",
   "admin.overview.toReview": "Inzendingen reviewen",
   "admin.overview.toUsers": "Gebruikers",
+  "admin.overview.toReports": "Rapporten",
   "admin.overview.search": "Zoeken",
   "admin.overview.searchPlaceholder": "Naam, code of regio",
   "admin.overview.sort": "Sorteren op",
@@ -370,6 +433,46 @@ export const nl: Messages = {
   "admin.overview.col.status": "Status",
   "admin.overview.status.cookReady": "Kookklaar",
   "admin.overview.status.spinOnly": "Alleen spin",
+
+  "admin.reports.title": "Rapporten",
+  "admin.reports.subtitle":
+    "API-verkeer per IP, populaire paden en productgebruik over tijd.",
+  "admin.reports.loading": "Rapporten laden…",
+  "admin.reports.error": "Kon rapporten niet laden.",
+  "admin.reports.empty": "Nog geen data in dit bereik.",
+  "admin.reports.toOverview": "Overzicht",
+  "admin.reports.range": "Periode",
+  "admin.reports.range.24h": "24 uur",
+  "admin.reports.range.7d": "7 dagen",
+  "admin.reports.range.30d": "30 dagen",
+  "admin.reports.metric.requests": "Requests",
+  "admin.reports.metric.errors": "Fouten",
+  "admin.reports.metric.uniqueIps": "Unieke IPs",
+  "admin.reports.metric.countryViews": "Landweergaven",
+  "admin.reports.metric.restaurantSearches": "Dine-zoekopdrachten",
+  "admin.reports.traffic": "Verkeer",
+  "admin.reports.trafficHint":
+    "Donkere balken zijn requests; tomaatrood is status ≥ 400.",
+  "admin.reports.chartLabel": "Requests over tijd",
+  "admin.reports.chartEmpty": "Geen requestreeks in dit bereik.",
+  "admin.reports.requests": "requests",
+  "admin.reports.errors": "fouten",
+  "admin.reports.topIps": "Top-IPs",
+  "admin.reports.topPaths": "Top-paden",
+  "admin.reports.col.ip": "IP",
+  "admin.reports.col.path": "Pad",
+  "admin.reports.col.count": "Aantal",
+  "admin.reports.col.lastSeen": "Laatst gezien",
+  "admin.reports.product": "Productevents",
+  "admin.reports.productHint":
+    "Belangrijke acties naast het access-log.",
+  "admin.reports.product.countryViews": "Landweergaven",
+  "admin.reports.product.restaurantSearches": "Dine-zoekopdrachten",
+  "admin.reports.product.restaurantViews": "Restaurantweergaven",
+  "admin.reports.product.suggestionPreviews": "Suggestie-previews",
+  "admin.reports.product.suggestionCreates": "Suggesties aangemaakt",
+  "admin.reports.product.loginSuccess": "Login geslaagd",
+  "admin.reports.product.loginFailure": "Login mislukt",
 
   "admin.users.title": "Gebruikers",
   "admin.users.subtitle":
@@ -397,10 +500,17 @@ export const nl: Messages = {
   "admin.country.menu": "Admin-tools",
   "admin.cook.menu": "Menutools",
   "admin.dine.menu": "Uit eten-tools",
-  "admin.dine.findRestaurants": "Meer restaurants zoeken",
+  "admin.dine.findRestaurants": "Restaurants zoeken",
+  "admin.dine.findRestaurants.hint":
+    "Ontdek beoordeelde restaurants om uit eten te gaan",
+  "admin.dine.findOrderOptions": "Bestelopties zoeken",
+  "admin.dine.findOrderOptions.hint":
+    "Thuisbezorgd.nl, Uber Eats, directe bestellinks en meer",
   "admin.country.overview": "Overzicht",
   "admin.country.overview.hint":
     "Aantallen recepten, restaurants, dranken, winkels",
+  "admin.country.reports": "Rapporten",
+  "admin.country.reports.hint": "Verkeer, IPs en productgebruik",
   "admin.country.review": "Review",
   "admin.country.review.hint": "Beoordeel communityvoorstellen voor recepten, dranken, winkels en restaurants",
   "admin.country.users": "Gebruikers",
@@ -549,11 +659,11 @@ export const nl: Messages = {
     "Geen gerechten teruggekregen. Probeer een andere focus.",
   "admin.discover.restaurants.title": "Restaurants zoeken",
   "admin.discover.restaurants.hint":
-    "Resultaten komen uit Google Places Text Search in grote Nederlandse steden, plus OpenStreetMap-keukentags—niet uit AI-verzinsels. Alleen locaties met een straatadres in NL. Directorysites worden niet als website gebruikt.",
+    "Google Places + OpenStreetMap, plus Tripadvisor via Apify wanneer APIFY_TOKEN is gezet (Engelstalige listings). Alleen locaties met een straatadres in NL.",
   "admin.discover.restaurants.placeholder":
     "Optionele focus: bijv. Amsterdam, familiebedrijf, vegan",
   "admin.discover.restaurants.empty":
-    "Geen Places/OSM-restaurants. Probeer een stadsnaam in het focusveld.",
+    "Geen Places/Tripadvisor/OSM-restaurants. Probeer een stadsnaam in het focusveld.",
   "admin.discover.restaurants.verified": "Geverifieerd",
   "admin.discover.restaurants.confidence": "{level} vertrouwen",
   "admin.discover.restaurants.authenticity": "Authenticiteit {rating}/5",
@@ -566,6 +676,15 @@ export const nl: Messages = {
     "bijv. Aziatische supermarkten in Rotterdam, kruidenwinkels",
   "admin.discover.shops.empty":
     "Geen winkels teruggekregen. Probeer een andere focus.",
+  "admin.discover.orderOptions.title": "Bestelopties zoeken",
+  "admin.discover.orderOptions.hint":
+    "Live Thuisbezorgd.nl + Uber Eats via Apify (echte restaurantmenu-/store-URL’s). Vereist APIFY_TOKEN.",
+  "admin.discover.orderOptions.city": "Plaats of postcode",
+  "admin.discover.orderOptions.cityPlaceholder": "bijv. Leiden of 2312",
+  "admin.discover.orderOptions.placeholder":
+    "Optionele focus, bijv. Thai, sushi, pizza",
+  "admin.discover.orderOptions.empty":
+    "Geen bestelopties teruggekregen. Probeer een andere stad of focus.",
   "admin.discover.drinks.title": "Dranken zoeken",
   "admin.discover.drinks.hint":
     "Zoek bieren (bekende merken + flesfoto’s), wijnen (druiven + foodpairing), overige alcoholisch en non-alcoholisch.",
@@ -603,6 +722,12 @@ export const nl: Messages = {
     "{count} restaurants toegevoegd en review ingepland (menu, scores, foto).",
   "admin.discover.added.shop": "{count} winkel toegevoegd.",
   "admin.discover.added.shops": "{count} winkels toegevoegd.",
+  "admin.discover.added.orderOption": "{count} besteloptie toegevoegd.",
+  "admin.discover.added.orderOptions": "{count} bestelopties toegevoegd.",
+  "admin.discover.added.orderOption.enriched":
+    "{count} besteloptie toegevoegd. Specialty-tekst en afbeelding worden op de achtergrond verrijkt…",
+  "admin.discover.added.orderOptions.enriched":
+    "{count} bestelopties toegevoegd. Specialty-tekst en afbeeldingen worden op de achtergrond verrijkt…",
   "admin.discover.added.drink": "{count} drank toegevoegd.",
   "admin.discover.added.drinks": "{count} dranken toegevoegd.",
 

@@ -3,6 +3,7 @@ import { LoaderCircle, Plus, Trash2, X } from "lucide-react";
 import type { Country, Ingredient, Recipe } from "@/types/content";
 import { patchRecipeFields } from "@/admin/countryTools";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
 
 export type EditRecipeAppliedResult = {
   country?: Country;
@@ -142,7 +143,7 @@ export function EditRecipeModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4"
+      className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget && !busy) onClose();
@@ -162,7 +163,7 @@ export function EditRecipeModal({
             </p>
             <h2
               id={titleId}
-              className="font-display text-3xl leading-tight text-ink"
+              className="font-display text-3xl leading-tight text-burgundy"
             >
               {t("admin.recipe.edit.title", { name: recipe.name })}
             </h2>
@@ -190,8 +191,8 @@ export function EditRecipeModal({
               onClick={() => setSection(item.id)}
               className={`shrink-0 rounded-full px-3 py-1.5 text-sm font-semibold ${
                 section === item.id
-                  ? "bg-ink text-cream"
-                  : "bg-parchment text-ink hover:bg-ink/10"
+                  ? "bg-burgundy text-cream"
+                  : "bg-parchment text-burgundy hover:bg-burgundy/10"
               }`}
             >
               {item.label}

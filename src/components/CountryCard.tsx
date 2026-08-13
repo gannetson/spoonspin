@@ -66,19 +66,19 @@ export function CountryCard({
             <p className="text-sm uppercase tracking-[0.18em] text-cream/75">
               {spinning ? t("country.card.choosing") : country.region}
             </p>
-            <h2 className="mt-1 font-display text-4xl text-cream sm:text-5xl">
+            <h2 className="mt-1 font-display text-4xl text-ochre sm:text-5xl">
               {name}
             </h2>
           </div>
-          <div
+          <span
             aria-hidden="true"
             className={[
-              "flex size-16 shrink-0 items-center justify-center rounded-2xl bg-cream/15 text-5xl backdrop-blur-sm sm:size-20 sm:text-6xl",
+              "flag-glow shrink-0 text-5xl leading-none sm:text-6xl",
               spinning ? "animate-pulse" : "",
             ].join(" ")}
           >
             {flag}
-          </div>
+          </span>
         </div>
       </div>
 

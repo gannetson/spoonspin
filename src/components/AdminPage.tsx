@@ -102,7 +102,7 @@ export function AdminPage() {
             ) : null}
           </div>
         </div>
-        <h1 className="mt-4 font-display text-5xl text-ink">{t("admin.title")}</h1>
+        <h1 className="mt-4 font-display text-5xl text-burgundy">{t("admin.title")}</h1>
         <p className="mt-2 max-w-2xl text-ink-soft">{t("admin.subtitle")}</p>
 
         {authLoading ? (
@@ -134,7 +134,7 @@ export function AdminPage() {
 
         {isAdmin ? (
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <label htmlFor="status-filter" className="text-sm font-semibold text-ink">
+            <label htmlFor="status-filter" className="text-sm font-semibold text-burgundy">
               {t("admin.show")}
             </label>
             <select
@@ -143,7 +143,7 @@ export function AdminPage() {
               onChange={(event) =>
                 setStatusFilter(event.target.value as SubmissionStatus | "all")
               }
-              className="min-h-11 rounded-xl border border-ink/20 bg-white px-3 text-sm"
+              className="min-h-11 rounded-xl border border-burgundy/20 bg-white px-3 text-sm text-burgundy"
             >
               <option value="pending">{t("admin.filter.pending")}</option>
               <option value="approved">{t("admin.filter.approved")}</option>
@@ -188,7 +188,7 @@ export function AdminPage() {
                       {t(`admin.kind.${item.kind}`)} · {item.status} ·{" "}
                       {item.countryName}
                     </p>
-                    <h2 className="mt-1 font-display text-2xl text-ink">
+                    <h2 className="mt-1 font-display text-2xl text-burgundy">
                       {item.kind === "recipe"
                         ? item.recipe.name
                         : item.kind === "restaurant"

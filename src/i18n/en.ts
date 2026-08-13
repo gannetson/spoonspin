@@ -19,12 +19,38 @@ export const en: Messages = {
   "app.mode.cook.descriptionReady": "Cook a typical menu at home",
   "app.mode.cook.descriptionSoon": "Recipes coming soon — overview available",
   "app.mode.dine": "Dine",
-  "app.mode.dine.description": "Find restaurants in the Netherlands",
+  "app.mode.dine.description": "Eat out or order delivery in the Netherlands",
   "app.countrySelect.labelResult": "Or pick a country",
   "app.share.title": "Spoon Spin: {name}",
   "app.lang.en": "EN",
   "app.lang.nl": "NL",
   "app.lang.switchAria": "Language",
+
+  "cookie.banner.title": "Cookies & affiliate tracking",
+  "cookie.banner.body":
+    "We use essential cookies to keep you signed in. With your OK, we also use marketing cookies so Thuisbezorgd.nl order links can be tracked through our affiliate programme. That commission helps fund Spoonspin and keep the platform running — without acceptance those links stay untracked and we earn nothing from them.",
+  "cookie.banner.accept": "Accept marketing cookies",
+  "cookie.banner.reject": "Essential only",
+  "cookie.banner.privacyLink": "Privacy & cookies",
+
+  "privacy.back": "Back to Spoonspin",
+  "privacy.title": "Privacy & cookies",
+  "privacy.intro":
+    "This page explains which cookies and similar technologies Spoonspin uses, and how you can change your preference.",
+  "privacy.necessary.title": "Necessary cookies",
+  "privacy.necessary.body":
+    "Session and sign-in cookies (for example spoonspin_session and short-lived OAuth cookies) are required for login and account features. They are always on.",
+  "privacy.marketing.title": "Marketing / affiliate cookies",
+  "privacy.marketing.body":
+    "When you accept, Thuisbezorgd.nl order links go through Awin so a click can be attributed if you place an order within the programme’s 7-day cookie window. Affiliate commissions help fund Spoonspin. If you choose essential only, links open Thuisbezorgd.nl directly with no affiliate tracking.",
+  "privacy.analytics.title": "First-party analytics",
+  "privacy.analytics.body":
+    "We keep limited server-side request and product-event logs (for example IP truncated with user-agent, retained about 30 days) to operate and improve the service. These are not third-party ad trackers.",
+  "privacy.preference.title": "Your preference",
+  "privacy.preference.current": "Current choice: {status}",
+  "privacy.preference.undecided": "Not chosen yet",
+  "privacy.preference.accepted": "Marketing cookies accepted",
+  "privacy.preference.essential": "Essential cookies only",
 
   "hero.heading": "Where in the world will you eat today?",
   "hero.subtitle":
@@ -57,6 +83,7 @@ export const en: Messages = {
   "spin.hint.lg.spinning": "Hold onto your forks",
   "spin.hint.sm": "Try another",
   "spin.hint.sm.spinning": "Again…",
+  "spin.nudge": "Click here to start your journey.",
   "spin.flag.choosing": "Choosing…",
   "spin.flag.finding": "Finding a country…",
 
@@ -176,17 +203,52 @@ export const en: Messages = {
 
   "dine.heading": "Dine in the Netherlands",
   "dine.subtitle": "Find reviewed {name} restaurants within about 100 km.",
+  "dine.subtitle.out":
+    "Find reviewed {name} restaurants within about 100 km.",
+  "dine.subtitle.home":
+    "Curated delivery and takeaway options for {name} cuisine.",
+  "dine.tabs.label": "Dine sections",
+  "dine.tabs.out": "Dine out",
+  "dine.tabs.home": "Order at home",
+  "dine.order.heading": "Order at home",
+  "dine.order.subtitle":
+    "Curated places to order {name} food for delivery or takeaway.",
+  "dine.order.note":
+    "Filter by city when options list a city. Availability still depends on your address on the platform.",
+  "dine.order.empty":
+    "No curated order options for {name} yet. Suggest a place you order from, or browse a platform below.",
+  "dine.order.open": "Order",
+  "dine.order.browsePlatforms": "Browse platforms",
+  "dine.order.platformLabel": "Delivery",
+  "dine.order.platform.thuisbezorgd": "Thuisbezorgd.nl",
+  "dine.order.platform.ubereats": "Uber Eats",
+  "dine.order.platform.deliveroo": "Deliveroo (left NL)",
+  "dine.order.platform.direct": "Direct order",
+  "dine.order.platform.other": "Other",
+  "dine.order.signatureDish": "Try: {dish}",
+  "dine.order.thuisbezorgd.title": "Thuisbezorgd.nl",
+  "dine.order.thuisbezorgd.hint":
+    "Open the {name} cuisine page on Thuisbezorgd.nl — enter your address there to see who delivers.",
+  "dine.order.thuisbezorgd.cta": "Open Thuisbezorgd.nl",
+  "dine.order.ubereats.title": "Uber Eats",
+  "dine.order.ubereats.hint":
+    "Browse {name} restaurants on Uber Eats near {query}. Enter your address on Uber to confirm delivery.",
+  "dine.order.ubereats.cta": "Open Uber Eats",
   "dine.suggestRestaurant": "Suggest a restaurant",
+  "dine.suggestOrder": "Suggest a place to order",
   "dine.searchingNear": "Searching near {location}",
+  "dine.orderingNear": "Ordering near {location}",
   "dine.changeLocation": "Change location",
   "dine.cityOrPostcode": "City or postcode",
   "dine.cityOrPostcode.placeholder": "e.g. Leiden or 2312",
   "dine.searchRestaurants": "Search restaurants",
+  "dine.setLocation": "Use this location",
   "dine.useMyLocation": "Use my location",
   "dine.rememberCity": "Remember city for other countries",
   "dine.locationUnsupported": "Location is not supported in this browser.",
   "dine.locationDenied":
     "We could not access your location. You can still search by city or postcode.",
+  "dine.locationRequired": "Enter a city or postcode.",
   "dine.searching": "Searching restaurants…",
   "dine.retry": "Retry",
   "dine.empty.default":
@@ -345,6 +407,7 @@ export const en: Messages = {
   "admin.overview.empty": "No countries match this search.",
   "admin.overview.toReview": "Review submissions",
   "admin.overview.toUsers": "Users",
+  "admin.overview.toReports": "Reports",
   "admin.overview.search": "Search",
   "admin.overview.searchPlaceholder": "Name, code, or region",
   "admin.overview.sort": "Sort by",
@@ -366,6 +429,45 @@ export const en: Messages = {
   "admin.overview.col.status": "Status",
   "admin.overview.status.cookReady": "Cook ready",
   "admin.overview.status.spinOnly": "Spin only",
+
+  "admin.reports.title": "Reports",
+  "admin.reports.subtitle":
+    "API traffic by IP, popular paths, and product usage over time.",
+  "admin.reports.loading": "Loading reports…",
+  "admin.reports.error": "Could not load reports.",
+  "admin.reports.empty": "No data in this range yet.",
+  "admin.reports.toOverview": "Overview",
+  "admin.reports.range": "Time range",
+  "admin.reports.range.24h": "24 hours",
+  "admin.reports.range.7d": "7 days",
+  "admin.reports.range.30d": "30 days",
+  "admin.reports.metric.requests": "Requests",
+  "admin.reports.metric.errors": "Errors",
+  "admin.reports.metric.uniqueIps": "Unique IPs",
+  "admin.reports.metric.countryViews": "Country views",
+  "admin.reports.metric.restaurantSearches": "Dine searches",
+  "admin.reports.traffic": "Traffic",
+  "admin.reports.trafficHint":
+    "Ink bars are requests; tomato overlay is status ≥ 400.",
+  "admin.reports.chartLabel": "Requests over time",
+  "admin.reports.chartEmpty": "No request series in this range.",
+  "admin.reports.requests": "requests",
+  "admin.reports.errors": "errors",
+  "admin.reports.topIps": "Top IPs",
+  "admin.reports.topPaths": "Top paths",
+  "admin.reports.col.ip": "IP",
+  "admin.reports.col.path": "Path",
+  "admin.reports.col.count": "Count",
+  "admin.reports.col.lastSeen": "Last seen",
+  "admin.reports.product": "Product events",
+  "admin.reports.productHint": "Key actions recorded alongside the access log.",
+  "admin.reports.product.countryViews": "Country views",
+  "admin.reports.product.restaurantSearches": "Dine searches",
+  "admin.reports.product.restaurantViews": "Restaurant views",
+  "admin.reports.product.suggestionPreviews": "Suggestion previews",
+  "admin.reports.product.suggestionCreates": "Suggestion creates",
+  "admin.reports.product.loginSuccess": "Login success",
+  "admin.reports.product.loginFailure": "Login failure",
 
   "admin.users.title": "Users",
   "admin.users.subtitle":
@@ -393,10 +495,17 @@ export const en: Messages = {
   "admin.country.menu": "Admin tools",
   "admin.cook.menu": "Menu tools",
   "admin.dine.menu": "Dine tools",
-  "admin.dine.findRestaurants": "Find more restaurants",
+  "admin.dine.findRestaurants": "Find restaurants",
+  "admin.dine.findRestaurants.hint":
+    "Discover reviewed restaurants to dine out",
+  "admin.dine.findOrderOptions": "Find order options",
+  "admin.dine.findOrderOptions.hint":
+    "Thuisbezorgd.nl, Uber Eats, direct order links, and more",
   "admin.country.overview": "Overview",
   "admin.country.overview.hint":
     "Counts of recipes, restaurants, drinks, shops",
+  "admin.country.reports": "Reports",
+  "admin.country.reports.hint": "Traffic, IPs, and product usage",
   "admin.country.review": "Review",
   "admin.country.review.hint": "Review community recipe, drink, shop, and restaurant suggestions",
   "admin.country.users": "Users",
@@ -541,11 +650,11 @@ export const en: Messages = {
   "admin.discover.recipes.empty": "No dishes returned. Try a different focus.",
   "admin.discover.restaurants.title": "Find restaurants",
   "admin.discover.restaurants.hint":
-    "Results come from Google Places Text Search across major Dutch cities, plus OpenStreetMap cuisine tags—not AI invention. Only venues with a street-level NL address are listed. Directory sites are never used as the website.",
+    "Google Places + OpenStreetMap, plus Tripadvisor via Apify when APIFY_TOKEN is set (English listings). Only venues with a street-level NL address are listed.",
   "admin.discover.restaurants.placeholder":
     "Optional focus: e.g. Amsterdam, family-run, vegan",
   "admin.discover.restaurants.empty":
-    "No Places/OSM restaurants returned. Try a city name in the focus field.",
+    "No Places/Tripadvisor/OSM restaurants returned. Try a city name in the focus field.",
   "admin.discover.restaurants.verified": "Verified",
   "admin.discover.restaurants.confidence": "{level} confidence",
   "admin.discover.restaurants.authenticity": "Authenticity {rating}/5",
@@ -557,6 +666,15 @@ export const en: Messages = {
   "admin.discover.shops.placeholder":
     "e.g. Asian groceries in Rotterdam, spice shops",
   "admin.discover.shops.empty": "No shops returned. Try a different focus.",
+  "admin.discover.orderOptions.title": "Find order options",
+  "admin.discover.orderOptions.hint":
+    "Live Thuisbezorgd.nl + Uber Eats listings via Apify (real restaurant menu/store URLs). Needs APIFY_TOKEN.",
+  "admin.discover.orderOptions.city": "City or postcode",
+  "admin.discover.orderOptions.cityPlaceholder": "e.g. Leiden or 2312",
+  "admin.discover.orderOptions.placeholder":
+    "Optional focus, e.g. Thai, sushi, pizza",
+  "admin.discover.orderOptions.empty":
+    "No order options returned. Try a different city or focus.",
   "admin.discover.drinks.title": "Find drinks",
   "admin.discover.drinks.hint":
     "Find beers (famous brands + bottle images), wines (grapes + food pairing), other alcoholic, and non-alcoholic drinks.",
@@ -593,6 +711,12 @@ export const en: Messages = {
     "Added {count} restaurants and queued review (menu, scores, image).",
   "admin.discover.added.shop": "Added {count} shop.",
   "admin.discover.added.shops": "Added {count} shops.",
+  "admin.discover.added.orderOption": "Added {count} order option.",
+  "admin.discover.added.orderOptions": "Added {count} order options.",
+  "admin.discover.added.orderOption.enriched":
+    "Added {count} order option. Enriching specialty text and image in the background…",
+  "admin.discover.added.orderOptions.enriched":
+    "Added {count} order options. Enriching specialty text and images in the background…",
   "admin.discover.added.drink": "Added {count} drink.",
   "admin.discover.added.drinks": "Added {count} drinks.",
 

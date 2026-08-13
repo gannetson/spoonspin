@@ -81,6 +81,7 @@ Copy `.env.example` to `.env`:
 | `TRIPADVISOR_API_KEY`   | No                           | Tripadvisor Content API key (optional)  |
 | `OPENAI_API_KEY`        | No (suggestions)             | Confirms community recipe/restaurant suggestions |
 | `OPENAI_MODEL`          | No                           | Defaults to `gpt-4o-mini`               |
+| `APIFY_TOKEN`           | No (order options / TA)      | Admin discover: delivery actors + Tripadvisor restaurants (English) |
 | `RESTAURANT_PROVIDER`   | No                           | `auto` (default), `mapbox`, or `google` |
 | `RESTAURANT_LIVE_FALLBACK` | No                        | Set `1` to allow Mapbox/Google when curated DB has no match (off by default) |
 | `DATABASE_URL`          | No                           | Defaults to `postgresql://localhost:5432/spoonspin` |

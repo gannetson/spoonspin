@@ -21,14 +21,18 @@ import {
 import { createGooglePlacesProvider } from "./providers/googlePlaces.ts";
 import { createMapboxProvider } from "./providers/mapbox.ts";
 import type { LiveRestaurantProvider } from "./providers/types.ts";
+import { recordProductEvent } from "./db/analytics.ts";
+import { apiRequestLogMiddleware } from "./middleware/requestLog.ts";
 import { registerAuthRoutes } from "./routes/auth.ts";
 import { registerAdminCountryRoutes } from "./routes/adminCountry.ts";
 import { registerAdminImageRoutes } from "./routes/adminImages.ts";
+import { registerAdminReportRoutes } from "./routes/adminReports.ts";
 import { registerAdminUserRoutes } from "./routes/adminUsers.ts";
 import { registerContentRoutes } from "./routes/content.ts";
 import { registerSuggestionRoutes } from "./routes/suggestions.ts";
 import { getUploadsRoot, registerMeRoutes } from "./routes/me.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
+import { isApifyConfigured } from "./lib/apifyOrderSearch.ts";
 import { warnIfOAuthMisconfigured } from "./auth/oauth.ts";
 
 // Load .env from the project root even when cwd differs (e.g. supervisor).
@@ -74,6 +78,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json({ limit: "64kb" }));
+app.use(apiRequestLogMiddleware);
 
 app.get("/api/health", async (_req, res) => {
   let dbOk = false;
@@ -96,6 +101,7 @@ registerContentRoutes(app);
 registerAdminUserRoutes(app);
 registerAdminCountryRoutes(app);
 registerAdminImageRoutes(app);
+registerAdminReportRoutes(app);
 registerSuggestionRoutes(app);
 registerMeRoutes(app);
 
@@ -113,6 +119,11 @@ app.get("/api/restaurants/:id", async (req, res) => {
       res.status(404).json({ message: "Restaurant not found." });
       return;
     }
+    recordProductEvent({
+      eventType: "restaurant_view",
+      ip: req.ip,
+      meta: { id },
+    });
     res.json({ restaurant: toApiRestaurant(row) });
   } catch (error) {
     console.error("Get restaurant failed", error);
@@ -134,6 +145,16 @@ app.post("/api/restaurants", async (req, res) => {
   }
 
   const params = parsed.data;
+  recordProductEvent({
+    eventType: "restaurant_search",
+    ip: req.ip,
+    meta: {
+      countryCode: params.countryCode ?? null,
+      cityOrPostcode: params.cityOrPostcode?.trim() || null,
+      cuisineAliases: params.cuisineAliases.slice(0, 8),
+      hasVisitorLocation: Boolean(params.visitorLocation),
+    },
+  });
   const mapsSearchUrl = buildMapsSearchUrl(params);
 
   if (params.countryCode) {
@@ -306,6 +327,11 @@ const server = app.listen(PORT, () => {
     isOpenAiConfigured()
       ? "OpenAI suggestions: configured"
       : "OpenAI suggestions: set OPENAI_API_KEY to enable Look up & confirm",
+  );
+  console.log(
+    isApifyConfigured()
+      ? "Apify discovery: configured (order options + Tripadvisor restaurants)"
+      : "Apify discovery: set APIFY_TOKEN for order options / Tripadvisor restaurants",
   );
   console.log("Admin review: /admin (requires signed-in admin user)");
   warnIfOAuthMisconfigured();

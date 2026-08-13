@@ -328,7 +328,7 @@ export default function App() {
             onClick={() => setSearchParams({}, { replace: false })}
             className="text-left"
           >
-            <p className="font-display text-3xl text-ink sm:text-4xl">
+            <p className="font-display text-3xl text-burgundy sm:text-4xl">
               {t("app.brand")}
             </p>
             <p className="text-sm text-ink-soft">{t("app.tagline")}</p>
@@ -466,27 +466,31 @@ export default function App() {
               onCountryUpdated={handleCountryUpdated}
             />
 
-            <div className="flex flex-wrap items-end gap-4">
-              <ModeButton
-                active={mode === "cook"}
-                onClick={() =>
-                  updateParams({ mode: "cook", recipe: null, restaurant: null })
-                }
-                label={t("app.mode.cook")}
-                description={
-                  selectedCountry.cookReady
-                    ? t("app.mode.cook.descriptionReady")
-                    : t("app.mode.cook.descriptionSoon")
-                }
-              />
-              <ModeButton
-                active={mode === "dine"}
-                onClick={() =>
-                  updateParams({ mode: "dine", recipe: null, restaurant: null })
-                }
-                label={t("app.mode.dine")}
-                description={t("app.mode.dine.description")}
-              />
+            <div className="space-y-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <ModeButton
+                  active={mode === "cook"}
+                  onClick={() =>
+                    updateParams({ mode: "cook", recipe: null, restaurant: null })
+                  }
+                  label={t("app.mode.cook")}
+                  description={
+                    selectedCountry.cookReady
+                      ? t("app.mode.cook.descriptionReady")
+                      : t("app.mode.cook.descriptionSoon")
+                  }
+                  iconSrc="/modes/cook.png"
+                />
+                <ModeButton
+                  active={mode === "dine"}
+                  onClick={() =>
+                    updateParams({ mode: "dine", recipe: null, restaurant: null })
+                  }
+                  label={t("app.mode.dine")}
+                  description={t("app.mode.dine.description")}
+                  iconSrc="/modes/dine.png"
+                />
+              </div>
               <CountrySelect
                 countries={published}
                 value={selectedCountry.code}
@@ -565,11 +569,13 @@ function ModeButton({
   onClick,
   label,
   description,
+  iconSrc,
 }: {
   active: boolean;
   onClick: () => void;
   label: string;
   description: string;
+  iconSrc: string;
 }) {
   return (
     <button
@@ -577,22 +583,31 @@ function ModeButton({
       onClick={onClick}
       aria-pressed={active}
       aria-label={label}
-      className={`min-h-14 min-w-[9rem] flex-1 rounded-2xl px-5 py-3 text-left shadow-sm transition sm:flex-none ${
+      className={`flex w-full min-h-[6.5rem] items-center gap-3 overflow-hidden rounded-full py-1.5 pl-1.5 pr-5 text-left shadow-sm transition sm:gap-4 sm:pr-6 ${
         active
-          ? "bg-tomato text-cream"
-          : "bg-cream text-ink ring-1 ring-ink/10 hover:ring-tomato/40"
+          ? "bg-tomato text-ochre"
+          : "bg-cream text-burgundy ring-1 ring-ink/10 hover:ring-tomato/40"
       }`}
     >
-      <span
-        aria-hidden="true"
-        className="block font-display text-2xl leading-none sm:text-3xl"
-      >
-        {label}
-      </span>
-      <span
-        className={`mt-1 block text-sm ${active ? "text-cream/90" : "text-ink-soft"}`}
-      >
-        {description}
+      <img
+        src={iconSrc}
+        alt=""
+        width={104}
+        height={104}
+        className="size-[5.75rem] shrink-0 object-contain sm:size-[6.5rem]"
+      />
+      <span className="min-w-0 py-2">
+        <span
+          aria-hidden="true"
+          className="block font-display text-3xl leading-none sm:text-4xl"
+        >
+          {label}
+        </span>
+        <span
+          className={`mt-1.5 block text-sm leading-snug sm:text-base ${active ? "text-cream/90" : "text-ink-soft"}`}
+        >
+          {description}
+        </span>
       </span>
     </button>
   );

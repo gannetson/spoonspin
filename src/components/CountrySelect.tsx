@@ -10,6 +10,7 @@ import {
 import { createPortal } from "react-dom";
 import type { Country } from "@/types/content";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
 
 type CountrySelectProps = {
   countries: Country[];
@@ -221,7 +222,7 @@ export function CountrySelect({
               left: position.left,
               width: position.width,
             }}
-            className="fixed z-[90] max-h-64 overflow-auto rounded-2xl border-2 border-ink/10 bg-cream py-1 shadow-xl"
+            className={`fixed ${zClass.select} max-h-64 overflow-auto rounded-2xl border-2 border-ink/10 bg-cream py-1 shadow-xl`}
           >
             {filtered.length === 0 ? (
               <li className="px-4 py-3 text-sm text-ink-soft">

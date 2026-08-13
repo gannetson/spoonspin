@@ -1,6 +1,7 @@
 import type {
   Country,
   Drink,
+  OrderOption,
   Recipe,
   RecipeCategory,
   SpecialtyShop,
@@ -148,6 +149,36 @@ export function addShops(code: string, shops: SpecialtyShop[]) {
   return postAdmin<{ country: Country; added: number }>(
     `/api/admin/countries/${encodeURIComponent(code)}/shops`,
     { shops },
+  );
+}
+
+export function discoverOrderOptions(
+  code: string,
+  options?: { query?: string; city?: string },
+) {
+  return postAdmin<{ notes: string; options: import("@/types/content").OrderOption[] }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/discover/order-options`,
+    { query: options?.query, city: options?.city },
+  );
+}
+
+export function addOrderOptions(
+  code: string,
+  options: import("@/types/content").OrderOption[],
+) {
+  return postAdmin<{
+    country: Country;
+    added: number;
+    enrichmentQueued?: number;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/order-options`,
+    { options },
+  );
+}
+
+export function removeOrderOption(code: string, optionId: string) {
+  return deleteAdmin<{ country: Country | undefined }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/order-options/${encodeURIComponent(optionId)}`,
   );
 }
 
@@ -341,6 +372,26 @@ export function replaceShopText(code: string, shopId: string) {
   );
 }
 
+export function replaceOrderOptionImage(code: string, optionId: string) {
+  return postAdmin<{
+    country: Country | undefined;
+    option: OrderOption;
+    notes: string;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/order-options/${encodeURIComponent(optionId)}/replace-image`,
+  );
+}
+
+export function replaceOrderOptionText(code: string, optionId: string) {
+  return postAdmin<{
+    country: Country | undefined;
+    option: OrderOption;
+    notes: string;
+  }>(
+    `/api/admin/countries/${encodeURIComponent(code)}/order-options/${encodeURIComponent(optionId)}/replace-text`,
+  );
+}
+
 export function removeRestaurant(id: string) {
   return deleteAdmin<{ ok: true; id: string }>(
     `/api/admin/restaurants/${encodeURIComponent(id)}`,
@@ -398,7 +449,8 @@ export type AdminImageTarget =
   | { kind: "country"; countryCode: string }
   | { kind: "recipe"; countryCode: string; recipeId: string }
   | { kind: "drink"; countryCode: string; drinkKey: string }
-  | { kind: "restaurant"; restaurantId: string };
+  | { kind: "restaurant"; restaurantId: string }
+  | { kind: "orderOption"; countryCode: string; optionId: string };
 
 export type AdminImageSearchResult = {
   url: string;

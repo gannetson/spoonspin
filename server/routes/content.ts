@@ -3,6 +3,7 @@ import {
   getCountryFromDb,
   listCountriesFromDb,
 } from "../db/content.ts";
+import { recordProductEvent } from "../db/analytics.ts";
 
 export function registerContentRoutes(app: import("express").Express): void {
   app.get("/api/countries", async (_req, res) => {
@@ -28,11 +29,17 @@ export function registerContentRoutes(app: import("express").Express): void {
 
   app.get("/api/countries/:code", async (req, res) => {
     try {
-      const country = await getCountryFromDb(String(req.params.code ?? ""));
+      const code = String(req.params.code ?? "");
+      const country = await getCountryFromDb(code);
       if (!country) {
         res.status(404).json({ message: "Country not found." });
         return;
       }
+      recordProductEvent({
+        eventType: "country_view",
+        ip: req.ip,
+        meta: { code: country.code },
+      });
       res.json({ country });
     } catch (error) {
       console.error("Get country failed", error);

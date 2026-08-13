@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ClipboardList, LoaderCircle, LogIn, Users } from "lucide-react";
+import { Activity, ClipboardList, LoaderCircle, LogIn, Users } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
 import { useAuthModal } from "@/auth/AuthModalContext";
 import {
@@ -94,6 +94,13 @@ export function AdminOverviewPage() {
           {isAdmin ? (
             <div className="flex flex-wrap gap-2">
               <Link
+                to="/admin/reports"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink/10 px-4 text-sm font-semibold text-ink"
+              >
+                <Activity className="size-4" aria-hidden="true" />
+                {t("admin.overview.toReports")}
+              </Link>
+              <Link
                 to="/admin/users"
                 className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink/10 px-4 text-sm font-semibold text-ink"
               >
@@ -111,7 +118,7 @@ export function AdminOverviewPage() {
           ) : null}
         </div>
 
-        <h1 className="mt-4 font-display text-5xl text-ink">
+        <h1 className="mt-4 font-display text-5xl text-burgundy">
           {t("admin.overview.title")}
         </h1>
         <p className="mt-2 max-w-2xl text-ink-soft">
@@ -189,7 +196,7 @@ export function AdminOverviewPage() {
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
                     {t(`admin.overview.metric.${key}`)}
                   </p>
-                  <p className="mt-1 font-display text-3xl text-ink">{value}</p>
+                  <p className="mt-1 font-display text-3xl text-burgundy">{value}</p>
                 </div>
               ))}
             </div>

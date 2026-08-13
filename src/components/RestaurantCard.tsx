@@ -78,7 +78,7 @@ export function RestaurantCard({
             className="min-w-0 cursor-pointer space-y-1.5 text-left"
           >
             <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-              <h3 className="font-display text-xl leading-tight text-ink transition group-hover:text-tomato sm:text-2xl">
+              <h3 className="font-display text-xl leading-tight text-burgundy transition group-hover:text-tomato sm:text-2xl">
                 {restaurant.name}
               </h3>
               {restaurant.distanceKm != null ? (
@@ -110,10 +110,12 @@ export function RestaurantCard({
                 {cuisineFlags.slice(0, 3).map((flag) => (
                   <span
                     key={flag.code}
-                    className="inline-flex items-center gap-1 rounded-full bg-parchment px-2 py-0.5 text-xs font-semibold text-ink"
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-ink"
                     title={flag.name}
                   >
-                    <span aria-hidden="true">{flag.flag}</span>
+                    <span aria-hidden="true" className="flag-glow text-base leading-none">
+                      {flag.flag}
+                    </span>
                     <span className="hidden sm:inline">{flag.name}</span>
                   </span>
                 ))}

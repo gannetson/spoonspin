@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import { useAuth } from "@/auth/AuthContext";
 import type { AuthModalMode } from "@/auth/AuthModalContext";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
 
 type AuthModalProps = {
   open: boolean;
@@ -111,7 +112,7 @@ export function AuthModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4"
+      className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4`}
       role="presentation"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) onClose();
@@ -131,7 +132,7 @@ export function AuthModal({
             </p>
             <h2
               id={titleId}
-              className="font-display text-3xl leading-tight text-ink"
+              className="font-display text-3xl leading-tight text-burgundy"
             >
               {mode === "login"
                 ? t("login.title.signIn")

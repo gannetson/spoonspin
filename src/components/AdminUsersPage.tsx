@@ -128,7 +128,7 @@ export function AdminUsersPage() {
           ) : null}
         </div>
 
-        <h1 className="mt-4 font-display text-5xl text-ink">
+        <h1 className="mt-4 font-display text-5xl text-burgundy">
           {t("admin.users.title")}
         </h1>
         <p className="mt-2 max-w-2xl text-ink-soft">

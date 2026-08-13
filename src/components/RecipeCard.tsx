@@ -59,7 +59,7 @@ export function RecipeCard({
       <div
         className={`group relative overflow-hidden rounded-2xl transition ${
           isHighlighted
-            ? "bg-ochre text-ink ring-2 ring-saffron/55 shadow-sm shadow-saffron/20"
+            ? "bg-ochre-soft text-ink ring-2 ring-saffron/55 shadow-sm shadow-saffron/20"
             : "bg-cream text-ink ring-1 ring-ink/10 hover:ring-tomato/35"
         }`}
       >
@@ -121,7 +121,7 @@ export function RecipeCard({
             </div>
 
             <div className="min-w-0">
-              <p className="truncate font-display text-xl leading-tight sm:text-2xl">
+              <p className="truncate font-display text-xl leading-tight text-burgundy sm:text-2xl">
                 {recipe.name}
               </p>
               {recipe.localName ? (

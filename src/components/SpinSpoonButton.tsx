@@ -24,7 +24,7 @@ export function SpinSpoonButton({
       aria-label={spinning ? t("spin.ariaLabel.spinning") : t("spin.ariaLabel")}
       className={[
         "group relative inline-flex flex-col items-center justify-center",
-        "border-4 border-ink/15 bg-tomato text-cream",
+        "border-4 border-ink/15 bg-tomato text-ochre",
         "transition duration-150",
         "hover:-translate-y-1 hover:bg-tomato-deep",
         "active:translate-y-2",
@@ -119,7 +119,7 @@ export function FlagSpinner({ current, compact = false }: FlagSpinnerProps) {
       </p>
       <p
         className={[
-          "font-display leading-none motion-safe:animate-pulse",
+          "flag-glow font-display leading-none motion-safe:animate-pulse",
           compact ? "text-5xl" : "text-5xl sm:text-6xl",
         ].join(" ")}
         aria-hidden="true"
@@ -128,7 +128,7 @@ export function FlagSpinner({ current, compact = false }: FlagSpinnerProps) {
       </p>
       <p
         className={[
-          "font-display text-ink",
+          "font-display text-burgundy",
           compact ? "text-xl" : "text-2xl",
         ].join(" ")}
       >

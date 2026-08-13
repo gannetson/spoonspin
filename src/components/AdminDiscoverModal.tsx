@@ -1,12 +1,14 @@
 import { useEffect, useId, useState } from "react";
 import { LoaderCircle, X } from "lucide-react";
-import type { Country, Drink, SpecialtyShop } from "@/types/content";
+import type { Country, Drink, OrderOption, SpecialtyShop } from "@/types/content";
 import {
   addDrinks,
+  addOrderOptions,
   addRecipes,
   addRestaurants,
   addShops,
   discoverDrinks,
+  discoverOrderOptions,
   discoverRecipes,
   discoverRestaurants,
   discoverShops,
@@ -15,12 +17,15 @@ import {
 } from "@/admin/countryTools";
 import { fetchCountry } from "@/content/client";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
+import { getPreferredDineCity } from "@/restaurants/locationPreference";
 
 export type AdminDiscoverKind =
   | "recipes"
   | "restaurants"
   | "shops"
-  | "drinks";
+  | "drinks"
+  | "orderOptions";
 
 type AdminDiscoverModalProps = {
   kind: AdminDiscoverKind;
@@ -30,13 +35,16 @@ type AdminDiscoverModalProps = {
   onCountryUpdated: (country: Country) => void;
   /** Fired after restaurants are saved so Dine can re-search. */
   onRestaurantsAdded?: () => void;
+  /** Prefill for order-option city (Dine “Search near …”). */
+  defaultCity?: string;
 };
 
 type Item =
   | { kind: "recipes"; item: DishCandidate; key: string }
   | { kind: "restaurants"; item: DiscoveredRestaurant; key: string }
   | { kind: "shops"; item: SpecialtyShop; key: string }
-  | { kind: "drinks"; item: Drink; key: string };
+  | { kind: "drinks"; item: Drink; key: string }
+  | { kind: "orderOptions"; item: OrderOption; key: string };
 
 type State =
   | { status: "idle" }
@@ -65,6 +73,11 @@ function addedMessageKey(kind: AdminDiscoverKind, count: number): string {
       ? "admin.discover.added.drink"
       : "admin.discover.added.drinks";
   }
+  if (kind === "orderOptions") {
+    return count === 1
+      ? "admin.discover.added.orderOption"
+      : "admin.discover.added.orderOptions";
+  }
   return count === 1
     ? "admin.discover.added.shop"
     : "admin.discover.added.shops";
@@ -77,10 +90,15 @@ export function AdminDiscoverModal({
   onClose,
   onCountryUpdated,
   onRestaurantsAdded,
+  defaultCity,
 }: AdminDiscoverModalProps) {
   const t = useT();
   const titleId = useId();
+  const cityFieldId = useId();
   const [query, setQuery] = useState("");
+  const [city, setCity] = useState(() =>
+    defaultCity?.trim() || getPreferredDineCity(),
+  );
   const [state, setState] = useState<State>({ status: "idle" });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -95,10 +113,11 @@ export function AdminDiscoverModal({
   useEffect(() => {
     if (!open) return;
     setQuery("");
+    setCity(defaultCity?.trim() || getPreferredDineCity());
     setState({ status: "idle" });
     setSelected(new Set());
     setSaving(false);
-  }, [open, kind, country.code]);
+  }, [open, kind, country.code, defaultCity]);
 
   useEffect(() => {
     if (!open) return;
@@ -139,6 +158,18 @@ export function AdminDiscoverModal({
           kind: "drinks",
           item,
           key: itemKey("drinks", index, item.name),
+        }));
+        setState({ status: "ready", notes: result.notes, items });
+        setSelected(new Set(items.map((item) => item.key)));
+      } else if (kind === "orderOptions") {
+        const result = await discoverOrderOptions(country.code, {
+          query,
+          city: city.trim() || getPreferredDineCity(),
+        });
+        const items: Item[] = result.options.map((item, index) => ({
+          kind: "orderOptions",
+          item,
+          key: itemKey("orderOptions", index, item.name),
         }));
         setState({ status: "ready", notes: result.notes, items });
         setSelected(new Set(items.map((item) => item.key)));
@@ -251,6 +282,38 @@ export function AdminDiscoverModal({
             count: result.added,
           }),
         });
+      } else if (kind === "orderOptions") {
+        const optionsList = picked.map(
+          (entry) => (entry as Extract<Item, { kind: "orderOptions" }>).item,
+        );
+        const result = await addOrderOptions(country.code, optionsList);
+        if (result.country) onCountryUpdated(result.country);
+        const enriched = (result.enrichmentQueued ?? 0) > 0;
+        setState({
+          status: "saved",
+          message: t(
+            enriched
+              ? result.added === 1
+                ? "admin.discover.added.orderOption.enriched"
+                : "admin.discover.added.orderOptions.enriched"
+              : addedMessageKey("orderOptions", result.added),
+            { count: result.added },
+          ),
+        });
+        if (enriched) {
+          const code = country.code;
+          void (async () => {
+            for (const delayMs of [4_000, 10_000, 20_000, 40_000]) {
+              await new Promise((resolve) => setTimeout(resolve, delayMs));
+              try {
+                const refreshed = await fetchCountry(code);
+                if (refreshed) onCountryUpdated(refreshed);
+              } catch {
+                /* ignore transient refresh errors */
+              }
+            }
+          })();
+        }
       } else {
         const shops = picked.map(
           (entry) => (entry as Extract<Item, { kind: "shops" }>).item,
@@ -279,7 +342,7 @@ export function AdminDiscoverModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-4 sm:items-center"
+      className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-4 sm:items-center`}
       onClick={onClose}
       role="presentation"
     >
@@ -293,7 +356,7 @@ export function AdminDiscoverModal({
         <div className="shrink-0 p-5 pb-0 sm:p-7 sm:pb-0">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 id={titleId} className="font-display text-3xl text-ink">
+              <h2 id={titleId} className="font-display text-3xl text-burgundy">
                 {copy.title}
               </h2>
               <p className="mt-2 text-sm text-ink-soft">{copy.hint}</p>
@@ -308,28 +371,48 @@ export function AdminDiscoverModal({
             </button>
           </div>
 
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row">
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder={copy.placeholder}
-              className="min-h-12 flex-1 rounded-full border-2 border-ink/15 bg-parchment px-4 text-ink"
-            />
-            <button
-              type="button"
-              onClick={() => void runDiscover()}
-              disabled={state.status === "loading" || saving}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-tomato px-5 font-semibold text-cream disabled:opacity-60"
-            >
-              {state.status === "loading" ? (
-                <>
-                  <LoaderCircle className="size-4 animate-spin" />
-                  {t("admin.discover.querying")}
-                </>
-              ) : (
-                t("admin.discover.query")
-              )}
-            </button>
+          <div className="mt-5 flex flex-col gap-3">
+            {kind === "orderOptions" ? (
+              <div>
+                <label
+                  htmlFor={cityFieldId}
+                  className="text-sm font-semibold text-ink"
+                >
+                  {t("admin.discover.orderOptions.city")}
+                </label>
+                <input
+                  id={cityFieldId}
+                  value={city}
+                  onChange={(event) => setCity(event.target.value)}
+                  placeholder={t("admin.discover.orderOptions.cityPlaceholder")}
+                  className="mt-1 min-h-12 w-full rounded-full border-2 border-ink/15 bg-parchment px-4 text-ink"
+                  autoComplete="address-level2"
+                />
+              </div>
+            ) : null}
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <input
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder={copy.placeholder}
+                className="min-h-12 flex-1 rounded-full border-2 border-ink/15 bg-parchment px-4 text-ink"
+              />
+              <button
+                type="button"
+                onClick={() => void runDiscover()}
+                disabled={state.status === "loading" || saving}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-tomato px-5 font-semibold text-cream disabled:opacity-60"
+              >
+                {state.status === "loading" ? (
+                  <>
+                    <LoaderCircle className="size-4 animate-spin" />
+                    {t("admin.discover.querying")}
+                  </>
+                ) : (
+                  t("admin.discover.query")
+                )}
+              </button>
+            </div>
           </div>
 
           {state.status === "error" ? (
@@ -472,6 +555,31 @@ export function AdminDiscoverModal({
                               </span>
                               <span className="mt-1 block text-sm text-ink-soft">
                                 {entry.item.address}, {entry.item.city}
+                              </span>
+                            </>
+                          ) : null}
+                          {entry.kind === "orderOptions" ? (
+                            <>
+                              <span className="block font-semibold text-ink">
+                                {entry.item.name}
+                                <span className="ml-2 text-xs font-medium uppercase tracking-wide text-ink-soft">
+                                  {t(
+                                    `dine.order.platform.${entry.item.platform}`,
+                                  )}
+                                </span>
+                              </span>
+                              {entry.item.signatureDish ? (
+                                <span className="mt-1 block text-sm font-medium text-tomato">
+                                  {t("dine.order.signatureDish", {
+                                    dish: entry.item.signatureDish,
+                                  })}
+                                </span>
+                              ) : null}
+                              <span className="mt-1 block text-sm text-ink-soft">
+                                {entry.item.city
+                                  ? `${entry.item.city} · `
+                                  : null}
+                                {entry.item.notes ?? entry.item.url}
                               </span>
                             </>
                           ) : null}

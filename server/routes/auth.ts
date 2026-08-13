@@ -24,6 +24,7 @@ import {
   getUserBySessionToken,
   type PublicUser,
 } from "../db/users.ts";
+import { recordProductEvent } from "../db/analytics.ts";
 
 const credentialsSchema = z.object({
   email: z.string().email(),
@@ -189,9 +190,20 @@ export function registerAuthRoutes(app: import("express").Express): void {
       });
       const session = await createSession(user.id);
       setSessionCookie(res, session.token, session.expiresAt);
+      recordProductEvent({
+        eventType: "auth_login_success",
+        ip: req.ip,
+        userId: user.id,
+        meta: { method: "google" },
+      });
       res.redirect(`${appOrigin(req)}${nextPath}`);
     } catch (error) {
       console.error("[auth] google callback failed", error);
+      recordProductEvent({
+        eventType: "auth_login_failure",
+        ip: req.ip,
+        meta: { method: "google" },
+      });
       res.redirect(oauthErrorRedirect(req, nextPath));
     }
   });
@@ -230,11 +242,22 @@ export function registerAuthRoutes(app: import("express").Express): void {
       parsed.data.password,
     );
     if (!user) {
+      recordProductEvent({
+        eventType: "auth_login_failure",
+        ip: req.ip,
+        meta: {},
+      });
       res.status(401).json({ message: "Invalid email or password." });
       return;
     }
     const session = await createSession(user.id);
     setSessionCookie(res, session.token, session.expiresAt);
+    recordProductEvent({
+      eventType: "auth_login_success",
+      ip: req.ip,
+      userId: user.id,
+      meta: { method: "password" },
+    });
     res.json({ user });
   });
 

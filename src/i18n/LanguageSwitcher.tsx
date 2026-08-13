@@ -16,7 +16,7 @@ export function LanguageSwitcher({ tone = "light" }: LanguageSwitcherProps) {
       className={`inline-flex overflow-hidden rounded-full text-sm font-semibold ring-1 ${
         tone === "dark"
           ? "ring-cream/30 text-cream"
-          : "ring-ink/15 text-ink"
+          : "ring-burgundy/20 text-burgundy"
       }`}
     >
       {options.map((option) => {
@@ -30,11 +30,11 @@ export function LanguageSwitcher({ tone = "light" }: LanguageSwitcherProps) {
             className={`min-h-9 min-w-10 px-2.5 transition ${
               active
                 ? tone === "dark"
-                  ? "bg-cream text-ink"
-                  : "bg-ink text-cream"
+                  ? "bg-cream text-burgundy"
+                  : "bg-burgundy text-cream"
                 : tone === "dark"
                   ? "hover:bg-cream/15"
-                  : "hover:bg-ink/5"
+                  : "hover:bg-burgundy/5"
             }`}
           >
             {t(`app.lang.${option}`)}

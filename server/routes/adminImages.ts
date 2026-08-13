@@ -10,6 +10,7 @@ import {
   publicDrinkKey,
   updateCountryDrink,
   updateCountryImage,
+  updateOrderOption,
   updateRecipeImage,
 } from "../db/content.ts";
 import {
@@ -49,6 +50,11 @@ const targetSchema = z.discriminatedUnion("kind", [
   z.object({
     kind: z.literal("restaurant"),
     restaurantId: z.string().min(1),
+  }),
+  z.object({
+    kind: z.literal("orderOption"),
+    countryCode: z.string().min(2).max(2),
+    optionId: z.string().min(1),
   }),
 ]);
 
@@ -219,6 +225,32 @@ async function applyImage(
     return {
       country: result.country,
       drink: result.drink,
+      imageUrl,
+      imageAttribution: imageAttribution ?? null,
+    };
+  }
+
+  if (target.kind === "orderOption") {
+    const country = await getCountryFromDb(target.countryCode);
+    if (!country) {
+      throw Object.assign(new Error("Country not found."), { status: 404 });
+    }
+    const option = (country.orderOptions ?? []).find(
+      (item) => item.id === target.optionId,
+    );
+    if (!option) {
+      throw Object.assign(new Error("Order option not found."), { status: 404 });
+    }
+    const result = await updateOrderOption(target.countryCode, target.optionId, {
+      imageUrl,
+      imageAttribution: imageAttribution ?? undefined,
+    });
+    if (!result) {
+      throw Object.assign(new Error("Order option not found."), { status: 404 });
+    }
+    return {
+      country: result.country,
+      option: result.option,
       imageUrl,
       imageAttribution: imageAttribution ?? null,
     };

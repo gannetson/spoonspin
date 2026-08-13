@@ -8,6 +8,7 @@ import {
 import {
   appendMoreDrinks,
   appendMoreRecipes,
+  appendOrderOptions,
   appendSpecialtyShops,
   addDrinkToDinner,
   deleteRecipe,
@@ -19,6 +20,7 @@ import {
   removeCountryDrink,
   removeDinnerCourse,
   removeDinnerDrink,
+  removeOrderOption,
   removeSpecialtyShop,
   saveCountryDrinks,
   saveDinnerSuggestion,
@@ -26,6 +28,7 @@ import {
   updateCountryDrink,
   updateCountryImage,
   updateCountryText,
+  updateOrderOption,
   updateRecipeFields,
   updateRecipeImage,
   updateSpecialtyShop,
@@ -44,10 +47,10 @@ import {
   findVisibleCommunityRecipe,
   updateCommunityRecipe,
 } from "../db/submissions.ts";
-import { isGooglePlacesConfigured } from "../lib/googlePlacesLookup.ts";
 import {
   discoverCountryDrinks,
   discoverCountryImageQueries,
+  discoverCountryOrderOptions,
   discoverCountryRecipes,
   discoverCountryRestaurants,
   discoverCountryShops,
@@ -55,11 +58,13 @@ import {
   composeDinnerSuggestion,
   drinkImageSearchQueries,
   enrichDrinkWithImage,
+  isApifyConfigured,
   isOpenAiConfigured,
   researchRestaurantMenu,
   researchRestaurantScores,
   rewriteDinnerNarrative,
   rewriteDrinkText,
+  rewriteOrderOptionText,
   rewriteRecipeText,
   rewriteRestaurantText,
   rewriteShopText,
@@ -67,13 +72,14 @@ import {
 import { findCuisineImageFromQueries, sameImageUrl } from "../lib/wikimedia.ts";
 import { fetchBestWebsiteRestaurantPhoto } from "../lib/websiteImages.ts";
 import {
-  fetchGoogleRestaurantPhoto,
   isGooglePlacesConfigured,
-} from "../lib/googlePlacesPhoto.ts";
-import { lookupGoogleRestaurant } from "../lib/googlePlacesLookup.ts";
+  lookupGoogleRestaurant,
+} from "../lib/googlePlacesLookup.ts";
+import { fetchGoogleRestaurantPhoto } from "../lib/googlePlacesPhoto.ts";
 import { scheduleRestaurantEnrichments } from "../lib/restaurantEnrichmentQueue.ts";
 import { scheduleRecipeEnrichments } from "../lib/recipeEnrichmentQueue.ts";
-import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
+import { scheduleOrderOptionEnrichments } from "../lib/orderOptionEnrichmentQueue.ts";
+import type { Drink, OrderOption, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import type { Restaurant } from "../../src/restaurants/types.ts";
 import {
   getCountryDrinks,
@@ -84,6 +90,11 @@ import { stableMapsUrl } from "../../src/restaurants/utils.ts";
 
 const querySchema = z.object({
   query: z.string().max(200).optional(),
+});
+
+const orderOptionsDiscoverSchema = z.object({
+  query: z.string().max(200).optional(),
+  city: z.string().max(100).optional(),
 });
 
 const recipeSchema = z.object({
@@ -182,6 +193,24 @@ const shopSchema = z.object({
   notes: z.string().nullish(),
 });
 
+const orderOptionSchema = z.object({
+  id: z.string().nullish(),
+  name: z.string().min(1),
+  platform: z.enum([
+    "thuisbezorgd",
+    "ubereats",
+    "deliveroo",
+    "direct",
+    "other",
+  ]),
+  url: z.string().url(),
+  city: z.string().nullish(),
+  notes: z.string().nullish(),
+  signatureDish: z.string().nullish(),
+  imageUrl: z.string().nullish(),
+  imageAttribution: z.string().nullish(),
+});
+
 const drinkSchema = z.object({
   name: z.string().min(1),
   localName: z.string().nullish(),
@@ -254,10 +283,21 @@ function openaiRequired(
 function placesRequired(
   res: import("express").Response,
 ): boolean {
-  if (isGooglePlacesConfigured()) return true;
+  if (isGooglePlacesConfigured() || isApifyConfigured()) return true;
   res.status(503).json({
     message:
-      "GOOGLE_PLACES_API_KEY is not configured. Restaurant discover needs Google Places.",
+      "Restaurant discover needs GOOGLE_PLACES_API_KEY and/or APIFY_TOKEN (Tripadvisor).",
+  });
+  return false;
+}
+
+function apifyRequired(
+  res: import("express").Response,
+): boolean {
+  if (isApifyConfigured()) return true;
+  res.status(503).json({
+    message:
+      "APIFY_TOKEN is not configured. Order option discover needs Apify (Thuisbezorgd / Uber Eats actors).",
   });
   return false;
 }
@@ -858,6 +898,263 @@ export function registerAdminCountryRoutes(
         console.error("Add shops failed", error);
         res.status(500).json({
           message: publicErrorMessage(error, "Could not add shops."),
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/discover/order-options",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      if (!apifyRequired(res)) return;
+      const parsed = orderOptionsDiscoverSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        res.status(400).json({ message: "Invalid request." });
+        return;
+      }
+      try {
+        const country = await getCountryFromDb(String(req.params.code ?? ""));
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        const result = await discoverCountryOrderOptions({
+          countryCode: country.code,
+          countryName: country.name,
+          query: parsed.data.query,
+          city: parsed.data.city,
+        });
+        res.json(result);
+      } catch (error) {
+        console.error("Discover order options failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(
+            error,
+            "Could not discover order options.",
+          ),
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/order-options",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      const parsed = z
+        .object({ options: z.array(orderOptionSchema).min(1).max(50) })
+        .safeParse(req.body);
+      if (!parsed.success) {
+        res
+          .status(400)
+          .json({ message: "Select at least one valid order option." });
+        return;
+      }
+      try {
+        const country = await getCountryFromDb(String(req.params.code ?? ""));
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        const options: OrderOption[] = parsed.data.options.map((option) => ({
+          id:
+            option.id?.trim() ||
+            slugify(
+              `${option.platform}-${option.name}-${option.city ?? "nl"}`,
+            ) ||
+            "order",
+          name: option.name.trim(),
+          platform: option.platform,
+          url: option.url.trim(),
+          city: option.city?.trim() || undefined,
+          notes: option.notes?.trim() || undefined,
+          signatureDish: option.signatureDish?.trim() || undefined,
+          imageUrl: option.imageUrl?.trim() || undefined,
+          imageAttribution: option.imageAttribution?.trim() || undefined,
+        }));
+        const updated = await appendOrderOptions(country.code, options);
+        if (!updated) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+
+        const enrichmentJobs = options
+          .filter((option) => Boolean(option.id))
+          .map((option) => ({
+            countryCode: country.code,
+            countryName: country.name,
+            optionId: option.id,
+          }));
+        const enrichmentQueued = isOpenAiConfigured()
+          ? scheduleOrderOptionEnrichments(enrichmentJobs)
+          : 0;
+
+        res.json({
+          country: updated,
+          added: options.length,
+          enrichmentQueued,
+        });
+      } catch (error) {
+        console.error("Add order options failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(error, "Could not add order options."),
+        });
+      }
+    },
+  );
+
+  app.delete(
+    "/api/admin/countries/:code/order-options/:optionId",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const code = String(req.params.code ?? "");
+        const optionId = decodeURIComponent(String(req.params.optionId ?? ""));
+        const updated = await removeOrderOption(code, optionId);
+        if (!updated) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        res.json({ country: updated });
+      } catch (error) {
+        console.error("Remove order option failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(error, "Could not remove order option."),
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/order-options/:optionId/replace-image",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      if (!openaiRequired(res)) return;
+      try {
+        const code = String(req.params.code ?? "");
+        const optionId = decodeURIComponent(String(req.params.optionId ?? ""));
+        const country = await getCountryFromDb(code);
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        const option = (country.orderOptions ?? []).find(
+          (item) => item.id === optionId,
+        );
+        if (!option) {
+          res.status(404).json({ message: "Order option not found." });
+          return;
+        }
+
+        const dishHint =
+          option.signatureDish?.trim() ||
+          option.notes?.trim()?.slice(0, 160) ||
+          option.name;
+        const discovered = await discoverItemImageQueries({
+          kind: "recipe",
+          countryName: country.name,
+          title: option.signatureDish?.trim() || option.name,
+          detail: dishHint,
+        });
+        const queries = [
+          ...discovered.searchQueries,
+          ...(option.signatureDish
+            ? [
+                `${option.signatureDish} dish`,
+                `${option.signatureDish} ${country.name} food`,
+                `${option.signatureDish} plate`,
+              ]
+            : []),
+          `${option.name} food`,
+          `${option.name} ${country.name} dish`,
+          `${country.name} takeaway food`,
+        ];
+        const image = await findCuisineImageFromQueries(queries, {
+          excludeUrls: [option.imageUrl],
+        });
+        if (!image) {
+          res.status(404).json({
+            message: "Could not find a suitable Wikimedia image.",
+            notes: discovered.notes,
+            searchQueries: queries,
+          });
+          return;
+        }
+
+        const result = await updateOrderOption(code, optionId, {
+          imageUrl: image.url,
+          imageAttribution: image.attribution,
+        });
+        if (!result) {
+          res.status(404).json({ message: "Order option not found." });
+          return;
+        }
+        res.json({
+          country: result.country,
+          option: result.option,
+          imageUrl: image.url,
+          imageAttribution: image.attribution,
+          notes: discovered.notes,
+          query: image.query,
+        });
+      } catch (error) {
+        console.error("Replace order option image failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(
+            error,
+            "Could not replace order option image.",
+          ),
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/countries/:code/order-options/:optionId/replace-text",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      if (!openaiRequired(res)) return;
+      try {
+        const code = String(req.params.code ?? "");
+        const optionId = decodeURIComponent(String(req.params.optionId ?? ""));
+        const country = await getCountryFromDb(code);
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        const option = (country.orderOptions ?? []).find(
+          (item) => item.id === optionId,
+        );
+        if (!option) {
+          res.status(404).json({ message: "Order option not found." });
+          return;
+        }
+        const rewritten = await rewriteOrderOptionText({
+          countryName: country.name,
+          option,
+        });
+        const result = await updateOrderOption(
+          code,
+          optionId,
+          rewritten.patch,
+        );
+        if (!result) {
+          res.status(404).json({ message: "Order option not found." });
+          return;
+        }
+        res.json({
+          country: result.country,
+          option: result.option,
+          notes: rewritten.notes,
+        });
+      } catch (error) {
+        console.error("Replace order option text failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(
+            error,
+            "Could not replace order option text.",
+          ),
         });
       }
     },

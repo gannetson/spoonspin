@@ -12,6 +12,7 @@ import {
 } from "@/tags/client";
 import type { TagEntityType, UserTag } from "@/tags/types";
 import { drinkEntityId } from "@/tags/types";
+import { zClass } from "@/lib/stacking";
 
 export type SuggestReviewTarget = {
   entityType: TagEntityType;
@@ -171,7 +172,7 @@ function Toast({
     <div
       role="status"
       aria-live="polite"
-      className="fixed bottom-4 left-1/2 z-[80] flex w-[min(24rem,calc(100vw-2rem))] -translate-x-1/2 items-start gap-3 rounded-2xl border border-ink/10 bg-ink px-4 py-3 text-sm text-cream shadow-lg"
+      className={`fixed bottom-4 left-1/2 ${zClass.popover} flex w-[min(24rem,calc(100vw-2rem))] -translate-x-1/2 items-start gap-3 rounded-2xl border border-ink/10 bg-ink px-4 py-3 text-sm text-cream shadow-lg`}
     >
       <p className="min-w-0 flex-1 leading-snug">{message}</p>
       <button

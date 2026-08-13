@@ -119,7 +119,9 @@ export type GooglePlaceMatch = {
 export type GroundedPlace = GooglePlaceMatch & {
   /** Alias or query that found this place. */
   matchedQuery?: string;
-  source: "google" | "osm";
+  source: "google" | "osm" | "tripadvisor";
+  /** Tripadvisor Restaurant_Review profile when found via Apify. */
+  tripadvisorUrl?: string;
 };
 
 export const NL_DISCOVER_CITIES = [

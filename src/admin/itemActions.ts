@@ -1,10 +1,17 @@
 import { useCallback, useState } from "react";
-import type { Country, Drink, Recipe, SpecialtyShop } from "@/types/content";
+import type {
+  Country,
+  Drink,
+  OrderOption,
+  Recipe,
+  SpecialtyShop,
+} from "@/types/content";
 import type { Restaurant } from "@/restaurants/types";
 import {
   removeDinnerCourse,
   removeDinnerDrink,
   removeDrink,
+  removeOrderOption as deleteOrderOption,
   removeRecipe,
   removeRestaurant,
   removeShop,
@@ -17,6 +24,8 @@ import {
   findRestaurantMenu,
   findRestaurantScores,
   replaceShopText,
+  replaceOrderOptionImage,
+  replaceOrderOptionText,
   selectDrinkForDinner,
   selectRecipeForDinner,
 } from "@/admin/countryTools";
@@ -313,6 +322,57 @@ export async function handleShopAdminAction(input: {
   const result = await replaceShopText(country.code, shop.id);
   if (result.country) input.onCountryUpdated(result.country);
   return "Text updated";
+}
+
+export async function handleOrderOptionAdminAction(input: {
+  action: AdminItemAction;
+  country: Country;
+  option: OrderOption;
+  onCountryUpdated: (country: Country) => void;
+  openSelectImage?: (options: OpenSelectImageOptions) => void;
+}): Promise<string> {
+  const { action, country, option } = input;
+  if (action === "remove") {
+    if (
+      !window.confirm(`Remove “${option.name}” from order options?`)
+    ) {
+      return "";
+    }
+    const result = await deleteOrderOption(country.code, option.id);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Removed";
+  }
+  if (action === "select-image") {
+    if (!input.openSelectImage) {
+      throw new Error("Select image is not available.");
+    }
+    input.openSelectImage({
+      target: {
+        kind: "orderOption",
+        countryCode: country.code,
+        optionId: option.id,
+      },
+      label: option.name,
+      defaultQuery: option.signatureDish
+        ? `${option.signatureDish} ${country.name} dish`
+        : `${option.name} ${country.name} food`,
+      onApplied: (result) => {
+        if (result.country) input.onCountryUpdated(result.country);
+      },
+    });
+    return "";
+  }
+  if (action === "replace-image") {
+    const result = await replaceOrderOptionImage(country.code, option.id);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Image updated";
+  }
+  if (action === "replace-text") {
+    const result = await replaceOrderOptionText(country.code, option.id);
+    if (result.country) input.onCountryUpdated(result.country);
+    return "Text updated";
+  }
+  throw new Error("Unsupported order option action.");
 }
 
 export async function handleRestaurantAdminAction(input: {

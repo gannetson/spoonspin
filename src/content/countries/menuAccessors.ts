@@ -2,6 +2,7 @@ import type {
   Country,
   DinnerSuggestion,
   Drink,
+  OrderOption,
   Recipe,
   RecipeCategory,
   SpecialtyShop,
@@ -58,6 +59,10 @@ export function getSpecialtyShops(country: Country): SpecialtyShop[] {
     return country.specialtyShops;
   }
   return specialtyShopsFor(country.code);
+}
+
+export function getOrderOptions(country: Country): OrderOption[] {
+  return country.orderOptions ?? [];
 }
 
 export type RecipeDietFilter = "all" | "vegan" | "vegetarian" | "meat";

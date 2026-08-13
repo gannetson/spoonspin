@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
+import type { Drink, OrderOption, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import { countryCatalog } from "../../src/content/countries/catalog.ts";
 import { OSM_CUISINE_BY_COUNTRY } from "../../src/restaurants/osmCuisineMap.ts";
 import {
@@ -11,8 +11,14 @@ import {
 import { searchOsmRestaurantsForCountry } from "../lib/osmRestaurantSearch.ts";
 import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
 import { chatJson, isOpenAiConfigured } from "./suggest.ts";
+import {
+  isApifyConfigured,
+  searchDeliveryOrderOptions,
+  type GroundedOrderListing,
+} from "../lib/apifyOrderSearch.ts";
+import { searchTripadvisorRestaurants } from "../lib/apifyTripadvisorSearch.ts";
 
-export { isOpenAiConfigured };
+export { isOpenAiConfigured, isApifyConfigured };
 
 /** OpenAI often returns null for omitted optional fields. */
 const optionalString = z.string().nullish().transform((value) => value ?? undefined);
@@ -142,7 +148,13 @@ function groundedToDiscovered(
             ? ` · ${place.rating.toFixed(1)}★ (${place.reviewCount ?? 0} reviews)`
             : ""
         }.`
-      : `OpenStreetMap cuisine tag match near ${place.city}.`;
+      : place.source === "tripadvisor"
+        ? `Tripadvisor match${place.matchedQuery ? ` for “${place.matchedQuery}”` : ""}${
+            place.rating != null
+              ? ` · ${place.rating.toFixed(1)}★ (${place.reviewCount ?? 0} reviews)`
+              : ""
+          }${place.tripadvisorUrl ? ` · ${place.tripadvisorUrl}` : ""}.`
+        : `OpenStreetMap cuisine tag match near ${place.city}.`;
   const mapsUrl = stableMapsUrl(place.mapsUrl, {
     name: place.name,
     address: place.address,
@@ -159,12 +171,15 @@ function groundedToDiscovered(
     lng: place.lng,
     cuisine,
     cuisineEvidence,
-    evidenceSourceUrl: officialWebsiteOrUndefined(place.website) ?? mapsUrl,
+    evidenceSourceUrl:
+      place.source === "tripadvisor" && place.tripadvisorUrl
+        ? place.tripadvisorUrl
+        : officialWebsiteOrUndefined(place.website) ?? mapsUrl,
     confidence,
     authenticityNotes: cuisineEvidence,
     authenticityRating: confidenceToRating(confidence),
     phone: place.phone,
-    verified: place.source === "google",
+    verified: place.source === "google" || place.source === "tripadvisor",
   };
 }
 
@@ -406,9 +421,11 @@ export async function discoverCountryRestaurants(input: {
   query?: string;
   cuisineAliases?: string[];
 }): Promise<{ notes: string; restaurants: DiscoveredRestaurant[] }> {
-  if (!isGooglePlacesConfigured()) {
+  const hasPlaces = isGooglePlacesConfigured();
+  const hasApify = isApifyConfigured();
+  if (!hasPlaces && !hasApify) {
     throw new Error(
-      "GOOGLE_PLACES_API_KEY is not configured. Restaurant discover needs Google Places.",
+      "Restaurant discover needs GOOGLE_PLACES_API_KEY and/or APIFY_TOKEN (Tripadvisor).",
     );
   }
 
@@ -423,11 +440,14 @@ export async function discoverCountryRestaurants(input: {
   const aliases = [...aliasSet].slice(0, 8);
   const focus = input.query?.trim() || undefined;
 
-  const placesHits = await searchGoogleRestaurantsByCuisine({
-    aliases,
-    focus,
-    maxPerQuery: 8,
-  });
+  let placesHits: GroundedPlace[] = [];
+  if (hasPlaces) {
+    placesHits = await searchGoogleRestaurantsByCuisine({
+      aliases,
+      focus,
+      maxPerQuery: 8,
+    });
+  }
 
   let osmHits: GroundedPlace[] = [];
   try {
@@ -438,17 +458,44 @@ export async function discoverCountryRestaurants(input: {
     console.warn("OSM restaurant supplement failed", error);
   }
 
+  let tripadvisorHits: GroundedPlace[] = [];
+  let tripadvisorNotes = "";
+  if (hasApify) {
+    try {
+      const ta = await searchTripadvisorRestaurants({
+        countryName: input.countryName,
+        query: input.query,
+        cuisineAliases: input.cuisineAliases,
+        maxPerCity: 10,
+      });
+      tripadvisorHits = ta.places;
+      tripadvisorNotes = ta.notes;
+    } catch (error) {
+      console.warn("Tripadvisor restaurant search failed", error);
+      tripadvisorNotes =
+        error instanceof Error
+          ? `Tripadvisor failed: ${error.message}`
+          : "Tripadvisor search failed.";
+    }
+  }
+
   const byKey = new Map<string, GroundedPlace>();
+  const nameCityKey = (place: GroundedPlace) =>
+    `${place.name.trim().toLowerCase()}|${place.city.trim().toLowerCase()}`;
+
   for (const place of placesHits) {
     byKey.set(place.placeId, place);
   }
-  for (const place of osmHits) {
-    // Prefer Google when both sources find the same name+city.
-    const nameCity = `${place.name.trim().toLowerCase()}|${place.city.trim().toLowerCase()}`;
+  for (const place of tripadvisorHits) {
     const already = [...byKey.values()].some(
-      (existing) =>
-        `${existing.name.trim().toLowerCase()}|${existing.city.trim().toLowerCase()}` ===
-        nameCity,
+      (existing) => nameCityKey(existing) === nameCityKey(place),
+    );
+    if (!already) byKey.set(place.placeId, place);
+  }
+  for (const place of osmHits) {
+    // Prefer Google / Tripadvisor when both sources find the same name+city.
+    const already = [...byKey.values()].some(
+      (existing) => nameCityKey(existing) === nameCityKey(place),
     );
     if (!already) byKey.set(place.placeId, place);
   }
@@ -458,10 +505,14 @@ export async function discoverCountryRestaurants(input: {
     .filter((place): place is DiscoveredRestaurant => Boolean(place));
 
   const parts = [
-    `Found ${placesHits.length} Google Places hit(s) across major Dutch cities` +
-      (osmHits.length > 0 ? ` and ${osmHits.length} OSM specialty match(es)` : "") +
+    `Found ${placesHits.length} Google Places hit(s)` +
+      (tripadvisorHits.length > 0
+        ? `, ${tripadvisorHits.length} Tripadvisor hit(s)`
+        : "") +
+      (osmHits.length > 0 ? `, and ${osmHits.length} OSM specialty match(es)` : "") +
       ` for ${cuisine}.`,
   ];
+  if (tripadvisorNotes) parts.push(tripadvisorNotes);
   if (focus) parts.push(`Focus: ${focus}.`);
 
   if (grounded.length === 0) {
@@ -488,7 +539,7 @@ export async function discoverCountryRestaurants(input: {
       }
       if (verification.restaurants.length === 0) {
         parts.push(
-          "No authentic specialists remained after verification. Showing unfiltered Places/OSM hits instead.",
+          "No authentic specialists remained after verification. Showing unfiltered Places/Tripadvisor/OSM hits instead.",
         );
         return {
           notes: parts.join(" "),
@@ -500,7 +551,10 @@ export async function discoverCountryRestaurants(input: {
         restaurants: verification.restaurants.slice(0, 16),
       };
     } catch (error) {
-      console.warn("Authenticity verify failed; returning Places/OSM list", error);
+      console.warn(
+        "Authenticity verify failed; returning Places/Tripadvisor/OSM list",
+        error,
+      );
       parts.push("Authenticity check skipped due to an error.");
     }
   }
@@ -681,6 +735,128 @@ JSON shape:
         notes: shop.notes,
       };
     }),
+  };
+}
+
+const orderOptionAnnotateSchema = z.object({
+  notes: z.string(),
+  items: z
+    .array(
+      z.object({
+        index: z.coerce.number().int().nonnegative(),
+        signatureDish: optionalString,
+        optionNotes: optionalString,
+      }),
+    )
+    .max(30),
+});
+
+async function annotateGroundedOrderOptions(input: {
+  countryName: string;
+  listings: GroundedOrderListing[];
+}): Promise<Map<number, { signatureDish?: string; notes?: string }>> {
+  const out = new Map<number, { signatureDish?: string; notes?: string }>();
+  if (!isOpenAiConfigured() || input.listings.length === 0) return out;
+
+  const catalog = input.listings
+    .map((listing, index) => {
+      const bits = [
+        `#${index}`,
+        listing.platform,
+        listing.name,
+        listing.city ? `@ ${listing.city}` : null,
+        listing.cuisines?.length ? `cuisines: ${listing.cuisines.join(", ")}` : null,
+        listing.signatureDishHint
+          ? `featured: ${listing.signatureDishHint}`
+          : null,
+        listing.notes ? `meta: ${listing.notes}` : null,
+      ].filter(Boolean);
+      return bits.join(" | ");
+    })
+    .join("\n");
+
+  try {
+    const raw = await chatJson(
+      `You annotate real meal-delivery restaurants for Spoon Spin.
+Reply with JSON only. Do NOT invent restaurants or URLs.
+Only suggest a signatureDish when it is clearly implied by featured dishes or very typical for this cuisine at this venue.
+Keep optionNotes short (one sentence) or omit.`,
+      `Cuisine: ${input.countryName}
+
+Grounded listings (index is authoritative):
+${catalog}
+
+JSON shape:
+{
+  "notes": string,
+  "items": [{ "index": number, "signatureDish": string?, "optionNotes": string? }]
+}`,
+    );
+    const parsed = orderOptionAnnotateSchema.parse(raw);
+    for (const item of parsed.items) {
+      if (item.index < 0 || item.index >= input.listings.length) continue;
+      out.set(item.index, {
+        signatureDish: item.signatureDish?.trim() || undefined,
+        notes: item.optionNotes?.trim() || undefined,
+      });
+    }
+  } catch (error) {
+    console.warn("Order option annotation skipped", error);
+  }
+  return out;
+}
+
+/**
+ * Discover order options from live Thuisbezorgd / Uber Eats listings (Apify).
+ * OpenAI is optional and only annotates signature dishes — never invents venues.
+ */
+export async function discoverCountryOrderOptions(input: {
+  countryCode: string;
+  countryName: string;
+  query?: string;
+  city?: string;
+}): Promise<{ notes: string; options: OrderOption[] }> {
+  if (!isApifyConfigured()) {
+    throw new Error(
+      "APIFY_TOKEN is not configured. Add it to .env to discover order options from Thuisbezorgd / Uber Eats.",
+    );
+  }
+
+  const grounded = await searchDeliveryOrderOptions({
+    countryCode: input.countryCode,
+    countryName: input.countryName,
+    query: input.query,
+    city: input.city,
+    maxPerPlatform: 10,
+  });
+
+  const annotations = await annotateGroundedOrderOptions({
+    countryName: input.countryName,
+    listings: grounded.listings,
+  });
+
+  const options: OrderOption[] = grounded.listings.map((listing, index) => {
+    const annotation = annotations.get(index);
+    const notes = [listing.notes, annotation?.notes]
+      .filter(Boolean)
+      .join(" — ");
+    return {
+      id:
+        slugify(`${listing.platform}-${listing.name}-${listing.city ?? "nl"}`) ||
+        "order",
+      name: listing.name,
+      platform: listing.platform,
+      url: listing.url,
+      city: listing.city,
+      notes: notes || undefined,
+      signatureDish:
+        annotation?.signatureDish || listing.signatureDishHint || undefined,
+    };
+  });
+
+  return {
+    notes: grounded.notes,
+    options,
   };
 }
 
@@ -1107,6 +1283,55 @@ JSON shape:
       notes: parsed.shopNotes,
       address: parsed.address,
       website,
+    },
+  };
+}
+
+const orderOptionRewriteSchema = z.object({
+  notes: z.string(),
+  name: z.string().min(1),
+  optionNotes: optionalString,
+  city: optionalString,
+  signatureDish: optionalString,
+  url: optionalString,
+});
+
+export async function rewriteOrderOptionText(input: {
+  countryName: string;
+  option: OrderOption;
+}): Promise<{
+  notes: string;
+  patch: Partial<OrderOption>;
+}> {
+  const raw = await chatJson(
+    `You improve meal-delivery order option blurbs for diners in the Netherlands.
+Reply with JSON only. Keep the restaurant and platform identity.
+Improve notes and set a clear signatureDish (one must-order dish).`,
+    `Cuisine country: ${input.countryName}
+Current order option JSON:
+${JSON.stringify(input.option, null, 2)}
+
+JSON shape:
+{
+  "notes": string,
+  "name": string,
+  "optionNotes": string?,
+  "city": string?,
+  "signatureDish": string?,
+  "url": string?
+}`,
+  );
+  const parsed = orderOptionRewriteSchema.parse(raw);
+  const url =
+    parsed.url && /^https?:\/\//i.test(parsed.url) ? parsed.url.trim() : undefined;
+  return {
+    notes: parsed.notes,
+    patch: {
+      name: parsed.name.trim(),
+      notes: parsed.optionNotes?.trim() || undefined,
+      city: parsed.city?.trim() || undefined,
+      signatureDish: parsed.signatureDish?.trim() || undefined,
+      ...(url ? { url } : {}),
     },
   };
 }

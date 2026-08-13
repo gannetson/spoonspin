@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Deliveroo">
+  <rect width="64" height="64" rx="14" fill="#00CCBC"/>
+  <path fill="#fff" d="M18 38c2-10 8-16 14-16s12 6 14 16c-4-2-8-3-14-3s-10 1-14 3z"/>
+  <path fill="#fff" d="M24 40h16l2 8H22l2-8z"/>
+  <circle cx="28" cy="50" r="3.5" fill="#0B3D4A"/>
+  <circle cx="40" cy="50" r="3.5" fill="#0B3D4A"/>
+  <path fill="#fff" d="M30 18c2-4 6-6 10-4l-2 6c-2-1-4 0-5 2l-3-4z"/>
+</svg>

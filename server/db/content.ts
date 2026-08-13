@@ -3,6 +3,7 @@ import type {
   Country,
   DinnerSuggestion,
   Drink,
+  OrderOption,
   Recipe,
   SpecialtyShop,
   WikipediaCuisine,
@@ -120,6 +121,7 @@ function assembleCountry(
       row.national_dish_id == null ? undefined : String(row.national_dish_id),
     nationalDrink: asObject<Drink>(row.national_drink),
     specialtyShops: asArray<SpecialtyShop>(row.specialty_shops),
+    orderOptions: asArray<OrderOption>(row.order_options),
     imageUrl: row.image_url == null ? undefined : String(row.image_url),
     imageAttribution:
       row.image_attribution == null
@@ -190,13 +192,13 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
     `INSERT INTO countries (
       code, slug, name, flag, region, introduction, cuisine_aliases,
       national_dish_id, national_drink, menu_drink, more_drinks, wikipedia,
-      specialty_shops, image_url, image_attribution, dinner_json,
+      specialty_shops, order_options, image_url, image_attribution, dinner_json,
       cook_ready, status, updated_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7::jsonb,
       $8, $9::jsonb, $10::jsonb, $11::jsonb, $12::jsonb,
-      $13::jsonb, $14, $15, $16::jsonb,
-      $17, $18, NOW()
+      $13::jsonb, $14::jsonb, $15, $16, $17::jsonb,
+      $18, $19, NOW()
     )
     ON CONFLICT (code) DO UPDATE SET
       slug = EXCLUDED.slug,
@@ -211,6 +213,7 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
       more_drinks = EXCLUDED.more_drinks,
       wikipedia = EXCLUDED.wikipedia,
       specialty_shops = EXCLUDED.specialty_shops,
+      order_options = EXCLUDED.order_options,
       image_url = COALESCE(EXCLUDED.image_url, countries.image_url),
       image_attribution = COALESCE(EXCLUDED.image_attribution, countries.image_attribution),
       dinner_json = COALESCE(EXCLUDED.dinner_json, countries.dinner_json),
@@ -233,6 +236,7 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
       ),
       country.wikipedia ? JSON.stringify(country.wikipedia) : null,
       JSON.stringify(country.specialtyShops ?? []),
+      JSON.stringify(country.orderOptions ?? []),
       country.imageUrl ?? null,
       country.imageAttribution ?? null,
       country.dinner ? JSON.stringify(country.dinner) : null,
@@ -661,6 +665,77 @@ export async function appendSpecialtyShops(
   await db.query(
     `UPDATE countries
      SET specialty_shops = $2::jsonb, updated_at = NOW()
+     WHERE code = $1`,
+    [countryCode.toLowerCase(), JSON.stringify([...byId.values()])],
+  );
+  return getCountryFromDb(countryCode);
+}
+
+export async function removeOrderOption(
+  countryCode: string,
+  optionId: string,
+): Promise<Country | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country) return undefined;
+  const options = (country.orderOptions ?? []).filter(
+    (option) => option.id !== optionId,
+  );
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE countries
+     SET order_options = $2::jsonb, updated_at = NOW()
+     WHERE code = $1`,
+    [countryCode.toLowerCase(), JSON.stringify(options)],
+  );
+  return getCountryFromDb(countryCode);
+}
+
+export async function updateOrderOption(
+  countryCode: string,
+  optionId: string,
+  patch: Partial<OrderOption>,
+): Promise<{ country: Country; option: OrderOption } | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country) return undefined;
+  const options = [...(country.orderOptions ?? [])];
+  const index = options.findIndex((option) => option.id === optionId);
+  if (index === -1) return undefined;
+  const next = { ...options[index]!, ...patch, id: optionId };
+  options[index] = next;
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE countries
+     SET order_options = $2::jsonb, updated_at = NOW()
+     WHERE code = $1`,
+    [countryCode.toLowerCase(), JSON.stringify(options)],
+  );
+  const updated = await getCountryFromDb(countryCode);
+  if (!updated) return undefined;
+  return { country: updated, option: next };
+}
+
+export async function appendOrderOptions(
+  countryCode: string,
+  options: OrderOption[],
+): Promise<Country | undefined> {
+  const country = await getCountryFromDb(countryCode);
+  if (!country) return undefined;
+
+  const byId = new Map(
+    (country.orderOptions ?? []).map((option) => [option.id, option]),
+  );
+  for (const option of options) {
+    const id =
+      option.id?.trim() ||
+      slugifyId(`${option.platform}-${option.name}-${option.city ?? "nl"}`) ||
+      `order-${byId.size + 1}`;
+    byId.set(id, { ...option, id });
+  }
+
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE countries
+     SET order_options = $2::jsonb, updated_at = NOW()
      WHERE code = $1`,
     [countryCode.toLowerCase(), JSON.stringify([...byId.values()])],
   );

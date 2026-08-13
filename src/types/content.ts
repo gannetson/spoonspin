@@ -70,6 +70,29 @@ export type SpecialtyShop = {
   notes?: string;
 };
 
+/** Curated delivery / takeaway option for Order at home. */
+export type OrderPlatform =
+  | "thuisbezorgd"
+  | "ubereats"
+  | "deliveroo"
+  | "direct"
+  | "other";
+
+export type OrderOption = {
+  id: string;
+  name: string;
+  platform: OrderPlatform;
+  /** Order / listing URL (platform page or restaurant own ordering). */
+  url: string;
+  city?: string;
+  notes?: string;
+  /** Hero / food photo for this order option. */
+  imageUrl?: string;
+  imageAttribution?: string;
+  /** Must-order dish to highlight for this place. */
+  signatureDish?: string;
+};
+
 export type Menu = {
   starter: Recipe;
   main: Recipe;
@@ -159,6 +182,8 @@ export type Country = {
   /** Composed dinner suggestion for the Dinner tab. */
   dinner?: DinnerSuggestion;
   specialtyShops?: SpecialtyShop[];
+  /** Curated delivery / takeaway options for Order at home. */
+  orderOptions?: OrderOption[];
   /** Cuisine banner plate (DB or curated). */
   imageUrl?: string;
   imageAttribution?: string;

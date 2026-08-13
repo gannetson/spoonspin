@@ -227,10 +227,12 @@ export function RestaurantView({
                 {cuisineFlags.map((flag) => (
                   <span
                     key={flag.code}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-cream/15 px-2.5 py-1 backdrop-blur-sm"
+                    className="inline-flex items-center gap-1.5"
                     title={flag.name}
                   >
-                    <span aria-hidden="true">{flag.flag}</span>
+                    <span aria-hidden="true" className="flag-glow text-base leading-none">
+                      {flag.flag}
+                    </span>
                     {flag.name}
                   </span>
                 ))}
@@ -238,7 +240,7 @@ export function RestaurantView({
             ) : null}
             <h2
               id="restaurant-heading"
-              className="font-display text-4xl leading-tight text-cream sm:text-5xl"
+              className="font-display text-4xl leading-tight text-ochre sm:text-5xl"
             >
               {restaurant.name}
             </h2>
@@ -364,7 +366,7 @@ export function RestaurantView({
         <section aria-labelledby="restaurant-menu-heading" className="space-y-4">
           <h3
             id="restaurant-menu-heading"
-            className="font-display text-3xl text-ink"
+            className="font-display text-3xl text-burgundy"
           >
             {t("restaurant.menuHeading")}
           </h3>
@@ -396,12 +398,12 @@ export function RestaurantView({
                         >
                           <div className="flex flex-wrap items-baseline justify-between gap-2">
                             <div className="min-w-0 space-y-1">
-                              <p className="flex flex-wrap items-center gap-2 font-display text-xl text-ink">
+                              <p className="flex flex-wrap items-center gap-2 font-display text-xl text-burgundy">
                                 <span>{item.name}</span>
                                 {matches.map((match) => (
                                   <span
                                     key={`${item.id}-${match.code}`}
-                                    className="inline-flex items-center gap-1 rounded-full bg-parchment px-2 py-0.5 text-xs font-semibold text-ink"
+                                    className="inline-flex items-center gap-1 text-xs font-semibold text-ink"
                                     title={
                                       match.isNationalDish
                                         ? t("restaurant.nationalDishMatch", {
@@ -414,7 +416,9 @@ export function RestaurantView({
                                           })
                                     }
                                   >
-                                    <span aria-hidden="true">{match.flag}</span>
+                                    <span aria-hidden="true" className="flag-glow text-sm leading-none">
+                                      {match.flag}
+                                    </span>
                                     {match.isNationalDish
                                       ? t("restaurant.nationalDishLabel")
                                       : match.name}

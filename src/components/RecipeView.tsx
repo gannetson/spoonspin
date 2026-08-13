@@ -136,7 +136,7 @@ export function RecipeView({
               {t("recipe.iconicNationalDish")}
             </p>
           ) : null}
-          <h2 id="recipe-heading" className="font-display text-4xl text-ink sm:text-5xl">
+          <h2 id="recipe-heading" className="font-display text-4xl text-burgundy sm:text-5xl">
             {recipe.name}
           </h2>
           {recipe.localName ? (

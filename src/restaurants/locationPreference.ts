@@ -2,7 +2,15 @@ const REMEMBER_KEY = "spoonspin:remember-city";
 const CITY_KEY = "spoonspin:dine-city";
 const COORDS_KEY = "spoonspin:dine-coords";
 
+/** Default "Search near …" / order-discovery city when none is saved. */
+export const DEFAULT_DINE_CITY = "Leiden";
+
 export type SavedCoords = { lat: number; lng: number };
+
+/** Saved dine city, or the app default (Leiden). */
+export function getPreferredDineCity(): string {
+  return getSavedDineCity() ?? DEFAULT_DINE_CITY;
+}
 
 export function getRememberCityPreference(): boolean {
   if (typeof window === "undefined") return false;

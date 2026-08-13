@@ -165,8 +165,8 @@ export function ItemTagBar({
         onClick={() => void setRating(0)}
         className={`mr-0.5 rounded px-1 py-0.5 text-[0.65rem] font-bold transition ${
           tag?.rating === 0
-            ? "bg-ink text-cream"
-            : "text-ink/40 hover:bg-parchment hover:text-ink"
+            ? "bg-burgundy text-cream"
+            : "text-burgundy/40 hover:bg-parchment hover:text-burgundy"
         }`}
       >
         0
@@ -213,7 +213,7 @@ export function ItemTagBar({
           className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition sm:text-sm ${
             tag?.intent === "want"
               ? "bg-stamp text-cream"
-              : "bg-parchment text-ink hover:bg-stamp/15"
+              : "bg-parchment text-burgundy hover:bg-stamp/15"
           }`}
         >
           <Bookmark className="size-3.5" aria-hidden="true" />
@@ -227,7 +227,7 @@ export function ItemTagBar({
           className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold transition sm:text-sm ${
             tag?.intent === "did"
               ? "bg-tomato text-cream"
-              : "bg-parchment text-ink hover:bg-tomato/15"
+              : "bg-parchment text-burgundy hover:bg-tomato/15"
           }`}
         >
           <Check className="size-3.5" aria-hidden="true" />

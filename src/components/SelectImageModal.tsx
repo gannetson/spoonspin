@@ -8,6 +8,7 @@ import {
   type AdminImageTarget,
 } from "@/admin/countryTools";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
 
 export type SelectImageModalProps = {
   open: boolean;
@@ -179,7 +180,7 @@ export function SelectImageModal({
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-4 sm:items-center"
+      className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-4 sm:items-center`}
       onClick={() => {
         if (!applyBusy) onClose();
       }}
@@ -197,7 +198,7 @@ export function SelectImageModal({
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
               {t("admin.selectImage.eyebrow")}
             </p>
-            <h2 id={titleId} className="mt-1 font-display text-2xl text-ink">
+            <h2 id={titleId} className="mt-1 font-display text-2xl text-burgundy">
               {t("admin.selectImage.title", { label })}
             </h2>
             <p className="mt-1 text-sm text-ink-soft">

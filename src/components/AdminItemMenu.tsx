@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useId } from "react";
 import { createPortal } from "react-dom";
 import {
   ClipboardList,
@@ -12,6 +12,8 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
+import { useAnchoredToast, usePortalMenu } from "@/lib/usePortalMenu";
 
 export type AdminItemAction =
   | "remove"
@@ -47,11 +49,6 @@ type AdminItemMenuProps = {
   tone?: "light" | "dark";
 };
 
-type MenuPosition = {
-  top: number;
-  left: number;
-};
-
 export function AdminItemMenu({
   label,
   showReplaceImage = true,
@@ -72,91 +69,13 @@ export function AdminItemMenu({
 }: AdminItemMenuProps) {
   const t = useT();
   const menuId = useId();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState<MenuPosition | null>(null);
-  const [statusPosition, setStatusPosition] = useState<MenuPosition | null>(
-    null,
-  );
-
-  function updatePosition() {
-    const button = buttonRef.current;
-    if (!button) return;
-    const rect = button.getBoundingClientRect();
-    const panelWidth = 288;
-    const gap = 8;
-    const left = Math.min(
-      Math.max(8, rect.right - panelWidth),
-      window.innerWidth - panelWidth - 8,
-    );
-    let top = rect.bottom + gap;
-    const panelHeight = panelRef.current?.offsetHeight ?? 280;
-    if (top + panelHeight > window.innerHeight - 8) {
-      top = Math.max(8, rect.top - gap - panelHeight);
-    }
-    setPosition({ top, left });
-  }
-
-  function updateStatusPosition() {
-    const button = buttonRef.current;
-    if (!button || (!status && !error)) {
-      setStatusPosition(null);
-      return;
-    }
-    const rect = button.getBoundingClientRect();
-    const toastWidth = 224;
-    const left = Math.min(
-      Math.max(8, rect.right - toastWidth),
-      window.innerWidth - toastWidth - 8,
-    );
-    setStatusPosition({ top: rect.bottom + 4, left });
-  }
-
-  useLayoutEffect(() => {
-    if (!open) {
-      setPosition(null);
-      return;
-    }
-    updatePosition();
-  }, [open]);
-
-  useLayoutEffect(() => {
-    updateStatusPosition();
-  }, [status, error]);
-
-  useEffect(() => {
-    if (!open && !status && !error) return;
-    function onPointer(event: MouseEvent) {
-      if (!open) return;
-      const target = event.target as Node;
-      if (
-        rootRef.current?.contains(target) ||
-        panelRef.current?.contains(target)
-      ) {
-        return;
-      }
-      setOpen(false);
-    }
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
-    }
-    function onReposition() {
-      if (open) updatePosition();
-      updateStatusPosition();
-    }
-    window.addEventListener("mousedown", onPointer);
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("resize", onReposition);
-    window.addEventListener("scroll", onReposition, true);
-    return () => {
-      window.removeEventListener("mousedown", onPointer);
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("resize", onReposition);
-      window.removeEventListener("scroll", onReposition, true);
-    };
-  }, [open, status, error]);
+  const { open, setOpen, rootRef, triggerRef, panelRef, position } =
+    usePortalMenu({ estimatedHeight: 280 });
+  const { position: statusPosition } = useAnchoredToast({
+    active: Boolean(status || error),
+    triggerRef,
+    width: 224,
+  });
 
   function run(action: AdminItemAction) {
     setOpen(false);
@@ -171,7 +90,7 @@ export function AdminItemMenu({
             id={menuId}
             role="menu"
             style={{ top: position.top, left: position.left }}
-            className="fixed z-[80] w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border border-ink/10 bg-cream text-ink shadow-xl"
+            className={`fixed ${zClass.popover} w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border border-ink/10 bg-cream text-ink shadow-xl`}
           >
             <button
               type="button"
@@ -191,42 +110,42 @@ export function AdminItemMenu({
             </button>
             {!removeOnly && showReplaceImage ? (
               <>
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => run("replace-image")}
-                className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
-              >
-                <ImagePlus className="mt-0.5 size-4 shrink-0 text-tomato" />
-                <span>
-                  <span className="block font-semibold text-ink">
-                    {t("admin.item.replaceImage")}
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => run("replace-image")}
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
+                >
+                  <ImagePlus className="mt-0.5 size-4 shrink-0 text-tomato" />
+                  <span>
+                    <span className="block font-semibold text-ink">
+                      {t("admin.item.replaceImage")}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-ink-soft">
+                      {t(
+                        showRestaurantResearch
+                          ? "admin.item.replaceImage.restaurant.hint"
+                          : replaceImageHintKey,
+                      )}
+                    </span>
                   </span>
-                  <span className="mt-0.5 block text-xs text-ink-soft">
-                    {t(
-                      showRestaurantResearch
-                        ? "admin.item.replaceImage.restaurant.hint"
-                        : replaceImageHintKey,
-                    )}
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => run("select-image")}
+                  className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
+                >
+                  <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
+                  <span>
+                    <span className="block font-semibold text-ink">
+                      {t("admin.item.selectImage")}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-ink-soft">
+                      {t("admin.item.selectImage.hint")}
+                    </span>
                   </span>
-                </span>
-              </button>
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => run("select-image")}
-                className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
-              >
-                <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
-                <span>
-                  <span className="block font-semibold text-ink">
-                    {t("admin.item.selectImage")}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-ink-soft">
-                    {t("admin.item.selectImage.hint")}
-                  </span>
-                </span>
-              </button>
+                </button>
               </>
             ) : null}
             {!removeOnly && showEditText ? (
@@ -248,22 +167,22 @@ export function AdminItemMenu({
               </button>
             ) : null}
             {!removeOnly && showReplaceText ? (
-            <button
-              type="button"
-              role="menuitem"
-              onClick={() => run("replace-text")}
-              className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
-            >
-              <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.item.replaceText")}
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => run("replace-text")}
+                className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
+              >
+                <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
+                <span>
+                  <span className="block font-semibold text-ink">
+                    {t("admin.item.replaceText")}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-ink-soft">
+                    {t("admin.item.replaceText.hint")}
+                  </span>
                 </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.item.replaceText.hint")}
-                </span>
-              </span>
-            </button>
+              </button>
             ) : null}
             {!removeOnly && showSelectForDinner ? (
               <button
@@ -330,7 +249,7 @@ export function AdminItemMenu({
           <p
             role={error ? "alert" : "status"}
             style={{ top: statusPosition.top, left: statusPosition.left }}
-            className={`fixed z-[80] max-w-56 rounded-xl px-2 py-1 text-xs shadow-sm ${
+            className={`fixed ${zClass.popover} max-w-56 rounded-xl px-2 py-1 text-xs shadow-sm ${
               error ? "bg-cream text-tomato" : "bg-cream text-ink-soft"
             }`}
           >
@@ -343,12 +262,12 @@ export function AdminItemMenu({
   return (
     <div
       ref={rootRef}
-      className={`z-30 ${className}`}
+      className={className}
       onClick={(event) => event.stopPropagation()}
       onKeyDown={(event) => event.stopPropagation()}
     >
       <button
-        ref={buttonRef}
+        ref={triggerRef}
         type="button"
         aria-label={t("admin.item.menuAria", { label })}
         aria-haspopup="menu"

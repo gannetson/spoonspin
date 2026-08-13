@@ -32,6 +32,7 @@ import {
   previewShopSuggestion,
 } from "../openai/suggest.ts";
 import { upsertRestaurant } from "../db/restaurants.ts";
+import { recordProductEvent } from "../db/analytics.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import { requireAdmin } from "./auth.ts";
 
@@ -230,17 +231,21 @@ export function registerSuggestionRoutes(
     try {
       if (parsed.data.kind === "recipe") {
         res.json(await previewRecipeSuggestion(parsed.data));
-        return;
-      }
-      if (parsed.data.kind === "restaurant") {
+      } else if (parsed.data.kind === "restaurant") {
         res.json(await previewRestaurantSuggestion(parsed.data));
-        return;
-      }
-      if (parsed.data.kind === "drink") {
+      } else if (parsed.data.kind === "drink") {
         res.json(await previewDrinkSuggestion(parsed.data));
-        return;
+      } else {
+        res.json(await previewShopSuggestion(parsed.data));
       }
-      res.json(await previewShopSuggestion(parsed.data));
+      recordProductEvent({
+        eventType: "suggestion_preview",
+        ip: req.ip,
+        meta: {
+          kind: parsed.data.kind,
+          countryCode: parsed.data.countryCode,
+        },
+      });
     } catch (error) {
       console.error("Suggestion preview failed", error);
       res.status(502).json({
@@ -268,6 +273,14 @@ export function registerSuggestionRoutes(
       return;
     }
 
+    const trackCreate = (kind: string, countryCode: string) => {
+      recordProductEvent({
+        eventType: "suggestion_create",
+        ip: req.ip,
+        meta: { kind, countryCode },
+      });
+    };
+
     try {
       if (parsed.data.kind === "recipe") {
         const id = slugifyId("suggest", parsed.data.recipe.name);
@@ -284,6 +297,7 @@ export function registerSuggestionRoutes(
           recipe: { ...recipe, description },
           confirmationNotes: parsed.data.confirmationNotes,
         });
+        trackCreate("recipe", parsed.data.countryCode);
         res.status(201).json({ kind: "recipe", submission });
         return;
       }
@@ -306,6 +320,7 @@ export function registerSuggestionRoutes(
           drink,
           confirmationNotes: parsed.data.confirmationNotes,
         });
+        trackCreate("drink", parsed.data.countryCode);
         res.status(201).json({ kind: "drink", submission });
         return;
       }
@@ -336,6 +351,7 @@ export function registerSuggestionRoutes(
           shop,
           confirmationNotes: parsed.data.confirmationNotes,
         });
+        trackCreate("shop", parsed.data.countryCode);
         res.status(201).json({ kind: "shop", submission });
         return;
       }
@@ -416,6 +432,7 @@ export function registerSuggestionRoutes(
         restaurantRowId: rowId,
         confirmationNotes: parsed.data.confirmationNotes,
       });
+      trackCreate("restaurant", parsed.data.countryCode);
       res.status(201).json({ kind: "restaurant", submission });
     } catch (error) {
       console.error("Suggestion create failed", error);

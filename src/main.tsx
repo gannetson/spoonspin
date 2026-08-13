@@ -6,11 +6,15 @@ import { AuthProvider } from "./auth/AuthContext";
 import { AuthModalProvider } from "./auth/AuthModalContext";
 import { EditRecipeProvider } from "./admin/EditRecipeContext";
 import { SelectImageProvider } from "./admin/SelectImageContext";
+import { ConsentProvider } from "./consent/ConsentContext";
 import { LocaleProvider } from "./i18n/LocaleContext";
 import { AdminOverviewPage } from "./components/AdminOverviewPage";
 import { AdminPage } from "./components/AdminPage";
+import { AdminReportsPage } from "./components/AdminReportsPage";
 import { AdminUsersPage } from "./components/AdminUsersPage";
+import { CookieBanner } from "./components/CookieBanner";
 import { LoginPage } from "./components/LoginPage";
+import { PrivacyPage } from "./components/PrivacyPage";
 import {
   PlannedPlatesPage,
   ProfilePage,
@@ -21,24 +25,29 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <BrowserRouter>
       <LocaleProvider>
-        <AuthProvider>
-          <AuthModalProvider>
-            <SelectImageProvider>
-              <EditRecipeProvider>
-                <Routes>
-                  <Route path="/admin" element={<AdminOverviewPage />} />
-                  <Route path="/admin/review" element={<AdminPage />} />
-                  <Route path="/admin/users" element={<AdminUsersPage />} />
-                  <Route path="/login" element={<LoginPage />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/profile/:userId" element={<ProfilePage />} />
-                  <Route path="/planned" element={<PlannedPlatesPage />} />
-                  <Route path="/*" element={<App />} />
-                </Routes>
-              </EditRecipeProvider>
-            </SelectImageProvider>
-          </AuthModalProvider>
-        </AuthProvider>
+        <ConsentProvider>
+          <AuthProvider>
+            <AuthModalProvider>
+              <SelectImageProvider>
+                <EditRecipeProvider>
+                  <Routes>
+                    <Route path="/admin" element={<AdminOverviewPage />} />
+                    <Route path="/admin/review" element={<AdminPage />} />
+                    <Route path="/admin/reports" element={<AdminReportsPage />} />
+                    <Route path="/admin/users" element={<AdminUsersPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/profile" element={<ProfilePage />} />
+                    <Route path="/profile/:userId" element={<ProfilePage />} />
+                    <Route path="/planned" element={<PlannedPlatesPage />} />
+                    <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/*" element={<App />} />
+                  </Routes>
+                  <CookieBanner />
+                </EditRecipeProvider>
+              </SelectImageProvider>
+            </AuthModalProvider>
+          </AuthProvider>
+        </ConsentProvider>
       </LocaleProvider>
     </BrowserRouter>
   </StrictMode>,

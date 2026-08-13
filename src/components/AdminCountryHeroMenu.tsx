@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type FormEvent,
-} from "react";
+import { useEffect, useId, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import {
   ChevronDown,
@@ -19,15 +12,12 @@ import type { Country } from "@/types/content";
 import { replaceCountryImage, updateCountryText } from "@/admin/countryTools";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
+import { useAnchoredToast, usePortalMenu } from "@/lib/usePortalMenu";
 
 type AdminCountryHeroMenuProps = {
   country: Country;
   onCountryUpdated: (country: Country) => void;
-};
-
-type MenuPosition = {
-  top: number;
-  left: number;
 };
 
 function countryDisplayText(country: Country): string {
@@ -43,14 +33,8 @@ export function AdminCountryHeroMenu({
   const { openSelectImage } = useSelectImage();
   const menuId = useId();
   const textTitleId = useId();
-  const rootRef = useRef<HTMLDivElement>(null);
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState<MenuPosition | null>(null);
-  const [statusPosition, setStatusPosition] = useState<MenuPosition | null>(
-    null,
-  );
+  const { open, setOpen, rootRef, triggerRef, panelRef, position } =
+    usePortalMenu({ estimatedHeight: 220 });
   const [textOpen, setTextOpen] = useState(false);
   const [textDraft, setTextDraft] = useState("");
   const [textBusy, setTextBusy] = useState(false);
@@ -58,83 +42,11 @@ export function AdminCountryHeroMenu({
   const [imageBusy, setImageBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  function updatePosition() {
-    const button = buttonRef.current;
-    if (!button) return;
-    const rect = button.getBoundingClientRect();
-    const panelWidth = 288;
-    const gap = 8;
-    const left = Math.min(
-      Math.max(8, rect.right - panelWidth),
-      window.innerWidth - panelWidth - 8,
-    );
-    let top = rect.bottom + gap;
-    const panelHeight = panelRef.current?.offsetHeight ?? 220;
-    if (top + panelHeight > window.innerHeight - 8) {
-      top = Math.max(8, rect.top - gap - panelHeight);
-    }
-    setPosition({ top, left });
-  }
-
-  function updateStatusPosition() {
-    const button = buttonRef.current;
-    if (!button || (!imageBusy && !status && !error)) {
-      setStatusPosition(null);
-      return;
-    }
-    const rect = button.getBoundingClientRect();
-    const toastWidth = 256;
-    const left = Math.min(
-      Math.max(8, rect.right - toastWidth),
-      window.innerWidth - toastWidth - 8,
-    );
-    setStatusPosition({ top: rect.bottom + 4, left });
-  }
-
-  useLayoutEffect(() => {
-    if (!open) {
-      setPosition(null);
-      return;
-    }
-    updatePosition();
-  }, [open]);
-
-  useLayoutEffect(() => {
-    updateStatusPosition();
-  }, [imageBusy, status, error]);
-
-  useEffect(() => {
-    if (!open && !imageBusy && !status && !error) return;
-    function onPointer(event: MouseEvent) {
-      if (!open) return;
-      const target = event.target as Node;
-      if (
-        rootRef.current?.contains(target) ||
-        panelRef.current?.contains(target)
-      ) {
-        return;
-      }
-      setOpen(false);
-    }
-    function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setOpen(false);
-    }
-    function onReposition() {
-      if (open) updatePosition();
-      updateStatusPosition();
-    }
-    window.addEventListener("mousedown", onPointer);
-    window.addEventListener("keydown", onKey);
-    window.addEventListener("resize", onReposition);
-    window.addEventListener("scroll", onReposition, true);
-    return () => {
-      window.removeEventListener("mousedown", onPointer);
-      window.removeEventListener("keydown", onKey);
-      window.removeEventListener("resize", onReposition);
-      window.removeEventListener("scroll", onReposition, true);
-    };
-  }, [open, imageBusy, status, error]);
+  const { position: statusPosition } = useAnchoredToast({
+    active: Boolean(imageBusy || status || error),
+    triggerRef,
+    width: 256,
+  });
 
   useEffect(() => {
     if (!textOpen) return;
@@ -216,7 +128,7 @@ export function AdminCountryHeroMenu({
             id={menuId}
             role="menu"
             style={{ top: position.top, left: position.left }}
-            className="fixed z-[80] w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border border-ink/10 bg-cream text-ink shadow-xl"
+            className={`fixed ${zClass.popover} w-72 max-w-[calc(100vw-1rem)] overflow-hidden rounded-2xl border border-ink/10 bg-cream text-ink shadow-xl`}
           >
             <button
               type="button"
@@ -277,7 +189,7 @@ export function AdminCountryHeroMenu({
       ? createPortal(
           <div
             style={{ top: statusPosition.top, left: statusPosition.left }}
-            className="fixed z-[80] w-max max-w-[16rem] rounded-lg border border-ink/10 bg-cream px-3 py-2 text-sm text-ink shadow-md"
+            className={`fixed ${zClass.popover} w-max max-w-[16rem] rounded-lg border border-ink/10 bg-cream px-3 py-2 text-sm text-ink shadow-md`}
           >
             {imageBusy ? (
               <span className="inline-flex items-center gap-2 text-ink-soft">
@@ -300,30 +212,10 @@ export function AdminCountryHeroMenu({
         )
       : null;
 
-  return (
-    <div ref={rootRef} className="relative z-30">
-      <button
-        ref={buttonRef}
-        type="button"
-        aria-haspopup="menu"
-        aria-expanded={open}
-        aria-controls={menuId}
-        onClick={() => setOpen((value) => !value)}
-        className="inline-flex items-center gap-1.5 rounded-full bg-cream/15 px-3 py-1.5 text-sm font-semibold text-cream ring-1 ring-cream/30 hover:bg-cream/25"
-      >
-        {t("admin.country.menu")}
-        <ChevronDown
-          className={`size-3.5 transition ${open ? "rotate-180" : ""}`}
-          aria-hidden="true"
-        />
-      </button>
-
-      {menu}
-      {statusToast}
-
-      {textOpen ? (
+  const textModal = textOpen
+    ? createPortal(
         <div
-          className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4"
+          className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4`}
           role="presentation"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget && !textBusy) {
@@ -342,7 +234,7 @@ export function AdminCountryHeroMenu({
               <div>
                 <h2
                   id={textTitleId}
-                  className="font-display text-3xl leading-tight text-ink"
+                  className="font-display text-3xl leading-tight text-burgundy"
                 >
                   {t("admin.country.editText")}
                 </h2>
@@ -405,8 +297,32 @@ export function AdminCountryHeroMenu({
               </div>
             </form>
           </div>
-        </div>
-      ) : null}
+        </div>,
+        document.body,
+      )
+    : null;
+
+  return (
+    <div ref={rootRef} className="relative">
+      <button
+        ref={triggerRef}
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((value) => !value)}
+        className="inline-flex items-center gap-1.5 rounded-full bg-cream/15 px-3 py-1.5 text-sm font-semibold text-cream ring-1 ring-cream/30 hover:bg-cream/25"
+      >
+        {t("admin.country.menu")}
+        <ChevronDown
+          className={`size-3.5 transition ${open ? "rotate-180" : ""}`}
+          aria-hidden="true"
+        />
+      </button>
+
+      {menu}
+      {statusToast}
+      {textModal}
     </div>
   );
 }

@@ -72,13 +72,13 @@ export function HomeProgressCards() {
                 alt=""
                 width={80}
                 height={80}
-                className="size-20 shrink-0 rounded-2xl bg-parchment object-cover ring-1 ring-ink/10"
+                className="size-20 shrink-0 object-contain"
               />
               <div className="min-w-0">
                 <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
                   {t("app.profile")}
                 </p>
-                <h2 className="mt-1 font-display text-2xl text-ink">
+                <h2 className="mt-1 font-display text-2xl text-burgundy">
                   {progress.levelNumber > 0
                     ? t("profile.levelHeading", {
                         level: progress.levelNumber,
@@ -106,7 +106,7 @@ export function HomeProgressCards() {
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
                 {t("app.planned")}
               </p>
-              <h2 className="mt-1 font-display text-2xl text-ink">
+              <h2 className="mt-1 font-display text-2xl text-burgundy">
                 {t("home.progress.plannedTitle")}
               </h2>
               <p className="mt-2 text-sm text-ink-soft">
