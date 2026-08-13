@@ -12,19 +12,28 @@ import {
   setTagPhotoUrls,
   upsertUserTag,
 } from "../db/userTags.ts";
+import { createContentFlag } from "../db/contentFlags.ts";
 import { requireUser, type AuthedRequest } from "./auth.ts";
 
 const MAX_PHOTOS = 5;
 const MAX_PHOTO_BYTES = 2 * 1024 * 1024;
 
 const upsertSchema = z.object({
-  entityType: z.enum(["recipe", "drink", "restaurant"]),
+  entityType: z.enum(["recipe", "drink", "restaurant", "shop"]),
   entityId: z.string().min(1).max(200),
   entityName: z.string().min(1).max(200),
   countryCode: z.string().min(2).max(2),
   intent: z.enum(["want", "did"]),
   rating: z.number().int().min(0).max(5).nullable().optional(),
   reviewText: z.string().max(4000).nullable().optional(),
+});
+
+const flagSchema = z.object({
+  entityType: z.enum(["recipe", "drink", "restaurant", "shop"]),
+  entityId: z.string().min(1).max(200),
+  entityName: z.string().min(1).max(200),
+  countryCode: z.string().min(2).max(2),
+  reason: z.string().trim().min(3).max(2000),
 });
 
 const removePhotoSchema = z.object({
@@ -119,7 +128,8 @@ export function registerMeRoutes(app: Express): void {
       const entityType =
         req.query.entity_type === "recipe" ||
         req.query.entity_type === "drink" ||
-        req.query.entity_type === "restaurant"
+        req.query.entity_type === "restaurant" ||
+        req.query.entity_type === "shop"
           ? req.query.entity_type
           : undefined;
       const countryCode =
@@ -285,6 +295,29 @@ export function registerMeRoutes(app: Express): void {
     } catch (error) {
       console.error("Remove photo failed", error);
       res.status(500).json({ message: "Could not remove photo." });
+    }
+  });
+
+  app.post("/api/me/flags", requireUser, async (req, res) => {
+    const parsed = flagSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ message: "Invalid report payload." });
+      return;
+    }
+    try {
+      const user = (req as AuthedRequest).user!;
+      const flag = await createContentFlag({
+        userId: user.id,
+        entityType: parsed.data.entityType,
+        entityId: parsed.data.entityId,
+        entityName: parsed.data.entityName,
+        countryCode: parsed.data.countryCode,
+        reason: parsed.data.reason,
+      });
+      res.status(201).json({ flag });
+    } catch (error) {
+      console.error("Create content flag failed", error);
+      res.status(500).json({ message: "Could not submit report." });
     }
   });
 }

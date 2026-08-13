@@ -188,11 +188,12 @@ function Toast({
 }
 
 export function reviewTargetFromSuggestion(input: {
-  kind: "recipe" | "drink" | "restaurant";
+  kind: "recipe" | "drink" | "restaurant" | "shop";
   countryCode: string;
   recipe?: { id: string; name: string };
   drink?: { id?: string; name: string };
   restaurant?: { id: string; name: string };
+  shop?: { id: string; name: string };
 }): SuggestReviewTarget | null {
   if (input.kind === "recipe" && input.recipe) {
     return {
@@ -215,6 +216,14 @@ export function reviewTargetFromSuggestion(input: {
       entityType: "restaurant",
       entityId: input.restaurant.id,
       entityName: input.restaurant.name,
+      countryCode: input.countryCode,
+    };
+  }
+  if (input.kind === "shop" && input.shop) {
+    return {
+      entityType: "shop",
+      entityId: input.shop.id,
+      entityName: input.shop.name,
       countryCode: input.countryCode,
     };
   }

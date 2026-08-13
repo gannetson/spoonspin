@@ -229,7 +229,8 @@ export async function getUserTagSummary(userId: string): Promise<TagSummary> {
          )::int AS dishes_digested,
          COUNT(*) FILTER (WHERE entity_type = 'recipe')::int AS recipe,
          COUNT(*) FILTER (WHERE entity_type = 'drink')::int AS drink,
-         COUNT(*) FILTER (WHERE entity_type = 'restaurant')::int AS restaurant
+         COUNT(*) FILTER (WHERE entity_type = 'restaurant')::int AS restaurant,
+         COUNT(*) FILTER (WHERE entity_type = 'shop')::int AS shop
        FROM user_tags
        WHERE user_id = $1`,
       [userId],
@@ -256,6 +257,7 @@ export async function getUserTagSummary(userId: string): Promise<TagSummary> {
       recipe: Number(counts.recipe ?? 0),
       drink: Number(counts.drink ?? 0),
       restaurant: Number(counts.restaurant ?? 0),
+      shop: Number(counts.shop ?? 0),
     },
     level: {
       countriesTasted,

@@ -27,6 +27,7 @@ import { registerAuthRoutes } from "./routes/auth.ts";
 import { registerAdminCountryRoutes } from "./routes/adminCountry.ts";
 import { registerAdminImageRoutes } from "./routes/adminImages.ts";
 import { registerAdminReportRoutes } from "./routes/adminReports.ts";
+import { registerAdminFlagRoutes } from "./routes/adminFlags.ts";
 import { registerAdminUserRoutes } from "./routes/adminUsers.ts";
 import { registerContentRoutes } from "./routes/content.ts";
 import { registerSuggestionRoutes } from "./routes/suggestions.ts";
@@ -96,12 +97,29 @@ app.get("/api/health", async (_req, res) => {
   });
 });
 
+/** Non-secret client config (Awin ids are public in affiliate URLs). */
+app.get("/api/public-config", (_req, res) => {
+  const publisher =
+    process.env.AWIN_PUBLISHER_ID?.trim() ||
+    process.env.VITE_AWIN_PUBLISHER_ID?.trim() ||
+    "";
+  const mid =
+    process.env.AWIN_THUISBEZORGD_MID?.trim() ||
+    process.env.VITE_AWIN_THUISBEZORGD_MID?.trim() ||
+    "";
+  res.json({
+    awinPublisherId: publisher || null,
+    awinThuisbezorgdMid: mid || null,
+  });
+});
+
 registerAuthRoutes(app);
 registerContentRoutes(app);
 registerAdminUserRoutes(app);
 registerAdminCountryRoutes(app);
 registerAdminImageRoutes(app);
 registerAdminReportRoutes(app);
+registerAdminFlagRoutes(app);
 registerSuggestionRoutes(app);
 registerMeRoutes(app);
 

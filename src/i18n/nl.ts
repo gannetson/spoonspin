@@ -178,6 +178,10 @@ export const nl: Messages = {
   "cook.shops.openInMaps": "Open in Maps",
   "cook.shops.empty": "Nog geen speciaalzaken — stel er een voor die je kent.",
 
+  "shop.backToList": "Terug naar winkels",
+  "shop.notFound": "Winkel niet gevonden.",
+  "shop.openAria": "Open {name}",
+
   "recipe.backToMenu": "Terug naar menu",
   "recipe.print": "Recept printen",
   "recipe.iconicNationalDish": "Nationaal icoon",
@@ -403,6 +407,27 @@ export const nl: Messages = {
   "admin.kind.shop": "Winkel",
   "admin.review.backToOverview": "← Landenoverzicht",
 
+  "admin.flags.title": "Gemelde items",
+  "admin.flags.subtitle":
+    "Meldingen van gebruikers over verkeerde, verouderde of kapotte recepten, dranken, restaurants en winkels.",
+  "admin.flags.backToOverview": "← Landenoverzicht",
+  "admin.flags.toReview": "Community review →",
+  "admin.flags.filter.open": "Open",
+  "admin.flags.filter.resolved": "Opgelost",
+  "admin.flags.filter.dismissed": "Afgewezen",
+  "admin.flags.filter.all": "Alles",
+  "admin.flags.openCount": "{count} open melding",
+  "admin.flags.loading": "Meldingen laden…",
+  "admin.flags.empty": "Geen meldingen in dit filter.",
+  "admin.flags.reportedBy": "Gemeld door {who}",
+  "admin.flags.unknownUser": "Onbekende gebruiker",
+  "admin.flags.submitted": "Ingediend {datetime}",
+  "admin.flags.resolve": "Oplossen",
+  "admin.flags.dismiss": "Afwijzen",
+  "admin.flags.reopen": "Heropenen",
+  "admin.flags.error.load": "Kon meldingen niet laden.",
+  "admin.flags.error.update": "Kon melding niet bijwerken.",
+
   "admin.overview.title": "Landenoverzicht",
   "admin.overview.subtitle":
     "Recepten, restaurants, dranken en winkels per land.",
@@ -410,6 +435,7 @@ export const nl: Messages = {
   "admin.overview.error": "Kon landenoverzicht niet laden.",
   "admin.overview.empty": "Geen landen komen overeen met deze zoekopdracht.",
   "admin.overview.toReview": "Inzendingen reviewen",
+  "admin.overview.toFlags": "Meldingen",
   "admin.overview.toUsers": "Gebruikers",
   "admin.overview.toReports": "Rapporten",
   "admin.overview.search": "Zoeken",
@@ -513,6 +539,8 @@ export const nl: Messages = {
   "admin.country.reports.hint": "Verkeer, IPs en productgebruik",
   "admin.country.review": "Review",
   "admin.country.review.hint": "Beoordeel communityvoorstellen voor recepten, dranken, winkels en restaurants",
+  "admin.country.flags": "Meldingen",
+  "admin.country.flags.hint": "Gebruikersmeldingen over verkeerde of kapotte content",
   "admin.country.users": "Gebruikers",
   "admin.country.users.hint": "Bekijk accounts en wijzig rollen",
   "admin.country.replaceImage": "Afbeelding vervangen",
@@ -735,14 +763,39 @@ export const nl: Messages = {
   "tag.want.recipe": "Wil koken",
   "tag.want.drink": "Wil drinken",
   "tag.want.restaurant": "Wil gaan",
+  "tag.want.shop": "Wil bezoeken",
   "tag.did.recipe": "Heb gekookt",
   "tag.did.drink": "Heb gedronken",
   "tag.did.restaurant": "Ben geweest",
+  "tag.did.shop": "Heb bezocht",
   "tag.writeReview": "Schrijf een review",
   "tag.editReview": "Review bewerken",
+  "tag.report": "Meld",
+  "tag.reportAria": "Meld een probleem met {name}",
   "tag.ratingAria": "Jouw beoordeling",
   "tag.starAria": "Geef {rating} van 5 sterren",
   "tag.error.save": "Kon je tag niet opslaan.",
+
+  "report.kicker": "Probleem melden",
+  "report.title": "Wat klopt er niet aan {name}?",
+  "report.hint.recipe":
+    "Verkeerde ingrediënten, kapotte stappen, of iets anders mis met dit recept?",
+  "report.hint.drink":
+    "Onjuiste info, verkeerde pairing, of iets anders mis met deze drank?",
+  "report.hint.restaurant":
+    "Gesloten, verkeerd adres, nepvermelding, of iets anders mis?",
+  "report.hint.shop":
+    "Gesloten, verkeerd adres, slechte voorraadinfo, of iets anders mis?",
+  "report.reasonLabel": "Wat moeten we nakijken?",
+  "report.placeholder": "Beschrijf het probleem kort…",
+  "report.cancel": "Annuleren",
+  "report.submit": "Melding versturen",
+  "report.submitting": "Bezig…",
+  "report.closeAria": "Melding sluiten",
+  "report.error.tooShort": "Voeg iets meer detail toe (minstens een paar woorden).",
+  "report.error.save": "Kon melding niet versturen.",
+  "report.thanks":
+    "Bedankt — we hebben je melding over {name} ontvangen en bekijken die.",
 
   "review.kicker": "Jouw proefnotities",
   "review.title": "Review {name}",
@@ -779,6 +832,12 @@ export const nl: Messages = {
     "Dankjewel dat je je slok {name} deelde — genoteerd voor de volgende ronde!",
   "review.thanks.drink.high":
     "Dankjewel voor de perfecte pour van {name} — proost!",
+  "review.thanks.shop.low":
+    "Dankjewel voor je eerlijke notitie over {name} — dat helpt de volgende kok plannen.",
+  "review.thanks.shop.mid":
+    "Dankjewel dat je je bezoek aan {name} deelde — handige voorraadtips.",
+  "review.thanks.shop.high":
+    "Dankjewel dat je zo enthousiast bent over {name} — klinkt als een voorraadgoudmijn!",
 
   "review.guide.recipe.low":
     "Ai — keukenchaos? Vertel wat misging, zodat de volgende kok wijzer is.",
@@ -798,6 +857,12 @@ export const nl: Messages = {
     "Prima slok. Zou je ’m opnieuw bestellen bij een bepaald gerecht?",
   "review.guide.drink.high":
     "Perfecte pour! Wanneer drinken we dit, en hoe smaakt het?",
+  "review.guide.shop.low":
+    "Misgeschoten? Weinig voorraad, prijzen, of een lange rit voor weinig?",
+  "review.guide.shop.mid":
+    "Nuttige stop — wat was de moeite waard, en wat miste je?",
+  "review.guide.shop.high":
+    "Voorraadjackpot! Wat moeten we meenemen, en tips om de goede spullen te vinden?",
 
   "review.placeholder.recipe.low":
     "Ingrediënten moeilijk te vinden? Stappen onduidelijk? Smaak mis?",
@@ -814,6 +879,12 @@ export const nl: Messages = {
   "review.placeholder.drink.low": "Wat werkte niet voor jou?",
   "review.placeholder.drink.mid": "Zou je ’m bij iets anders serveren?",
   "review.placeholder.drink.high": "Beschrijf het perfecte moment voor dit drankje…",
+  "review.placeholder.shop.low":
+    "Wat miste er, was te duur, of moeilijk te vinden?",
+  "review.placeholder.shop.mid":
+    "Wat was prima — en wat maakt een volgende keer beter?",
+  "review.placeholder.shop.high":
+    "Beste vondsten, tip van het personeel, en waarom je terugkomt…",
 
   "review.chip.recipe.low.1": "Ik kon niet alle ingrediënten vinden.",
   "review.chip.recipe.low.2": "De stappen voelden zwaarder dan verwacht.",
@@ -842,6 +913,15 @@ export const nl: Messages = {
   "review.chip.drink.high.1": "Perfect bij pittig eten.",
   "review.chip.drink.high.2": "Fris, verfrissend, opnieuw bestellen.",
   "review.chip.drink.high.3": "Bewaar dit voor een toast.",
+  "review.chip.shop.low.1": "Beperkt assortiment voor wat ik zocht.",
+  "review.chip.shop.low.2": "Prijzen voelden stevig voor het aanbod.",
+  "review.chip.shop.low.3": "Moeilijk te vinden of slecht bewegwijzerd.",
+  "review.chip.shop.mid.1": "Goede basics, specialty-items misten.",
+  "review.chip.shop.mid.2": "Behulpzaam personeel, gemiddeld assortiment.",
+  "review.chip.shop.mid.3": "De moeite waard als je toch in de buurt bent.",
+  "review.chip.shop.high.1": "Vraag het personeel — zij kennen de goede spullen.",
+  "review.chip.shop.high.2": "Ruim aanbod van lastig te vinden ingrediënten.",
+  "review.chip.shop.high.3": "Mijn vaste adres voor deze keuken.",
 
   "levels.firstBite": "Eerste hap",
   "levels.curiousFork": "Nieuwsgierige vork",
@@ -883,6 +963,7 @@ export const nl: Messages = {
   "profile.filter.recipe": "Recepten",
   "profile.filter.drink": "Dranken",
   "profile.filter.restaurant": "Restaurants",
+  "profile.filter.shop": "Winkels",
   "profile.filter.country": "Land",
   "profile.filter.countryAll": "Alle landen",
   "profile.filter.rating": "Min. rating",

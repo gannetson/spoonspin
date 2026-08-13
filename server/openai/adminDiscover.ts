@@ -198,18 +198,75 @@ const shopsDiscoverSchema = z.object({
   shops: z.array(shopItemSchema).min(1).max(20),
 });
 
+const DRINK_TYPES = [
+  "beer",
+  "wine",
+  "spirit",
+  "cocktail",
+  "soft-drink",
+  "tea",
+  "coffee",
+] as const;
+
+type DiscoverDrinkType = (typeof DRINK_TYPES)[number];
+
+/** Map common LLM drink-type labels onto our enum. */
+function normalizeDrinkType(raw: unknown): DiscoverDrinkType | null {
+  if (typeof raw !== "string") return null;
+  const key = raw.trim().toLowerCase().replace(/_/g, "-").replace(/\s+/g, "-");
+  if ((DRINK_TYPES as readonly string[]).includes(key)) {
+    return key as DiscoverDrinkType;
+  }
+  if (
+    /^(lager|ale|stout|porter|pils|pilsner|ipa|cider|mead)$/.test(key) ||
+    key.includes("beer")
+  ) {
+    return "beer";
+  }
+  if (
+    /^(red-wine|white-wine|rose|rosé|sparkling|champagne|prosecco|cava)$/.test(
+      key,
+    ) ||
+    key.includes("wine")
+  ) {
+    return "wine";
+  }
+  if (
+    /^(liqueur|liquor|aperitif|digestif|schnapps|brandy|whisky|whiskey|vodka|gin|rum|tequila|sake|soju|shochu|arak|ouzo|grappa|cognac|armagnac|aquavit|jenever|genever|rakija|palinka)$/.test(
+      key,
+    ) ||
+    key.includes("spirit")
+  ) {
+    return "spirit";
+  }
+  if (
+    /^(mixed-drink|punch|highball|mocktail)$/.test(key) ||
+    key.includes("cocktail")
+  ) {
+    return key.includes("mocktail") ? "soft-drink" : "cocktail";
+  }
+  if (
+    /^(soda|juice|lemonade|soft|softdrink|non-alcoholic|nonalcoholic|water|kombucha|ayran|lassi)$/.test(
+      key,
+    ) ||
+    key.includes("soft")
+  ) {
+    return "soft-drink";
+  }
+  if (key.includes("tea") || key === "chai" || key === "mate") return "tea";
+  if (key.includes("coffee") || key === "espresso" || key === "cafe") {
+    return "coffee";
+  }
+  return null;
+}
+
 const drinkItemSchema = z.object({
   name: z.string().min(1),
   localName: optionalString,
-  type: z.enum([
-    "beer",
-    "wine",
-    "spirit",
-    "cocktail",
-    "soft-drink",
-    "tea",
-    "coffee",
-  ]),
+  type: z.preprocess(
+    (value) => normalizeDrinkType(value) ?? value,
+    z.enum(DRINK_TYPES),
+  ),
   alcoholic: z.boolean(),
   description: z.string().min(20),
   grape: optionalString,
@@ -908,10 +965,57 @@ JSON shape:
 }`,
   );
 
-  const parsed = drinksDiscoverSchema.parse(raw);
+  const parsed = drinksDiscoverSchema.safeParse(raw);
+  if (!parsed.success) {
+    // Soft-parse: keep valid drinks, drop items with bad types/fields.
+    const row =
+      raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+    const notes =
+      typeof row.notes === "string" && row.notes.trim()
+        ? row.notes.trim()
+        : `Drinks from ${input.countryName}.`;
+    const list = Array.isArray(row.drinks) ? row.drinks : [];
+    const kept: z.infer<typeof drinkItemSchema>[] = [];
+    for (const item of list) {
+      const one = drinkItemSchema.safeParse(item);
+      if (one.success) kept.push(one.data);
+      else {
+        const name =
+          item && typeof item === "object" && "name" in item
+            ? String((item as { name: unknown }).name)
+            : "(unnamed)";
+        console.warn(
+          `Skipping invalid discovered drink "${name}":`,
+          one.error.issues[0]?.message ?? one.error.message,
+        );
+      }
+    }
+    if (kept.length === 0) {
+      throw parsed.error;
+    }
+    return await materializeDiscoveredDrinks(input, notes, kept);
+  }
+
+  return await materializeDiscoveredDrinks(
+    input,
+    parsed.data.notes,
+    parsed.data.drinks,
+  );
+}
+
+async function materializeDiscoveredDrinks(
+  input: {
+    countryCode: string;
+    countryName: string;
+    query?: string;
+    existingNames: string[];
+  },
+  notes: string,
+  items: z.infer<typeof drinkItemSchema>[],
+): Promise<{ notes: string; drinks: Drink[] }> {
   const drinks: Drink[] = [];
 
-  for (const item of parsed.drinks) {
+  for (const item of items) {
     const drink: Drink = {
       name: item.name,
       localName: item.localName,
@@ -955,7 +1059,7 @@ JSON shape:
     drinks.push(drink);
   }
 
-  return { notes: parsed.notes, drinks };
+  return { notes, drinks };
 }
 
 export function drinkImageSearchQueries(

@@ -565,7 +565,7 @@ async function migrate(db: Pool) {
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       CONSTRAINT user_tags_entity_type_check
-        CHECK (entity_type IN ('recipe', 'drink', 'restaurant')),
+        CHECK (entity_type IN ('recipe', 'drink', 'restaurant', 'shop')),
       CONSTRAINT user_tags_intent_check
         CHECK (intent IN ('want', 'did')),
       CONSTRAINT user_tags_rating_check
@@ -580,6 +580,42 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_user_tags_user_country
       ON user_tags (user_id, country_code);
+  `,
+  );
+
+  await migrateSql(
+    db,
+    `
+    ALTER TABLE user_tags DROP CONSTRAINT IF EXISTS user_tags_entity_type_check;
+    ALTER TABLE user_tags ADD CONSTRAINT user_tags_entity_type_check
+      CHECK (entity_type IN ('recipe', 'drink', 'restaurant', 'shop'));
+  `,
+  );
+
+  await migrateSql(
+    db,
+    `
+    CREATE TABLE IF NOT EXISTS content_flags (
+      id TEXT PRIMARY KEY,
+      user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      entity_type TEXT NOT NULL,
+      entity_id TEXT NOT NULL,
+      entity_name TEXT NOT NULL,
+      country_code TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      status TEXT NOT NULL DEFAULT 'open',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      resolved_at TIMESTAMPTZ,
+      CONSTRAINT content_flags_entity_type_check
+        CHECK (entity_type IN ('recipe', 'drink', 'restaurant', 'shop')),
+      CONSTRAINT content_flags_status_check
+        CHECK (status IN ('open', 'resolved', 'dismissed'))
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_content_flags_status_created
+      ON content_flags (status, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_content_flags_entity
+      ON content_flags (entity_type, entity_id);
   `,
   );
 

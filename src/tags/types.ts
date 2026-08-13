@@ -1,4 +1,4 @@
-export type TagEntityType = "recipe" | "drink" | "restaurant";
+export type TagEntityType = "recipe" | "drink" | "restaurant" | "shop";
 export type TagIntent = "want" | "did";
 
 export type UserTag = {
@@ -30,6 +30,7 @@ export type TagSummary = {
     recipe: number;
     drink: number;
     restaurant: number;
+    shop: number;
   };
   level: {
     countriesTasted: number;

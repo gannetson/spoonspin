@@ -5,6 +5,7 @@ import {
   Activity,
   ChevronDown,
   ClipboardList,
+  Flag,
   LayoutGrid,
   Users,
 } from "lucide-react";
@@ -21,7 +22,7 @@ export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
   const t = useT();
   const menuId = useId();
   const { open, setOpen, rootRef, triggerRef, panelRef, position } =
-    usePortalMenu({ estimatedHeight: 280 });
+    usePortalMenu({ estimatedHeight: 340 });
 
   const menu =
     open && position
@@ -94,6 +95,22 @@ export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
                 </span>
                 <span className="mt-0.5 block text-xs text-ink-soft">
                   {t("admin.country.review.hint")}
+                </span>
+              </span>
+            </Link>
+            <Link
+              to="/admin/flags"
+              role="menuitem"
+              onClick={() => setOpen(false)}
+              className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
+            >
+              <Flag className="mt-0.5 size-4 shrink-0 text-tomato" />
+              <span>
+                <span className="block font-semibold text-ink">
+                  {t("admin.country.flags")}
+                </span>
+                <span className="mt-0.5 block text-xs text-ink-soft">
+                  {t("admin.country.flags.hint")}
                 </span>
               </span>
             </Link>

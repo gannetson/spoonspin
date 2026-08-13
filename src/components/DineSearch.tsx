@@ -11,6 +11,7 @@ import {
 import type { Country, OrderPlatform } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { useConsent } from "@/consent/ConsentContext";
+import { usePublicConfig } from "@/lib/usePublicConfig";
 import { fetchRestaurants } from "@/restaurants/client";
 import { getOrderOptions } from "@/content/countries/menuAccessors";
 import { deliveryPlatformLinks, resolveOrderOptionHref } from "@/restaurants/deliveryLinks";
@@ -102,6 +103,7 @@ export function DineSearch({
 }: DineSearchProps) {
   const t = useT();
   const { marketingAllowed } = useConsent();
+  const publicConfig = usePublicConfig();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
@@ -352,7 +354,14 @@ export function DineSearch({
         cityOrPostcode,
         marketingAllowed,
       }),
-    [country.code, country.name, cityOrPostcode, marketingAllowed],
+    [
+      country.code,
+      country.name,
+      cityOrPostcode,
+      marketingAllowed,
+      publicConfig.awinPublisherId,
+      publicConfig.awinThuisbezorgdMid,
+    ],
   );
 
   return (

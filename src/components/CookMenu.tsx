@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { ExternalLink, MapPin, Plus, Store, UtensilsCrossed } from "lucide-react";
+import { MapPin, Plus, UtensilsCrossed } from "lucide-react";
 import type { Country, Drink, Recipe, RecipeCategory, SpecialtyShop } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { isEditorOrAdmin } from "@/auth/roles";
@@ -50,6 +50,7 @@ type CookMenuProps = {
   onCommunityShopsChange: (shops: SpecialtyShop[]) => void;
   onCountryUpdated: (country: Country) => void;
   onOpenRecipe: (recipe: Recipe) => void;
+  onOpenShop: (shop: SpecialtyShop) => void;
 };
 
 type CookTab = "dinner" | "recipes" | "drinks" | "shops";
@@ -131,6 +132,7 @@ export function CookMenu({
   onCommunityShopsChange,
   onCountryUpdated,
   onOpenRecipe,
+  onOpenShop,
 }: CookMenuProps) {
   const t = useT();
   const { user } = useAuth();
@@ -281,6 +283,13 @@ export function CookMenu({
             );
           } else if (result.kind === "shop") {
             onCommunityShopsChange([result.shop, ...communityShops]);
+            setReviewTarget(
+              reviewTargetFromSuggestion({
+                kind: "shop",
+                countryCode: country.code,
+                shop: result.shop,
+              }),
+            );
           }
         }}
       />
@@ -769,13 +778,45 @@ export function CookMenu({
               {shops.map((shop) => (
                 <li
                   key={shop.id}
-                  className="relative rounded-2xl bg-cream p-5 ring-1 ring-ink/10"
+                  className="group relative overflow-hidden rounded-2xl bg-cream ring-1 ring-ink/10 transition hover:ring-tomato/35"
                 >
-                  {communityShopIds.has(shop.id) ? (
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
-                      {t("cook.communitySuggestion")}
-                    </p>
-                  ) : null}
+                  <button
+                    type="button"
+                    onClick={() => onOpenShop(shop)}
+                    aria-label={t("shop.openAria", { name: shop.name })}
+                    className="w-full cursor-pointer p-5 text-left"
+                  >
+                    {communityShopIds.has(shop.id) ? (
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
+                        {t("cook.communitySuggestion")}
+                      </p>
+                    ) : null}
+                    <div className={isAdmin ? "pr-12" : undefined}>
+                      <div className="space-y-1.5">
+                        <h3 className="font-display text-xl leading-tight text-burgundy transition group-hover:text-tomato sm:text-2xl">
+                          {shop.name}
+                        </h3>
+                        <p className="flex items-start gap-1.5 text-sm text-ink-soft">
+                          <MapPin
+                            aria-hidden="true"
+                            className="mt-0.5 size-3.5 shrink-0"
+                          />
+                          <span className="line-clamp-1">
+                            {shop.address}
+                            {shop.city ? ` · ${shop.city}` : ""}
+                          </span>
+                        </p>
+                      </div>
+                      <p className="mt-2 text-sm font-semibold text-ink">
+                        {shop.specialty}
+                      </p>
+                      {shop.notes ? (
+                        <p className="mt-1 line-clamp-2 text-sm text-ink-soft">
+                          {shop.notes}
+                        </p>
+                      ) : null}
+                    </div>
+                  </button>
                   {isAdmin ? (
                     <AdminItemMenu
                       className="absolute right-3 top-3"
@@ -796,51 +837,14 @@ export function CookMenu({
                       }}
                     />
                   ) : null}
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className={isAdmin ? "pr-12" : undefined}>
-                      <p className="inline-flex items-center gap-2 font-display text-xl text-burgundy">
-                        <Store aria-hidden="true" className="size-5" />
-                        {shop.name}
-                      </p>
-                      <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
-                        <MapPin
-                          aria-hidden="true"
-                          className="mt-0.5 size-4 shrink-0"
-                        />
-                        <span>
-                          {shop.address}
-                          {shop.city ? ` · ${shop.city}` : ""}
-                        </span>
-                      </p>
-                      <p className="mt-2 text-sm font-semibold text-ink">
-                        {shop.specialty}
-                      </p>
-                      {shop.notes ? (
-                        <p className="mt-1 text-sm text-ink-soft">{shop.notes}</p>
-                      ) : null}
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      {shop.website ? (
-                        <a
-                          href={shop.website}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
-                        >
-                          {t("cook.shops.website")}
-                          <ExternalLink aria-hidden="true" className="size-4" />
-                        </a>
-                      ) : null}
-                      <a
-                        href={shop.mapsUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                      >
-                        {t("cook.shops.openInMaps")}
-                        <ExternalLink aria-hidden="true" className="size-4" />
-                      </a>
-                    </div>
+                  <div className="border-t border-ink/10 px-4 py-2.5">
+                    <ItemTagBar
+                      entityType="shop"
+                      entityId={shop.id}
+                      entityName={shop.name}
+                      countryCode={country.code}
+                      variant="compact"
+                    />
                   </div>
                 </li>
               ))}

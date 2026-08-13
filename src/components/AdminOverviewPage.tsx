@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Activity, ClipboardList, LoaderCircle, LogIn, Users } from "lucide-react";
+import { Activity, ClipboardList, Flag, LoaderCircle, LogIn, Users } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
 import { useAuthModal } from "@/auth/AuthModalContext";
 import {
@@ -106,6 +106,13 @@ export function AdminOverviewPage() {
               >
                 <Users className="size-4" aria-hidden="true" />
                 {t("admin.overview.toUsers")}
+              </Link>
+              <Link
+                to="/admin/flags"
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink/10 px-4 text-sm font-semibold text-ink"
+              >
+                <Flag className="size-4" aria-hidden="true" />
+                {t("admin.overview.toFlags")}
               </Link>
               <Link
                 to="/admin/review"

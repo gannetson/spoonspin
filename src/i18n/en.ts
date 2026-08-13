@@ -177,6 +177,10 @@ export const en: Messages = {
   "cook.shops.openInMaps": "Open in Maps",
   "cook.shops.empty": "No specialty shops listed yet — suggest one you know.",
 
+  "shop.backToList": "Back to shops",
+  "shop.notFound": "Shop not found.",
+  "shop.openAria": "Open {name}",
+
   "recipe.backToMenu": "Back to menu",
   "recipe.print": "Print recipe",
   "recipe.iconicNationalDish": "Iconic national dish",
@@ -399,6 +403,27 @@ export const en: Messages = {
   "admin.kind.shop": "Shop",
   "admin.review.backToOverview": "← Country overview",
 
+  "admin.flags.title": "Flagged items",
+  "admin.flags.subtitle":
+    "Reports from users about wrong, outdated, or broken recipes, drinks, restaurants, and shops.",
+  "admin.flags.backToOverview": "← Country overview",
+  "admin.flags.toReview": "Community review →",
+  "admin.flags.filter.open": "Open",
+  "admin.flags.filter.resolved": "Resolved",
+  "admin.flags.filter.dismissed": "Dismissed",
+  "admin.flags.filter.all": "All",
+  "admin.flags.openCount": "{count} open report",
+  "admin.flags.loading": "Loading flags…",
+  "admin.flags.empty": "No flags in this filter.",
+  "admin.flags.reportedBy": "Reported by {who}",
+  "admin.flags.unknownUser": "Unknown user",
+  "admin.flags.submitted": "Submitted {datetime}",
+  "admin.flags.resolve": "Resolve",
+  "admin.flags.dismiss": "Dismiss",
+  "admin.flags.reopen": "Reopen",
+  "admin.flags.error.load": "Could not load flags.",
+  "admin.flags.error.update": "Could not update flag.",
+
   "admin.overview.title": "Country overview",
   "admin.overview.subtitle":
     "Recipes, restaurants, drinks, and shops per country.",
@@ -406,6 +431,7 @@ export const en: Messages = {
   "admin.overview.error": "Could not load country overview.",
   "admin.overview.empty": "No countries match this search.",
   "admin.overview.toReview": "Review submissions",
+  "admin.overview.toFlags": "Flags",
   "admin.overview.toUsers": "Users",
   "admin.overview.toReports": "Reports",
   "admin.overview.search": "Search",
@@ -508,6 +534,8 @@ export const en: Messages = {
   "admin.country.reports.hint": "Traffic, IPs, and product usage",
   "admin.country.review": "Review",
   "admin.country.review.hint": "Review community recipe, drink, shop, and restaurant suggestions",
+  "admin.country.flags": "Flags",
+  "admin.country.flags.hint": "User reports of wrong or broken content",
   "admin.country.users": "Users",
   "admin.country.users.hint": "View accounts and change roles",
   "admin.country.replaceImage": "Replace image",
@@ -724,14 +752,39 @@ export const en: Messages = {
   "tag.want.recipe": "Want to cook",
   "tag.want.drink": "Want to drink",
   "tag.want.restaurant": "Want to go",
+  "tag.want.shop": "Want to visit",
   "tag.did.recipe": "Did cook",
   "tag.did.drink": "Did drink",
   "tag.did.restaurant": "Did go",
+  "tag.did.shop": "Did visit",
   "tag.writeReview": "Write a review",
   "tag.editReview": "Edit review",
+  "tag.report": "Report",
+  "tag.reportAria": "Report a problem with {name}",
   "tag.ratingAria": "Your rating",
   "tag.starAria": "Rate {rating} out of 5",
   "tag.error.save": "Could not save your tag.",
+
+  "report.kicker": "Report a problem",
+  "report.title": "What’s wrong with {name}?",
+  "report.hint.recipe":
+    "Wrong ingredients, broken steps, or something else off about this recipe?",
+  "report.hint.drink":
+    "Incorrect info, wrong pairing, or something else off about this drink?",
+  "report.hint.restaurant":
+    "Closed, wrong address, fake listing, or something else off?",
+  "report.hint.shop":
+    "Closed, wrong address, poor stock info, or something else off?",
+  "report.reasonLabel": "What should we look at?",
+  "report.placeholder": "Describe the problem briefly…",
+  "report.cancel": "Cancel",
+  "report.submit": "Submit report",
+  "report.submitting": "Submitting…",
+  "report.closeAria": "Close report",
+  "report.error.tooShort": "Please add a bit more detail (at least a few words).",
+  "report.error.save": "Could not submit report.",
+  "report.thanks":
+    "Thanks — we received your report about {name} and will review it.",
 
   "review.kicker": "Your tasting notes",
   "review.title": "Review {name}",
@@ -768,6 +821,12 @@ export const en: Messages = {
     "Thank you for sharing your sip of {name} — noted for the next round!",
   "review.thanks.drink.high":
     "Thank you for sharing the perfect pour of {name} — cheers!",
+  "review.thanks.shop.low":
+    "Thank you for the candid note on {name} — that helps the next cook plan their run.",
+  "review.thanks.shop.mid":
+    "Thank you for sharing your visit to {name} — useful stock tips.",
+  "review.thanks.shop.high":
+    "Thank you for raving about {name} — sounds like a pantry goldmine!",
 
   "review.guide.recipe.low":
     "Oof — kitchen chaos? Tell us what tripped you up so the next cook is wiser.",
@@ -787,6 +846,12 @@ export const en: Messages = {
     "Decent sip. Would you order it again with a certain dish?",
   "review.guide.drink.high":
     "Perfect pour! When should we drink this, and what does it taste like?",
+  "review.guide.shop.low":
+    "Missed the mark? Stock gaps, prices, or a long trek for little reward?",
+  "review.guide.shop.mid":
+    "Useful stop — what was worth buying, and what was missing?",
+  "review.guide.shop.high":
+    "Pantry jackpot! What should we grab, and any tips for finding the good stuff?",
 
   "review.placeholder.recipe.low":
     "Ingredients hard to find? Steps confusing? Flavour off?",
@@ -803,6 +868,12 @@ export const en: Messages = {
   "review.placeholder.drink.low": "What didn’t work for you?",
   "review.placeholder.drink.mid": "Would you pair it with something else?",
   "review.placeholder.drink.high": "Describe the perfect pour moment…",
+  "review.placeholder.shop.low":
+    "What was missing, overpriced, or hard to find?",
+  "review.placeholder.shop.mid":
+    "What was solid — and what would make a return trip better?",
+  "review.placeholder.shop.high":
+    "Best finds, staff tips, and why you’ll go back…",
 
   "review.chip.recipe.low.1": "I couldn’t find all the ingredients.",
   "review.chip.recipe.low.2": "The steps felt harder than expected.",
@@ -831,6 +902,15 @@ export const en: Messages = {
   "review.chip.drink.high.1": "Perfect with spicy food.",
   "review.chip.drink.high.2": "Crisp, refreshing, repeat-worthy.",
   "review.chip.drink.high.3": "Save this for a celebration toast.",
+  "review.chip.shop.low.1": "Limited stock for what I needed.",
+  "review.chip.shop.low.2": "Prices felt steep for the range.",
+  "review.chip.shop.low.3": "Hard to find or poorly signed.",
+  "review.chip.shop.mid.1": "Good basics, missing specialty items.",
+  "review.chip.shop.mid.2": "Helpful staff, average selection.",
+  "review.chip.shop.mid.3": "Worth it if you’re already nearby.",
+  "review.chip.shop.high.1": "Ask staff — they know the good stuff.",
+  "review.chip.shop.high.2": "Wide range of hard-to-find ingredients.",
+  "review.chip.shop.high.3": "My go-to for this cuisine’s pantry.",
 
   "levels.firstBite": "First Bite",
   "levels.curiousFork": "Curious Fork",
@@ -871,6 +951,7 @@ export const en: Messages = {
   "profile.filter.recipe": "Recipes",
   "profile.filter.drink": "Drinks",
   "profile.filter.restaurant": "Restaurants",
+  "profile.filter.shop": "Shops",
   "profile.filter.country": "Country",
   "profile.filter.countryAll": "All countries",
   "profile.filter.rating": "Min rating",

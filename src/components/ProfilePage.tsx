@@ -419,6 +419,7 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                   value: "restaurant",
                   label: t("profile.filter.restaurant"),
                 },
+                { value: "shop", label: t("profile.filter.shop") },
               ]}
             />
             <label className="block text-sm">
@@ -487,7 +488,9 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                     ? `/?country=${tag.countryCode}&mode=dine&restaurant=${encodeURIComponent(tag.entityId)}`
                     : tag.entityType === "recipe"
                       ? `/?country=${tag.countryCode}&mode=cook&recipe=${encodeURIComponent(tag.entityId)}`
-                      : `/?country=${tag.countryCode}&mode=cook`;
+                      : tag.entityType === "shop"
+                        ? `/?country=${tag.countryCode}&mode=cook&shop=${encodeURIComponent(tag.entityId)}`
+                        : `/?country=${tag.countryCode}&mode=cook`;
                 return (
                   <li
                     key={tag.id}

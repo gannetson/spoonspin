@@ -4,6 +4,7 @@ import { useAuth } from "@/auth/AuthContext";
 import { useAuthModal } from "@/auth/AuthModalContext";
 import {
   getRecipeFromCountry,
+  getSpecialtyShops,
   setRuntimeCountries,
 } from "@/content/countries";
 import { fetchCountries } from "@/content/client";
@@ -22,6 +23,7 @@ import { HomeProgressCards } from "@/components/HomeProgressCards";
 import { AdminNavMenu } from "@/components/AdminNavMenu";
 import { RecipeView } from "@/components/RecipeView";
 import { RestaurantView } from "@/components/RestaurantView";
+import { ShopView } from "@/components/ShopView";
 import { ShareButton } from "@/components/ShareButton";
 import { FlagSpinner, SpinSpoonButton } from "@/components/SpinSpoonButton";
 import {
@@ -67,6 +69,7 @@ export default function App() {
   const countryCode = searchParams.get("country")?.toLowerCase() ?? null;
   const mode = parseMode(searchParams.get("mode"));
   const recipeId = searchParams.get("recipe");
+  const shopId = searchParams.get("shop");
   const restaurantId = searchParams.get("restaurant");
   const [dineRestaurantCache, setDineRestaurantCache] =
     useState<Restaurant | null>(null);
@@ -134,6 +137,12 @@ export default function App() {
         communityRecipes.find((recipe) => recipe.id === recipeId))
       : undefined;
 
+  const selectedShop =
+    selectedCountry && shopId && !recipeId
+      ? (getSpecialtyShops(selectedCountry).find((shop) => shop.id === shopId) ??
+        communityShops.find((shop) => shop.id === shopId))
+      : undefined;
+
   const [spinning, setSpinning] = useState(false);
   const [spinNames, setSpinNames] = useState<{ flag: string; name: string }[]>([]);
   const [announcement, setAnnouncement] = useState("");
@@ -160,6 +169,7 @@ export default function App() {
       country?: string;
       mode?: AppMode;
       recipe?: string | null;
+      shop?: string | null;
       restaurant?: string | null;
     }) => {
       setSearchParams(
@@ -170,6 +180,8 @@ export default function App() {
           else if (next.mode) params.set("mode", next.mode);
           if (next.recipe === null) params.delete("recipe");
           else if (next.recipe) params.set("recipe", next.recipe);
+          if (next.shop === null) params.delete("shop");
+          else if (next.shop) params.set("shop", next.shop);
           if (next.restaurant === null) params.delete("restaurant");
           else if (next.restaurant) params.set("restaurant", next.restaurant);
           return params;
@@ -190,16 +202,18 @@ export default function App() {
     if (cookReadyCountries.length === 0) return;
     setFallbackNotice(null);
     setSpinning(true);
-    setSearchParams(
-      (prev) => {
-        if (!prev.get("recipe") && !prev.get("restaurant")) return prev;
-        const params = new URLSearchParams(prev);
-        params.delete("recipe");
-        params.delete("restaurant");
-        return params;
-      },
-      { replace: true },
-    );
+      setSearchParams(
+        (prev) => {
+          if (!prev.get("recipe") && !prev.get("restaurant") && !prev.get("shop"))
+            return prev;
+          const params = new URLSearchParams(prev);
+          params.delete("recipe");
+          params.delete("restaurant");
+          params.delete("shop");
+          return params;
+        },
+        { replace: true },
+      );
     const pool = cookReadyCountries.map((c) => ({
       flag: c.flag,
       name: c.name,
@@ -278,16 +292,39 @@ export default function App() {
   }, []);
 
   const openRecipe = (recipe: Recipe) => {
-    updateParams({ mode: "cook", recipe: recipe.id, restaurant: null });
+    updateParams({
+      mode: "cook",
+      recipe: recipe.id,
+      shop: null,
+      restaurant: null,
+    });
   };
 
   const closeRecipe = () => {
     updateParams({ mode: "cook", recipe: null });
   };
 
+  const openShop = (shop: SpecialtyShop) => {
+    updateParams({
+      mode: "cook",
+      shop: shop.id,
+      recipe: null,
+      restaurant: null,
+    });
+  };
+
+  const closeShop = () => {
+    updateParams({ mode: "cook", shop: null });
+  };
+
   const openRestaurant = (restaurant: Restaurant) => {
     setDineRestaurantCache(restaurant);
-    updateParams({ mode: "dine", restaurant: restaurant.id, recipe: null });
+    updateParams({
+      mode: "dine",
+      restaurant: restaurant.id,
+      recipe: null,
+      shop: null,
+    });
   };
 
   const closeRestaurant = () => {
@@ -303,6 +340,12 @@ export default function App() {
       updateParams({ restaurant: null });
     }
   }, [mode, restaurantId, updateParams]);
+
+  useEffect(() => {
+    if (mode !== "cook" && (recipeId || shopId)) {
+      updateParams({ recipe: null, shop: null });
+    }
+  }, [mode, recipeId, shopId, updateParams]);
 
   const showHome = !selectedCountry && !spinning && !countriesLoading;
   const showCompactHeader = !showHome;
@@ -500,7 +543,7 @@ export default function App() {
               />
             </div>
 
-            {mode === "cook" && !selectedRecipe ? (
+            {mode === "cook" && !selectedRecipe && !selectedShop ? (
               <CookMenu
                 country={selectedCountry}
                 communityRecipes={communityRecipes}
@@ -511,6 +554,7 @@ export default function App() {
                 onCommunityShopsChange={setCommunityShops}
                 onCountryUpdated={handleCountryUpdated}
                 onOpenRecipe={openRecipe}
+                onOpenShop={openShop}
               />
             ) : null}
 
@@ -528,6 +572,32 @@ export default function App() {
                 }
                 onBack={closeRecipe}
               />
+            ) : null}
+
+            {mode === "cook" && selectedShop ? (
+              <ShopView
+                country={selectedCountry}
+                shop={selectedShop}
+                community={communityShops.some(
+                  (item) => item.id === selectedShop.id,
+                )}
+                onCountryUpdated={handleCountryUpdated}
+                onBack={closeShop}
+                onRemoved={closeShop}
+              />
+            ) : null}
+
+            {mode === "cook" && shopId && !selectedShop && !selectedRecipe ? (
+              <div className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10">
+                <p className="text-ink-soft">{t("shop.notFound")}</p>
+                <button
+                  type="button"
+                  onClick={closeShop}
+                  className="mt-4 text-sm font-semibold text-tomato underline-offset-2 hover:underline"
+                >
+                  {t("shop.backToList")}
+                </button>
+              </div>
             ) : null}
 
             {mode === "dine" && restaurantId ? (

@@ -1,12 +1,18 @@
 /** Thuisbezorgd.nl NL publishers programme on Awin. */
+import { getPublicConfig } from "../lib/publicConfig.ts";
+
 export const AWIN_THUISBEZORGD_MID = "10510";
 
 function publisherId(): string {
+  const runtime = getPublicConfig().awinPublisherId?.trim();
+  if (runtime) return runtime;
   const raw = import.meta.env.VITE_AWIN_PUBLISHER_ID;
   return typeof raw === "string" ? raw.trim() : "";
 }
 
 function advertiserMid(): string {
+  const runtime = getPublicConfig().awinThuisbezorgdMid?.trim();
+  if (runtime) return runtime;
   const raw = import.meta.env.VITE_AWIN_THUISBEZORGD_MID;
   if (typeof raw === "string" && raw.trim()) return raw.trim();
   return AWIN_THUISBEZORGD_MID;

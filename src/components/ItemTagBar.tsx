@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { Bookmark, Check, MessageSquareText, Star, X } from "lucide-react";
+import { Bookmark, Check, Flag, MessageSquareText, Star, X } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
 import { useAuthModal } from "@/auth/AuthModalContext";
+import { ReportModal } from "@/components/ReportModal";
 import { ReviewModal } from "@/components/ReviewModal";
+import { submitContentFlag } from "@/flags/client";
 import { useT } from "@/i18n/LocaleContext";
 import { useTagsOptional } from "@/tags/TagsContext";
 import {
@@ -46,6 +48,8 @@ export function ItemTagBar({
   const [error, setError] = useState<string | null>(null);
   const [reviewOpen, setReviewOpen] = useState(false);
   const [savingReview, setSavingReview] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [savingReport, setSavingReport] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   const fromCtx = tagsCtx?.tagFor(entityType, entityId, countryCode);
@@ -233,6 +237,16 @@ export function ItemTagBar({
           <Check className="size-3.5" aria-hidden="true" />
           {didLabel}
         </button>
+        <button
+          type="button"
+          disabled={busy || savingReport}
+          onClick={() => setReportOpen(true)}
+          className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold text-ink-soft hover:bg-parchment hover:text-tomato sm:text-sm"
+          aria-label={t("tag.reportAria", { name: entityName })}
+        >
+          <Flag className="size-3.5" aria-hidden="true" />
+          {t("tag.report")}
+        </button>
 
         {tag?.intent === "did" || variant === "full" ? starRow : null}
 
@@ -295,6 +309,30 @@ export function ItemTagBar({
             : await removeTagPhoto(tag.id, url);
           setLocalTag(saved);
           return saved;
+        }}
+      />
+
+      <ReportModal
+        open={reportOpen}
+        entityType={entityType}
+        entityName={entityName}
+        saving={savingReport}
+        onClose={() => setReportOpen(false)}
+        onSubmit={async (reason) => {
+          setSavingReport(true);
+          try {
+            await submitContentFlag({
+              entityType,
+              entityId,
+              entityName,
+              countryCode,
+              reason,
+            });
+            setReportOpen(false);
+            setToast(t("report.thanks", { name: entityName }));
+          } finally {
+            setSavingReport(false);
+          }
         }}
       />
 

@@ -2,13 +2,25 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   AWIN_THUISBEZORGD_MID,
   wrapThuisbezorgdAffiliateUrl,
-} from "@/restaurants/affiliateLinks";
+} from "./affiliateLinks";
+import { getPublicConfig } from "../lib/publicConfig";
+
+vi.mock("../lib/publicConfig", () => ({
+  getPublicConfig: vi.fn(() => ({
+    awinPublisherId: null,
+    awinThuisbezorgdMid: null,
+  })),
+}));
 
 const TB_URL = "https://www.thuisbezorgd.nl/bestel/amsterdam/italiaans";
 
 describe("wrapThuisbezorgdAffiliateUrl", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.mocked(getPublicConfig).mockReturnValue({
+      awinPublisherId: null,
+      awinThuisbezorgdMid: null,
+    });
   });
 
   it("returns the destination when marketing is not allowed", () => {
@@ -36,6 +48,18 @@ describe("wrapThuisbezorgdAffiliateUrl", () => {
     expect(url.searchParams.get("awinmid")).toBe(AWIN_THUISBEZORGD_MID);
     expect(url.searchParams.get("awinaffid")).toBe("424242");
     expect(url.searchParams.get("ued")).toBe(TB_URL);
+  });
+
+  it("prefers runtime public config over Vite env", () => {
+    vi.stubEnv("VITE_AWIN_PUBLISHER_ID", "111");
+    vi.mocked(getPublicConfig).mockReturnValue({
+      awinPublisherId: "222",
+      awinThuisbezorgdMid: null,
+    });
+    const wrapped = wrapThuisbezorgdAffiliateUrl(TB_URL, {
+      marketingAllowed: true,
+    });
+    expect(new URL(wrapped).searchParams.get("awinaffid")).toBe("222");
   });
 
   it("does not wrap non-Thuisbezorgd destinations", () => {

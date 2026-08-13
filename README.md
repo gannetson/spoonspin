@@ -86,8 +86,9 @@ Copy `.env.example` to `.env`:
 | `RESTAURANT_LIVE_FALLBACK` | No                        | Set `1` to allow Mapbox/Google when curated DB has no match (off by default) |
 | `DATABASE_URL`          | No                           | Defaults to `postgresql://localhost:5432/spoonspin` |
 | `API_PORT`              | No                           | Defaults to `3007`                      |
+| `AWIN_PUBLISHER_ID`     | No (affiliate)               | Awin publisher id for Thuisbezorgd links (also accepts `VITE_AWIN_PUBLISHER_ID`). Served via `/api/public-config` after restart. TB links wrap only after marketing cookie consent. |
 
-Never put provider secrets in Vite `VITE_*` variables or client code.
+Never put provider secrets in Vite `VITE_*` variables or client code. Awin publisher IDs are public in click URLs and are fine in `AWIN_*` / `VITE_AWIN_*`.
 
 ## Auth
 

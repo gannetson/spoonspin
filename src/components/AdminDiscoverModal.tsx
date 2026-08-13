@@ -551,10 +551,10 @@ export function AdminDiscoverModal({
                                 {entry.item.name}
                               </span>
                               <span className="mt-1 block text-sm text-ink-soft">
-                                {entry.item.specialty}
+                                {entry.item.address}, {entry.item.city}
                               </span>
                               <span className="mt-1 block text-sm text-ink-soft">
-                                {entry.item.address}, {entry.item.city}
+                                {entry.item.specialty}
                               </span>
                             </>
                           ) : null}

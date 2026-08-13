@@ -10,6 +10,7 @@ import { ConsentProvider } from "./consent/ConsentContext";
 import { LocaleProvider } from "./i18n/LocaleContext";
 import { AdminOverviewPage } from "./components/AdminOverviewPage";
 import { AdminPage } from "./components/AdminPage";
+import { AdminFlagsPage } from "./components/AdminFlagsPage";
 import { AdminReportsPage } from "./components/AdminReportsPage";
 import { AdminUsersPage } from "./components/AdminUsersPage";
 import { CookieBanner } from "./components/CookieBanner";
@@ -19,7 +20,10 @@ import {
   PlannedPlatesPage,
   ProfilePage,
 } from "./components/ProfilePage";
+import { ensurePublicConfigLoaded } from "./lib/usePublicConfig";
 import "./index.css";
+
+ensurePublicConfigLoaded();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -33,6 +37,7 @@ createRoot(document.getElementById("root")!).render(
                   <Routes>
                     <Route path="/admin" element={<AdminOverviewPage />} />
                     <Route path="/admin/review" element={<AdminPage />} />
+                    <Route path="/admin/flags" element={<AdminFlagsPage />} />
                     <Route path="/admin/reports" element={<AdminReportsPage />} />
                     <Route path="/admin/users" element={<AdminUsersPage />} />
                     <Route path="/login" element={<LoginPage />} />
