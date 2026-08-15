@@ -77,8 +77,7 @@ function parseArgs(argv: string[]) {
   const codeIdx = argv.indexOf("--code");
   const code = codeIdx >= 0 ? argv[codeIdx + 1]?.toLowerCase() : undefined;
   const batchIdx = argv.indexOf("--batch");
-  const batch =
-    batchIdx >= 0 ? Math.max(1, Number(argv[batchIdx + 1] || 5)) : 5;
+  const batch = batchIdx >= 0 ? Math.max(1, Number(argv[batchIdx + 1] || 5)) : 5;
   return { status, force, code, batch };
 }
 
@@ -142,9 +141,7 @@ function isFullRecipe(recipe: Recipe): boolean {
     !recipe.ingredients.some((item) =>
       /details loading|see enrichment/i.test(item.name),
     ) &&
-    !recipe.steps.some((step) =>
-      /being generated in the background/i.test(step),
-    )
+    !recipe.steps.some((step) => /being generated in the background/i.test(step))
   );
 }
 
@@ -180,10 +177,7 @@ function isUsableDishName(name: string): boolean {
   if (/\bas food\b/i.test(n)) return false;
   if (/^list of\b/i.test(n)) return false;
   if (/\bcategory:/i.test(n)) return false;
-  if (
-    /\b(cuisine|culture|history)\b/i.test(n) &&
-    !/\b(pie|cake|soup|stew)\b/i.test(n)
-  ) {
+  if (/\b(cuisine|culture|history)\b/i.test(n) && !/\b(pie|cake|soup|stew)\b/i.test(n)) {
     return false;
   }
   // Generic Wikipedia food pages, not dishes.
@@ -198,10 +192,7 @@ function isUsableDishName(name: string): boolean {
   return true;
 }
 
-function wikiToCandidates(
-  countryCode: string,
-  dishes: WikiDish[],
-): DishCandidate[] {
+function wikiToCandidates(countryCode: string, dishes: WikiDish[]): DishCandidate[] {
   const seen = new Set<string>();
   const out: DishCandidate[] = [];
   for (const dish of dishes) {
@@ -378,9 +369,7 @@ async function completeCountry(
 
   for (const recipe of existingRecipes) {
     if (
-      !candidates.some(
-        (item) => item.name.toLowerCase() === recipe.name.toLowerCase(),
-      )
+      !candidates.some((item) => item.name.toLowerCase() === recipe.name.toLowerCase())
     ) {
       candidates.unshift(recipeToCandidate(recipe));
     }
@@ -388,11 +377,7 @@ async function completeCountry(
 
   const wikiEntry = dishesByCountry[country.code];
   for (const dish of wikiToCandidates(country.code, wikiEntry?.dishes ?? [])) {
-    if (
-      candidates.some(
-        (item) => item.name.toLowerCase() === dish.name.toLowerCase(),
-      )
-    ) {
+    if (candidates.some((item) => item.name.toLowerCase() === dish.name.toLowerCase())) {
       continue;
     }
     candidates.push(dish);
@@ -432,9 +417,7 @@ async function completeCountry(
   }
 
   const chosenIds = new Set(Object.values(slotIds));
-  const moreCandidates = candidates
-    .filter((dish) => !chosenIds.has(dish.id))
-    .slice(0, 2);
+  const moreCandidates = candidates.filter((dish) => !chosenIds.has(dish.id)).slice(0, 2);
   const expandList: DishCandidate[] = [
     ...CORE_SLOTS.map((slot) => {
       const dish = candidates.find((item) => item.id === slotIds[slot])!;
@@ -501,9 +484,7 @@ async function completeCountry(
     const made = expandedById.get(dish.id);
     if (!made) {
       // Optional "more" dishes may fail; core slots must succeed.
-      if (
-        CORE_SLOTS.includes(dish.category as (typeof CORE_SLOTS)[number])
-      ) {
+      if (CORE_SLOTS.includes(dish.category as (typeof CORE_SLOTS)[number])) {
         throw new Error(`Missing expanded recipe for ${dish.name}`);
       }
       continue;
@@ -512,7 +493,9 @@ async function completeCountry(
   }
 
   for (const slot of CORE_SLOTS) {
-    if (!resolved.some((recipe) => recipe.category === slot || recipe.id === slotIds[slot])) {
+    if (
+      !resolved.some((recipe) => recipe.category === slot || recipe.id === slotIds[slot])
+    ) {
       // Ensure each core slot id is present after optional more drops.
       const needed = expandList.find((dish) => dish.id === slotIds[slot]);
       if (needed && !resolved.some((recipe) => recipe.id === needed.id)) {
@@ -532,8 +515,7 @@ async function completeCountry(
     const byName = uniqueRecipes.find(
       (recipe) =>
         recipe.name.toLowerCase() ===
-        (candidates.find((dish) => dish.id === wantedId)?.name.toLowerCase() ??
-          ""),
+        (candidates.find((dish) => dish.id === wantedId)?.name.toLowerCase() ?? ""),
     );
     if (byName) return { ...byName, category: slot };
     const heuristic = heuristicSlots(uniqueRecipes)[slot];
@@ -628,10 +610,7 @@ async function main() {
 
   await getDb();
   const countries = await listCountriesFromDb();
-  const dishesByCountry = loadJson<Record<string, WikiCountryDishes>>(
-    DISHES_PATH,
-    {},
-  );
+  const dishesByCountry = loadJson<Record<string, WikiCountryDishes>>(DISHES_PATH, {});
   const progress = loadProgress();
 
   const pending = countries.filter((country) => {
@@ -676,13 +655,9 @@ async function main() {
       if (!progress.completedCodes.includes(country.code)) {
         progress.completedCodes.push(country.code);
       }
-      progress.failedCodes = progress.failedCodes.filter(
-        (code) => code !== country.code,
-      );
+      progress.failedCodes = progress.failedCodes.filter((code) => code !== country.code);
       completed += 1;
-      console.log(
-        `✓ ${result.recipeCount} recipes · ${result.drinkCount} drinks`,
-      );
+      console.log(`✓ ${result.recipeCount} recipes · ${result.drinkCount} drinks`);
     } catch (error) {
       console.log("failed");
       console.warn(error);

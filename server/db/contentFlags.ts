@@ -79,10 +79,12 @@ export async function createContentFlag(input: {
   return rowToFlag(result.rows[0]!);
 }
 
-export async function listContentFlags(filter: {
-  status?: ContentFlagStatus | "all";
-  limit?: number;
-} = {}): Promise<AdminContentFlag[]> {
+export async function listContentFlags(
+  filter: {
+    status?: ContentFlagStatus | "all";
+    limit?: number;
+  } = {},
+): Promise<AdminContentFlag[]> {
   const db = await ensureDb();
   const params: unknown[] = [];
   const clauses: string[] = [];
@@ -141,9 +143,11 @@ export async function updateContentFlagStatus(
     [id],
   );
   const row = joined.rows[0];
-  return row ? rowToAdminFlag(row) : {
-    ...rowToFlag(updated),
-    reporterEmail: null,
-    reporterName: null,
-  };
+  return row
+    ? rowToAdminFlag(row)
+    : {
+        ...rowToFlag(updated),
+        reporterEmail: null,
+        reporterName: null,
+      };
 }

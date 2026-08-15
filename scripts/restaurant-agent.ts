@@ -1,18 +1,9 @@
 #!/usr/bin/env tsx
 import "dotenv/config";
-import {
-  closeDb,
-  countByCuisineCode,
-  getDb,
-} from "../server/db/restaurants.ts";
+import { closeDb, countByCuisineCode, getDb } from "../server/db/restaurants.ts";
 import { osmTagsForCountry } from "../src/restaurants/osmCuisineMap.ts";
 import { publishedCountries } from "../src/content/countries/published.ts";
-import {
-  HUBS,
-  harvestCountryAtHub,
-  sleep,
-  type Hub,
-} from "./lib/overpassRestaurants.ts";
+import { HUBS, harvestCountryAtHub, sleep, type Hub } from "./lib/overpassRestaurants.ts";
 
 type CliOptions = {
   hubs: Hub[];

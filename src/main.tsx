@@ -13,13 +13,11 @@ import { AdminPage } from "./components/AdminPage";
 import { AdminFlagsPage } from "./components/AdminFlagsPage";
 import { AdminReportsPage } from "./components/AdminReportsPage";
 import { AdminUsersPage } from "./components/AdminUsersPage";
+import { AboutPage } from "./components/AboutPage";
 import { CookieBanner } from "./components/CookieBanner";
 import { LoginPage } from "./components/LoginPage";
 import { PrivacyPage } from "./components/PrivacyPage";
-import {
-  PlannedPlatesPage,
-  ProfilePage,
-} from "./components/ProfilePage";
+import { PlannedPlatesPage, ProfilePage } from "./components/ProfilePage";
 import { ensurePublicConfigLoaded } from "./lib/usePublicConfig";
 import "./index.css";
 
@@ -45,6 +43,7 @@ createRoot(document.getElementById("root")!).render(
                     <Route path="/profile/:userId" element={<ProfilePage />} />
                     <Route path="/planned" element={<PlannedPlatesPage />} />
                     <Route path="/privacy" element={<PrivacyPage />} />
+                    <Route path="/about" element={<AboutPage />} />
                     <Route path="/*" element={<App />} />
                   </Routes>
                   <CookieBanner />

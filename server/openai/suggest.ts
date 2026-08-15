@@ -33,7 +33,10 @@ const recipeDraftSchema = z.object({
       cookMinutes: z.coerce.number().int().nonnegative(),
       waitTime: optionalString,
       difficulty: z.enum(["easy", "medium", "challenging"]),
-      dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
+      dietaryLabels: z
+        .array(z.string())
+        .nullish()
+        .transform((v) => v ?? []),
       ingredients: z
         .array(
           z.object({
@@ -86,15 +89,7 @@ const drinkDraftSchema = z.object({
     .object({
       name: z.string().min(1),
       localName: optionalString,
-      type: z.enum([
-        "beer",
-        "wine",
-        "spirit",
-        "cocktail",
-        "soft-drink",
-        "tea",
-        "coffee",
-      ]),
+      type: z.enum(["beer", "wine", "spirit", "cocktail", "soft-drink", "tea", "coffee"]),
       alcoholic: z.boolean(),
       description: z.string().min(20),
       grape: optionalString,
@@ -248,8 +243,7 @@ export async function previewRestaurantSuggestion(input: {
 
   const query = input.query.trim();
   const hits = await searchGoogleRestaurantsByQuery(query);
-  const match =
-    hits.find((place) => namesLikelyMatch(query, place.name)) ?? hits[0];
+  const match = hits.find((place) => namesLikelyMatch(query, place.name)) ?? hits[0];
 
   if (!match) {
     return {
@@ -411,9 +405,7 @@ JSON shape:
 
   const shop = parsed.shop;
   const website =
-    shop.website && /^https?:\/\//i.test(shop.website)
-      ? shop.website
-      : undefined;
+    shop.website && /^https?:\/\//i.test(shop.website) ? shop.website : undefined;
   const fallbackMaps = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
     `${shop.name} ${shop.address} ${shop.city} Netherlands`,
   )}`;

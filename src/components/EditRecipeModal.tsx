@@ -43,8 +43,7 @@ export function EditRecipeModal({
   const [prepMinutes, setPrepMinutes] = useState(0);
   const [cookMinutes, setCookMinutes] = useState(0);
   const [waitTime, setWaitTime] = useState("");
-  const [difficulty, setDifficulty] =
-    useState<Recipe["difficulty"]>("medium");
+  const [difficulty, setDifficulty] = useState<Recipe["difficulty"]>("medium");
   const [dietaryLabels, setDietaryLabels] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [stepsText, setStepsText] = useState("");
@@ -148,9 +147,7 @@ export function EditRecipeModal({
       onApplied({ country: result.country, recipe: result.recipe });
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("admin.recipe.edit.error.save"),
-      );
+      setError(err instanceof Error ? err.message : t("admin.recipe.edit.error.save"));
     } finally {
       setBusy(false);
     }
@@ -250,9 +247,7 @@ export function EditRecipeModal({
                       max={100}
                       step={1}
                       value={servings}
-                      onChange={(event) =>
-                        setServings(Number(event.target.value))
-                      }
+                      onChange={(event) => setServings(Number(event.target.value))}
                       className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
                     />
                   </label>
@@ -263,18 +258,12 @@ export function EditRecipeModal({
                     <select
                       value={difficulty}
                       onChange={(event) =>
-                        setDifficulty(
-                          event.target.value as Recipe["difficulty"],
-                        )
+                        setDifficulty(event.target.value as Recipe["difficulty"])
                       }
                       className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
                     >
-                      <option value="easy">
-                        {t("recipe.difficulty.easy")}
-                      </option>
-                      <option value="medium">
-                        {t("recipe.difficulty.medium")}
-                      </option>
+                      <option value="easy">{t("recipe.difficulty.easy")}</option>
+                      <option value="medium">{t("recipe.difficulty.medium")}</option>
                       <option value="challenging">
                         {t("recipe.difficulty.challenging")}
                       </option>
@@ -290,9 +279,7 @@ export function EditRecipeModal({
                       max={1440}
                       step={1}
                       value={prepMinutes}
-                      onChange={(event) =>
-                        setPrepMinutes(Number(event.target.value))
-                      }
+                      onChange={(event) => setPrepMinutes(Number(event.target.value))}
                       className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
                     />
                   </label>
@@ -306,9 +293,7 @@ export function EditRecipeModal({
                       max={1440}
                       step={1}
                       value={cookMinutes}
-                      onChange={(event) =>
-                        setCookMinutes(Number(event.target.value))
-                      }
+                      onChange={(event) => setCookMinutes(Number(event.target.value))}
                       className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
                     />
                   </label>
@@ -388,9 +373,7 @@ export function EditRecipeModal({
                     <button
                       type="button"
                       onClick={() =>
-                        setIngredients(
-                          ingredients.filter((_, i) => i !== index),
-                        )
+                        setIngredients(ingredients.filter((_, i) => i !== index))
                       }
                       className="inline-flex items-center justify-center rounded-xl p-2 text-tomato hover:bg-tomato/10"
                       aria-label={t("admin.recipe.edit.ingredient.remove")}
@@ -415,10 +398,7 @@ export function EditRecipeModal({
                 <button
                   type="button"
                   onClick={() =>
-                    setIngredients([
-                      ...ingredients,
-                      { name: "", quantity: 1, unit: "" },
-                    ])
+                    setIngredients([...ingredients, { name: "", quantity: 1, unit: "" }])
                   }
                   className="inline-flex items-center gap-2 rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:border-tomato hover:text-tomato"
                 >
@@ -480,9 +460,7 @@ export function EditRecipeModal({
                   </span>
                   <textarea
                     value={servingSuggestion}
-                    onChange={(event) =>
-                      setServingSuggestion(event.target.value)
-                    }
+                    onChange={(event) => setServingSuggestion(event.target.value)}
                     rows={3}
                     className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
                   />
@@ -514,12 +492,8 @@ export function EditRecipeModal({
               disabled={busy}
               className="inline-flex min-h-12 items-center gap-2 rounded-full bg-tomato px-6 font-semibold text-cream hover:bg-tomato/90 disabled:opacity-60"
             >
-              {busy ? (
-                <LoaderCircle className="size-4 animate-spin" aria-hidden />
-              ) : null}
-              {busy
-                ? t("admin.recipe.edit.saving")
-                : t("admin.recipe.edit.save")}
+              {busy ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : null}
+              {busy ? t("admin.recipe.edit.saving") : t("admin.recipe.edit.save")}
             </button>
             <button
               type="button"

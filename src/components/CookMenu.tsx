@@ -1,6 +1,12 @@
 import { useMemo, useState } from "react";
 import { MapPin, Plus, UtensilsCrossed } from "lucide-react";
-import type { Country, Drink, Recipe, RecipeCategory, SpecialtyShop } from "@/types/content";
+import type {
+  Country,
+  Drink,
+  Recipe,
+  RecipeCategory,
+  SpecialtyShop,
+} from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { isEditorOrAdmin } from "@/auth/roles";
 import {
@@ -56,12 +62,7 @@ type CookMenuProps = {
 type CookTab = "dinner" | "recipes" | "drinks" | "shops";
 type CategoryFilter = "all" | RecipeCategory;
 type DietFilter = "all" | "vegan" | "vegetarian" | "meat";
-type AlcoholFilter =
-  | "all"
-  | "other-alcoholic"
-  | "non-alcoholic"
-  | "beer"
-  | "wine";
+type AlcoholFilter = "all" | "other-alcoholic" | "non-alcoholic" | "beer" | "wine";
 
 const TABS: CookTab[] = ["dinner", "recipes", "drinks", "shops"];
 
@@ -74,12 +75,7 @@ const CATEGORY_FILTER_VALUES: CategoryFilter[] = [
   "snack",
 ];
 
-const DIET_FILTER_VALUES: DietFilter[] = [
-  "all",
-  "vegan",
-  "vegetarian",
-  "meat",
-];
+const DIET_FILTER_VALUES: DietFilter[] = ["all", "vegan", "vegetarian", "meat"];
 
 const ALCOHOL_FILTER_VALUES: AlcoholFilter[] = [
   "all",
@@ -146,9 +142,7 @@ export function CookMenu({
   const [dietFilter, setDietFilter] = useState<DietFilter>("all");
   const [alcoholFilter, setAlcoholFilter] = useState<AlcoholFilter>("all");
   const [suggestKind, setSuggestKind] = useState<SuggestionKind | null>(null);
-  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(
-    null,
-  );
+  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(null);
 
   const authoredRecipes = useMemo(() => getCountryRecipes(country), [country]);
   const recipes = useMemo(() => {
@@ -176,10 +170,7 @@ export function CookMenu({
   const authoredShops = useMemo(() => getSpecialtyShops(country), [country]);
   const shops = useMemo(() => {
     const seen = new Set(authoredShops.map((shop) => shop.id));
-    return [
-      ...authoredShops,
-      ...communityShops.filter((shop) => !seen.has(shop.id)),
-    ];
+    return [...authoredShops, ...communityShops.filter((shop) => !seen.has(shop.id))];
   }, [authoredShops, communityShops]);
   const communityRecipeIds = useMemo(
     () => new Set(communityRecipes.map((recipe) => recipe.id)),
@@ -187,11 +178,7 @@ export function CookMenu({
   );
   const communityDrinkKeys = useMemo(
     () =>
-      new Set(
-        communityDrinks.map(
-          (drink) => drink.id ?? `${drink.name}|${drink.type}`,
-        ),
-      ),
+      new Set(communityDrinks.map((drink) => drink.id ?? `${drink.name}|${drink.type}`)),
     [communityDrinks],
   );
   const communityShopIds = useMemo(
@@ -293,10 +280,7 @@ export function CookMenu({
           }
         }}
       />
-      <SuggestedItemReview
-        target={reviewTarget}
-        onClose={() => setReviewTarget(null)}
-      />
+      <SuggestedItemReview target={reviewTarget} onClose={() => setReviewTarget(null)} />
     </>
   );
 
@@ -305,17 +289,10 @@ export function CookMenu({
       <div className="relative rounded-[2rem]">
         <div className="relative overflow-hidden rounded-[2rem]">
           {bannerUrl ? (
-            <img
-              src={bannerUrl}
-              alt=""
-              className="h-40 w-full object-cover sm:h-52"
-            />
+            <img src={bannerUrl} alt="" className="h-40 w-full object-cover sm:h-52" />
           ) : (
             <div className="h-40 w-full sm:h-52">
-              <MediaPlaceholder
-                labelKey="media.placeholder.country"
-                tone="dark"
-              />
+              <MediaPlaceholder labelKey="media.placeholder.country" tone="dark" />
             </div>
           )}
           <div
@@ -368,9 +345,7 @@ export function CookMenu({
               aria-selected={active}
               onClick={() => setTab(value)}
               className={`min-h-11 rounded-xl px-4 text-sm font-semibold transition ${
-                active
-                  ? "bg-burgundy text-cream"
-                  : "text-burgundy hover:bg-burgundy/5"
+                active ? "bg-burgundy text-cream" : "text-burgundy hover:bg-burgundy/5"
               }`}
             >
               {t(`cook.tabs.${value}`)}
@@ -489,8 +464,7 @@ export function CookMenu({
                     {dinner.drinks.map((suggestion) => {
                       const drink = drinks.find(
                         (item) =>
-                          item.name.toLowerCase() ===
-                          suggestion.drinkName.toLowerCase(),
+                          item.name.toLowerCase() === suggestion.drinkName.toLowerCase(),
                       );
                       const drinkImage = drink?.imageUrl?.trim() || null;
                       return (
@@ -505,26 +479,18 @@ export function CookMenu({
                               removeHintKey="admin.item.removeFromDinner.hint"
                               selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
                               replaceImageHintKey="admin.item.replaceImage.drink.hint"
-                              busy={Boolean(
-                                busy[`dinner-drink:${suggestion.drinkName}`],
-                              )}
-                              status={
-                                status[`dinner-drink:${suggestion.drinkName}`]
-                              }
-                              error={
-                                error[`dinner-drink:${suggestion.drinkName}`]
-                              }
+                              busy={Boolean(busy[`dinner-drink:${suggestion.drinkName}`])}
+                              status={status[`dinner-drink:${suggestion.drinkName}`]}
+                              error={error[`dinner-drink:${suggestion.drinkName}`]}
                               onAction={(action) => {
-                                void run(
-                                  `dinner-drink:${suggestion.drinkName}`,
-                                  () =>
-                                    handleDinnerDrinkAdminAction({
-                                      action,
-                                      country,
-                                      drink,
-                                      onCountryUpdated,
-                                      openSelectImage,
-                                    }),
+                                void run(`dinner-drink:${suggestion.drinkName}`, () =>
+                                  handleDinnerDrinkAdminAction({
+                                    action,
+                                    country,
+                                    drink,
+                                    onCountryUpdated,
+                                    openSelectImage,
+                                  }),
                                 );
                               }}
                             />
@@ -534,30 +500,22 @@ export function CookMenu({
                               label={suggestion.drinkName}
                               removeOnly
                               removeHintKey="admin.item.removeFromDinner.hint"
-                              busy={Boolean(
-                                busy[`dinner-drink:${suggestion.drinkName}`],
-                              )}
-                              status={
-                                status[`dinner-drink:${suggestion.drinkName}`]
-                              }
-                              error={
-                                error[`dinner-drink:${suggestion.drinkName}`]
-                              }
+                              busy={Boolean(busy[`dinner-drink:${suggestion.drinkName}`])}
+                              status={status[`dinner-drink:${suggestion.drinkName}`]}
+                              error={error[`dinner-drink:${suggestion.drinkName}`]}
                               onAction={(action) => {
-                                void run(
-                                  `dinner-drink:${suggestion.drinkName}`,
-                                  () =>
-                                    handleDinnerDrinkAdminAction({
-                                      action,
-                                      country,
-                                      drink: {
-                                        name: suggestion.drinkName,
-                                        type: "soft-drink",
-                                        alcoholic: false,
-                                        description: "",
-                                      },
-                                      onCountryUpdated,
-                                    }),
+                                void run(`dinner-drink:${suggestion.drinkName}`, () =>
+                                  handleDinnerDrinkAdminAction({
+                                    action,
+                                    country,
+                                    drink: {
+                                      name: suggestion.drinkName,
+                                      type: "soft-drink",
+                                      alcoholic: false,
+                                      description: "",
+                                    },
+                                    onCountryUpdated,
+                                  }),
                                 );
                               }}
                             />
@@ -587,9 +545,7 @@ export function CookMenu({
                               ) : null}
                             </p>
                             <p className="mt-2 text-sm leading-relaxed text-ink-soft">
-                              {drink?.description ||
-                                suggestion.note?.trim() ||
-                                ""}
+                              {drink?.description || suggestion.note?.trim() || ""}
                             </p>
                           </div>
                         </div>
@@ -885,66 +841,57 @@ function DrinkCard({
   return (
     <article className="relative flex flex-col gap-3 rounded-2xl border border-dashed border-stamp/40 bg-white/40 p-4">
       <div className="relative flex gap-3">
-      {isAdmin && onAdminAction ? (
-        <AdminItemMenu
-          className="absolute right-2 top-2"
-          label={drink.name}
-          showSelectForDinner
-          selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
-          replaceImageHintKey="admin.item.replaceImage.drink.hint"
-          busy={adminBusy}
-          status={adminStatus}
-          error={adminError}
-          onAction={onAdminAction}
-        />
-      ) : null}
-      {drink.imageUrl ? (
-        <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-lg bg-parchment">
-          <img
-            src={drink.imageUrl}
-            alt=""
-            className="size-full object-cover"
-            loading="lazy"
+        {isAdmin && onAdminAction ? (
+          <AdminItemMenu
+            className="absolute right-2 top-2"
+            label={drink.name}
+            showSelectForDinner
+            selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
+            replaceImageHintKey="admin.item.replaceImage.drink.hint"
+            busy={adminBusy}
+            status={adminStatus}
+            error={adminError}
+            onAction={onAdminAction}
           />
-        </div>
-      ) : null}
-      <div className={`min-w-0 flex-1 ${isAdmin ? "pr-10" : ""}`}>
-        {community ? (
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
-            {t("cook.communitySuggestion")}
-          </p>
         ) : null}
-        <p className="font-semibold text-ink">
-          {drink.name}
-          {drink.localName ? (
-            <span className="font-normal text-ink-soft">
-              {" "}
-              · {drink.localName}
-            </span>
+        {drink.imageUrl ? (
+          <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-lg bg-parchment">
+            <img
+              src={drink.imageUrl}
+              alt=""
+              className="size-full object-cover"
+              loading="lazy"
+            />
+          </div>
+        ) : null}
+        <div className={`min-w-0 flex-1 ${isAdmin ? "pr-10" : ""}`}>
+          {community ? (
+            <p className="mb-1 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
+              {t("cook.communitySuggestion")}
+            </p>
           ) : null}
-        </p>
-        <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-soft">
-          {drink.alcoholic
-            ? t("cook.drink.alcoholic")
-            : t("cook.drink.nonAlcoholic")}{" "}
-          · {drink.type}
-          {drink.grape ? ` · ${drink.grape}` : null}
-        </p>
-        <p className="mt-2 text-sm text-ink-soft">{drink.description}</p>
-        {drink.foodPairing ? (
-          <p className="mt-2 text-sm text-ink">
-            <span className="font-semibold">
-              {t("cook.drink.foodPairing")}:{" "}
-            </span>
-            {drink.foodPairing}
+          <p className="font-semibold text-ink">
+            {drink.name}
+            {drink.localName ? (
+              <span className="font-normal text-ink-soft"> · {drink.localName}</span>
+            ) : null}
           </p>
-        ) : null}
-        {drink.imageAttribution ? (
-          <p className="mt-1 text-[0.65rem] text-ink-soft">
-            {drink.imageAttribution}
+          <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+            {drink.alcoholic ? t("cook.drink.alcoholic") : t("cook.drink.nonAlcoholic")} ·{" "}
+            {drink.type}
+            {drink.grape ? ` · ${drink.grape}` : null}
           </p>
-        ) : null}
-      </div>
+          <p className="mt-2 text-sm text-ink-soft">{drink.description}</p>
+          {drink.foodPairing ? (
+            <p className="mt-2 text-sm text-ink">
+              <span className="font-semibold">{t("cook.drink.foodPairing")}: </span>
+              {drink.foodPairing}
+            </p>
+          ) : null}
+          {drink.imageAttribution ? (
+            <p className="mt-1 text-[0.65rem] text-ink-soft">{drink.imageAttribution}</p>
+          ) : null}
+        </div>
       </div>
       <ItemTagBar
         entityType="drink"

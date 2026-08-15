@@ -18,9 +18,7 @@ describe("normalizeTripadvisorRestaurantUrl", () => {
 
   it("rejects search pages", () => {
     expect(
-      normalizeTripadvisorRestaurantUrl(
-        "https://www.tripadvisor.com/Search?q=thai",
-      ),
+      normalizeTripadvisorRestaurantUrl("https://www.tripadvisor.com/Search?q=thai"),
     ).toBeUndefined();
   });
 });

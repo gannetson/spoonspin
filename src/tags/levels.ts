@@ -33,9 +33,7 @@ export type LevelProgress = {
 };
 
 /** Comic cook badge art for a level (or the pre-level “hungry explorer”). */
-export function levelArtSrc(
-  levelId: CuisineLevelId | "none" | null | undefined,
-): string {
+export function levelArtSrc(levelId: CuisineLevelId | "none" | null | undefined): string {
   return `/levels/${levelId ?? "none"}.png`;
 }
 
@@ -51,9 +49,7 @@ export function resolveLevelProgress(countriesTasted: number): LevelProgress {
     } else break;
   }
   const next =
-    currentIndex + 1 < CUISINE_LEVELS.length
-      ? CUISINE_LEVELS[currentIndex + 1]!
-      : null;
+    currentIndex + 1 < CUISINE_LEVELS.length ? CUISINE_LEVELS[currentIndex + 1]! : null;
 
   let progressToNext = 1;
   if (next) {

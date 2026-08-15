@@ -69,9 +69,7 @@ export function TagsProvider({
     }
     setLoading(true);
     try {
-      const list = await fetchMyTags(
-        countryCode ? { countryCode } : undefined,
-      );
+      const list = await fetchMyTags(countryCode ? { countryCode } : undefined);
       setTags(list);
     } catch {
       setTags([]);
@@ -137,9 +135,7 @@ export function TagsProvider({
     [tags, loading, byKey, replaceTag, refresh],
   );
 
-  return (
-    <TagsContext.Provider value={value}>{children}</TagsContext.Provider>
-  );
+  return <TagsContext.Provider value={value}>{children}</TagsContext.Provider>;
 }
 
 export function useTags(): TagsContextValue {

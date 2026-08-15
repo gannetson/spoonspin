@@ -123,9 +123,7 @@ export async function findOrCreateOAuthUser(input: {
 
   const email = input.email ? normalizeEmail(input.email) : null;
   if (!email || !email.includes("@") || email.length < 5) {
-    throw new Error(
-      "This sign-in did not provide an email address. Try another method.",
-    );
+    throw new Error("This sign-in did not provide an email address. Try another method.");
   }
 
   const existing = await db.query(
@@ -170,9 +168,7 @@ export async function createSession(userId: string): Promise<{
   expiresAt: Date;
 }> {
   const db = await ensureDb();
-  const token = createHash("sha256")
-    .update(randomBytes(48))
-    .digest("hex");
+  const token = createHash("sha256").update(randomBytes(48)).digest("hex");
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + SESSION_DAYS);
   await db.query(
@@ -180,9 +176,7 @@ export async function createSession(userId: string): Promise<{
      VALUES ($1, $2, $3, NOW())`,
     [token, userId, expiresAt.toISOString()],
   );
-  await db.query(`UPDATE users SET last_login_at = NOW() WHERE id = $1`, [
-    userId,
-  ]);
+  await db.query(`UPDATE users SET last_login_at = NOW() WHERE id = $1`, [userId]);
   return { token, expiresAt };
 }
 
@@ -216,9 +210,7 @@ export async function listUsersForAdmin(): Promise<AdminUserRow[]> {
   return result.rows.map(rowToAdminUser);
 }
 
-export async function getAdminUserById(
-  userId: string,
-): Promise<AdminUserRow | null> {
+export async function getAdminUserById(userId: string): Promise<AdminUserRow | null> {
   const db = await ensureDb();
   const result = await db.query(
     `SELECT id, email, name, role, created_at, last_login_at

@@ -4,12 +4,12 @@ App path on the server: `/var/www/spoonspin/spoonspin`
 
 ## Layout
 
-| File | Installs to |
-|------|-------------|
-| [`nginx/spoonspin.nl.conf`](nginx/spoonspin.nl.conf) | `/etc/nginx/sites-available/spoonspin.nl` (HTTP / certbot) |
-| [`nginx/spoonspin.nl.ssl.conf`](nginx/spoonspin.nl.ssl.conf) | same path after TLS (or merge with certbot) |
-| [`supervisor/spoonspin.conf`](supervisor/spoonspin.conf) | `/etc/supervisor/conf.d/spoonspin.conf` |
-| [`install-server.sh`](install-server.sh) | copies configs + reloads services |
+| File                                                         | Installs to                                                |
+| ------------------------------------------------------------ | ---------------------------------------------------------- |
+| [`nginx/spoonspin.nl.conf`](nginx/spoonspin.nl.conf)         | `/etc/nginx/sites-available/spoonspin.nl` (HTTP / certbot) |
+| [`nginx/spoonspin.nl.ssl.conf`](nginx/spoonspin.nl.ssl.conf) | same path after TLS (or merge with certbot)                |
+| [`supervisor/spoonspin.conf`](supervisor/spoonspin.conf)     | `/etc/supervisor/conf.d/spoonspin.conf`                    |
+| [`install-server.sh`](install-server.sh)                     | copies configs + reloads services                          |
 
 ## Remote deploy (from your laptop)
 

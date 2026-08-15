@@ -48,8 +48,7 @@ export function SelectImageModal({
   const [applyBusy, setApplyBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searched, setSearched] = useState(false);
-  const restaurantId =
-    target.kind === "restaurant" ? target.restaurantId : undefined;
+  const restaurantId = target.kind === "restaurant" ? target.restaurantId : undefined;
 
   useEffect(() => {
     if (!open) return;
@@ -81,11 +80,7 @@ export function SelectImageModal({
       })
       .catch((err) => {
         if (cancelled) return;
-        setError(
-          err instanceof Error
-            ? err.message
-            : t("admin.selectImage.searchError"),
-        );
+        setError(err instanceof Error ? err.message : t("admin.selectImage.searchError"));
         setSearched(true);
       })
       .finally(() => {
@@ -126,9 +121,7 @@ export function SelectImageModal({
       setTotalHits(page.totalHits);
       setSearched(true);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("admin.selectImage.searchError"),
-      );
+      setError(err instanceof Error ? err.message : t("admin.selectImage.searchError"));
     } finally {
       setSearchBusy(false);
     }
@@ -146,9 +139,7 @@ export function SelectImageModal({
       onApplied(result);
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("admin.selectImage.applyError"),
-      );
+      setError(err instanceof Error ? err.message : t("admin.selectImage.applyError"));
     } finally {
       setApplyBusy(false);
     }
@@ -163,9 +154,7 @@ export function SelectImageModal({
       onApplied(result);
       onClose();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("admin.selectImage.uploadError"),
-      );
+      setError(err instanceof Error ? err.message : t("admin.selectImage.uploadError"));
     } finally {
       setApplyBusy(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -266,9 +255,7 @@ export function SelectImageModal({
                         <button
                           type="button"
                           disabled={busy}
-                          onClick={() =>
-                            void applyFromUrl(item.url, item.attribution)
-                          }
+                          onClick={() => void applyFromUrl(item.url, item.attribution)}
                           className="group relative aspect-[4/3] w-full overflow-hidden rounded-xl bg-parchment ring-1 ring-ink/10 disabled:opacity-60"
                         >
                           <img
@@ -305,9 +292,7 @@ export function SelectImageModal({
                     <button
                       type="button"
                       disabled={!canPrev}
-                      onClick={() =>
-                        void runSearch(Math.max(0, offset - PAGE_SIZE))
-                      }
+                      onClick={() => void runSearch(Math.max(0, offset - PAGE_SIZE))}
                       className="rounded-lg border border-ink/15 px-3 py-1.5 text-sm font-semibold text-ink disabled:opacity-40"
                     >
                       {t("admin.selectImage.prev")}
@@ -330,17 +315,13 @@ export function SelectImageModal({
             <h3 className="text-sm font-semibold text-ink">
               {t("admin.selectImage.uploadHeading")}
             </h3>
-            <p className="text-sm text-ink-soft">
-              {t("admin.selectImage.uploadHint")}
-            </p>
+            <p className="text-sm text-ink-soft">{t("admin.selectImage.uploadHint")}</p>
             <input
               ref={fileInputRef}
               type="file"
               accept="image/jpeg,image/png,image/webp"
               className="sr-only"
-              onChange={(event) =>
-                void onUploadFile(event.target.files?.[0])
-              }
+              onChange={(event) => void onUploadFile(event.target.files?.[0])}
             />
             <button
               type="button"

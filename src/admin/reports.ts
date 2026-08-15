@@ -34,10 +34,9 @@ export type AdminReportsResponse = {
 export async function fetchAdminReports(
   range: ReportRange = "7d",
 ): Promise<AdminReportsResponse> {
-  const response = await fetch(
-    `/api/admin/reports?range=${encodeURIComponent(range)}`,
-    { credentials: "include" },
-  );
+  const response = await fetch(`/api/admin/reports?range=${encodeURIComponent(range)}`, {
+    credentials: "include",
+  });
   const contentType = response.headers.get("content-type") ?? "";
   if (!contentType.includes("application/json")) {
     throw new Error(

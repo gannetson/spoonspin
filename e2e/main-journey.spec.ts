@@ -1,8 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("main journey: pick country, cook, recipe, dine search", async ({
-  page,
-}) => {
+test("main journey: pick country, cook, recipe, dine search", async ({ page }) => {
   test.setTimeout(60_000);
   await page.goto("/");
 
@@ -18,14 +16,9 @@ test("main journey: pick country, cook, recipe, dine search", async ({
   });
 
   await page.getByRole("button", { name: "Cook" }).click();
-  await expect(
-    page.getByRole("heading", { name: /tonight's menu/i }),
-  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: /tonight's menu/i })).toBeVisible();
 
-  await page
-    .locator("section[aria-labelledby='menu-heading'] button")
-    .first()
-    .click();
+  await page.locator("section[aria-labelledby='menu-heading'] button").first().click();
   await expect(page.getByRole("button", { name: /back to menu/i })).toBeVisible();
   await page.getByRole("button", { name: /back to menu/i }).click();
 

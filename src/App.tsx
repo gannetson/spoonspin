@@ -19,6 +19,7 @@ import { CountrySelect } from "@/components/CountrySelect";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
 import { OrderHome } from "@/components/OrderHome";
+import { HomeExplainer } from "@/components/HomeExplainer";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeProgressCards } from "@/components/HomeProgressCards";
 import { AdminNavMenu } from "@/components/AdminNavMenu";
@@ -26,6 +27,7 @@ import { RecipeView } from "@/components/RecipeView";
 import { RestaurantView } from "@/components/RestaurantView";
 import { ShopView } from "@/components/ShopView";
 import { ShareButton } from "@/components/ShareButton";
+import { SiteFooter } from "@/components/SiteFooter";
 import { FlagSpinner, SpinSpoonButton } from "@/components/SpinSpoonButton";
 import {
   fetchCommunityDrinks,
@@ -35,6 +37,13 @@ import {
 import type { Restaurant } from "@/restaurants/types";
 import { useT } from "@/i18n/LocaleContext";
 import { TagsProvider } from "@/tags/TagsContext";
+import { countryMeta, homeMeta, recipeMeta, setDocumentMeta } from "@/seo/documentMeta";
+import {
+  clearSeoJsonLd,
+  setCountryWebPageJsonLd,
+  setRecipeJsonLd,
+  setWebsiteJsonLd,
+} from "@/seo/jsonLd";
 
 export type AppMode = "choose" | "cook" | "dine" | "order";
 
@@ -51,10 +60,7 @@ function parseMode(value: string | null): AppMode {
   return "cook";
 }
 
-function findCountry(
-  countries: Country[],
-  code: string | null,
-): Country | undefined {
+function findCountry(countries: Country[], code: string | null): Country | undefined {
   if (!code) return undefined;
   return countries.find((country) => country.code === code.toLowerCase());
 }
@@ -72,8 +78,7 @@ export default function App() {
   const recipeId = searchParams.get("recipe");
   const shopId = searchParams.get("shop");
   const restaurantId = searchParams.get("restaurant");
-  const [dineRestaurantCache, setDineRestaurantCache] =
-    useState<Restaurant | null>(null);
+  const [dineRestaurantCache, setDineRestaurantCache] = useState<Restaurant | null>(null);
   const [dineRefreshKey, setDineRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -101,8 +106,7 @@ export default function App() {
     () => findCountry(published, countryCode),
     [published, countryCode],
   );
-  const invalidCountry =
-    !countriesLoading && Boolean(countryCode) && !selectedCountry;
+  const invalidCountry = !countriesLoading && Boolean(countryCode) && !selectedCountry;
 
   const [communityRecipes, setCommunityRecipes] = useState<Recipe[]>([]);
   const [communityDrinks, setCommunityDrinks] = useState<Drink[]>([]);
@@ -152,9 +156,7 @@ export default function App() {
 
   useEffect(() => {
     if (invalidCountry) {
-      setFallbackNotice(
-        t("app.fallback.unknownCountry", { code: countryCode ?? "" }),
-      );
+      setFallbackNotice(t("app.fallback.unknownCountry", { code: countryCode ?? "" }));
       setSearchParams({}, { replace: true });
     }
   }, [invalidCountry, countryCode, setSearchParams, t]);
@@ -203,18 +205,18 @@ export default function App() {
     if (cookReadyCountries.length === 0) return;
     setFallbackNotice(null);
     setSpinning(true);
-      setSearchParams(
-        (prev) => {
-          if (!prev.get("recipe") && !prev.get("restaurant") && !prev.get("shop"))
-            return prev;
-          const params = new URLSearchParams(prev);
-          params.delete("recipe");
-          params.delete("restaurant");
-          params.delete("shop");
-          return params;
-        },
-        { replace: true },
-      );
+    setSearchParams(
+      (prev) => {
+        if (!prev.get("recipe") && !prev.get("restaurant") && !prev.get("shop"))
+          return prev;
+        const params = new URLSearchParams(prev);
+        params.delete("recipe");
+        params.delete("restaurant");
+        params.delete("shop");
+        return params;
+      },
+      { replace: true },
+    );
     const pool = cookReadyCountries.map((c) => ({
       flag: c.flag,
       name: c.name,
@@ -350,6 +352,56 @@ export default function App() {
     }
   }, [mode, recipeId, shopId, updateParams]);
 
+  useEffect(() => {
+    if (!selectedCountry) {
+      setDocumentMeta(homeMeta(t));
+      setWebsiteJsonLd(t("meta.description"));
+      return () => {
+        clearSeoJsonLd();
+      };
+    }
+
+    if (selectedRecipe) {
+      setDocumentMeta(
+        recipeMeta(
+          selectedRecipe.name,
+          selectedCountry.name,
+          selectedCountry.code,
+          selectedRecipe.id,
+          t,
+        ),
+      );
+      setWebsiteJsonLd(t("meta.description"));
+      setCountryWebPageJsonLd({
+        name: t("meta.country.title", { name: selectedCountry.name }),
+        description: t("meta.country.description", {
+          name: selectedCountry.name,
+        }),
+        countryCode: selectedCountry.code,
+      });
+      setRecipeJsonLd({
+        recipe: selectedRecipe,
+        countryName: selectedCountry.name,
+        countryCode: selectedCountry.code,
+      });
+      return () => {
+        clearSeoJsonLd();
+      };
+    }
+
+    const meta = countryMeta(selectedCountry.name, selectedCountry.code, t);
+    setDocumentMeta(meta);
+    setWebsiteJsonLd(t("meta.description"));
+    setCountryWebPageJsonLd({
+      name: meta.title,
+      description: meta.description,
+      countryCode: selectedCountry.code,
+    });
+    return () => {
+      clearSeoJsonLd();
+    };
+  }, [selectedCountry, selectedRecipe, t]);
+
   const showHome = !selectedCountry && !spinning && !countriesLoading;
   const showCompactHeader = !showHome;
   const switcherTone = showHome ? "dark" : "light";
@@ -364,7 +416,7 @@ export default function App() {
       </a>
 
       <header
-        className={`mx-auto flex w-full max-w-5xl items-center justify-between gap-4 px-4 pt-6 sm:px-6 ${
+        className={`mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 ${
           showHome ? "absolute inset-x-0 top-0 z-20" : "pb-2"
         }`}
       >
@@ -372,7 +424,7 @@ export default function App() {
           <button
             type="button"
             onClick={() => setSearchParams({}, { replace: false })}
-            className="text-left"
+            className="w-full text-left sm:w-auto sm:min-w-0 sm:shrink"
           >
             <p className="font-display text-3xl text-burgundy sm:text-4xl">
               {t("app.brand")}
@@ -384,8 +436,10 @@ export default function App() {
         )}
 
         <div
-          className={`ml-auto flex flex-wrap items-center gap-3 ${
-            showHome ? "text-cream" : "text-ink"
+          className={`flex flex-wrap items-center gap-3 ${
+            showHome
+              ? "ml-auto text-cream"
+              : "w-full text-ink sm:ml-auto sm:w-auto sm:justify-end"
           }`}
         >
           {!authLoading && user ? (
@@ -408,9 +462,7 @@ export default function App() {
               >
                 {t("app.planned")}
               </Link>
-              {user.role === "admin" ? (
-                <AdminNavMenu tone={switcherTone} />
-              ) : null}
+              {user.role === "admin" ? <AdminNavMenu tone={switcherTone} /> : null}
               <button
                 type="button"
                 onClick={() => void logout()}
@@ -443,9 +495,7 @@ export default function App() {
 
       <main
         id="main"
-        className={
-          showHome ? "" : "mx-auto w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6"
-        }
+        className={showHome ? "" : "mx-auto w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6"}
       >
         <div aria-live="polite" className="sr-only">
           {announcement}
@@ -486,184 +536,182 @@ export default function App() {
         ) : null}
 
         {showHome ? (
-          <HomeHero
-            countries={published}
-            onPick={pickCountry}
-            onSelectCountry={selectCountry}
-          >
-            <HomeProgressCards />
-          </HomeHero>
+          <>
+            <HomeHero
+              countries={published}
+              onPick={pickCountry}
+              onSelectCountry={selectCountry}
+            >
+              <HomeProgressCards />
+            </HomeHero>
+            <HomeExplainer />
+          </>
         ) : null}
 
         {selectedCountry ? (
           <TagsProvider countryCode={selectedCountry.code}>
-          <section
-            className="space-y-6"
-            aria-label={t("app.result.ariaLabel", {
-              name: selectedCountry.name,
-            })}
-            aria-busy={spinning}
-          >
-            <CountryCard
-              country={selectedCountry}
-              spinning={spinning}
-              spinningCountry={spinNames[0]}
-              onSpin={pickCountry}
-              onCountryUpdated={handleCountryUpdated}
-            />
+            <section
+              className="space-y-6"
+              aria-label={t("app.result.ariaLabel", {
+                name: selectedCountry.name,
+              })}
+              aria-busy={spinning}
+            >
+              <CountryCard
+                country={selectedCountry}
+                spinning={spinning}
+                spinningCountry={spinNames[0]}
+                onSpin={pickCountry}
+                onCountryUpdated={handleCountryUpdated}
+              />
 
-            <div className="space-y-4">
-              <div className="grid gap-4 md:grid-cols-3">
-                <ModeButton
-                  active={mode === "cook"}
-                  onClick={() =>
-                    updateParams({
-                      mode: "cook",
-                      recipe: null,
-                      restaurant: null,
-                      shop: null,
-                    })
-                  }
-                  label={t("app.mode.cook")}
-                  description={
-                    selectedCountry.cookReady
-                      ? t("app.mode.cook.descriptionReady")
-                      : t("app.mode.cook.descriptionSoon")
-                  }
-                  iconSrc="/modes/cook.png"
-                />
-                <ModeButton
-                  active={mode === "dine"}
-                  onClick={() =>
-                    updateParams({
-                      mode: "dine",
-                      recipe: null,
-                      restaurant: null,
-                      shop: null,
-                    })
-                  }
-                  label={t("app.mode.dine")}
-                  description={t("app.mode.dine.description")}
-                  iconSrc="/modes/dine.png"
-                />
-                <ModeButton
-                  active={mode === "order"}
-                  onClick={() =>
-                    updateParams({
-                      mode: "order",
-                      recipe: null,
-                      restaurant: null,
-                      shop: null,
-                    })
-                  }
-                  label={t("app.mode.order")}
-                  description={t("app.mode.order.description")}
-                  iconSrc="/modes/order.png"
+              <div className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-3">
+                  <ModeButton
+                    active={mode === "cook"}
+                    onClick={() =>
+                      updateParams({
+                        mode: "cook",
+                        recipe: null,
+                        restaurant: null,
+                        shop: null,
+                      })
+                    }
+                    label={t("app.mode.cook")}
+                    description={
+                      selectedCountry.cookReady
+                        ? t("app.mode.cook.descriptionReady")
+                        : t("app.mode.cook.descriptionSoon")
+                    }
+                    iconSrc="/modes/cook.png"
+                  />
+                  <ModeButton
+                    active={mode === "dine"}
+                    onClick={() =>
+                      updateParams({
+                        mode: "dine",
+                        recipe: null,
+                        restaurant: null,
+                        shop: null,
+                      })
+                    }
+                    label={t("app.mode.dine")}
+                    description={t("app.mode.dine.description")}
+                    iconSrc="/modes/dine.png"
+                  />
+                  <ModeButton
+                    active={mode === "order"}
+                    onClick={() =>
+                      updateParams({
+                        mode: "order",
+                        recipe: null,
+                        restaurant: null,
+                        shop: null,
+                      })
+                    }
+                    label={t("app.mode.order")}
+                    description={t("app.mode.order.description")}
+                    iconSrc="/modes/order.png"
+                  />
+                </div>
+                <CountrySelect
+                  countries={published}
+                  value={selectedCountry.code}
+                  onSelect={selectCountry}
+                  id="result-country-select"
+                  label={t("app.countrySelect.labelResult")}
                 />
               </div>
-              <CountrySelect
-                countries={published}
-                value={selectedCountry.code}
-                onSelect={selectCountry}
-                id="result-country-select"
-                label={t("app.countrySelect.labelResult")}
-              />
-            </div>
 
-            {mode === "cook" && !selectedRecipe && !selectedShop ? (
-              <CookMenu
-                country={selectedCountry}
-                communityRecipes={communityRecipes}
-                communityDrinks={communityDrinks}
-                communityShops={communityShops}
-                onCommunityRecipesChange={setCommunityRecipes}
-                onCommunityDrinksChange={setCommunityDrinks}
-                onCommunityShopsChange={setCommunityShops}
-                onCountryUpdated={handleCountryUpdated}
-                onOpenRecipe={openRecipe}
-                onOpenShop={openShop}
-              />
-            ) : null}
+              {mode === "cook" && !selectedRecipe && !selectedShop ? (
+                <CookMenu
+                  country={selectedCountry}
+                  communityRecipes={communityRecipes}
+                  communityDrinks={communityDrinks}
+                  communityShops={communityShops}
+                  onCommunityRecipesChange={setCommunityRecipes}
+                  onCommunityDrinksChange={setCommunityDrinks}
+                  onCommunityShopsChange={setCommunityShops}
+                  onCountryUpdated={handleCountryUpdated}
+                  onOpenRecipe={openRecipe}
+                  onOpenShop={openShop}
+                />
+              ) : null}
 
-            {mode === "cook" && selectedRecipe ? (
-              <RecipeView
-                country={selectedCountry}
-                recipe={selectedRecipe}
-                communityRecipes={communityRecipes}
-                onCommunityRecipesChange={setCommunityRecipes}
-                onCountryUpdated={handleCountryUpdated}
-                drink={
-                  selectedCountry.menu?.drink ??
-                  selectedCountry.nationalDrink ??
-                  FALLBACK_DRINK
-                }
-                onBack={closeRecipe}
-              />
-            ) : null}
+              {mode === "cook" && selectedRecipe ? (
+                <RecipeView
+                  country={selectedCountry}
+                  recipe={selectedRecipe}
+                  communityRecipes={communityRecipes}
+                  onCommunityRecipesChange={setCommunityRecipes}
+                  onCountryUpdated={handleCountryUpdated}
+                  drink={
+                    selectedCountry.menu?.drink ??
+                    selectedCountry.nationalDrink ??
+                    FALLBACK_DRINK
+                  }
+                  onBack={closeRecipe}
+                />
+              ) : null}
 
-            {mode === "cook" && selectedShop ? (
-              <ShopView
-                country={selectedCountry}
-                shop={selectedShop}
-                community={communityShops.some(
-                  (item) => item.id === selectedShop.id,
-                )}
-                onCountryUpdated={handleCountryUpdated}
-                onBack={closeShop}
-                onRemoved={closeShop}
-              />
-            ) : null}
+              {mode === "cook" && selectedShop ? (
+                <ShopView
+                  country={selectedCountry}
+                  shop={selectedShop}
+                  community={communityShops.some((item) => item.id === selectedShop.id)}
+                  onCountryUpdated={handleCountryUpdated}
+                  onBack={closeShop}
+                  onRemoved={closeShop}
+                />
+              ) : null}
 
-            {mode === "cook" && shopId && !selectedShop && !selectedRecipe ? (
-              <div className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10">
-                <p className="text-ink-soft">{t("shop.notFound")}</p>
-                <button
-                  type="button"
-                  onClick={closeShop}
-                  className="mt-4 text-sm font-semibold text-tomato underline-offset-2 hover:underline"
-                >
-                  {t("shop.backToList")}
-                </button>
-              </div>
-            ) : null}
+              {mode === "cook" && shopId && !selectedShop && !selectedRecipe ? (
+                <div className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10">
+                  <p className="text-ink-soft">{t("shop.notFound")}</p>
+                  <button
+                    type="button"
+                    onClick={closeShop}
+                    className="mt-4 text-sm font-semibold text-tomato underline-offset-2 hover:underline"
+                  >
+                    {t("shop.backToList")}
+                  </button>
+                </div>
+              ) : null}
 
-            {mode === "dine" && restaurantId ? (
-              <RestaurantView
-                country={selectedCountry}
-                restaurantId={restaurantId}
-                initialRestaurant={
-                  dineRestaurantCache?.id === restaurantId
-                    ? dineRestaurantCache
-                    : null
-                }
-                onBack={closeRestaurant}
-                onUpdated={(next) => setDineRestaurantCache(next)}
-                onRemoved={() => setDineRestaurantCache(null)}
-              />
-            ) : null}
+              {mode === "dine" && restaurantId ? (
+                <RestaurantView
+                  country={selectedCountry}
+                  restaurantId={restaurantId}
+                  initialRestaurant={
+                    dineRestaurantCache?.id === restaurantId ? dineRestaurantCache : null
+                  }
+                  onBack={closeRestaurant}
+                  onUpdated={(next) => setDineRestaurantCache(next)}
+                  onRemoved={() => setDineRestaurantCache(null)}
+                />
+              ) : null}
 
-            {mode === "dine" && !restaurantId ? (
-              <DineSearch
-                country={selectedCountry}
-                onOpenRestaurant={openRestaurant}
-                refreshKey={dineRefreshKey}
-                onCountryUpdated={handleCountryUpdated}
-                onRestaurantsAdded={() =>
-                  setDineRefreshKey((value) => value + 1)
-                }
-              />
-            ) : null}
+              {mode === "dine" && !restaurantId ? (
+                <DineSearch
+                  country={selectedCountry}
+                  onOpenRestaurant={openRestaurant}
+                  refreshKey={dineRefreshKey}
+                  onCountryUpdated={handleCountryUpdated}
+                  onRestaurantsAdded={() => setDineRefreshKey((value) => value + 1)}
+                />
+              ) : null}
 
-            {mode === "order" ? (
-              <OrderHome
-                country={selectedCountry}
-                onCountryUpdated={handleCountryUpdated}
-              />
-            ) : null}
-          </section>
+              {mode === "order" ? (
+                <OrderHome
+                  country={selectedCountry}
+                  onCountryUpdated={handleCountryUpdated}
+                />
+              ) : null}
+            </section>
           </TagsProvider>
         ) : null}
       </main>
+      <SiteFooter />
     </div>
   );
 }

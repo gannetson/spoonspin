@@ -1,8 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
-import {
-  insertApiRequestLog,
-  shouldSkipAccessLog,
-} from "../db/analytics.ts";
+import { insertApiRequestLog, shouldSkipAccessLog } from "../db/analytics.ts";
 
 /** Fire-and-forget API access logger. Must run after trust proxy. */
 export function apiRequestLogMiddleware(

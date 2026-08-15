@@ -21,11 +21,7 @@ vi.stubGlobal("localStorage", {
   },
 });
 
-function recipe(
-  id: string,
-  name: string,
-  category: Recipe["category"],
-): Recipe {
+function recipe(id: string, name: string, category: Recipe["category"]): Recipe {
   return {
     id,
     name,
@@ -119,34 +115,22 @@ function renderAt(path: string) {
 describe("URL state", () => {
   it("restores a valid country from the URL", async () => {
     renderAt("/?country=bg&mode=cook");
-    expect(
-      await screen.findByRole("heading", { name: "Bulgaria" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /Tonight's menu/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Bulgaria" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Tonight's menu/i })).toBeInTheDocument();
   });
 
   it("defaults to cook mode when a country URL has no mode", async () => {
     renderAt("/?country=bg");
-    expect(
-      await screen.findByRole("heading", { name: "Bulgaria" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /Tonight's menu/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Bulgaria" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Tonight's menu/i })).toBeInTheDocument();
   });
 
   it("fails gracefully for invalid country codes", async () => {
     renderAt("/?country=zz");
     await waitFor(() => {
-      expect(
-        screen.getByText(/could not find a published country/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/could not find a published country/i)).toBeInTheDocument();
     });
-    expect(
-      screen.getByRole("button", { name: /spin the spoon/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /spin the spoon/i })).toBeInTheDocument();
   });
 
   it("opens a recipe from cook mode", async () => {
@@ -156,9 +140,7 @@ describe("URL state", () => {
       await screen.findByRole("heading", { name: "Netherlands" }),
     ).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /stamppot/i }));
-    expect(
-      screen.getByRole("button", { name: /back to menu/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /back to menu/i })).toBeInTheDocument();
   });
 
   it("lets you manually select a country", async () => {
@@ -170,11 +152,7 @@ describe("URL state", () => {
     await user.click(combobox);
     await user.type(combobox, "Bulgaria");
     await user.click(screen.getByRole("option", { name: /bulgaria/i }));
-    expect(
-      screen.getByRole("heading", { name: "Bulgaria" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: /Tonight's menu/i }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Bulgaria" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /Tonight's menu/i })).toBeInTheDocument();
   });
 });

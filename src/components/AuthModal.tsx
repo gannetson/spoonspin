@@ -69,9 +69,7 @@ export function AuthModal({
   useEffect(() => {
     if (!open) return;
     const params = new URLSearchParams(location.search);
-    setError(
-      params.get("error") === "oauth" ? t("login.error.oauth") : null,
-    );
+    setError(params.get("error") === "oauth" ? t("login.error.oauth") : null);
     setBusy(false);
     const timer = window.setTimeout(() => {
       emailRef.current?.focus();
@@ -102,9 +100,7 @@ export function AuthModal({
       }
       onSuccess();
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("login.error.generic"),
-      );
+      setError(err instanceof Error ? err.message : t("login.error.generic"));
     } finally {
       setBusy(false);
     }
@@ -161,102 +157,98 @@ export function AuthModal({
               >
                 {t("login.continueGoogle")}
               </a>
-              <p className="text-center text-sm text-ink-soft">
-                {t("login.orEmail")}
-              </p>
+              <p className="text-center text-sm text-ink-soft">{t("login.orEmail")}</p>
             </div>
           ) : null}
 
           <form onSubmit={onSubmit} className="space-y-4">
-          {mode === "register" ? (
+            {mode === "register" ? (
+              <label className="block">
+                <span className="text-sm font-medium text-ink-soft">
+                  {t("login.field.name")}
+                </span>
+                <input
+                  value={name}
+                  onChange={(event) => setName(event.target.value)}
+                  className="mt-1 min-h-12 w-full rounded-full border-2 border-ink/15 bg-white px-4 text-ink outline-none ring-tomato/30 focus:ring-2"
+                  autoComplete="name"
+                />
+              </label>
+            ) : null}
+
             <label className="block">
               <span className="text-sm font-medium text-ink-soft">
-                {t("login.field.name")}
+                {t("login.field.email")}
               </span>
               <input
-                value={name}
-                onChange={(event) => setName(event.target.value)}
+                ref={emailRef}
+                type="email"
+                required
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 className="mt-1 min-h-12 w-full rounded-full border-2 border-ink/15 bg-white px-4 text-ink outline-none ring-tomato/30 focus:ring-2"
-                autoComplete="name"
+                autoComplete="email"
               />
             </label>
-          ) : null}
 
-          <label className="block">
-            <span className="text-sm font-medium text-ink-soft">
-              {t("login.field.email")}
-            </span>
-            <input
-              ref={emailRef}
-              type="email"
-              required
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              className="mt-1 min-h-12 w-full rounded-full border-2 border-ink/15 bg-white px-4 text-ink outline-none ring-tomato/30 focus:ring-2"
-              autoComplete="email"
-            />
-          </label>
+            <label className="block">
+              <span className="text-sm font-medium text-ink-soft">
+                {t("login.field.password")}
+              </span>
+              <input
+                type="password"
+                required
+                minLength={8}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                className="mt-1 min-h-12 w-full rounded-full border-2 border-ink/15 bg-white px-4 text-ink outline-none ring-tomato/30 focus:ring-2"
+                autoComplete={mode === "login" ? "current-password" : "new-password"}
+              />
+            </label>
 
-          <label className="block">
-            <span className="text-sm font-medium text-ink-soft">
-              {t("login.field.password")}
-            </span>
-            <input
-              type="password"
-              required
-              minLength={8}
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              className="mt-1 min-h-12 w-full rounded-full border-2 border-ink/15 bg-white px-4 text-ink outline-none ring-tomato/30 focus:ring-2"
-              autoComplete={
-                mode === "login" ? "current-password" : "new-password"
-              }
-            />
-          </label>
+            {error ? (
+              <p role="alert" className="text-sm font-semibold text-tomato">
+                {error}
+              </p>
+            ) : null}
 
-          {error ? (
-            <p role="alert" className="text-sm font-semibold text-tomato">
-              {error}
+            <button
+              type="submit"
+              disabled={busy}
+              className="min-h-12 w-full rounded-full bg-tomato px-6 font-semibold text-cream hover:bg-tomato/90 disabled:opacity-60"
+            >
+              {busy
+                ? t("login.submit.busy")
+                : mode === "login"
+                  ? t("login.submit.signIn")
+                  : t("login.submit.createAccount")}
+            </button>
+
+            <p className="text-center text-sm text-ink-soft">
+              {mode === "login" ? (
+                <>
+                  {t("login.switch.noAccount")}{" "}
+                  <button
+                    type="button"
+                    className="font-semibold text-tomato underline-offset-2 hover:underline"
+                    onClick={() => onModeChange("register")}
+                  >
+                    {t("login.switch.register")}
+                  </button>
+                </>
+              ) : (
+                <>
+                  {t("login.switch.alreadyRegistered")}{" "}
+                  <button
+                    type="button"
+                    className="font-semibold text-tomato underline-offset-2 hover:underline"
+                    onClick={() => onModeChange("login")}
+                  >
+                    {t("login.switch.signIn")}
+                  </button>
+                </>
+              )}
             </p>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={busy}
-            className="min-h-12 w-full rounded-full bg-tomato px-6 font-semibold text-cream hover:bg-tomato/90 disabled:opacity-60"
-          >
-            {busy
-              ? t("login.submit.busy")
-              : mode === "login"
-                ? t("login.submit.signIn")
-                : t("login.submit.createAccount")}
-          </button>
-
-          <p className="text-center text-sm text-ink-soft">
-            {mode === "login" ? (
-              <>
-                {t("login.switch.noAccount")}{" "}
-                <button
-                  type="button"
-                  className="font-semibold text-tomato underline-offset-2 hover:underline"
-                  onClick={() => onModeChange("register")}
-                >
-                  {t("login.switch.register")}
-                </button>
-              </>
-            ) : (
-              <>
-                {t("login.switch.alreadyRegistered")}{" "}
-                <button
-                  type="button"
-                  className="font-semibold text-tomato underline-offset-2 hover:underline"
-                  onClick={() => onModeChange("login")}
-                >
-                  {t("login.switch.signIn")}
-                </button>
-              </>
-            )}
-          </p>
           </form>
         </div>
       </div>

@@ -5,11 +5,7 @@ import { useAuthModal } from "@/auth/AuthModalContext";
 import { ReviewModal } from "@/components/ReviewModal";
 import { useT } from "@/i18n/LocaleContext";
 import { useTagsOptional } from "@/tags/TagsContext";
-import {
-  removeTagPhoto,
-  uploadTagPhotos,
-  upsertMyTag,
-} from "@/tags/client";
+import { removeTagPhoto, uploadTagPhotos, upsertMyTag } from "@/tags/client";
 import type { TagEntityType, UserTag } from "@/tags/types";
 import { drinkEntityId } from "@/tags/types";
 import { zClass } from "@/lib/stacking";
@@ -75,9 +71,7 @@ export function SuggestedItemReview({
   }, [toast]);
 
   if (!target) {
-    return toast ? (
-      <Toast message={toast} onDismiss={() => setToast(null)} />
-    ) : null;
+    return toast ? <Toast message={toast} onDismiss={() => setToast(null)} /> : null;
   }
 
   if (!user) {
@@ -153,20 +147,12 @@ export function SuggestedItemReview({
           return saved;
         }}
       />
-      {toast ? (
-        <Toast message={toast} onDismiss={() => setToast(null)} />
-      ) : null}
+      {toast ? <Toast message={toast} onDismiss={() => setToast(null)} /> : null}
     </>
   );
 }
 
-function Toast({
-  message,
-  onDismiss,
-}: {
-  message: string;
-  onDismiss: () => void;
-}) {
+function Toast({ message, onDismiss }: { message: string; onDismiss: () => void }) {
   const t = useT();
   return (
     <div

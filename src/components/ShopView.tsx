@@ -3,10 +3,7 @@ import type { Country, SpecialtyShop } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
-import {
-  handleShopAdminAction,
-  useAdminItemBusy,
-} from "@/admin/itemActions";
+import { handleShopAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useT } from "@/i18n/LocaleContext";
 
 type ShopViewProps = {
@@ -84,10 +81,7 @@ export function ShopView({
             {shop.name}
           </h2>
           <p className="flex items-start gap-1.5 text-ink-soft">
-            <MapPin
-              aria-hidden="true"
-              className="mt-1 size-4 shrink-0"
-            />
+            <MapPin aria-hidden="true" className="mt-1 size-4 shrink-0" />
             <span>
               {shop.address}
               {shop.city ? ` · ${shop.city}` : ""}
@@ -96,9 +90,7 @@ export function ShopView({
         </header>
 
         <p className="mt-4 text-lg font-semibold text-ink">{shop.specialty}</p>
-        {shop.notes ? (
-          <p className="mt-2 max-w-2xl text-ink-soft">{shop.notes}</p>
-        ) : null}
+        {shop.notes ? <p className="mt-2 max-w-2xl text-ink-soft">{shop.notes}</p> : null}
 
         <ItemTagBar
           className="mt-5"

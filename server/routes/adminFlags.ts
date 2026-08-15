@@ -14,12 +14,9 @@ const statusUpdateSchema = z.object({
 
 export function registerAdminFlagRoutes(app: Express): void {
   app.get("/api/admin/flags", requireAdmin, async (req, res) => {
-    const raw =
-      typeof req.query.status === "string" ? req.query.status : "open";
+    const raw = typeof req.query.status === "string" ? req.query.status : "open";
     const parsed = statusFilterSchema.safeParse(raw);
-    const status = (parsed.success ? parsed.data : "open") as
-      | ContentFlagStatus
-      | "all";
+    const status = (parsed.success ? parsed.data : "open") as ContentFlagStatus | "all";
 
     try {
       const flags = await listContentFlags({ status });

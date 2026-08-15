@@ -19,11 +19,7 @@ import {
   upsertCountryRecord,
   type MenuSlot,
 } from "../server/db/content.ts";
-import {
-  closeDb,
-  getDb,
-  upsertRestaurant,
-} from "../server/db/restaurants.ts";
+import { closeDb, getDb, upsertRestaurant } from "../server/db/restaurants.ts";
 import type { Country, Recipe } from "../src/types/content.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -104,9 +100,7 @@ async function main() {
   console.log(
     `Imported ${raw.countries.length} countries (${recipeCount} recipe rows) · ${restaurantCount} restaurants from ${inPath}`,
   );
-  console.log(
-    `DB totals: ${totals.countries} countries · ${totals.recipes} recipes`,
-  );
+  console.log(`DB totals: ${totals.countries} countries · ${totals.recipes} recipes`);
 }
 
 main().catch(async (error) => {

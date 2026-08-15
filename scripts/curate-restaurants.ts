@@ -24,10 +24,7 @@ import { countryCatalog } from "../src/content/countries/catalog.ts";
 import { aggregateGuestRating } from "../src/restaurants/ratings.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const CURATED_PATH = path.join(
-  rootDir,
-  "data/curated-restaurants.json",
-);
+const CURATED_PATH = path.join(rootDir, "data/curated-restaurants.json");
 
 const sourceRatingSchema = z.object({
   score: z.number().min(0).max(10),
@@ -72,9 +69,7 @@ function mapsUrl(name: string, address: string): string {
 async function main() {
   if (!fs.existsSync(CURATED_PATH)) {
     console.error(`Missing ${CURATED_PATH}`);
-    console.error(
-      "Create it with agent:proef or export restaurants, then re-run.",
-    );
+    console.error("Create it with agent:proef or export restaurants, then re-run.");
     process.exit(1);
   }
   const raw = JSON.parse(fs.readFileSync(CURATED_PATH, "utf8"));
@@ -113,9 +108,7 @@ async function main() {
   }
 
   const totals = await countByCuisineCode();
-  const missing = countryCatalog
-    .map((c) => c.code)
-    .filter((code) => !totals[code]);
+  const missing = countryCatalog.map((c) => c.code).filter((code) => !totals[code]);
 
   console.log(`Curated import complete: ${imported} reviewed restaurants`);
   console.log("\nReviewed coverage by cuisine (sample of gaps):");

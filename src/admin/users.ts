@@ -55,10 +55,9 @@ export type AdminUserProfileResponse = {
 export async function fetchAdminUserProfile(
   userId: string,
 ): Promise<AdminUserProfileResponse> {
-  const response = await fetch(
-    `/api/admin/users/${encodeURIComponent(userId)}/profile`,
-    { credentials: "include" },
-  );
+  const response = await fetch(`/api/admin/users/${encodeURIComponent(userId)}/profile`, {
+    credentials: "include",
+  });
   const data = (await response.json()) as AdminUserProfileResponse & {
     message?: string;
   };

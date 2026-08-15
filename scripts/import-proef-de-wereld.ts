@@ -101,13 +101,15 @@ function loadText(inputPath: string): string {
 }
 
 function slugify(value: string): string {
-  return value
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 48) || "place";
+  return (
+    value
+      .normalize("NFKD")
+      .replace(/\p{M}/gu, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "")
+      .slice(0, 48) || "place"
+  );
 }
 
 function normName(value: string): string {
@@ -188,9 +190,7 @@ function parsePlaces(text: string): ParsedPlace[] {
           current = line;
           fields[current] = "";
         } else if (current && line) {
-          fields[current] = fields[current]
-            ? `${fields[current]} ${line}`
-            : line;
+          fields[current] = fields[current] ? `${fields[current]} ${line}` : line;
         }
       }
 
@@ -230,9 +230,7 @@ function main() {
   const text = loadText(input);
   const parsed = parsePlaces(text);
   const existing = curatedSchema.parse(
-    fs.existsSync(CURATED_PATH)
-      ? JSON.parse(fs.readFileSync(CURATED_PATH, "utf8"))
-      : [],
+    fs.existsSync(CURATED_PATH) ? JSON.parse(fs.readFileSync(CURATED_PATH, "utf8")) : [],
   );
 
   // Replace previous Proef imports; dedupe only against non-Proef curated rows.
@@ -329,10 +327,7 @@ function main() {
 
     let id = entry.id;
     let n = 2;
-    const usedIds = new Set([
-      ...retained.map((e) => e.id),
-      ...added.map((e) => e.id),
-    ]);
+    const usedIds = new Set([...retained.map((e) => e.id), ...added.map((e) => e.id)]);
     while (usedIds.has(id)) {
       id = `${entry.id}-${n}`;
       n += 1;

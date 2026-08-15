@@ -14,9 +14,7 @@ export function LanguageSwitcher({ tone = "light" }: LanguageSwitcherProps) {
       role="group"
       aria-label={t("app.lang.switchAria")}
       className={`inline-flex overflow-hidden rounded-full text-sm font-semibold ring-1 ${
-        tone === "dark"
-          ? "ring-cream/30 text-cream"
-          : "ring-burgundy/20 text-burgundy"
+        tone === "dark" ? "ring-cream/30 text-cream" : "ring-burgundy/20 text-burgundy"
       }`}
     >
       {options.map((option) => {

@@ -54,9 +54,7 @@ export function ConsentProvider({ children }: { children: ReactNode }) {
     [consent, acceptMarketing, rejectMarketing],
   );
 
-  return (
-    <ConsentContext.Provider value={value}>{children}</ConsentContext.Provider>
-  );
+  return <ConsentContext.Provider value={value}>{children}</ConsentContext.Provider>;
 }
 
 export function useConsent(): ConsentContextValue {

@@ -133,9 +133,7 @@ export async function fetchSuggestionStatus(): Promise<{
   };
 }
 
-export async function fetchCommunityRecipes(
-  countryCode: string,
-): Promise<Recipe[]> {
+export async function fetchCommunityRecipes(countryCode: string): Promise<Recipe[]> {
   try {
     const response = await fetch(
       `/api/suggestions/recipes?countryCode=${encodeURIComponent(countryCode)}`,
@@ -148,9 +146,7 @@ export async function fetchCommunityRecipes(
   }
 }
 
-export async function fetchCommunityDrinks(
-  countryCode: string,
-): Promise<Drink[]> {
+export async function fetchCommunityDrinks(countryCode: string): Promise<Drink[]> {
   try {
     const response = await fetch(
       `/api/suggestions/drinks?countryCode=${encodeURIComponent(countryCode)}`,
@@ -163,9 +159,7 @@ export async function fetchCommunityDrinks(
   }
 }
 
-export async function fetchCommunityShops(
-  countryCode: string,
-): Promise<SpecialtyShop[]> {
+export async function fetchCommunityShops(countryCode: string): Promise<SpecialtyShop[]> {
   try {
     const response = await fetch(
       `/api/suggestions/shops?countryCode=${encodeURIComponent(countryCode)}`,
@@ -237,10 +231,7 @@ export async function confirmSuggestion(
   const data = (await response.json()) as {
     kind: SuggestionKind;
     submission:
-      | RecipeSubmission
-      | RestaurantSubmission
-      | DrinkSubmission
-      | ShopSubmission;
+      RecipeSubmission | RestaurantSubmission | DrinkSubmission | ShopSubmission;
   };
   return { kind: data.kind, ...data.submission } as AnySubmission;
 }
@@ -279,10 +270,7 @@ export async function reviewSubmission(input: {
   const data = (await response.json()) as {
     kind: SuggestionKind;
     submission:
-      | RecipeSubmission
-      | RestaurantSubmission
-      | DrinkSubmission
-      | ShopSubmission;
+      RecipeSubmission | RestaurantSubmission | DrinkSubmission | ShopSubmission;
   };
   return { kind: data.kind, ...data.submission } as AnySubmission;
 }

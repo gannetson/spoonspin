@@ -187,9 +187,7 @@
   }
 
   .flag-glow {
-    filter:
-      drop-shadow(0 0 0.5px #fff)
-      drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
+    filter: drop-shadow(0 0 0.5px #fff) drop-shadow(0 0 2px rgba(255, 255, 255, 0.95))
       drop-shadow(0 0 6px rgba(255, 255, 255, 0.75))
       drop-shadow(0 1px 8px rgba(255, 255, 255, 0.45));
   }

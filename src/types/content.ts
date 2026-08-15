@@ -1,11 +1,5 @@
 export type DrinkType =
-  | "beer"
-  | "wine"
-  | "spirit"
-  | "cocktail"
-  | "soft-drink"
-  | "tea"
-  | "coffee";
+  "beer" | "wine" | "spirit" | "cocktail" | "soft-drink" | "tea" | "coffee";
 
 export type Drink = {
   /** Present on community suggestions; authored drinks may omit it. */
@@ -74,11 +68,7 @@ export type SpecialtyShop = {
 
 /** Curated delivery / takeaway option for Order at home. */
 export type OrderPlatform =
-  | "thuisbezorgd"
-  | "ubereats"
-  | "deliveroo"
-  | "direct"
-  | "other";
+  "thuisbezorgd" | "ubereats" | "deliveroo" | "direct" | "other";
 
 export type OrderOption = {
   id: string;
@@ -108,9 +98,7 @@ export type Menu = {
 };
 
 /** Curated “perfect taste” dinner for the Dinner tab (refs into recipes/drinks). */
-export type DinnerCourseRole =
-  | RecipeCategory
-  | "extra";
+export type DinnerCourseRole = RecipeCategory | "extra";
 
 export type DinnerCourse = {
   recipeId: string;

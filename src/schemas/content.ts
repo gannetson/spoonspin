@@ -3,15 +3,7 @@ import { z } from "zod";
 export const drinkSchema = z.object({
   name: z.string().min(1),
   localName: z.string().min(1).optional(),
-  type: z.enum([
-    "beer",
-    "wine",
-    "spirit",
-    "cocktail",
-    "soft-drink",
-    "tea",
-    "coffee",
-  ]),
+  type: z.enum(["beer", "wine", "spirit", "cocktail", "soft-drink", "tea", "coffee"]),
   alcoholic: z.boolean(),
   description: z.string().min(20),
   grape: z.string().min(2).optional(),

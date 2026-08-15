@@ -191,10 +191,7 @@ export async function fetchWebsiteImageCandidates(
     return ranked.slice(0, MAX_RESULTS).map((url, index) => ({
       url,
       attribution: `From ${host}`,
-      title:
-        index === 0
-          ? `${name} (website)`
-          : `${name} (website ${index + 1})`,
+      title: index === 0 ? `${name} (website)` : `${name} (website ${index + 1})`,
     }));
   } catch (error) {
     console.warn(`Website image lookup failed for ${pageUrl}`, error);

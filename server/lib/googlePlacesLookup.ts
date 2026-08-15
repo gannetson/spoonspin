@@ -3,10 +3,7 @@
  * Used for admin discover, community suggestions, and name verification.
  */
 
-import {
-  getGooglePlacesApiKey,
-  isGooglePlacesConfigured,
-} from "./googlePlacesPhoto.ts";
+import { getGooglePlacesApiKey, isGooglePlacesConfigured } from "./googlePlacesPhoto.ts";
 
 export { isGooglePlacesConfigured };
 
@@ -77,24 +74,18 @@ const DIRECTORY_WEBSITE_HOSTS = [
   "maps.app.goo.gl",
 ];
 
-export function isDirectoryOrDeliveryWebsite(
-  url: string | undefined,
-): boolean {
+export function isDirectoryOrDeliveryWebsite(url: string | undefined): boolean {
   if (!url?.trim()) return false;
   try {
     const parsed = new URL(url.trim());
     const hostPath = `${parsed.hostname}${parsed.pathname}`.toLowerCase();
-    return DIRECTORY_WEBSITE_HOSTS.some((fragment) =>
-      hostPath.includes(fragment),
-    );
+    return DIRECTORY_WEBSITE_HOSTS.some((fragment) => hostPath.includes(fragment));
   } catch {
     return true;
   }
 }
 
-export function officialWebsiteOrUndefined(
-  url: string | undefined,
-): string | undefined {
+export function officialWebsiteOrUndefined(url: string | undefined): string | undefined {
   if (!url?.trim() || !/^https?:\/\//i.test(url.trim())) return undefined;
   if (isDirectoryOrDeliveryWebsite(url)) return undefined;
   return url.trim();
@@ -162,28 +153,25 @@ async function searchGooglePlaces(
     body.includedType = options.includedType;
   }
 
-  const response = await fetch(
-    "https://places.googleapis.com/v1/places:searchText",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask": [
-          "places.id",
-          "places.displayName",
-          "places.formattedAddress",
-          "places.location",
-          "places.websiteUri",
-          "places.googleMapsUri",
-          "places.nationalPhoneNumber",
-          "places.rating",
-          "places.userRatingCount",
-        ].join(","),
-      },
-      body: JSON.stringify(body),
+  const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask": [
+        "places.id",
+        "places.displayName",
+        "places.formattedAddress",
+        "places.location",
+        "places.websiteUri",
+        "places.googleMapsUri",
+        "places.nationalPhoneNumber",
+        "places.rating",
+        "places.userRatingCount",
+      ].join(","),
     },
-  );
+    body: JSON.stringify(body),
+  });
 
   if (!response.ok) {
     const text = await response.text();
@@ -213,14 +201,10 @@ function pickNetherlandsMatch(
   );
 }
 
-function toMatch(
-  match: PlacesSearchHit,
-  fallbackCity: string,
-): GooglePlaceMatch {
+function toMatch(match: PlacesSearchHit, fallbackCity: string): GooglePlaceMatch {
   const formattedAddress = match.formattedAddress!;
   const postcodeMatch = formattedAddress.match(/\b(\d{4}\s*[A-Z]{2})\b/i);
-  const city =
-    extractCity(formattedAddress) ?? (fallbackCity.trim() || "Netherlands");
+  const city = extractCity(formattedAddress) ?? (fallbackCity.trim() || "Netherlands");
 
   return {
     placeId: match.id!,
@@ -238,10 +222,7 @@ function toMatch(
   };
 }
 
-function hitToGrounded(
-  hit: PlacesSearchHit,
-  matchedQuery: string,
-): GroundedPlace | null {
+function hitToGrounded(hit: PlacesSearchHit, matchedQuery: string): GroundedPlace | null {
   if (
     !hit.id ||
     !hit.displayName?.text ||
@@ -274,9 +255,7 @@ export async function lookupGoogleRestaurant(place: {
   const queries = [
     [place.name, "restaurant", city, "Netherlands"].filter(Boolean).join(" "),
     address
-      ? [place.name, "restaurant", address, city, "Netherlands"]
-          .filter(Boolean)
-          .join(" ")
+      ? [place.name, "restaurant", address, city, "Netherlands"].filter(Boolean).join(" ")
       : null,
   ].filter((query, index, all): query is string => {
     if (!query) return false;
@@ -405,7 +384,5 @@ export async function searchGoogleRestaurantsByCuisine(input: {
     }
   }
 
-  return [...byId.values()].sort(
-    (a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0),
-  );
+  return [...byId.values()].sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
 }

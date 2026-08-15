@@ -9,8 +9,7 @@ import {
 } from "./restaurants";
 
 const TEST_DATABASE_URL =
-  process.env.TEST_DATABASE_URL?.trim() ||
-  "postgresql://localhost:5432/spoonspin_test";
+  process.env.TEST_DATABASE_URL?.trim() || "postgresql://localhost:5432/spoonspin_test";
 
 describe("local restaurant repository", () => {
   beforeEach(async () => {

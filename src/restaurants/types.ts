@@ -4,12 +4,7 @@ import type { RestaurantRatings } from "./ratings";
 export type PriceLevel = 1 | 2 | 3 | 4;
 
 export type RestaurantMenuItemCategory =
-  | "starter"
-  | "main"
-  | "side"
-  | "dessert"
-  | "snack"
-  | "drink";
+  "starter" | "main" | "side" | "dessert" | "snack" | "drink";
 
 export type RestaurantMenuItem = {
   id: string;

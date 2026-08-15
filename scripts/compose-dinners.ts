@@ -9,10 +9,7 @@
  *   npm run agent:compose-dinners -- --status
  */
 import "dotenv/config";
-import {
-  listCountriesFromDb,
-  saveDinnerSuggestion,
-} from "../server/db/content.ts";
+import { listCountriesFromDb, saveDinnerSuggestion } from "../server/db/content.ts";
 import { closeDb, getDb } from "../server/db/restaurants.ts";
 import { composeDinnerSuggestion } from "../server/openai/adminDiscover.ts";
 import {
@@ -26,8 +23,7 @@ function parseArgs(argv: string[]) {
   const codeIdx = argv.indexOf("--code");
   const code = codeIdx >= 0 ? argv[codeIdx + 1]?.toLowerCase() : undefined;
   const batchIdx = argv.indexOf("--batch");
-  const batch =
-    batchIdx >= 0 ? Math.max(1, Number(argv[batchIdx + 1] || 5)) : 5;
+  const batch = batchIdx >= 0 ? Math.max(1, Number(argv[batchIdx + 1] || 5)) : 5;
   return { status, force, code, batch };
 }
 

@@ -66,10 +66,7 @@ export function getSavedDineCoords(): SavedCoords | undefined {
   }
 }
 
-export function saveDineLocation(
-  cityOrPostcode: string,
-  coords?: SavedCoords,
-): void {
+export function saveDineLocation(cityOrPostcode: string, coords?: SavedCoords): void {
   if (typeof window === "undefined") return;
   const city = cityOrPostcode.trim();
   if (!city) return;

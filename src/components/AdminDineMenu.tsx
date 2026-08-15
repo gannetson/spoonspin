@@ -23,8 +23,9 @@ export function AdminDineMenu({
 }: AdminDineMenuProps) {
   const t = useT();
   const menuId = useId();
-  const { open, setOpen, rootRef, triggerRef, panelRef, position } =
-    usePortalMenu({ estimatedHeight: 120 });
+  const { open, setOpen, rootRef, triggerRef, panelRef, position } = usePortalMenu({
+    estimatedHeight: 120,
+  });
   const [discoverOpen, setDiscoverOpen] = useState(false);
 
   const menu =

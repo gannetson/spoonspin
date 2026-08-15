@@ -128,8 +128,7 @@ function flagsFromCodes(
   if (flags.length === 0) return [];
   const candidates = itemNameCandidates(item);
   return flags.map((cuisine) => {
-    const hit =
-      candidates.length > 0 ? findRecipeHit(cuisine.code, candidates) : null;
+    const hit = candidates.length > 0 ? findRecipeHit(cuisine.code, candidates) : null;
     return {
       code: cuisine.code,
       name: cuisine.name,

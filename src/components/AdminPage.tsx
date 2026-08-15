@@ -15,9 +15,7 @@ export function AdminPage() {
   const t = useT();
   const { user, loading: authLoading } = useAuth();
   const { openAuth } = useAuthModal();
-  const [statusFilter, setStatusFilter] = useState<SubmissionStatus | "all">(
-    "pending",
-  );
+  const [statusFilter, setStatusFilter] = useState<SubmissionStatus | "all">("pending");
   const [submissions, setSubmissions] = useState<AnySubmission[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -49,9 +47,7 @@ export function AdminPage() {
       } catch (err) {
         if (!cancelled) {
           setSubmissions([]);
-          setError(
-            err instanceof Error ? err.message : t("admin.error.load"),
-          );
+          setError(err instanceof Error ? err.message : t("admin.error.load"));
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -89,7 +85,10 @@ export function AdminPage() {
       <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-3">
-            <Link to="/admin" className="text-sm font-semibold text-tomato hover:underline">
+            <Link
+              to="/admin"
+              className="text-sm font-semibold text-tomato hover:underline"
+            >
               {t("admin.review.backToOverview")}
             </Link>
             {isAdmin ? (
@@ -127,14 +126,20 @@ export function AdminPage() {
         ) : null}
 
         {!authLoading && user && !isAdmin ? (
-          <p role="alert" className="mt-8 rounded-xl border border-tomato/30 bg-cream px-4 py-3 text-tomato">
+          <p
+            role="alert"
+            className="mt-8 rounded-xl border border-tomato/30 bg-cream px-4 py-3 text-tomato"
+          >
             {t("admin.noAccess")}
           </p>
         ) : null}
 
         {isAdmin ? (
           <div className="mt-6 flex flex-wrap items-center gap-3">
-            <label htmlFor="status-filter" className="text-sm font-semibold text-burgundy">
+            <label
+              htmlFor="status-filter"
+              className="text-sm font-semibold text-burgundy"
+            >
               {t("admin.show")}
             </label>
             <select
@@ -159,7 +164,10 @@ export function AdminPage() {
         ) : null}
 
         {error ? (
-          <p role="alert" className="mt-4 rounded-xl border border-tomato/30 bg-cream px-4 py-3 text-tomato">
+          <p
+            role="alert"
+            className="mt-4 rounded-xl border border-tomato/30 bg-cream px-4 py-3 text-tomato"
+          >
             {error}
           </p>
         ) : null}
@@ -185,8 +193,7 @@ export function AdminPage() {
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
-                      {t(`admin.kind.${item.kind}`)} · {item.status} ·{" "}
-                      {item.countryName}
+                      {t(`admin.kind.${item.kind}`)} · {item.status} · {item.countryName}
                     </p>
                     <h2 className="mt-1 font-display text-2xl text-burgundy">
                       {item.kind === "recipe"
@@ -207,8 +214,7 @@ export function AdminPage() {
                     ) : null}
                     {item.kind === "recipe" ? (
                       <p className="mt-2 text-sm text-ink-soft">
-                        {item.recipe.category} · {item.recipe.description.slice(0, 140)}
-                        …
+                        {item.recipe.category} · {item.recipe.description.slice(0, 140)}…
                       </p>
                     ) : null}
                     {item.kind === "restaurant" ? (
@@ -218,8 +224,7 @@ export function AdminPage() {
                     ) : null}
                     {item.kind === "drink" ? (
                       <p className="mt-2 text-sm text-ink-soft">
-                        {item.drink.type} · {item.drink.description.slice(0, 140)}
-                        …
+                        {item.drink.type} · {item.drink.description.slice(0, 140)}…
                       </p>
                     ) : null}
                     {item.kind === "shop" ? (

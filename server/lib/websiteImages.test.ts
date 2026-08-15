@@ -30,10 +30,9 @@ describe("fetchWebsiteImageCandidates", () => {
       }),
     );
 
-    const results = await fetchWebsiteImageCandidates(
-      "https://restaurant.example",
-      { restaurantName: "Demo Bistro" },
-    );
+    const results = await fetchWebsiteImageCandidates("https://restaurant.example", {
+      restaurantName: "Demo Bistro",
+    });
 
     expect(results.map((item) => item.url)).toEqual([
       "https://restaurant.example/media/hero.jpg",

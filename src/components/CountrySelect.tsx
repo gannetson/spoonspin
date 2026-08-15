@@ -103,10 +103,7 @@ export function CountrySelect({
     if (!open) return;
     const onPointerDown = (event: PointerEvent) => {
       const target = event.target as Node;
-      if (
-        rootRef.current?.contains(target) ||
-        listRef.current?.contains(target)
-      ) {
+      if (rootRef.current?.contains(target) || listRef.current?.contains(target)) {
         return;
       }
       setOpen(false);
@@ -150,9 +147,7 @@ export function CountrySelect({
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (
       !open &&
-      (event.key === "ArrowDown" ||
-        event.key === "ArrowUp" ||
-        event.key === "Enter")
+      (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter")
     ) {
       event.preventDefault();
       openList(true);
@@ -172,9 +167,7 @@ export function CountrySelect({
     if (event.key === "ArrowUp") {
       event.preventDefault();
       setActiveIndex((index) =>
-        filtered.length === 0
-          ? 0
-          : (index - 1 + filtered.length) % filtered.length,
+        filtered.length === 0 ? 0 : (index - 1 + filtered.length) % filtered.length,
       );
       return;
     }

@@ -4,11 +4,7 @@
  * Runs in-process (no external queue); jobs are fire-and-forget after admin add.
  */
 
-import {
-  getRecipeRow,
-  updateRecipeFields,
-  updateRecipeImage,
-} from "../db/content.ts";
+import { getRecipeRow, updateRecipeFields, updateRecipeImage } from "../db/content.ts";
 import {
   discoverItemImageQueries,
   expandDishCandidates,
@@ -41,9 +37,7 @@ export function scheduleRecipeEnrichment(job: RecipeEnrichmentJob): void {
   void drainQueue();
 }
 
-export function scheduleRecipeEnrichments(
-  jobs: RecipeEnrichmentJob[],
-): number {
+export function scheduleRecipeEnrichments(jobs: RecipeEnrichmentJob[]): number {
   let scheduled = 0;
   for (const job of jobs) {
     const key = jobKey(job);
@@ -79,26 +73,18 @@ async function drainQueue(): Promise<void> {
   }
 }
 
-export async function enrichRecipeFully(
-  job: RecipeEnrichmentJob,
-): Promise<void> {
+export async function enrichRecipeFully(job: RecipeEnrichmentJob): Promise<void> {
   const { countryCode, countryName, recipeId, candidate } = job;
   console.info(`[recipe-enrich] start ${countryCode}/${recipeId}`);
 
   if (candidate) {
     await expandStub(job).catch((error) => {
-      console.warn(
-        `[recipe-enrich] expand failed ${countryCode}/${recipeId}`,
-        error,
-      );
+      console.warn(`[recipe-enrich] expand failed ${countryCode}/${recipeId}`, error);
     });
   }
 
   await enrichImage(countryCode, countryName, recipeId).catch((error) => {
-    console.warn(
-      `[recipe-enrich] image failed ${countryCode}/${recipeId}`,
-      error,
-    );
+    console.warn(`[recipe-enrich] image failed ${countryCode}/${recipeId}`, error);
   });
 
   console.info(`[recipe-enrich] done ${countryCode}/${recipeId}`);
@@ -171,10 +157,5 @@ async function enrichImage(
   });
   if (!image) return;
 
-  await updateRecipeImage(
-    countryCode,
-    recipeId,
-    image.url,
-    image.attribution,
-  );
+  await updateRecipeImage(countryCode, recipeId, image.url, image.attribution);
 }

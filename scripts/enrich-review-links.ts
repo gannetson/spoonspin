@@ -48,8 +48,7 @@ function parseArgs(argv: string[]) {
   const status = argv.includes("--status");
   const force = argv.includes("--force");
   const batchIdx = argv.indexOf("--batch");
-  const batch =
-    batchIdx >= 0 ? Math.max(1, Number(argv[batchIdx + 1] || 20)) : 20;
+  const batch = batchIdx >= 0 ? Math.max(1, Number(argv[batchIdx + 1] || 20)) : 20;
   return { status, force, batch };
 }
 
@@ -190,9 +189,7 @@ async function resolveLinks(place: StoredRestaurant): Promise<{
   let tripadvisor = needTa
     ? pickReviewProfileUrl("tripadvisor", allSources, restaurant)
     : null;
-  let theFork = needFork
-    ? pickReviewProfileUrl("theFork", allSources, restaurant)
-    : null;
+  let theFork = needFork ? pickReviewProfileUrl("theFork", allSources, restaurant) : null;
   let openTable = needOt
     ? pickReviewProfileUrl("openTable", allSources, restaurant)
     : null;
@@ -204,11 +201,7 @@ async function resolveLinks(place: StoredRestaurant): Promise<{
       );
       allSources.push(...openaiSources);
       if (needTa && !tripadvisor) {
-        tripadvisor = pickReviewProfileUrl(
-          "tripadvisor",
-          allSources,
-          restaurant,
-        );
+        tripadvisor = pickReviewProfileUrl("tripadvisor", allSources, restaurant);
       }
       if (needFork && !theFork) {
         theFork = pickReviewProfileUrl("theFork", allSources, restaurant);
@@ -217,9 +210,7 @@ async function resolveLinks(place: StoredRestaurant): Promise<{
         openTable = pickReviewProfileUrl("openTable", allSources, restaurant);
       }
     } catch (error) {
-      console.warn(
-        ` openai: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      console.warn(` openai: ${error instanceof Error ? error.message : String(error)}`);
     }
   }
 
@@ -254,8 +245,7 @@ async function main() {
     .filter((place) => needsResolution(place, args.force))
     .sort((a, b) => {
       const score = (place: StoredRestaurant) =>
-        (place.ratings?.tripadvisor?.url ? 1 : 0) +
-        (place.ratings?.theFork?.url ? 1 : 0);
+        (place.ratings?.tripadvisor?.url ? 1 : 0) + (place.ratings?.theFork?.url ? 1 : 0);
       return score(a) - score(b);
     });
 
@@ -283,9 +273,7 @@ async function main() {
 
   let resolved = 0;
   const fullyDone = new Set(
-    places
-      .filter((place) => !needsResolution(place, false))
-      .map((place) => place.id),
+    places.filter((place) => !needsResolution(place, false)).map((place) => place.id),
   );
 
   for (const place of batch) {
@@ -328,9 +316,7 @@ async function main() {
         ` TA=${after.ta ? "yes" : "—"} Fork=${after.fork ? "yes" : "—"} OT=${after.ot ? "yes" : "—"} (+${gained})`,
       );
     } catch (error) {
-      console.log(
-        ` failed: ${error instanceof Error ? error.message : String(error)}`,
-      );
+      console.log(` failed: ${error instanceof Error ? error.message : String(error)}`);
     }
     await sleep(400);
   }

@@ -63,10 +63,7 @@ export type GroundedOrderListing = {
   notes?: string;
 };
 
-export function cuisineSearchTerms(
-  countryCode: string,
-  countryName: string,
-): string[] {
+export function cuisineSearchTerms(countryCode: string, countryName: string): string[] {
   const code = countryCode.toLowerCase();
   const terms = new Set<string>();
   const add = (value: string | undefined) => {
@@ -102,10 +99,9 @@ function hubsMatchingText(raw: string): {
       (alias) =>
         lower === alias ||
         lower.includes(alias) ||
-        new RegExp(
-          `\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-          "i",
-        ).test(raw),
+        new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(
+          raw,
+        ),
     ),
   );
 
@@ -170,10 +166,9 @@ export function resolveSearchHubs(
       (alias) =>
         lower === alias ||
         lower.includes(alias) ||
-        new RegExp(
-          `\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-          "i",
-        ).test(queryRaw),
+        new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(
+          queryRaw,
+        ),
     ),
   );
 
@@ -264,9 +259,7 @@ function normalizeUberEatsUrl(url: string): string | undefined {
   }
 }
 
-export function mapThuisbezorgdItem(
-  item: unknown,
-): GroundedOrderListing | null {
+export function mapThuisbezorgdItem(item: unknown): GroundedOrderListing | null {
   const row = asRecord(item);
   if (!row) return null;
   const name = asString(row.name);
@@ -303,35 +296,22 @@ export function mapThuisbezorgdItem(
 export function mapUberEatsItem(item: unknown): GroundedOrderListing | null {
   const row = asRecord(item);
   if (!row) return null;
-  const name =
-    asString(row.title) ||
-    asString(row.sanitizedTitle) ||
-    asString(row.name);
+  const name = asString(row.title) || asString(row.sanitizedTitle) || asString(row.name);
   const url = normalizeUberEatsUrl(asString(row.url));
   if (!name || !url) return null;
 
   const location = asRecord(row.location);
-  const city =
-    asString(location?.city) ||
-    asString(row.city) ||
-    undefined;
+  const city = asString(location?.city) || asString(row.city) || undefined;
   const cuisines =
-    asStringArray(row.cuisineList) ||
-    asStringArray(row.categories) ||
-    undefined;
+    asStringArray(row.cuisineList) || asStringArray(row.categories) || undefined;
   const ratingObj = asRecord(row.rating);
-  const rating =
-    asNumber(ratingObj?.ratingValue) || asNumber(row.ratingValue);
-  const reviewRaw =
-    asString(ratingObj?.reviewCount) || asString(row.reviewCount);
-  const ratingCount = reviewRaw
-    ? asNumber(reviewRaw.replace(/[^0-9.]/g, ""))
-    : undefined;
+  const rating = asNumber(ratingObj?.ratingValue) || asNumber(row.ratingValue);
+  const reviewRaw = asString(ratingObj?.reviewCount) || asString(row.reviewCount);
+  const ratingCount = reviewRaw ? asNumber(reviewRaw.replace(/[^0-9.]/g, "")) : undefined;
 
   const featured = asRecord(row.featuredItems);
   const signatureDishHint =
-    asString(featured?.title) ||
-    asString(asRecord(row.featuredItem)?.title);
+    asString(featured?.title) || asString(asRecord(row.featuredItem)?.title);
 
   const bits = [
     rating != null
@@ -365,16 +345,9 @@ function nameKey(listing: GroundedOrderListing): string {
   return `${listing.platform}:${listing.name.toLowerCase().replace(/[^a-z0-9]+/g, "")}`;
 }
 
-function matchesCuisineFocus(
-  listing: GroundedOrderListing,
-  terms: string[],
-): boolean {
+function matchesCuisineFocus(listing: GroundedOrderListing, terms: string[]): boolean {
   if (terms.length === 0) return true;
-  const hay = [
-    listing.name,
-    ...(listing.cuisines ?? []),
-    listing.notes ?? "",
-  ]
+  const hay = [listing.name, ...(listing.cuisines ?? []), listing.notes ?? ""]
     .join(" ")
     .toLowerCase();
   return terms.some((term) => {
@@ -447,17 +420,12 @@ export async function searchDeliveryOrderOptions(input: {
     );
   }
 
-  const maxPerPlatform = Math.min(
-    Math.max(input.maxPerPlatform ?? 10, 3),
-    20,
-  );
+  const maxPerPlatform = Math.min(Math.max(input.maxPerPlatform ?? 10, 3), 20);
   const { hubs, focusTerms } = resolveSearchHubs(input.query, input.city);
   const cuisineTerms = cuisineSearchTerms(input.countryCode, input.countryName);
-  const searchQuery = [...focusTerms, ...cuisineTerms]
-    .filter(Boolean)
-    .slice(0, 4)
-    .join(" ")
-    .trim() || input.countryName;
+  const searchQuery =
+    [...focusTerms, ...cuisineTerms].filter(Boolean).slice(0, 4).join(" ").trim() ||
+    input.countryName;
 
   const addresses = hubs.map((hub) => hub.address);
   // Uber Eats actor is address+query once; use the first hub (or only matched city).

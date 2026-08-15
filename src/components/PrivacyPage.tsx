@@ -1,16 +1,23 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
+import { SiteFooter } from "@/components/SiteFooter";
 import { useConsent } from "@/consent/ConsentContext";
 import { useT } from "@/i18n/LocaleContext";
+import { privacyMeta, setDocumentMeta } from "@/seo/documentMeta";
+import { clearSeoJsonLd, setWebsiteJsonLd } from "@/seo/jsonLd";
 
 export function PrivacyPage() {
   const t = useT();
-  const {
-    hasDecided,
-    marketingAllowed,
-    acceptMarketing,
-    rejectMarketing,
-  } = useConsent();
+  const { hasDecided, marketingAllowed, acceptMarketing, rejectMarketing } = useConsent();
+
+  useEffect(() => {
+    setDocumentMeta(privacyMeta(t));
+    setWebsiteJsonLd(t("meta.privacy.description"));
+    return () => {
+      clearSeoJsonLd();
+    };
+  }, [t]);
 
   const preferenceLabel = !hasDecided
     ? t("privacy.preference.undecided")
@@ -19,8 +26,8 @@ export function PrivacyPage() {
       : t("privacy.preference.essential");
 
   return (
-    <div className="min-h-screen bg-parchment">
-      <div className="mx-auto max-w-2xl px-4 py-8 sm:px-6 sm:py-12">
+    <div className="flex min-h-screen flex-col bg-parchment">
+      <div className="mx-auto w-full max-w-2xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
         <Link
           to="/"
           className="inline-flex items-center gap-2 text-sm font-semibold text-stamp hover:text-tomato"
@@ -49,6 +56,15 @@ export function PrivacyPage() {
           </h2>
           <p className="text-sm leading-relaxed text-ink-soft">
             {t("privacy.marketing.body")}
+          </p>
+        </section>
+
+        <section className="mt-8 space-y-2">
+          <h2 className="font-display text-2xl text-burgundy">
+            {t("privacy.affiliate.title")}
+          </h2>
+          <p className="text-sm leading-relaxed text-ink-soft">
+            {t("privacy.affiliate.body")}
           </p>
         </section>
 
@@ -86,6 +102,7 @@ export function PrivacyPage() {
           </div>
         </section>
       </div>
+      <SiteFooter />
     </div>
   );
 }

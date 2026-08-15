@@ -4,10 +4,7 @@ import type { Country } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { fetchRestaurants } from "@/restaurants/client";
 import type { Restaurant } from "@/restaurants/types";
-import {
-  sortRestaurants,
-  type RestaurantSortMode,
-} from "@/restaurants/sortRestaurants";
+import { sortRestaurants, type RestaurantSortMode } from "@/restaurants/sortRestaurants";
 import {
   DEFAULT_DINE_CITY,
   getRememberCityPreference,
@@ -27,10 +24,7 @@ import {
   type SuggestReviewTarget,
 } from "@/components/SuggestedItemReview";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
-import {
-  handleRestaurantAdminAction,
-  useAdminItemBusy,
-} from "@/admin/itemActions";
+import { handleRestaurantAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -63,11 +57,7 @@ type ViewState =
       message: string;
     };
 
-const SORT_OPTION_VALUES: RestaurantSortMode[] = [
-  "default",
-  "authenticity",
-  "rating",
-];
+const SORT_OPTION_VALUES: RestaurantSortMode[] = ["default", "authenticity", "rating"];
 
 const SORT_OPTION_KEYS: Record<RestaurantSortMode, string> = {
   default: "dine.sort.default",
@@ -91,9 +81,7 @@ export function DineSearch({
   const savedCity = getSavedDineCity();
   const rememberPreferred = getRememberCityPreference();
 
-  const [cityOrPostcode, setCityOrPostcode] = useState(
-    savedCity ?? DEFAULT_DINE_CITY,
-  );
+  const [cityOrPostcode, setCityOrPostcode] = useState(savedCity ?? DEFAULT_DINE_CITY);
   const [rememberCity, setRememberCity] = useState(rememberPreferred);
   const [editingLocation, setEditingLocation] = useState(
     !(rememberPreferred && Boolean(savedCity)),
@@ -105,9 +93,7 @@ export function DineSearch({
   const [sortMode, setSortMode] = useState<RestaurantSortMode>("default");
   const [state, setState] = useState<ViewState>({ status: "idle" });
   const [suggestOpen, setSuggestOpen] = useState(false);
-  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(
-    null,
-  );
+  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(null);
 
   const searchRef = useRef({
     country,
@@ -173,8 +159,7 @@ export function DineSearch({
       setState({
         status: "empty",
         mapsSearchUrl: result.mapsSearchUrl,
-        message:
-          result.message ?? t("dine.empty.default", { name: country.name }),
+        message: result.message ?? t("dine.empty.default", { name: country.name }),
       });
       return;
     }
@@ -298,17 +283,10 @@ export function DineSearch({
     <section aria-labelledby="dine-heading" className="space-y-5">
       <div className="relative overflow-hidden rounded-[2rem]">
         {bannerUrl ? (
-          <img
-            src={bannerUrl}
-            alt=""
-            className="h-40 w-full object-cover sm:h-52"
-          />
+          <img src={bannerUrl} alt="" className="h-40 w-full object-cover sm:h-52" />
         ) : (
           <div className="h-40 w-full sm:h-52">
-            <MediaPlaceholder
-              labelKey="media.placeholder.country"
-              tone="dark"
-            />
+            <MediaPlaceholder labelKey="media.placeholder.country" tone="dark" />
           </div>
         )}
         <div
@@ -369,20 +347,14 @@ export function DineSearch({
         />
 
         {state.status === "loading" ? (
-          <p
-            className="inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle aria-hidden="true" className="size-5 animate-spin" />
             {t("dine.searching")}
           </p>
         ) : null}
 
         {state.status === "error" ? (
-          <div
-            className="rounded-2xl border border-tomato/30 bg-cream p-5"
-            role="alert"
-          >
+          <div className="rounded-2xl border border-tomato/30 bg-cream p-5" role="alert">
             <p className="font-semibold text-ink">{state.message}</p>
             <div className="mt-3 flex flex-wrap gap-3">
               <button
@@ -422,10 +394,7 @@ export function DineSearch({
                     })}
               </p>
               <div className="flex items-center gap-2">
-                <label
-                  htmlFor={sortId}
-                  className="text-sm font-semibold text-ink"
-                >
+                <label htmlFor={sortId} className="text-sm font-semibold text-ink">
                   {t("dine.sortBy")}
                 </label>
                 <select
@@ -523,10 +492,7 @@ export function DineSearch({
           }
         }}
       />
-      <SuggestedItemReview
-        target={reviewTarget}
-        onClose={() => setReviewTarget(null)}
-      />
+      <SuggestedItemReview target={reviewTarget} onClose={() => setReviewTarget(null)} />
     </section>
   );
 }

@@ -121,7 +121,7 @@ const UBER_CITY_SLUG: Record<string, string> = {
   arnhem: "arnhem-gelderland",
   amersfoort: "amersfoort-utrecht",
   zaandam: "zaandam-noord-holland",
-  "hoofddorp": "hoofddorp-noord-holland",
+  hoofddorp: "hoofddorp-noord-holland",
   maastricht: "maastricht-limburg",
   dordrecht: "dordrecht-zuid-holland",
   leiden: "leiden-zuid-holland",
@@ -212,14 +212,8 @@ export function deliveryPlatformLinks(
 ): DeliveryPlatformLink[] {
   const city = input.cityOrPostcode?.trim() || undefined;
   const cuisine = THUISBEZORGD_CUISINE_SLUG[input.countryCode.toLowerCase()];
-  const thuisLabel = cuisine
-    ? input.countryName
-    : city
-      ? city
-      : input.countryName;
-  const cityLabel = city
-    ? `${input.countryName} · ${city}`
-    : input.countryName;
+  const thuisLabel = cuisine ? input.countryName : city ? city : input.countryName;
+  const cityLabel = city ? `${input.countryName} · ${city}` : input.countryName;
   const marketingAllowed = input.marketingAllowed === true;
 
   return [
@@ -283,9 +277,7 @@ export function resolveOrderOptionHref(input: {
   marketingAllowed?: boolean;
 }): string {
   const url = input.url.trim();
-  const city =
-    input.cityOrPostcode?.trim() ||
-    undefined;
+  const city = input.cityOrPostcode?.trim() || undefined;
   const browseInput: DeliveryLinkInput = {
     countryCode: input.countryCode,
     countryName: input.countryName,
@@ -301,9 +293,7 @@ export function resolveOrderOptionHref(input: {
     );
   }
   if (input.platform === "ubereats") {
-    return isPlausibleUberEatsUrl(url)
-      ? url
-      : buildUberEatsUrl(browseInput);
+    return isPlausibleUberEatsUrl(url) ? url : buildUberEatsUrl(browseInput);
   }
   if (input.platform === "deliveroo" || /deliveroo\./i.test(url)) {
     // Deliveroo left NL — send people to a working platform instead.

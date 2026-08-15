@@ -121,9 +121,7 @@ function rowToRecipeSubmission(row: QueryResultRow): RecipeSubmission {
   };
 }
 
-function rowToRestaurantSubmission(
-  row: QueryResultRow,
-): RestaurantSubmission {
+function rowToRestaurantSubmission(row: QueryResultRow): RestaurantSubmission {
   return {
     id: String(row.id),
     countryCode: String(row.country_code),
@@ -131,8 +129,7 @@ function rowToRestaurantSubmission(
     query: String(row.query),
     status: String(row.status) as SubmissionStatus,
     restaurant: parseRestaurant(row.restaurant_json),
-    restaurantRowId:
-      row.restaurant_row_id == null ? null : String(row.restaurant_row_id),
+    restaurantRowId: row.restaurant_row_id == null ? null : String(row.restaurant_row_id),
     confirmationNotes:
       row.confirmation_notes == null ? null : String(row.confirmation_notes),
     createdAt: toIso(row.created_at),
@@ -294,10 +291,7 @@ export async function getRecipeSubmission(
   id: string,
 ): Promise<RecipeSubmission | undefined> {
   const db = await ensureDb();
-  const result = await db.query(
-    `SELECT * FROM recipe_submissions WHERE id = $1`,
-    [id],
-  );
+  const result = await db.query(`SELECT * FROM recipe_submissions WHERE id = $1`, [id]);
   const row = result.rows[0];
   return row ? rowToRecipeSubmission(row) : undefined;
 }
@@ -306,10 +300,9 @@ export async function getRestaurantSubmission(
   id: string,
 ): Promise<RestaurantSubmission | undefined> {
   const db = await ensureDb();
-  const result = await db.query(
-    `SELECT * FROM restaurant_submissions WHERE id = $1`,
-    [id],
-  );
+  const result = await db.query(`SELECT * FROM restaurant_submissions WHERE id = $1`, [
+    id,
+  ]);
   const row = result.rows[0];
   return row ? rowToRestaurantSubmission(row) : undefined;
 }
@@ -318,20 +311,14 @@ export async function getDrinkSubmission(
   id: string,
 ): Promise<DrinkSubmission | undefined> {
   const db = await ensureDb();
-  const result = await db.query(`SELECT * FROM drink_submissions WHERE id = $1`, [
-    id,
-  ]);
+  const result = await db.query(`SELECT * FROM drink_submissions WHERE id = $1`, [id]);
   const row = result.rows[0];
   return row ? rowToDrinkSubmission(row) : undefined;
 }
 
-export async function getShopSubmission(
-  id: string,
-): Promise<ShopSubmission | undefined> {
+export async function getShopSubmission(id: string): Promise<ShopSubmission | undefined> {
   const db = await ensureDb();
-  const result = await db.query(`SELECT * FROM shop_submissions WHERE id = $1`, [
-    id,
-  ]);
+  const result = await db.query(`SELECT * FROM shop_submissions WHERE id = $1`, [id]);
   const row = result.rows[0];
   return row ? rowToShopSubmission(row) : undefined;
 }
@@ -350,9 +337,7 @@ export async function listVisibleRecipesForCountry(
   return result.rows.map((row) => parseRecipe(row.recipe_json));
 }
 
-export async function listVisibleDrinksForCountry(
-  countryCode: string,
-): Promise<Drink[]> {
+export async function listVisibleDrinksForCountry(countryCode: string): Promise<Drink[]> {
   const db = await ensureDb();
   const result = await db.query(
     `SELECT drink_json FROM drink_submissions
@@ -388,9 +373,7 @@ export async function listSubmissions(options?: {
   if (kind === "all" || kind === "recipe") {
     const result =
       status === "all"
-        ? await db.query(
-            `SELECT * FROM recipe_submissions ORDER BY created_at DESC`,
-          )
+        ? await db.query(`SELECT * FROM recipe_submissions ORDER BY created_at DESC`)
         : await db.query(
             `SELECT * FROM recipe_submissions WHERE status = $1 ORDER BY created_at DESC`,
             [status],
@@ -403,9 +386,7 @@ export async function listSubmissions(options?: {
   if (kind === "all" || kind === "restaurant") {
     const result =
       status === "all"
-        ? await db.query(
-            `SELECT * FROM restaurant_submissions ORDER BY created_at DESC`,
-          )
+        ? await db.query(`SELECT * FROM restaurant_submissions ORDER BY created_at DESC`)
         : await db.query(
             `SELECT * FROM restaurant_submissions WHERE status = $1 ORDER BY created_at DESC`,
             [status],
@@ -418,9 +399,7 @@ export async function listSubmissions(options?: {
   if (kind === "all" || kind === "drink") {
     const result =
       status === "all"
-        ? await db.query(
-            `SELECT * FROM drink_submissions ORDER BY created_at DESC`,
-          )
+        ? await db.query(`SELECT * FROM drink_submissions ORDER BY created_at DESC`)
         : await db.query(
             `SELECT * FROM drink_submissions WHERE status = $1 ORDER BY created_at DESC`,
             [status],
@@ -433,9 +412,7 @@ export async function listSubmissions(options?: {
   if (kind === "all" || kind === "shop") {
     const result =
       status === "all"
-        ? await db.query(
-            `SELECT * FROM shop_submissions ORDER BY created_at DESC`,
-          )
+        ? await db.query(`SELECT * FROM shop_submissions ORDER BY created_at DESC`)
         : await db.query(
             `SELECT * FROM shop_submissions WHERE status = $1 ORDER BY created_at DESC`,
             [status],

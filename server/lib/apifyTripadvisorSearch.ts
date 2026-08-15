@@ -12,11 +12,7 @@ import {
   officialWebsiteOrUndefined,
   type GroundedPlace,
 } from "./googlePlacesLookup.ts";
-import {
-  envActor,
-  isApifyConfigured,
-  runActorDatasetItems,
-} from "./apifyClient.ts";
+import { envActor, isApifyConfigured, runActorDatasetItems } from "./apifyClient.ts";
 
 const DEFAULT_TA_ACTOR = "meticulous_snail/tripadvisor-restaurant-leads";
 
@@ -77,9 +73,7 @@ function absoluteHttpUrl(url: string | undefined): string | undefined {
   if (!url) return undefined;
   try {
     const cleaned = url.replace(/^<|>$/g, "").trim();
-    const parsed = new URL(
-      cleaned.startsWith("//") ? `https:${cleaned}` : cleaned,
-    );
+    const parsed = new URL(cleaned.startsWith("//") ? `https:${cleaned}` : cleaned);
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
       return undefined;
     }
@@ -119,10 +113,9 @@ export function resolveTripadvisorCities(query?: string): {
       (alias) =>
         lower === alias ||
         lower.includes(alias) ||
-        new RegExp(
-          `\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`,
-          "i",
-        ).test(raw),
+        new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(
+          raw,
+        ),
     ),
   );
 
@@ -169,22 +162,14 @@ function looksRestaurant(row: Record<string, unknown>): boolean {
 function isNetherlandsListing(row: Record<string, unknown>): boolean {
   const addressObj = asRecord(row.addressObj) || asRecord(row.address_obj);
   const country =
-    asString(addressObj?.country) ||
-    asString(row.country) ||
-    asString(row.countryName);
+    asString(addressObj?.country) || asString(row.country) || asString(row.countryName);
   if (country) {
     return /nederland|netherlands|\bnl\b/i.test(country);
   }
   const locationString =
-    asString(row.locationString) ||
-    asString(row.location) ||
-    asString(row.city) ||
-    "";
+    asString(row.locationString) || asString(row.location) || asString(row.city) || "";
   const address =
-    asString(row.address) ||
-    asString(row.fullAddress) ||
-    asString(row.street) ||
-    "";
+    asString(row.address) || asString(row.fullAddress) || asString(row.street) || "";
   // Location was requested as "{city}, Netherlands" — keep NL postcode matches.
   if (isInNetherlands(`${address}, ${locationString}`)) return true;
   // Soft accept when the city is a known NL discover hub and no foreign country.
@@ -201,9 +186,7 @@ function isNetherlandsListing(row: Record<string, unknown>): boolean {
 
 function buildAddress(row: Record<string, unknown>): string | undefined {
   const direct =
-    asString(row.address) ||
-    asString(row.fullAddress) ||
-    asString(row.localAddress);
+    asString(row.address) || asString(row.fullAddress) || asString(row.localAddress);
   if (direct) return direct;
 
   const addressObj = asRecord(row.addressObj) || asRecord(row.address_obj);
@@ -220,9 +203,7 @@ function buildAddress(row: Record<string, unknown>): string | undefined {
   const street = asString(row.street) || asString(row.streetAddress);
   const city = asString(row.city);
   const postal =
-    asString(row.postalCode) ||
-    asString(row.postalcode) ||
-    asString(row.zip);
+    asString(row.postalCode) || asString(row.postalcode) || asString(row.zip);
   const composed = [street, postal, city].filter(Boolean).join(", ");
   return composed || undefined;
 }
@@ -262,9 +243,7 @@ export function mapTripadvisorRestaurantItem(
       asString(row.link),
   );
   const website = officialWebsiteOrUndefined(
-    asString(row.website) ||
-      asString(row.websiteUrl) ||
-      asString(row.officialWebsite),
+    asString(row.website) || asString(row.websiteUrl) || asString(row.officialWebsite),
   );
   const postcode = (
     asString(addressObj?.postalcode) ||
@@ -282,9 +261,7 @@ export function mapTripadvisorRestaurantItem(
     asNumber(row.lon) ||
     asNumber(asRecord(row.coordinates)?.lng);
   const rating =
-    asNumber(row.rating) ||
-    asNumber(row.averageRating) ||
-    asNumber(row.bubbleRating);
+    asNumber(row.rating) || asNumber(row.averageRating) || asNumber(row.bubbleRating);
   const reviewCount =
     asNumber(row.numberOfReviews) ||
     asNumber(row.reviewCount) ||
@@ -292,9 +269,7 @@ export function mapTripadvisorRestaurantItem(
     asNumber(row.numReviews) ||
     asNumber(row.rankingDenominator);
   const idHint =
-    asString(row.id) ||
-    asString(row.restaurantId) ||
-    asString(row.locationId);
+    asString(row.id) || asString(row.restaurantId) || asString(row.locationId);
   const placeId = idHint
     ? `tripadvisor:${idHint}`
     : webUrl
@@ -306,9 +281,7 @@ export function mapTripadvisorRestaurantItem(
     asStringArray(row.cuisine) ||
     asStringArray(row.cuisineTypes);
   const priceLevel =
-    asString(row.priceLevel) ||
-    asString(row.priceRange) ||
-    asString(row.price);
+    asString(row.priceLevel) || asString(row.priceRange) || asString(row.price);
   const cuisineHint = [
     ...(cuisines?.slice(0, 4) ?? []),
     priceLevel ? `price ${priceLevel}` : null,
@@ -330,8 +303,7 @@ export function mapTripadvisorRestaurantItem(
     phone: asString(row.phone) || asString(row.phoneNumber),
     rating,
     reviewCount,
-    matchedQuery:
-      [matchedQuery, cuisineHint].filter(Boolean).join(" · ") || undefined,
+    matchedQuery: [matchedQuery, cuisineHint].filter(Boolean).join(" · ") || undefined,
     source: "tripadvisor",
   };
 }

@@ -1,19 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  ClipboardList,
-  LayoutGrid,
-  LoaderCircle,
-  LogIn,
-  Users,
-} from "lucide-react";
+import { ClipboardList, LayoutGrid, LoaderCircle, LogIn, Users } from "lucide-react";
 import { useAuth, type UserRole } from "@/auth/AuthContext";
 import { useAuthModal } from "@/auth/AuthModalContext";
-import {
-  fetchAdminUsers,
-  updateAdminUserRole,
-  type AdminUserRow,
-} from "@/admin/users";
+import { fetchAdminUsers, updateAdminUserRole, type AdminUserRow } from "@/admin/users";
 import { useT } from "@/i18n/LocaleContext";
 
 const ROLES: UserRole[] = ["member", "editor", "admin"];
@@ -56,9 +46,7 @@ export function AdminUsersPage() {
       } catch (err) {
         if (!cancelled) {
           setUsers([]);
-          setError(
-            err instanceof Error ? err.message : t("admin.users.error"),
-          );
+          setError(err instanceof Error ? err.message : t("admin.users.error"));
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -86,13 +74,9 @@ export function AdminUsersPage() {
     setRoleError(null);
     try {
       const updated = await updateAdminUserRole(userId, role);
-      setUsers((prev) =>
-        prev.map((row) => (row.id === userId ? updated : row)),
-      );
+      setUsers((prev) => prev.map((row) => (row.id === userId ? updated : row)));
     } catch (err) {
-      setRoleError(
-        err instanceof Error ? err.message : t("admin.users.roleError"),
-      );
+      setRoleError(err instanceof Error ? err.message : t("admin.users.roleError"));
     } finally {
       setSavingId(null);
     }
@@ -102,10 +86,7 @@ export function AdminUsersPage() {
     <div className="passport-grid min-h-screen">
       <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="text-sm font-semibold text-tomato hover:underline"
-          >
+          <Link to="/" className="text-sm font-semibold text-tomato hover:underline">
             {t("admin.back")}
           </Link>
           {isAdmin ? (
@@ -131,15 +112,10 @@ export function AdminUsersPage() {
         <h1 className="mt-4 font-display text-5xl text-burgundy">
           {t("admin.users.title")}
         </h1>
-        <p className="mt-2 max-w-2xl text-ink-soft">
-          {t("admin.users.subtitle")}
-        </p>
+        <p className="mt-2 max-w-2xl text-ink-soft">{t("admin.users.subtitle")}</p>
 
         {authLoading ? (
-          <p
-            className="mt-8 inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="mt-8 inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             {t("admin.checkingAccess")}
           </p>
@@ -201,14 +177,8 @@ export function AdminUsersPage() {
             </label>
 
             {loading ? (
-              <p
-                className="inline-flex items-center gap-2 text-ink-soft"
-                role="status"
-              >
-                <LoaderCircle
-                  className="size-5 animate-spin"
-                  aria-hidden="true"
-                />
+              <p className="inline-flex items-center gap-2 text-ink-soft" role="status">
+                <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
                 {t("admin.users.loading")}
               </p>
             ) : null}
@@ -243,10 +213,7 @@ export function AdminUsersPage() {
                       const isSelf = row.id === user?.id;
                       const busy = savingId === row.id;
                       return (
-                        <tr
-                          key={row.id}
-                          className="border-t border-ink/10 align-top"
-                        >
+                        <tr key={row.id} className="border-t border-ink/10 align-top">
                           <td className="px-4 py-3">
                             <div className="flex items-start gap-2">
                               <Users
@@ -282,10 +249,7 @@ export function AdminUsersPage() {
                             {formatWhen(row.createdAt, "—")}
                           </td>
                           <td className="whitespace-nowrap px-4 py-3 text-ink-soft">
-                            {formatWhen(
-                              row.lastLoginAt,
-                              t("admin.users.never"),
-                            )}
+                            {formatWhen(row.lastLoginAt, t("admin.users.never"))}
                           </td>
                           <td className="px-4 py-3">
                             <select
@@ -295,10 +259,7 @@ export function AdminUsersPage() {
                                 email: row.email,
                               })}
                               onChange={(event) => {
-                                void onRoleChange(
-                                  row.id,
-                                  event.target.value as UserRole,
-                                );
+                                void onRoleChange(row.id, event.target.value as UserRole);
                               }}
                               className="min-h-10 rounded-full border-2 border-ink/15 bg-white px-3 text-ink disabled:opacity-60"
                             >

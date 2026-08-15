@@ -3,7 +3,7 @@ import type { Messages } from "./types";
 export const en: Messages = {
   "app.skipToContent": "Skip to content",
   "app.brand": "Spoon Spin",
-  "app.tagline": "Food & travel, by chance",
+  "app.tagline": "Discover new cuisines",
   "app.signIn": "Sign in",
   "app.signOut": "Sign out",
   "app.admin": "Admin",
@@ -28,9 +28,9 @@ export const en: Messages = {
   "app.lang.nl": "NL",
   "app.lang.switchAria": "Language",
 
-  "cookie.banner.title": "Cookies & affiliate tracking",
+  "cookie.banner.title": "Cookies & optional tracking",
   "cookie.banner.body":
-    "We use essential cookies to keep you signed in. With your OK, we also use marketing cookies so Thuisbezorgd.nl order links can be tracked through our affiliate programme. That commission helps fund Spoonspin and keep the platform running — without acceptance those links stay untracked and we earn nothing from them.",
+    "We use essential cookies to keep you signed in. With your OK, some ordering links may use affiliate tracking when an affiliate programme is available. If you place an order after following such a link, Spoonspin may receive a commission at no extra cost to you. Without acceptance, those links open the platform directly with no affiliate tracking.",
   "cookie.banner.accept": "Accept marketing cookies",
   "cookie.banner.reject": "Essential only",
   "cookie.banner.privacyLink": "Privacy & cookies",
@@ -42,9 +42,12 @@ export const en: Messages = {
   "privacy.necessary.title": "Necessary cookies",
   "privacy.necessary.body":
     "Session and sign-in cookies (for example spoonspin_session and short-lived OAuth cookies) are required for login and account features. They are always on.",
-  "privacy.marketing.title": "Marketing / affiliate cookies",
+  "privacy.marketing.title": "Marketing / optional affiliate tracking",
   "privacy.marketing.body":
-    "When you accept, Thuisbezorgd.nl order links go through Awin so a click can be attributed if you place an order within the programme’s 7-day cookie window. Affiliate commissions help fund Spoonspin. If you choose essential only, links open Thuisbezorgd.nl directly with no affiliate tracking.",
+    "When you accept marketing cookies, some ordering links (for example to Thuisbezorgd.nl) may use affiliate tracking via a partner network such as Awin when a programme is available. Attribution typically follows the partner’s cookie window. If you choose essential only, links open the platform directly with no affiliate tracking.",
+  "privacy.affiliate.title": "Affiliate disclosure",
+  "privacy.affiliate.body":
+    "Some links to ordering platforms may be affiliate links. If you place an order after following one of these links, Spoonspin may receive a commission at no extra cost to you. This helps us maintain and improve the platform. Affiliate relationships do not determine which cuisines Spoonspin shows, and do not mean a platform sponsors or endorses Spoonspin.",
   "privacy.analytics.title": "First-party analytics",
   "privacy.analytics.body":
     "We keep limited server-side request and product-event logs (for example IP truncated with user-agent, retained about 30 days) to operate and improve the service. These are not third-party ad trackers.",
@@ -54,22 +57,45 @@ export const en: Messages = {
   "privacy.preference.accepted": "Marketing cookies accepted",
   "privacy.preference.essential": "Essential cookies only",
 
-  "hero.heading": "Where in the world will you eat today?",
+  "hero.heading": "What in the world will you eat today?",
   "hero.subtitle":
     "Spin the globe, land on a cuisine, then cook at home or dine out in the Netherlands.",
 
+  "home.explainer.heading": "Discover what the world eats",
+  "home.explainer.body":
+    "Spoonspin helps you discover cuisines from around the world. Spin for a country, explore its traditional dishes and drinks, cook authentic recipes at home, find restaurants serving the cuisine in the Netherlands, or discover delivery and takeaway options.",
+
+  "about.title": "About Spoonspin",
+  "about.intro":
+    "Spoonspin is an independent food discovery platform. Spin for a country, explore its cuisine, and decide how you want to enjoy it.",
+  "about.cook.title": "Cook",
+  "about.cook.body":
+    "Browse traditional dishes, drinks, recipes, and specialty shops so you can cook authentic food at home.",
+  "about.dine.title": "Dine",
+  "about.dine.body":
+    "Find restaurants in the Netherlands that serve the cuisine you discovered.",
+  "about.order.title": "Order",
+  "about.order.body":
+    "Discover delivery and takeaway options for that cuisine, and continue to ordering platforms where relevant.",
+  "about.affiliate.title": "Affiliate links",
+  "about.affiliate.body":
+    "Some links to ordering platforms may be affiliate links. If you place an order after following one of these links, Spoonspin may receive a commission at no extra cost to you. This helps us maintain and improve the platform. Affiliate relationships do not determine which cuisines are shown, and do not mean a platform sponsors or endorses Spoonspin.",
+  "about.back": "Back to Spoonspin",
+
+  "footer.nav": "Site links",
+  "footer.about": "About Spoonspin",
+  "footer.privacy": "Privacy & cookies",
+  "footer.tagline": "Food discovery — cook, dine, or order.",
+
   "home.progress.aria": "Your tasting progress",
-  "home.progress.digested":
-    "You’ve tasted {dishes} dishes from {countries} countries.",
-  "home.progress.digested.one":
-    "You’ve tasted {dishes} dish from {countries} countries.",
+  "home.progress.digested": "You’ve tasted {dishes} dishes from {countries} countries.",
+  "home.progress.digested.one": "You’ve tasted {dishes} dish from {countries} countries.",
   "home.progress.digested.oneCountry":
     "You’ve tasted {dishes} dishes from {countries} country.",
   "home.progress.digested.oneEach":
     "You’ve tasted {dishes} dish from {countries} country.",
   "home.progress.plannedTitle": "On your list",
-  "home.progress.planned":
-    "You’ve planned {items} plates across {countries} countries.",
+  "home.progress.planned": "You’ve planned {items} plates across {countries} countries.",
   "home.progress.planned.one":
     "You’ve planned {items} plate across {countries} countries.",
   "home.progress.planned.oneCountry":
@@ -174,8 +200,7 @@ export const en: Messages = {
   "cook.drink.nonAlcoholic": "Non-alcoholic",
   "cook.drink.foodPairing": "Pairs with",
   "cook.shops.heading": "Specialty shops",
-  "cook.shops.subtitle":
-    "Netherlands shops that stock ingredients for {name} cooking.",
+  "cook.shops.subtitle": "Netherlands shops that stock ingredients for {name} cooking.",
   "cook.shops.website": "Website",
   "cook.shops.openInMaps": "Open in Maps",
   "cook.shops.empty": "No specialty shops listed yet — suggest one you know.",
@@ -211,19 +236,15 @@ export const en: Messages = {
 
   "dine.heading": "Dine in the Netherlands",
   "dine.subtitle": "Find reviewed {name} restaurants within about 100 km.",
-  "dine.subtitle.out":
-    "Find reviewed {name} restaurants within about 100 km.",
-  "dine.subtitle.home":
-    "Curated delivery and takeaway options for {name} cuisine.",
+  "dine.subtitle.out": "Find reviewed {name} restaurants within about 100 km.",
+  "dine.subtitle.home": "Curated delivery and takeaway options for {name} cuisine.",
   "order.heading": "Order at home",
-  "order.subtitle":
-    "Curated delivery and takeaway options for {name} cuisine.",
+  "order.subtitle": "Curated delivery and takeaway options for {name} cuisine.",
   "dine.tabs.label": "Dine sections",
   "dine.tabs.out": "Dine out",
   "dine.tabs.home": "Order at home",
   "dine.order.heading": "Order at home",
-  "dine.order.subtitle":
-    "Curated places to order {name} food for delivery or takeaway.",
+  "dine.order.subtitle": "Curated places to order {name} food for delivery or takeaway.",
   "dine.order.note":
     "Filter by city when options list a city. Availability still depends on your address on the platform.",
   "dine.order.empty":
@@ -264,10 +285,8 @@ export const en: Messages = {
   "dine.retry": "Retry",
   "dine.empty.default":
     "No reviewed {name} restaurants nearby yet. Open Google Maps, or try another city.",
-  "dine.results.count":
-    "{count} reviewed place within 100 km of {location}",
-  "dine.results.countPlural":
-    "{count} reviewed places within 100 km of {location}",
+  "dine.results.count": "{count} reviewed place within 100 km of {location}",
+  "dine.results.countPlural": "{count} reviewed places within 100 km of {location}",
   "dine.sortBy": "Sort by",
   "dine.sort.default": "Best match (distance + ratings)",
   "dine.sort.authenticity": "Authenticity",
@@ -298,11 +317,9 @@ export const en: Messages = {
   "restaurant.menuHeading": "Menu",
   "restaurant.menuOther": "More",
   "restaurant.menuEmpty": "No menu saved for this restaurant yet.",
-  "restaurant.menuEmptyAdmin":
-    "No menu yet — use Admin → Find menu to research dishes.",
+  "restaurant.menuEmptyAdmin": "No menu yet — use Admin → Find menu to research dishes.",
   "restaurant.nationalDishLabel": "National dish",
-  "restaurant.nationalDishMatch":
-    "Matches {country} national dish “{dish}”",
+  "restaurant.nationalDishMatch": "Matches {country} national dish “{dish}”",
   "restaurant.dishMatch": "Matches {country} dish “{dish}”",
   "restaurant.category.starter": "Starter",
   "restaurant.category.main": "Main",
@@ -326,12 +343,10 @@ export const en: Messages = {
     "For {flag} {name}. We look up the place on Google Places and only add a verified Netherlands address.",
   "suggest.closeAria": "Close",
   "suggest.queryLabel": "Name or short description",
-  "suggest.placeholder.recipe":
-    "e.g. Banitsa, or “cheese filo pastry breakfast”",
+  "suggest.placeholder.recipe": "e.g. Banitsa, or “cheese filo pastry breakfast”",
   "suggest.placeholder.restaurant":
     "e.g. Exact restaurant name and city (Amsterdam, Rotterdam…)",
-  "suggest.placeholder.drink":
-    "e.g. Rakia, or a non-alcoholic yogurt drink with mint",
+  "suggest.placeholder.drink": "e.g. Rakia, or a non-alcoholic yogurt drink with mint",
   "suggest.placeholder.shop":
     "e.g. Toko Dun Yong Amsterdam, or a Balkan grocery in Rotterdam",
   "suggest.openaiMissing.banner":
@@ -432,8 +447,7 @@ export const en: Messages = {
   "admin.flags.error.update": "Could not update flag.",
 
   "admin.overview.title": "Country overview",
-  "admin.overview.subtitle":
-    "Recipes, restaurants, drinks, and shops per country.",
+  "admin.overview.subtitle": "Recipes, restaurants, drinks, and shops per country.",
   "admin.overview.loading": "Loading overview…",
   "admin.overview.error": "Could not load country overview.",
   "admin.overview.empty": "No countries match this search.",
@@ -480,8 +494,7 @@ export const en: Messages = {
   "admin.reports.metric.countryViews": "Country views",
   "admin.reports.metric.restaurantSearches": "Dine searches",
   "admin.reports.traffic": "Traffic",
-  "admin.reports.trafficHint":
-    "Ink bars are requests; tomato overlay is status ≥ 400.",
+  "admin.reports.trafficHint": "Ink bars are requests; tomato overlay is status ≥ 400.",
   "admin.reports.chartLabel": "Requests over time",
   "admin.reports.chartEmpty": "No request series in this range.",
   "admin.reports.requests": "requests",
@@ -503,8 +516,7 @@ export const en: Messages = {
   "admin.reports.product.loginFailure": "Login failure",
 
   "admin.users.title": "Users",
-  "admin.users.subtitle":
-    "See who joined, when they last signed in, and change roles.",
+  "admin.users.subtitle": "See who joined, when they last signed in, and change roles.",
   "admin.users.loading": "Loading users…",
   "admin.users.error": "Could not load users.",
   "admin.users.empty": "No users match this search.",
@@ -530,18 +542,17 @@ export const en: Messages = {
   "admin.dine.menu": "Dine tools",
   "admin.order.menu": "Order tools",
   "admin.dine.findRestaurants": "Find restaurants",
-  "admin.dine.findRestaurants.hint":
-    "Discover reviewed restaurants to dine out",
+  "admin.dine.findRestaurants.hint": "Discover reviewed restaurants to dine out",
   "admin.dine.findOrderOptions": "Find order options",
   "admin.dine.findOrderOptions.hint":
     "Thuisbezorgd.nl, Uber Eats, direct order links, and more",
   "admin.country.overview": "Overview",
-  "admin.country.overview.hint":
-    "Counts of recipes, restaurants, drinks, shops",
+  "admin.country.overview.hint": "Counts of recipes, restaurants, drinks, shops",
   "admin.country.reports": "Reports",
   "admin.country.reports.hint": "Traffic, IPs, and product usage",
   "admin.country.review": "Review",
-  "admin.country.review.hint": "Review community recipe, drink, shop, and restaurant suggestions",
+  "admin.country.review.hint":
+    "Review community recipe, drink, shop, and restaurant suggestions",
   "admin.country.flags": "Flags",
   "admin.country.flags.hint": "User reports of wrong or broken content",
   "admin.country.users": "Users",
@@ -570,11 +581,9 @@ export const en: Messages = {
     "Drink images: {updated} added, {skipped} kept, {missing} not found",
   "admin.country.drinkImagesError": "Could not find drink images.",
   "admin.country.findRecipes": "Find recipes",
-  "admin.country.findRecipes.hint":
-    "Query national dishes and add selected recipes",
+  "admin.country.findRecipes.hint": "Query national dishes and add selected recipes",
   "admin.country.composeDinner": "Compose dinner",
-  "admin.country.composeDinner.hint":
-    "Pick 3–5 courses and drinks for the Dinner tab",
+  "admin.country.composeDinner.hint": "Pick 3–5 courses and drinks for the Dinner tab",
   "admin.country.composingDinner": "Composing dinner…",
   "admin.country.dinnerComposed": "Dinner ready: {title}",
   "admin.country.dinnerError": "Could not compose dinner.",
@@ -585,8 +594,7 @@ export const en: Messages = {
   "admin.country.findRestaurants.hint":
     "Find authentic specialists (verified), then enrich menu/text/scores/image",
   "admin.country.findShops": "Find specialty shops",
-  "admin.country.findShops.hint":
-    "Query ingredient shops and add selected stores",
+  "admin.country.findShops.hint": "Query ingredient shops and add selected stores",
   "admin.country.needCountry": "Open a country first to use these tools",
   "admin.country.findingImage": "Finding a new image…",
   "admin.country.imageUpdated": "Updated image · {dishName}",
@@ -597,15 +605,13 @@ export const en: Messages = {
   "admin.item.remove.hint": "Delete this entry",
   "admin.item.replaceImage": "Replace image",
   "admin.item.replaceImage.hint": "Search Wikimedia and swap the photo",
-  "admin.item.replaceImage.dish.hint":
-    "Search Wikimedia for a plated dish photo",
+  "admin.item.replaceImage.dish.hint": "Search Wikimedia for a plated dish photo",
   "admin.item.replaceImage.drink.hint":
     "Search Wikimedia for a drink photo (bottle or glass)",
   "admin.item.replaceImage.restaurant.hint":
     "Find a Google Places photo of this restaurant",
   "admin.item.selectImage": "Select image",
-  "admin.item.selectImage.hint":
-    "Browse Wikimedia results or upload your own photo",
+  "admin.item.selectImage.hint": "Browse Wikimedia results or upload your own photo",
   "admin.selectImage.eyebrow": "Image",
   "admin.selectImage.title": "Select image for {label}",
   "admin.selectImage.subtitle":
@@ -625,8 +631,7 @@ export const en: Messages = {
   "admin.selectImage.prev": "Previous",
   "admin.selectImage.next": "Next",
   "admin.selectImage.uploadHeading": "Upload image",
-  "admin.selectImage.uploadHint":
-    "JPEG, PNG, or WebP up to 5 MB. Applied immediately.",
+  "admin.selectImage.uploadHint": "JPEG, PNG, or WebP up to 5 MB. Applied immediately.",
   "admin.selectImage.upload": "Choose file",
   "admin.item.editRecipe": "Edit recipe",
   "admin.item.editRecipe.hint":
@@ -684,8 +689,7 @@ export const en: Messages = {
   "admin.item.findMenu": "Find menu",
   "admin.item.findMenu.hint": "Research dishes and save a menu",
   "admin.item.findScores": "Find scores",
-  "admin.item.findScores.hint":
-    "Google, Tripadvisor, The Fork, price & authenticity",
+  "admin.item.findScores.hint": "Google, Tripadvisor, The Fork, price & authenticity",
 
   "admin.discover.recipes.title": "Find recipes",
   "admin.discover.recipes.hint":
@@ -708,16 +712,14 @@ export const en: Messages = {
   "admin.discover.shops.title": "Find specialty shops",
   "admin.discover.shops.hint":
     "Query for ingredient shops in the Netherlands, then pick which to add.",
-  "admin.discover.shops.placeholder":
-    "e.g. Asian groceries in Rotterdam, spice shops",
+  "admin.discover.shops.placeholder": "e.g. Asian groceries in Rotterdam, spice shops",
   "admin.discover.shops.empty": "No shops returned. Try a different focus.",
   "admin.discover.orderOptions.title": "Find order options",
   "admin.discover.orderOptions.hint":
     "Live Thuisbezorgd.nl + Uber Eats listings via Apify (real restaurant menu/store URLs). Needs APIFY_TOKEN.",
   "admin.discover.orderOptions.city": "City or postcode",
   "admin.discover.orderOptions.cityPlaceholder": "e.g. Leiden or 2312",
-  "admin.discover.orderOptions.placeholder":
-    "Optional focus, e.g. Thai, sushi, pizza",
+  "admin.discover.orderOptions.placeholder": "Optional focus, e.g. Thai, sushi, pizza",
   "admin.discover.orderOptions.empty":
     "No order options returned. Try a different city or focus.",
   "admin.discover.drinks.title": "Find drinks",
@@ -788,10 +790,8 @@ export const en: Messages = {
     "Wrong ingredients, broken steps, or something else off about this recipe?",
   "report.hint.drink":
     "Incorrect info, wrong pairing, or something else off about this drink?",
-  "report.hint.restaurant":
-    "Closed, wrong address, fake listing, or something else off?",
-  "report.hint.shop":
-    "Closed, wrong address, poor stock info, or something else off?",
+  "report.hint.restaurant": "Closed, wrong address, fake listing, or something else off?",
+  "report.hint.shop": "Closed, wrong address, poor stock info, or something else off?",
   "report.reasonLabel": "What should we look at?",
   "report.placeholder": "Describe the problem briefly…",
   "report.cancel": "Cancel",
@@ -800,8 +800,7 @@ export const en: Messages = {
   "report.closeAria": "Close report",
   "report.error.tooShort": "Please add a bit more detail (at least a few words).",
   "report.error.save": "Could not submit report.",
-  "report.thanks":
-    "Thanks — we received your report about {name} and will review it.",
+  "report.thanks": "Thanks — we received your report about {name} and will review it.",
 
   "review.kicker": "Your tasting notes",
   "review.title": "Review {name}",
@@ -859,14 +858,12 @@ export const en: Messages = {
     "Table win! What should we order, how was the service, and did the room feel right?",
   "review.guide.drink.low":
     "Not your pour? Too sweet, flat, harsh — or just the wrong moment?",
-  "review.guide.drink.mid":
-    "Decent sip. Would you order it again with a certain dish?",
+  "review.guide.drink.mid": "Decent sip. Would you order it again with a certain dish?",
   "review.guide.drink.high":
     "Perfect pour! When should we drink this, and what does it taste like?",
   "review.guide.shop.low":
     "Missed the mark? Stock gaps, prices, or a long trek for little reward?",
-  "review.guide.shop.mid":
-    "Useful stop — what was worth buying, and what was missing?",
+  "review.guide.shop.mid": "Useful stop — what was worth buying, and what was missing?",
   "review.guide.shop.high":
     "Pantry jackpot! What should we grab, and any tips for finding the good stuff?",
 
@@ -874,23 +871,17 @@ export const en: Messages = {
     "Ingredients hard to find? Steps confusing? Flavour off?",
   "review.placeholder.recipe.mid":
     "What almost worked — and what would you change next time?",
-  "review.placeholder.recipe.high":
-    "Taste, ease, kitchen wins, and a tip for others…",
-  "review.placeholder.restaurant.low":
-    "Service, wait, atmosphere, authenticity…",
-  "review.placeholder.restaurant.mid":
-    "What was good, what was meh?",
-  "review.placeholder.restaurant.high":
-    "Must-order dish, service glow, atmosphere…",
+  "review.placeholder.recipe.high": "Taste, ease, kitchen wins, and a tip for others…",
+  "review.placeholder.restaurant.low": "Service, wait, atmosphere, authenticity…",
+  "review.placeholder.restaurant.mid": "What was good, what was meh?",
+  "review.placeholder.restaurant.high": "Must-order dish, service glow, atmosphere…",
   "review.placeholder.drink.low": "What didn’t work for you?",
   "review.placeholder.drink.mid": "Would you pair it with something else?",
   "review.placeholder.drink.high": "Describe the perfect pour moment…",
-  "review.placeholder.shop.low":
-    "What was missing, overpriced, or hard to find?",
+  "review.placeholder.shop.low": "What was missing, overpriced, or hard to find?",
   "review.placeholder.shop.mid":
     "What was solid — and what would make a return trip better?",
-  "review.placeholder.shop.high":
-    "Best finds, staff tips, and why you’ll go back…",
+  "review.placeholder.shop.high": "Best finds, staff tips, and why you’ll go back…",
 
   "review.chip.recipe.low.1": "I couldn’t find all the ingredients.",
   "review.chip.recipe.low.2": "The steps felt harder than expected.",
@@ -949,16 +940,14 @@ export const en: Messages = {
   "profile.unknownUser": "Member",
   "profile.subtitle":
     "Countries you’ve cooked at home or tried out — your tasting passport.",
-  "profile.subtitleOther":
-    "Countries {name} has cooked at home or tried out.",
+  "profile.subtitleOther": "Countries {name} has cooked at home or tried out.",
   "profile.plannedLinkHint": "Still planning a dish or night out? See",
   "profile.adminOnly": "Only admins can view other members’ plates.",
   "profile.backToUsers": "Users",
   "profile.emptyOther": "{name} hasn’t logged any cooked or tried dishes yet.",
   "profile.levelHeading": "Level {level}: {title}",
   "profile.countriesTasted": "{count} / {total} countries tasted",
-  "profile.nextLevel":
-    "Next up — Level {level}: {title} (at {threshold} countries)",
+  "profile.nextLevel": "Next up — Level {level}: {title} (at {threshold} countries)",
   "profile.maxLevel": "You’ve tasted the world — King of Cuisines!",
   "profile.filter.intent": "Status",
   "profile.filter.all": "All",
@@ -996,6 +985,19 @@ export const en: Messages = {
   "planned.signInPrompt": "Sign in to save dishes and places you want to try.",
   "planned.notOnPassport": "These don’t count toward your tasting passport on",
 
+  "meta.title": "Spoonspin — Discover World Cuisines, Recipes & Restaurants",
   "meta.description":
-    "Spoon Spin — randomly discover a country, then cook its food or dine out in the Netherlands.",
+    "Discover food from around the world with Spoonspin. Spin for a country, explore traditional dishes and recipes, find restaurants in the Netherlands, or order the cuisine at home.",
+  "meta.country.title": "{name} Food — Recipes, Restaurants & Delivery | Spoonspin",
+  "meta.country.description":
+    "Discover {name} cuisine with Spoonspin. Explore traditional {name} dishes and recipes, find {name} restaurants in the Netherlands, or order {name} food at home.",
+  "meta.recipe.title": "{recipe} — {name} Recipe | Spoonspin",
+  "meta.recipe.description":
+    "Cook {recipe} from {name} cuisine with Spoonspin. Explore the recipe, then dine out or order related food in the Netherlands.",
+  "meta.about.title": "About Spoonspin — Food Discovery Platform",
+  "meta.about.description":
+    "Spoonspin is an independent food discovery platform. Spin for a country, explore recipes and drinks, find restaurants in the Netherlands, or discover delivery and takeaway options.",
+  "meta.privacy.title": "Privacy & cookies | Spoonspin",
+  "meta.privacy.description":
+    "How Spoonspin uses cookies, optional affiliate tracking for ordering links, and first-party analytics.",
 };

@@ -32,6 +32,10 @@ export default defineConfig({
         target: apiTarget,
         changeOrigin: true,
       },
+      "/sitemap.xml": {
+        target: apiTarget,
+        changeOrigin: true,
+      },
     },
   },
   test: {

@@ -33,18 +33,14 @@ const queue: RestaurantEnrichmentJob[] = [];
 const queuedIds = new Set<string>();
 let running = false;
 
-export function scheduleRestaurantEnrichment(
-  job: RestaurantEnrichmentJob,
-): void {
+export function scheduleRestaurantEnrichment(job: RestaurantEnrichmentJob): void {
   if (queuedIds.has(job.restaurantId)) return;
   queuedIds.add(job.restaurantId);
   queue.push(job);
   void drainQueue();
 }
 
-export function scheduleRestaurantEnrichments(
-  jobs: RestaurantEnrichmentJob[],
-): number {
+export function scheduleRestaurantEnrichments(jobs: RestaurantEnrichmentJob[]): number {
   let scheduled = 0;
   for (const job of jobs) {
     if (queuedIds.has(job.restaurantId)) continue;
@@ -65,10 +61,7 @@ async function drainQueue(): Promise<void> {
       try {
         await enrichRestaurantFully(job);
       } catch (error) {
-        console.error(
-          `Restaurant enrichment failed for ${job.restaurantId}`,
-          error,
-        );
+        console.error(`Restaurant enrichment failed for ${job.restaurantId}`, error);
       } finally {
         queuedIds.delete(job.restaurantId);
       }
@@ -79,9 +72,7 @@ async function drainQueue(): Promise<void> {
   }
 }
 
-export async function enrichRestaurantFully(
-  job: RestaurantEnrichmentJob,
-): Promise<void> {
+export async function enrichRestaurantFully(job: RestaurantEnrichmentJob): Promise<void> {
   const { restaurantId, countryCode, countryName } = job;
   console.info(`[enrich] start ${restaurantId} (${countryName})`);
 
@@ -101,10 +92,7 @@ export async function enrichRestaurantFully(
   console.info(`[enrich] done ${restaurantId}`);
 }
 
-async function enrichImage(
-  restaurantId: string,
-  countryName: string,
-): Promise<void> {
+async function enrichImage(restaurantId: string, countryName: string): Promise<void> {
   const restaurant = await getRestaurantById(restaurantId);
   if (!restaurant) return;
   if (restaurant.photoUrl) return;
@@ -193,9 +181,7 @@ async function enrichMenu(
     countryCode,
     knownCuisineCodes: Array.from(
       new Set(
-        [countryCode, ...restaurant.cuisineCodes].map((code) =>
-          code.toLowerCase(),
-        ),
+        [countryCode, ...restaurant.cuisineCodes].map((code) => code.toLowerCase()),
       ),
     ),
     restaurant: {
@@ -210,10 +196,7 @@ async function enrichMenu(
   });
 }
 
-async function enrichScores(
-  restaurantId: string,
-  countryName: string,
-): Promise<void> {
+async function enrichScores(restaurantId: string, countryName: string): Promise<void> {
   const restaurant = await getRestaurantById(restaurantId);
   if (!restaurant) return;
 

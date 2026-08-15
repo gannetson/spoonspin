@@ -1,9 +1,6 @@
 import { randomUUID } from "node:crypto";
 import type { QueryResultRow } from "pg";
-import {
-  resolveLevelProgress,
-  TOTAL_CUISINE_COUNTRIES,
-} from "../../src/tags/levels.ts";
+import { resolveLevelProgress, TOTAL_CUISINE_COUNTRIES } from "../../src/tags/levels.ts";
 import type {
   TagEntityType,
   TagIntent,
@@ -111,10 +108,8 @@ export async function upsertUserTag(input: {
   const entityId = input.entityId.trim();
   const entityName = input.entityName.trim().slice(0, 200) || entityId;
 
-  const updateRating =
-    input.updateRating === true || input.rating !== undefined;
-  const updateReview =
-    input.updateReview === true || input.reviewText !== undefined;
+  const updateRating = input.updateRating === true || input.rating !== undefined;
+  const updateReview = input.updateReview === true || input.reviewText !== undefined;
 
   let rating: number | null = null;
   if (input.intent === "want") {
@@ -169,15 +164,12 @@ export async function upsertUserTag(input: {
   return rowToTag(result.rows[0]!);
 }
 
-export async function deleteUserTag(
-  userId: string,
-  tagId: string,
-): Promise<boolean> {
+export async function deleteUserTag(userId: string, tagId: string): Promise<boolean> {
   const db = await ensureDb();
-  const result = await db.query(
-    `DELETE FROM user_tags WHERE id = $1 AND user_id = $2`,
-    [tagId, userId],
-  );
+  const result = await db.query(`DELETE FROM user_tags WHERE id = $1 AND user_id = $2`, [
+    tagId,
+    userId,
+  ]);
   return (result.rowCount ?? 0) > 0;
 }
 

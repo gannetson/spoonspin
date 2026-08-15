@@ -64,10 +64,7 @@ type Progress = {
 
 function loadWikiByCode(): Record<string, WikiCuisine> {
   try {
-    return JSON.parse(fs.readFileSync(WIKI_PATH, "utf8")) as Record<
-      string,
-      WikiCuisine
-    >;
+    return JSON.parse(fs.readFileSync(WIKI_PATH, "utf8")) as Record<string, WikiCuisine>;
   } catch {
     return {};
   }
@@ -231,10 +228,7 @@ function extractDishCandidates(wikitext: string): string[] {
 }
 
 function listPageCandidates(countryName: string, cuisineTitle?: string): string[] {
-  const titles = [
-    `List of ${countryName} dishes`,
-    `List of foods of ${countryName}`,
-  ];
+  const titles = [`List of ${countryName} dishes`, `List of foods of ${countryName}`];
   if (cuisineTitle) {
     const adj = cuisineTitle.replace(/\s+cuisine$/i, "").trim();
     if (adj && adj.toLowerCase() !== countryName.toLowerCase()) {
@@ -263,9 +257,7 @@ async function fetchSummary(title: string): Promise<{
     title: page.title,
     extract: page.extract,
     type: page.type,
-    url:
-      page.content_urls?.desktop?.page ??
-      `https://en.wikipedia.org/wiki/${encoded}`,
+    url: page.content_urls?.desktop?.page ?? `https://en.wikipedia.org/wiki/${encoded}`,
   };
 }
 
@@ -318,16 +310,11 @@ async function findCommonsImage(
   const page = Object.values(info?.query?.pages ?? {})[0];
   const image = page?.imageinfo?.[0];
   if (!image?.url) return null;
-  const license =
-    image.extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
-  const artist = image.extmetadata?.Artist?.value
-    ?.replace(/<[^>]+>/g, "")
-    .trim();
+  const license = image.extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
+  const artist = image.extmetadata?.Artist?.value?.replace(/<[^>]+>/g, "").trim();
   return {
     url: image.url,
-    attribution: artist
-      ? `${artist} / ${license}`
-      : `Wikimedia Commons / ${license}`,
+    attribution: artist ? `${artist} / ${license}` : `Wikimedia Commons / ${license}`,
   };
 }
 
@@ -448,9 +435,7 @@ async function main() {
   let pending = countries.filter((c) => !completed.has(c.code));
   if (args.from) {
     const fromLower = args.from.toLowerCase();
-    pending = pending.filter(
-      (c) => c.name.toLowerCase().localeCompare(fromLower) >= 0,
-    );
+    pending = pending.filter((c) => c.name.toLowerCase().localeCompare(fromLower) >= 0);
   }
 
   if (args.status) {
@@ -469,9 +454,7 @@ async function main() {
   console.log(
     `Dish discovery batch: ${batch.length} countries · ${Math.max(0, pending.length - batch.length)} remaining after`,
   );
-  console.log(
-    `Order: ${batch.map((c) => c.name).join(" → ") || "(none)"}`,
-  );
+  console.log(`Order: ${batch.map((c) => c.name).join(" → ") || "(none)"}`);
 
   let dishesThisRun = 0;
   for (const entry of batch) {

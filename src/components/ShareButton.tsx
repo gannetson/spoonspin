@@ -20,9 +20,7 @@ export function ShareButton({ title, url }: ShareButtonProps) {
           try {
             const result = await shareOrCopyUrl(url, title);
             setMessage(
-              result === "shared"
-                ? t("share.status.shared")
-                : t("share.status.copied"),
+              result === "shared" ? t("share.status.shared") : t("share.status.copied"),
             );
             window.setTimeout(() => setMessage(null), 2000);
           } catch {

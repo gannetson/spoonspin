@@ -7,12 +7,7 @@ import { ReviewModal } from "@/components/ReviewModal";
 import { submitContentFlag } from "@/flags/client";
 import { useT } from "@/i18n/LocaleContext";
 import { useTagsOptional } from "@/tags/TagsContext";
-import {
-  deleteMyTag,
-  upsertMyTag,
-  uploadTagPhotos,
-  removeTagPhoto,
-} from "@/tags/client";
+import { deleteMyTag, upsertMyTag, uploadTagPhotos, removeTagPhoto } from "@/tags/client";
 import type { TagEntityType, TagIntent, UserTag } from "@/tags/types";
 
 type ItemTagBarProps = {
@@ -90,8 +85,7 @@ export function ItemTagBar({
       setLocalTag(saved);
       return saved;
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : t("tag.error.save");
+      const message = err instanceof Error ? err.message : t("tag.error.save");
       setError(message);
       throw err;
     } finally {

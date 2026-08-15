@@ -22,15 +22,9 @@ export function getRuntimeCountry(code: string): Country | undefined {
 /** Prefer API-loaded country; fall back to thin catalog stub. */
 export function resolveCountry(code: string): Country | undefined {
   const key = code.toLowerCase();
-  return (
-    runtimeByCode.get(key) ??
-    allCountries.find((country) => country.code === key)
-  );
+  return runtimeByCode.get(key) ?? allCountries.find((country) => country.code === key);
 }
 
-export function getRecipeFromResolvedCountry(
-  country: Country,
-  recipeId: string,
-) {
+export function getRecipeFromResolvedCountry(country: Country, recipeId: string) {
   return getCountryRecipes(country).find((recipe) => recipe.id === recipeId);
 }

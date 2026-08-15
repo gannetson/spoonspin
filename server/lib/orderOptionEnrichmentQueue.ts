@@ -26,9 +26,7 @@ function jobKey(job: OrderOptionEnrichmentJob): string {
   return `${job.countryCode.toLowerCase()}:${job.optionId}`;
 }
 
-export function scheduleOrderOptionEnrichment(
-  job: OrderOptionEnrichmentJob,
-): void {
+export function scheduleOrderOptionEnrichment(job: OrderOptionEnrichmentJob): void {
   const key = jobKey(job);
   if (queuedIds.has(key)) return;
   queuedIds.add(key);
@@ -36,9 +34,7 @@ export function scheduleOrderOptionEnrichment(
   void drainQueue();
 }
 
-export function scheduleOrderOptionEnrichments(
-  jobs: OrderOptionEnrichmentJob[],
-): number {
+export function scheduleOrderOptionEnrichments(jobs: OrderOptionEnrichmentJob[]): number {
   let scheduled = 0;
   for (const job of jobs) {
     const key = jobKey(job);
@@ -89,16 +85,10 @@ export async function enrichOrderOptionFully(
 
   // Text first so signatureDish / specialty notes improve the image search.
   await enrichText(countryCode, countryName, optionId).catch((error) => {
-    console.warn(
-      `[order-enrich] text failed ${countryCode}/${optionId}`,
-      error,
-    );
+    console.warn(`[order-enrich] text failed ${countryCode}/${optionId}`, error);
   });
   await enrichImage(countryCode, countryName, optionId).catch((error) => {
-    console.warn(
-      `[order-enrich] image failed ${countryCode}/${optionId}`,
-      error,
-    );
+    console.warn(`[order-enrich] image failed ${countryCode}/${optionId}`, error);
   });
 
   console.info(`[order-enrich] done ${countryCode}/${optionId}`);
@@ -110,9 +100,7 @@ async function enrichText(
   optionId: string,
 ): Promise<void> {
   const country = await getCountryFromDb(countryCode);
-  const option = (country?.orderOptions ?? []).find(
-    (item) => item.id === optionId,
-  );
+  const option = (country?.orderOptions ?? []).find((item) => item.id === optionId);
   if (!option) return;
 
   const rewritten = await rewriteOrderOptionText({
@@ -128,16 +116,12 @@ async function enrichImage(
   optionId: string,
 ): Promise<void> {
   const country = await getCountryFromDb(countryCode);
-  const option = (country?.orderOptions ?? []).find(
-    (item) => item.id === optionId,
-  );
+  const option = (country?.orderOptions ?? []).find((item) => item.id === optionId);
   if (!option) return;
   if (option.imageUrl?.trim()) return;
 
   const dishHint =
-    option.signatureDish?.trim() ||
-    option.notes?.trim()?.slice(0, 160) ||
-    option.name;
+    option.signatureDish?.trim() || option.notes?.trim()?.slice(0, 160) || option.name;
   const discovered = await discoverItemImageQueries({
     kind: "recipe",
     countryName,

@@ -25,9 +25,7 @@ export async function runActorDatasetItems(input: {
 }): Promise<unknown[]> {
   const token = getApifyToken();
   if (!token) {
-    throw new Error(
-      "APIFY_TOKEN is not configured. Add it to .env to use Apify actors.",
-    );
+    throw new Error("APIFY_TOKEN is not configured. Add it to .env to use Apify actors.");
   }
 
   const actorId = actorIdForUrl(input.actor);
@@ -54,9 +52,7 @@ export async function runActorDatasetItems(input: {
     } catch {
       // keep raw
     }
-    throw new Error(
-      `Apify actor ${input.actor} failed (${response.status}): ${detail}`,
-    );
+    throw new Error(`Apify actor ${input.actor} failed (${response.status}): ${detail}`);
   }
 
   if (!text.trim()) return [];

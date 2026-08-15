@@ -1,5 +1,10 @@
 import { z } from "zod";
-import type { Drink, OrderOption, Recipe, SpecialtyShop } from "../../src/types/content.ts";
+import type {
+  Drink,
+  OrderOption,
+  Recipe,
+  SpecialtyShop,
+} from "../../src/types/content.ts";
 import { countryCatalog } from "../../src/content/countries/catalog.ts";
 import { OSM_CUISINE_BY_COUNTRY } from "../../src/restaurants/osmCuisineMap.ts";
 import {
@@ -21,8 +26,14 @@ import { searchTripadvisorRestaurants } from "../lib/apifyTripadvisorSearch.ts";
 export { isOpenAiConfigured, isApifyConfigured };
 
 /** OpenAI often returns null for omitted optional fields. */
-const optionalString = z.string().nullish().transform((value) => value ?? undefined);
-const optionalNumber = z.number().nullish().transform((value) => value ?? undefined);
+const optionalString = z
+  .string()
+  .nullish()
+  .transform((value) => value ?? undefined);
+const optionalNumber = z
+  .number()
+  .nullish()
+  .transform((value) => value ?? undefined);
 const optionalStringArray = z
   .array(z.string())
   .nullish()
@@ -64,7 +75,10 @@ const recipeItemSchema = z.object({
   cookMinutes: z.coerce.number().int().nonnegative(),
   waitTime: optionalString,
   difficulty: z.enum(["easy", "medium", "challenging"]),
-  dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
+  dietaryLabels: z
+    .array(z.string())
+    .nullish()
+    .transform((v) => v ?? []),
   ingredients: z
     .array(
       z.object({
@@ -112,9 +126,7 @@ const restaurantsVerifySchema = z.object({
   verifications: z.array(restaurantVerifyItemSchema).max(24),
 });
 
-function confidenceToRating(
-  confidence: "high" | "medium" | "low" | undefined,
-): number {
+function confidenceToRating(confidence: "high" | "medium" | "low" | undefined): number {
   if (confidence === "high") return 5;
   if (confidence === "medium") return 4;
   return 3;
@@ -175,7 +187,7 @@ function groundedToDiscovered(
     evidenceSourceUrl:
       place.source === "tripadvisor" && place.tripadvisorUrl
         ? place.tripadvisorUrl
-        : officialWebsiteOrUndefined(place.website) ?? mapsUrl,
+        : (officialWebsiteOrUndefined(place.website) ?? mapsUrl),
     confidence,
     authenticityNotes: cuisineEvidence,
     authenticityRating: confidenceToRating(confidence),
@@ -225,9 +237,7 @@ function normalizeDrinkType(raw: unknown): DiscoverDrinkType | null {
     return "beer";
   }
   if (
-    /^(red-wine|white-wine|rose|rosé|sparkling|champagne|prosecco|cava)$/.test(
-      key,
-    ) ||
+    /^(red-wine|white-wine|rose|rosé|sparkling|champagne|prosecco|cava)$/.test(key) ||
     key.includes("wine")
   ) {
     return "wine";
@@ -240,10 +250,7 @@ function normalizeDrinkType(raw: unknown): DiscoverDrinkType | null {
   ) {
     return "spirit";
   }
-  if (
-    /^(mixed-drink|punch|highball|mocktail)$/.test(key) ||
-    key.includes("cocktail")
-  ) {
+  if (/^(mixed-drink|punch|highball|mocktail)$/.test(key) || key.includes("cocktail")) {
     return key.includes("mocktail") ? "soft-drink" : "cocktail";
   }
   if (
@@ -264,10 +271,7 @@ function normalizeDrinkType(raw: unknown): DiscoverDrinkType | null {
 const drinkItemSchema = z.object({
   name: z.string().min(1),
   localName: optionalString,
-  type: z.preprocess(
-    (value) => normalizeDrinkType(value) ?? value,
-    z.enum(DRINK_TYPES),
-  ),
+  type: z.preprocess((value) => normalizeDrinkType(value) ?? value, z.enum(DRINK_TYPES)),
   alcoholic: z.boolean(),
   description: z.string().min(20),
   grape: optionalString,
@@ -638,12 +642,8 @@ async function verifyRestaurantAuthenticity(input: {
       const parts = [
         `${index + 1}. ${place.name} — ${place.address}, ${place.city}`,
         place.website ? `website: ${place.website}` : "website: (none)",
-        place.cuisineEvidence
-          ? `claimed evidence: ${place.cuisineEvidence}`
-          : null,
-        place.evidenceSourceUrl
-          ? `evidence source: ${place.evidenceSourceUrl}`
-          : null,
+        place.cuisineEvidence ? `claimed evidence: ${place.cuisineEvidence}` : null,
+        place.evidenceSourceUrl ? `evidence source: ${place.evidenceSourceUrl}` : null,
         place.confidence ? `claimed confidence: ${place.confidence}` : null,
       ];
       return parts.filter(Boolean).join(" | ");
@@ -701,8 +701,7 @@ JSON shape:
     if (!verdict) {
       // Fuzzy fallback: match by name only.
       verdict = parsed.verifications.find(
-        (item) =>
-          item.name.trim().toLowerCase() === place.name.trim().toLowerCase(),
+        (item) => item.name.trim().toLowerCase() === place.name.trim().toLowerCase(),
       );
     }
     if (!verdict?.accept) continue;
@@ -775,9 +774,7 @@ JSON shape:
     notes: parsed.notes,
     shops: parsed.shops.map((shop) => {
       const website =
-        shop.website && /^https?:\/\//i.test(shop.website)
-          ? shop.website
-          : undefined;
+        shop.website && /^https?:\/\//i.test(shop.website) ? shop.website : undefined;
       const mapsUrl = stableMapsUrl(shop.mapsUrl, {
         name: shop.name,
         address: shop.address,
@@ -825,9 +822,7 @@ async function annotateGroundedOrderOptions(input: {
         listing.name,
         listing.city ? `@ ${listing.city}` : null,
         listing.cuisines?.length ? `cuisines: ${listing.cuisines.join(", ")}` : null,
-        listing.signatureDishHint
-          ? `featured: ${listing.signatureDishHint}`
-          : null,
+        listing.signatureDishHint ? `featured: ${listing.signatureDishHint}` : null,
         listing.notes ? `meta: ${listing.notes}` : null,
       ].filter(Boolean);
       return bits.join(" | ");
@@ -896,20 +891,16 @@ export async function discoverCountryOrderOptions(input: {
 
   const options: OrderOption[] = grounded.listings.map((listing, index) => {
     const annotation = annotations.get(index);
-    const notes = [listing.notes, annotation?.notes]
-      .filter(Boolean)
-      .join(" — ");
+    const notes = [listing.notes, annotation?.notes].filter(Boolean).join(" — ");
     return {
       id:
-        slugify(`${listing.platform}-${listing.name}-${listing.city ?? "nl"}`) ||
-        "order",
+        slugify(`${listing.platform}-${listing.name}-${listing.city ?? "nl"}`) || "order",
       name: listing.name,
       platform: listing.platform,
       url: listing.url,
       city: listing.city,
       notes: notes || undefined,
-      signatureDish:
-        annotation?.signatureDish || listing.signatureDishHint || undefined,
+      signatureDish: annotation?.signatureDish || listing.signatureDishHint || undefined,
     };
   });
 
@@ -970,8 +961,7 @@ JSON shape:
   const parsed = drinksDiscoverSchema.safeParse(raw);
   if (!parsed.success) {
     // Soft-parse: keep valid drinks, drop items with bad types/fields.
-    const row =
-      raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+    const row = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
     const notes =
       typeof row.notes === "string" && row.notes.trim()
         ? row.notes.trim()
@@ -998,11 +988,7 @@ JSON shape:
     return await materializeDiscoveredDrinks(input, notes, kept);
   }
 
-  return await materializeDiscoveredDrinks(
-    input,
-    parsed.data.notes,
-    parsed.data.drinks,
-  );
+  return await materializeDiscoveredDrinks(input, parsed.data.notes, parsed.data.drinks);
 }
 
 async function materializeDiscoveredDrinks(
@@ -1064,18 +1050,11 @@ async function materializeDiscoveredDrinks(
   return { notes, drinks };
 }
 
-export function drinkImageSearchQueries(
-  drink: Drink,
-  countryName: string,
-): string[] {
+export function drinkImageSearchQueries(drink: Drink, countryName: string): string[] {
   const name = drink.name;
   switch (drink.type) {
     case "beer":
-      return [
-        `${name} beer bottle`,
-        `${name} beer can`,
-        `${name} ${countryName} beer`,
-      ];
+      return [`${name} beer bottle`, `${name} beer can`, `${name} ${countryName} beer`];
     case "wine":
       return [
         `${name} wine bottle`,
@@ -1083,33 +1062,16 @@ export function drinkImageSearchQueries(
         `${name} ${countryName} wine`,
       ];
     case "spirit":
-      return [
-        `${name} bottle`,
-        `${name} spirit bottle`,
-        `${name} ${countryName}`,
-      ];
+      return [`${name} bottle`, `${name} spirit bottle`, `${name} ${countryName}`];
     case "cocktail":
-      return [
-        `${name} cocktail`,
-        `${name} drink glass`,
-        `${name} cocktail glass`,
-      ];
+      return [`${name} cocktail`, `${name} drink glass`, `${name} cocktail glass`];
     case "tea":
       return [`${name} tea`, `${name} tea cup`, `${name} ${countryName} tea`];
     case "coffee":
-      return [
-        `${name} coffee`,
-        `${name} coffee cup`,
-        `${name} ${countryName} coffee`,
-      ];
+      return [`${name} coffee`, `${name} coffee cup`, `${name} ${countryName} coffee`];
     case "soft-drink":
     default:
-      return [
-        `${name} bottle`,
-        `${name} can`,
-        `${name} drink`,
-        `${name} ${countryName}`,
-      ];
+      return [`${name} bottle`, `${name} can`, `${name} drink`, `${name} ${countryName}`];
   }
 }
 
@@ -1232,12 +1194,7 @@ const sourceRatingResearchSchema = z
 
 const restaurantScoresSchema = z.object({
   notes: z.string(),
-  priceLevel: z.union([
-    z.literal(1),
-    z.literal(2),
-    z.literal(3),
-    z.literal(4),
-  ]),
+  priceLevel: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4)]),
   authenticityRating: z.number().min(1).max(5),
   authenticityNotes: z.string().min(20),
   ratings: z.object({
@@ -1303,15 +1260,7 @@ const drinkRewriteSchema = z.object({
   grape: optionalString,
   foodPairing: optionalString,
   type: z
-    .enum([
-      "beer",
-      "wine",
-      "spirit",
-      "cocktail",
-      "soft-drink",
-      "tea",
-      "coffee",
-    ])
+    .enum(["beer", "wine", "spirit", "cocktail", "soft-drink", "tea", "coffee"])
     .optional(),
   alcoholic: z.boolean().optional(),
 });
@@ -1379,9 +1328,7 @@ JSON shape:
   );
   const parsed = shopRewriteSchema.parse(raw);
   const website =
-    parsed.website && /^https?:\/\//i.test(parsed.website)
-      ? parsed.website
-      : undefined;
+    parsed.website && /^https?:\/\//i.test(parsed.website) ? parsed.website : undefined;
   return {
     notes: parsed.notes,
     patch: {
@@ -1491,15 +1438,9 @@ JSON shape:
   if (cuisineCodes.length === 0) {
     cuisineCodes = seedCodes.length > 0 ? seedCodes : [];
   }
-  if (
-    input.countryCode &&
-    !cuisineCodes.includes(input.countryCode.toLowerCase())
-  ) {
+  if (input.countryCode && !cuisineCodes.includes(input.countryCode.toLowerCase())) {
     // Keep the page country if the model omitted it but notes still concern it.
-    cuisineCodes = [
-      input.countryCode.toLowerCase(),
-      ...cuisineCodes,
-    ];
+    cuisineCodes = [input.countryCode.toLowerCase(), ...cuisineCodes];
   }
   return {
     notes: parsed.notes,
@@ -1719,11 +1660,7 @@ export async function discoverItemImageQueries(input: {
   detail?: string;
 }): Promise<{ notes: string; searchQueries: string[] }> {
   const subject =
-    input.kind === "drink"
-      ? "drink"
-      : input.kind === "recipe"
-        ? "dish"
-        : "restaurant";
+    input.kind === "drink" ? "drink" : input.kind === "recipe" ? "dish" : "restaurant";
   const guidance =
     input.kind === "drink"
       ? `Emphasize that we are looking for a DRINK (beverage), not food.
@@ -1804,7 +1741,10 @@ export async function composeDinnerSuggestion(input: {
     alcoholic: boolean;
     description: string;
   }>;
-}): Promise<{ notes: string; dinner: import("../../src/types/content.ts").DinnerSuggestion }> {
+}): Promise<{
+  notes: string;
+  dinner: import("../../src/types/content.ts").DinnerSuggestion;
+}> {
   if (input.recipes.length < 3) {
     throw new Error("Need at least 3 recipes to compose a dinner.");
   }
@@ -1850,9 +1790,7 @@ JSON shape:
     .parse(raw);
 
   const recipeIds = new Set(input.recipes.map((recipe) => recipe.id));
-  const drinkNames = new Set(
-    input.drinks.map((drink) => drink.name.toLowerCase()),
-  );
+  const drinkNames = new Set(input.drinks.map((drink) => drink.name.toLowerCase()));
 
   const courses = parsed.courses.filter((course) => recipeIds.has(course.recipeId));
   if (courses.length < 3) {
@@ -1870,9 +1808,7 @@ JSON shape:
         note: drink.note,
       };
     })
-    .filter((drink): drink is { drinkName: string; note?: string } =>
-      Boolean(drink),
-    );
+    .filter((drink): drink is { drinkName: string; note?: string } => Boolean(drink));
 
   if (drinks.length === 0) {
     // Fall back to first drink if the model invented names.
@@ -1970,12 +1906,7 @@ JSON shape:
       return {
         recipeId: course.recipeId,
         role: (course.role || source.role) as
-          | "starter"
-          | "main"
-          | "side"
-          | "dessert"
-          | "snack"
-          | "extra",
+          "starter" | "main" | "side" | "dessert" | "snack" | "extra",
         note: course.note,
       };
     });
@@ -1986,13 +1917,7 @@ JSON shape:
     return (
       rewritten ?? {
         recipeId: source.recipeId,
-        role: source.role as
-          | "starter"
-          | "main"
-          | "side"
-          | "dessert"
-          | "snack"
-          | "extra",
+        role: source.role as "starter" | "main" | "side" | "dessert" | "snack" | "extra",
         note: source.description.slice(0, 180),
       }
     );
@@ -2006,9 +1931,7 @@ JSON shape:
       if (!match) return null;
       return { drinkName: match.name, note: drink.note };
     })
-    .filter((drink): drink is { drinkName: string; note?: string } =>
-      Boolean(drink),
-    );
+    .filter((drink): drink is { drinkName: string; note?: string } => Boolean(drink));
 
   if (drinks.length === 0 && input.drinks[0]) {
     drinks.push({

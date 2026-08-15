@@ -87,9 +87,7 @@ export function ReportModal({
             >
               {t("report.title", { name: entityName })}
             </h2>
-            <p className="mt-1 text-sm text-ink-soft">
-              {t(`report.hint.${entityType}`)}
-            </p>
+            <p className="mt-1 text-sm text-ink-soft">{t(`report.hint.${entityType}`)}</p>
           </div>
           <button
             type="button"

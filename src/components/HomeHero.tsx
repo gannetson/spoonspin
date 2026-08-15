@@ -115,9 +115,7 @@ export function HomeHero({
         </div>
       </section>
 
-      {children ? (
-        <div className="relative z-10 pb-12">{children}</div>
-      ) : null}
+      {children ? <div className="relative z-10 pb-12">{children}</div> : null}
     </div>
   );
 }

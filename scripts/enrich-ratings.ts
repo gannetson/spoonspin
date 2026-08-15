@@ -55,24 +55,21 @@ async function fetchGoogleRating(
   apiKey: string,
 ): Promise<SourceRating | null> {
   const textQuery = `${place.name} restaurant ${place.city} Netherlands`;
-  const response = await fetch(
-    "https://places.googleapis.com/v1/places:searchText",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask":
-          "places.id,places.displayName,places.rating,places.userRatingCount,places.googleMapsUri,places.formattedAddress",
-      },
-      body: JSON.stringify({
-        textQuery,
-        languageCode: "en",
-        regionCode: "NL",
-        maxResultCount: 5,
-      }),
+  const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask":
+        "places.id,places.displayName,places.rating,places.userRatingCount,places.googleMapsUri,places.formattedAddress",
     },
-  );
+    body: JSON.stringify({
+      textQuery,
+      languageCode: "en",
+      regionCode: "NL",
+      maxResultCount: 5,
+    }),
+  });
 
   if (!response.ok) {
     const body = await response.text();
@@ -108,9 +105,7 @@ async function fetchTripadvisorRating(
   place: StoredRestaurant,
   apiKey: string,
 ): Promise<SourceRating | null> {
-  const url = new URL(
-    "https://api.content.tripadvisor.com/api/v1/location/search",
-  );
+  const url = new URL("https://api.content.tripadvisor.com/api/v1/location/search");
   url.searchParams.set("key", apiKey);
   url.searchParams.set("searchQuery", `${place.name} ${place.city}`);
   url.searchParams.set("category", "restaurants");
@@ -124,9 +119,7 @@ async function fetchTripadvisorRating(
   });
   if (!searchResponse.ok) {
     const body = await searchResponse.text();
-    throw new Error(
-      `Tripadvisor search ${searchResponse.status}: ${body.slice(0, 180)}`,
-    );
+    throw new Error(`Tripadvisor search ${searchResponse.status}: ${body.slice(0, 180)}`);
   }
 
   const searchData = (await searchResponse.json()) as {
@@ -244,9 +237,7 @@ async function main() {
   console.log(
     `\nDone. Google hits: ${googleHits}, Tripadvisor hits: ${tripadvisorHits}, failures: ${failures}`,
   );
-  console.log(
-    `Updated ${places.length} reviewed restaurants in Postgres.`,
-  );
+  console.log(`Updated ${places.length} reviewed restaurants in Postgres.`);
 }
 
 main().catch(async (error) => {

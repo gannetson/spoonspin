@@ -10,11 +10,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { listCountriesFromDb } from "../server/db/content.ts";
-import {
-  closeDb,
-  getDb,
-  listRestaurants,
-} from "../server/db/restaurants.ts";
+import { closeDb, getDb, listRestaurants } from "../server/db/restaurants.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 

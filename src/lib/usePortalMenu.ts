@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type RefObject,
-} from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 
 export type PortalMenuPosition = {
   top: number;
@@ -63,10 +57,7 @@ export function usePortalMenu({
     if (!open) return;
     function onPointer(event: MouseEvent) {
       const target = event.target as Node;
-      if (
-        rootRef.current?.contains(target) ||
-        panelRef.current?.contains(target)
-      ) {
+      if (rootRef.current?.contains(target) || panelRef.current?.contains(target)) {
         return;
       }
       setOpen(false);
@@ -124,10 +115,7 @@ export function useAnchoredToast({
       return;
     }
     const rect = trigger.getBoundingClientRect();
-    const left = Math.min(
-      Math.max(8, rect.right - width),
-      window.innerWidth - width - 8,
-    );
+    const left = Math.min(Math.max(8, rect.right - width), window.innerWidth - width - 8);
     setPosition({ top: rect.bottom + gap, left });
   }
 

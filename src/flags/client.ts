@@ -11,9 +11,7 @@ export type ContentFlag = {
   createdAt: string;
 };
 
-async function readJson<T>(
-  response: Response,
-): Promise<T & { message?: string }> {
+async function readJson<T>(response: Response): Promise<T & { message?: string }> {
   return (await response.json()) as T & { message?: string };
 }
 

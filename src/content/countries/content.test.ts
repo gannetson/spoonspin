@@ -14,9 +14,7 @@ describe("worldwide country catalog (thin stubs)", () => {
     expect(spinable).toHaveLength(CATALOG_SIZE);
     expect(CATALOG_SIZE).toBe(197);
     expect(countryCatalog).toHaveLength(197);
-    expect(spinable.every((country) => country.status === "published")).toBe(
-      true,
-    );
+    expect(spinable.every((country) => country.status === "published")).toBe(true);
     expect(spinable.every((country) => !country.cookReady)).toBe(true);
     expect(getCookReadyCountries()).toHaveLength(0);
   });

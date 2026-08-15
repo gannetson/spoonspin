@@ -24,10 +24,7 @@ export function CookieBanner() {
         >
           {t("cookie.banner.title")}
         </h2>
-        <p
-          id="cookie-banner-body"
-          className="mt-2 text-sm leading-relaxed text-ink-soft"
-        >
+        <p id="cookie-banner-body" className="mt-2 text-sm leading-relaxed text-ink-soft">
           {t("cookie.banner.body")}{" "}
           <Link
             to="/privacy"

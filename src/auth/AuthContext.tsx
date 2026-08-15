@@ -73,22 +73,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(data.user ?? null);
   }, []);
 
-  const register = useCallback(
-    async (email: string, password: string, name?: string) => {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password, name }),
-      });
-      const data = await readJson(response);
-      if (!response.ok) {
-        throw new Error(data.message ?? "Could not create account.");
-      }
-      setUser(data.user ?? null);
-    },
-    [],
-  );
+  const register = useCallback(async (email: string, password: string, name?: string) => {
+    const response = await fetch("/api/auth/register", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password, name }),
+    });
+    const data = await readJson(response);
+    if (!response.ok) {
+      throw new Error(data.message ?? "Could not create account.");
+    }
+    setUser(data.user ?? null);
+  }, []);
 
   const logout = useCallback(async () => {
     await fetch("/api/auth/logout", {

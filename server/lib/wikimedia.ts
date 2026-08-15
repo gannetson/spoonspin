@@ -48,9 +48,7 @@ export function sameImageUrl(a: string, b: string): boolean {
   try {
     const left = new URL(a);
     const right = new URL(b);
-    return (
-      left.hostname === right.hostname && left.pathname === right.pathname
-    );
+    return left.hostname === right.hostname && left.pathname === right.pathname;
   } catch {
     return a === b;
   }
@@ -122,11 +120,8 @@ async function resolveCommonsTitle(
   if (image.mime && !IMAGE_MIME.test(image.mime)) return null;
   if (!isPhotoUrl(image.url)) return null;
 
-  const license =
-    image.extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
-  const artist = image.extmetadata?.Artist?.value
-    ?.replace(/<[^>]+>/g, "")
-    .trim();
+  const license = image.extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
+  const artist = image.extmetadata?.Artist?.value?.replace(/<[^>]+>/g, "").trim();
   const attribution = artist
     ? `${artist} / ${license}`
     : `Wikimedia Commons / ${license}`;
@@ -196,8 +191,7 @@ export async function searchCommonsImagesPage(
     `https://commons.wikimedia.org/w/api.php?${params}`,
   );
   const hits = search?.query?.search ?? [];
-  const results: Array<{ url: string; attribution: string; title: string }> =
-    [];
+  const results: Array<{ url: string; attribution: string; title: string }> = [];
 
   for (const hit of hits) {
     if (!hit?.title) continue;
@@ -208,9 +202,7 @@ export async function searchCommonsImagesPage(
   }
 
   const nextOffset =
-    typeof search?.continue?.sroffset === "number"
-      ? search.continue.sroffset
-      : null;
+    typeof search?.continue?.sroffset === "number" ? search.continue.sroffset : null;
   const totalHits =
     typeof search?.query?.searchinfo?.totalhits === "number"
       ? search.query.searchinfo.totalhits
@@ -234,9 +226,7 @@ export async function findCuisineImageFromQueries(
   queries: string[],
   options?: ImageLookupOptions,
 ): Promise<{ url: string; attribution: string; query: string } | null> {
-  const shuffledQueries = shuffleInPlace(
-    queries.map((q) => q.trim()).filter(Boolean),
-  );
+  const shuffledQueries = shuffleInPlace(queries.map((q) => q.trim()).filter(Boolean));
   const pool: Array<{ url: string; attribution: string; query: string }> = [];
 
   for (const query of shuffledQueries) {

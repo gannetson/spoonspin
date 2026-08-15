@@ -1,9 +1,4 @@
-import {
-  decodeIdToken,
-  generateCodeVerifier,
-  generateState,
-  Google,
-} from "arctic";
+import { decodeIdToken, generateCodeVerifier, generateState, Google } from "arctic";
 import type { Request } from "express";
 
 const OAUTH_STATE_COOKIE = "spoonspin_oauth_state";
@@ -29,20 +24,12 @@ function isLocalOrigin(origin: string): boolean {
 }
 
 function originFromRequest(req: Request): string | undefined {
-  const hostHeader = (
-    req.get("x-forwarded-host") ||
-    req.get("host") ||
-    ""
-  )
+  const hostHeader = (req.get("x-forwarded-host") || req.get("host") || "")
     .split(",")[0]
     ?.trim();
   if (!hostHeader) return undefined;
 
-  const protoHeader = (
-    req.get("x-forwarded-proto") ||
-    req.protocol ||
-    "http"
-  )
+  const protoHeader = (req.get("x-forwarded-proto") || req.protocol || "http")
     .split(",")[0]
     ?.trim();
   const proto =
@@ -94,9 +81,9 @@ export function isGoogleOAuthConfigured(): boolean {
 export function isAppleOAuthConfigured(): boolean {
   return Boolean(
     trimEnv("APPLE_CLIENT_ID") &&
-      trimEnv("APPLE_TEAM_ID") &&
-      trimEnv("APPLE_KEY_ID") &&
-      trimEnv("APPLE_PRIVATE_KEY"),
+    trimEnv("APPLE_TEAM_ID") &&
+    trimEnv("APPLE_KEY_ID") &&
+    trimEnv("APPLE_PRIVATE_KEY"),
   );
 }
 
@@ -168,10 +155,7 @@ export async function finishGoogleOAuth(
   req?: Request,
 ): Promise<GoogleProfile> {
   const google = createGoogleClient(req);
-  const tokens = await google.validateAuthorizationCode(
-    input.code,
-    input.codeVerifier,
-  );
+  const tokens = await google.validateAuthorizationCode(input.code, input.codeVerifier);
   const idToken = tokens.idToken();
   if (!idToken) {
     throw new Error("Google did not return an ID token.");
@@ -182,13 +166,11 @@ export async function finishGoogleOAuth(
     email_verified?: unknown;
     name?: unknown;
   };
-  const providerUserId =
-    typeof claims.sub === "string" ? claims.sub.trim() : "";
+  const providerUserId = typeof claims.sub === "string" ? claims.sub.trim() : "";
   if (!providerUserId) {
     throw new Error("Google ID token missing subject.");
   }
-  const email =
-    typeof claims.email === "string" ? claims.email.trim() : null;
+  const email = typeof claims.email === "string" ? claims.email.trim() : null;
   const name = typeof claims.name === "string" ? claims.name.trim() : null;
   const emailVerified =
     claims.email_verified === true || claims.email_verified === "true";
@@ -224,8 +206,4 @@ export function clearOAuthCookies(res: {
   res.clearCookie(OAUTH_NEXT_COOKIE, { path: "/" });
 }
 
-export {
-  OAUTH_STATE_COOKIE,
-  OAUTH_VERIFIER_COOKIE,
-  OAUTH_NEXT_COOKIE,
-};
+export { OAUTH_STATE_COOKIE, OAUTH_VERIFIER_COOKIE, OAUTH_NEXT_COOKIE };

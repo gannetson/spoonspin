@@ -53,8 +53,7 @@ export async function loadPublicConfig(): Promise<PublicConfig> {
             ? row.awinPublisherId.trim()
             : null,
         awinThuisbezorgdMid:
-          typeof row.awinThuisbezorgdMid === "string" &&
-          row.awinThuisbezorgdMid.trim()
+          typeof row.awinThuisbezorgdMid === "string" && row.awinThuisbezorgdMid.trim()
             ? row.awinThuisbezorgdMid.trim()
             : null,
       };

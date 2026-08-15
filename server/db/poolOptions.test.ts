@@ -19,9 +19,7 @@ describe("poolOptions", () => {
   });
 
   it("honors ?host= socket path", () => {
-    const opts = poolOptions(
-      "postgresql:///spoonspin?host=/tmp",
-    );
+    const opts = poolOptions("postgresql:///spoonspin?host=/tmp");
     expect(opts).toMatchObject({
       host: "/tmp",
       database: "spoonspin",
@@ -39,9 +37,7 @@ describe("poolOptions", () => {
   });
 
   it("keeps TCP password auth", () => {
-    const opts = poolOptions(
-      "postgresql://spoonspin:s3cret@localhost:5432/spoonspin",
-    );
+    const opts = poolOptions("postgresql://spoonspin:s3cret@localhost:5432/spoonspin");
     expect(opts).toMatchObject({
       host: "localhost",
       port: 5432,

@@ -24,10 +24,7 @@ type AdminCookMenuProps = {
   tone?: "light" | "dark";
 };
 
-type CookDiscoverKind = Exclude<
-  AdminDiscoverKind,
-  "restaurants" | "orderOptions"
->;
+type CookDiscoverKind = Exclude<AdminDiscoverKind, "restaurants" | "orderOptions">;
 
 /** Cook-mode admin tools: recipes, dinner, drinks, shops. */
 export function AdminCookMenu({
@@ -37,11 +34,10 @@ export function AdminCookMenu({
 }: AdminCookMenuProps) {
   const t = useT();
   const menuId = useId();
-  const { open, setOpen, rootRef, triggerRef, panelRef, position } =
-    usePortalMenu({ estimatedHeight: 280 });
-  const [discoverKind, setDiscoverKind] = useState<CookDiscoverKind | null>(
-    null,
-  );
+  const { open, setOpen, rootRef, triggerRef, panelRef, position } = usePortalMenu({
+    estimatedHeight: 280,
+  });
+  const [discoverKind, setDiscoverKind] = useState<CookDiscoverKind | null>(null);
   const [dinnerBusy, setDinnerBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -59,13 +55,9 @@ export function AdminCookMenu({
     try {
       const result = await composeDinner(country.code);
       onCountryUpdated(result.country);
-      setStatus(
-        t("admin.country.dinnerComposed", { title: result.dinner.title }),
-      );
+      setStatus(t("admin.country.dinnerComposed", { title: result.dinner.title }));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("admin.country.dinnerError"),
-      );
+      setError(err instanceof Error ? err.message : t("admin.country.dinnerError"));
     } finally {
       setDinnerBusy(false);
     }

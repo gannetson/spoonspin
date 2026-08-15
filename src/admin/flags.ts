@@ -17,19 +17,16 @@ export type AdminContentFlag = {
   reporterName: string | null;
 };
 
-async function readJson<T>(
-  response: Response,
-): Promise<T & { message?: string }> {
+async function readJson<T>(response: Response): Promise<T & { message?: string }> {
   return (await response.json()) as T & { message?: string };
 }
 
 export async function fetchAdminFlags(
   status: ContentFlagStatus | "all" = "open",
 ): Promise<AdminContentFlag[]> {
-  const response = await fetch(
-    `/api/admin/flags?status=${encodeURIComponent(status)}`,
-    { credentials: "include" },
-  );
+  const response = await fetch(`/api/admin/flags?status=${encodeURIComponent(status)}`, {
+    credentials: "include",
+  });
   const data = await readJson<{ flags?: AdminContentFlag[] }>(response);
   if (!response.ok) {
     throw new Error(data.message ?? "Could not load flags.");

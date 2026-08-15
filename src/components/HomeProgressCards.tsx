@@ -6,11 +6,7 @@ import { fetchMyTagSummary } from "@/tags/client";
 import { levelArtSrc, resolveLevelProgress } from "@/tags/levels";
 import type { TagSummary } from "@/tags/types";
 
-function countKey(
-  base: string,
-  items: number,
-  countries: number,
-): string {
+function countKey(base: string, items: number, countries: number): string {
   if (items === 1 && countries === 1) return `${base}.oneEach`;
   if (items === 1) return `${base}.one`;
   if (countries === 1) return `${base}.oneCountry`;
@@ -51,9 +47,7 @@ export function HomeProgressCards() {
   if (!showDigested && !showPlanned) return null;
 
   const progress = resolveLevelProgress(countriesTasted);
-  const levelTitle = progress.current
-    ? t(progress.current.titleKey)
-    : t("levels.none");
+  const levelTitle = progress.current ? t(progress.current.titleKey) : t("levels.none");
 
   return (
     <section
@@ -110,17 +104,10 @@ export function HomeProgressCards() {
                 {t("home.progress.plannedTitle")}
               </h2>
               <p className="mt-2 text-sm text-ink-soft">
-                {t(
-                  countKey(
-                    "home.progress.planned",
-                    plannedItems,
-                    countriesPlanned,
-                  ),
-                  {
-                    items: plannedItems,
-                    countries: countriesPlanned,
-                  },
-                )}
+                {t(countKey("home.progress.planned", plannedItems, countriesPlanned), {
+                  items: plannedItems,
+                  countries: countriesPlanned,
+                })}
               </p>
             </Link>
           </li>

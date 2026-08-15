@@ -133,17 +133,13 @@ export function registerMeRoutes(app: Express): void {
           ? req.query.entity_type
           : undefined;
       const countryCode =
-        typeof req.query.country_code === "string"
-          ? req.query.country_code
-          : undefined;
+        typeof req.query.country_code === "string" ? req.query.country_code : undefined;
       const minRatingRaw =
         typeof req.query.min_rating === "string"
           ? Number(req.query.min_rating)
           : undefined;
       const minRating =
-        minRatingRaw != null && Number.isFinite(minRatingRaw)
-          ? minRatingRaw
-          : undefined;
+        minRatingRaw != null && Number.isFinite(minRatingRaw) ? minRatingRaw : undefined;
 
       const tags = await listUserTags(user.id, {
         intent,
@@ -211,8 +207,7 @@ export function registerMeRoutes(app: Express): void {
     (req, res, next) => {
       upload.array("photos", MAX_PHOTOS)(req, res, (err) => {
         if (err) {
-          const message =
-            err instanceof Error ? err.message : "Upload failed.";
+          const message = err instanceof Error ? err.message : "Upload failed.";
           res.status(400).json({ message });
           return;
         }
@@ -255,13 +250,8 @@ export function registerMeRoutes(app: Express): void {
             /* ignore */
           }
         }
-        const added = accepted.map((file) =>
-          publicPhotoUrl(user.id, file.filename),
-        );
-        const tag = await setTagPhotoUrls(user.id, id, [
-          ...existing.photoUrls,
-          ...added,
-        ]);
+        const added = accepted.map((file) => publicPhotoUrl(user.id, file.filename));
+        const tag = await setTagPhotoUrls(user.id, id, [...existing.photoUrls, ...added]);
         res.json({ tag });
       } catch (error) {
         console.error("Photo upload failed", error);

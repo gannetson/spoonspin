@@ -33,8 +33,9 @@ export function AdminCountryHeroMenu({
   const { openSelectImage } = useSelectImage();
   const menuId = useId();
   const textTitleId = useId();
-  const { open, setOpen, rootRef, triggerRef, panelRef, position } =
-    usePortalMenu({ estimatedHeight: 220 });
+  const { open, setOpen, rootRef, triggerRef, panelRef, position } = usePortalMenu({
+    estimatedHeight: 220,
+  });
   const [textOpen, setTextOpen] = useState(false);
   const [textDraft, setTextDraft] = useState("");
   const [textBusy, setTextBusy] = useState(false);
@@ -65,13 +66,9 @@ export function AdminCountryHeroMenu({
     try {
       const result = await replaceCountryImage(country.code);
       onCountryUpdated(result.country);
-      setStatus(
-        t("admin.country.imageUpdated", { dishName: result.dishName }),
-      );
+      setStatus(t("admin.country.imageUpdated", { dishName: result.dishName }));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("admin.country.imageError"),
-      );
+      setError(err instanceof Error ? err.message : t("admin.country.imageError"));
     } finally {
       setImageBusy(false);
     }
@@ -112,9 +109,7 @@ export function AdminCountryHeroMenu({
       setStatus(t("admin.country.textUpdated"));
       setError(null);
     } catch (err) {
-      setTextError(
-        err instanceof Error ? err.message : t("admin.country.textError"),
-      );
+      setTextError(err instanceof Error ? err.message : t("admin.country.textError"));
     } finally {
       setTextBusy(false);
     }

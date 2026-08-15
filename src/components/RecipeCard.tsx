@@ -91,80 +91,78 @@ export function RecipeCard({
                 isAdmin ? "pr-14" : ""
               }`}
             >
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
-                  isHighlighted
-                    ? "bg-saffron/15 text-stamp"
-                    : "bg-parchment text-stamp"
-                }`}
-              >
-                {isCommunity && isSimple
-                  ? t("cook.communitySuggestion")
-                  : t(COURSE_KEYS[recipe.category])}
-              </span>
-              {isDinner ? (
-                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stamp">
-                  {t("cook.badge.dinner")}
+              <div className="flex flex-wrap items-center gap-2">
+                <span
+                  className={`rounded-full px-2.5 py-0.5 text-[0.65rem] font-semibold uppercase tracking-[0.14em] ${
+                    isHighlighted ? "bg-saffron/15 text-stamp" : "bg-parchment text-stamp"
+                  }`}
+                >
+                  {isCommunity && isSimple
+                    ? t("cook.communitySuggestion")
+                    : t(COURSE_KEYS[recipe.category])}
                 </span>
-              ) : null}
-              {isNational && !isDinner ? (
-                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stamp">
-                  {t("cook.badge.iconicNationalDish")}
-                </span>
-              ) : null}
-              {isCommunity && !isSimple ? (
-                <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stamp">
-                  {t("cook.badge.community")}
-                </span>
-              ) : null}
-            </div>
-
-            <div className="min-w-0">
-              <p className="truncate font-display text-xl leading-tight text-burgundy sm:text-2xl">
-                {recipe.name}
-              </p>
-              {recipe.localName ? (
-                <p className="mt-0.5 truncate text-sm text-ink-soft">
-                  {recipe.localName}
-                </p>
-              ) : null}
-              {recipe.description.trim() ? (
-                <p className="mt-1.5 line-clamp-2 text-sm leading-snug text-ink-soft">
-                  {recipe.description.trim()}
-                </p>
-              ) : null}
-            </div>
-
-            {showMeta && !isSimple ? (
-              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-soft">
-                <span className="inline-flex items-center gap-1">
-                  <Clock3 aria-hidden="true" className="size-3.5" />
-                  {t("cook.meta.minutes", {
-                    minutes: recipe.prepMinutes + recipe.cookMinutes,
-                  })}
-                </span>
-                {recipe.waitTime?.trim() ? (
-                  <span className="inline-flex items-center gap-1">
-                    {t("cook.meta.wait", { wait: recipe.waitTime.trim() })}
+                {isDinner ? (
+                  <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stamp">
+                    {t("cook.badge.dinner")}
                   </span>
                 ) : null}
-                <span className="inline-flex items-center gap-1 capitalize">
-                  <Flame aria-hidden="true" className="size-3.5" />
-                  {t(DIFFICULTY_KEYS[recipe.difficulty])}
-                </span>
-                {recipe.dietaryLabels.slice(0, 2).map((label) => (
-                  <span
-                    key={label}
-                    className="rounded-full bg-parchment px-2 py-0.5 text-xs text-ink-soft"
-                  >
-                    {label}
+                {isNational && !isDinner ? (
+                  <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stamp">
+                    {t("cook.badge.iconicNationalDish")}
                   </span>
-                ))}
+                ) : null}
+                {isCommunity && !isSimple ? (
+                  <span className="text-[0.65rem] font-semibold uppercase tracking-[0.14em] text-stamp">
+                    {t("cook.badge.community")}
+                  </span>
+                ) : null}
               </div>
-            ) : null}
-          </div>
-        </button>
+
+              <div className="min-w-0">
+                <p className="truncate font-display text-xl leading-tight text-burgundy sm:text-2xl">
+                  {recipe.name}
+                </p>
+                {recipe.localName ? (
+                  <p className="mt-0.5 truncate text-sm text-ink-soft">
+                    {recipe.localName}
+                  </p>
+                ) : null}
+                {recipe.description.trim() ? (
+                  <p className="mt-1.5 line-clamp-2 text-sm leading-snug text-ink-soft">
+                    {recipe.description.trim()}
+                  </p>
+                ) : null}
+              </div>
+
+              {showMeta && !isSimple ? (
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-soft">
+                  <span className="inline-flex items-center gap-1">
+                    <Clock3 aria-hidden="true" className="size-3.5" />
+                    {t("cook.meta.minutes", {
+                      minutes: recipe.prepMinutes + recipe.cookMinutes,
+                    })}
+                  </span>
+                  {recipe.waitTime?.trim() ? (
+                    <span className="inline-flex items-center gap-1">
+                      {t("cook.meta.wait", { wait: recipe.waitTime.trim() })}
+                    </span>
+                  ) : null}
+                  <span className="inline-flex items-center gap-1 capitalize">
+                    <Flame aria-hidden="true" className="size-3.5" />
+                    {t(DIFFICULTY_KEYS[recipe.difficulty])}
+                  </span>
+                  {recipe.dietaryLabels.slice(0, 2).map((label) => (
+                    <span
+                      key={label}
+                      className="rounded-full bg-parchment px-2 py-0.5 text-xs text-ink-soft"
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+          </button>
 
           {isAdmin && onAdminAction ? (
             <AdminItemMenu

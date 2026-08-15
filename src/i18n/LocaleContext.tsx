@@ -9,11 +9,7 @@ import {
 } from "react";
 import { en } from "./en";
 import { nl } from "./nl";
-import {
-  interpolate,
-  type Locale,
-  type MessageVars,
-} from "./types";
+import { interpolate, type Locale, type MessageVars } from "./types";
 
 const catalogs = { en, nl } as const;
 
@@ -35,28 +31,19 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = locale;
-    const description = catalogs[locale]["meta.description"] ?? en["meta.description"];
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta && description) meta.setAttribute("content", description);
   }, [locale]);
 
   const t = useCallback(
     (key: string, vars?: MessageVars) => {
-      const template =
-        catalogs[locale][key] ?? catalogs.en[key] ?? key;
+      const template = catalogs[locale][key] ?? catalogs.en[key] ?? key;
       return interpolate(template, vars);
     },
     [locale],
   );
 
-  const value = useMemo(
-    () => ({ locale, setLocale, t }),
-    [locale, setLocale, t],
-  );
+  const value = useMemo(() => ({ locale, setLocale, t }), [locale, setLocale, t]);
 
-  return (
-    <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>
-  );
+  return <LocaleContext.Provider value={value}>{children}</LocaleContext.Provider>;
 }
 
 export function useLocale(): LocaleContextValue {

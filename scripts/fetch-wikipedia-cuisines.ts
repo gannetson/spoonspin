@@ -40,18 +40,12 @@ const TITLE_OVERRIDES: Record<string, string[]> = {
   cn: ["Chinese cuisine"],
   bn: ["Bruneian cuisine", "Cuisine of Brunei"],
   mh: ["Marshallese cuisine", "Cuisine of the Marshall Islands"],
-  fm: [
-    "Cuisine of the Federated States of Micronesia",
-    "Micronesian cuisine",
-  ],
+  fm: ["Cuisine of the Federated States of Micronesia", "Micronesian cuisine"],
   st: ["São Toméan cuisine", "Cuisine of São Tomé and Príncipe"],
   ag: ["Antigua and Barbuda cuisine", "Cuisine of Antigua and Barbuda"],
   tt: ["Trinidad and Tobago cuisine"],
   kn: ["Cuisine of Saint Kitts and Nevis", "Kittitian cuisine"],
-  vc: [
-    "Cuisine of Saint Vincent and the Grenadines",
-    "Vincentian cuisine",
-  ],
+  vc: ["Cuisine of Saint Vincent and the Grenadines", "Vincentian cuisine"],
   lc: ["Cuisine of Saint Lucia", "Saint Lucian cuisine"],
   gd: ["Grenadian cuisine", "Cuisine of Grenada"],
   dm: ["Dominican cuisine", "Cuisine of Dominica"],
@@ -84,11 +78,7 @@ type Stored = { title: string; summary: string; url: string };
 
 function titleCandidates(code: string, name: string): string[] {
   const overrides = TITLE_OVERRIDES[code] ?? [];
-  return [
-    ...overrides,
-    `${name} cuisine`,
-    `Cuisine of ${name}`,
-  ];
+  return [...overrides, `${name} cuisine`, `Cuisine of ${name}`];
 }
 
 function encodeTitle(title: string): string {
@@ -119,10 +109,7 @@ function looksLikeCuisinePage(title: string, summary: string): boolean {
   return false;
 }
 
-async function resolveCuisine(
-  code: string,
-  name: string,
-): Promise<Stored | null> {
+async function resolveCuisine(code: string, name: string): Promise<Stored | null> {
   for (const title of titleCandidates(code, name)) {
     try {
       const page = await fetchSummary(title);

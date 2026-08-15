@@ -20,10 +20,7 @@ export function getRecipeEnrichment(
   return undefined;
 }
 
-export function applyRecipeEnrichment(
-  _countryCode: string,
-  recipe: Recipe,
-): Recipe {
+export function applyRecipeEnrichment(_countryCode: string, recipe: Recipe): Recipe {
   return recipe;
 }
 

@@ -21,8 +21,9 @@ type AdminNavMenuProps = {
 export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
   const t = useT();
   const menuId = useId();
-  const { open, setOpen, rootRef, triggerRef, panelRef, position } =
-    usePortalMenu({ estimatedHeight: 340 });
+  const { open, setOpen, rootRef, triggerRef, panelRef, position } = usePortalMenu({
+    estimatedHeight: 340,
+  });
 
   const menu =
     open && position

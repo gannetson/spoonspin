@@ -54,10 +54,7 @@ async function readJson<T>(response: Response): Promise<T & { message?: string }
   }
 }
 
-async function postAdmin<T>(
-  path: string,
-  body?: unknown,
-): Promise<T> {
+async function postAdmin<T>(path: string, body?: unknown): Promise<T> {
   const response = await fetch(path, {
     method: "POST",
     credentials: "include",
@@ -82,15 +79,12 @@ export function replaceCountryImage(code: string) {
 }
 
 export async function updateCountryText(code: string, introduction: string) {
-  const response = await fetch(
-    `/api/admin/countries/${encodeURIComponent(code)}/text`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ introduction }),
-    },
-  );
+  const response = await fetch(`/api/admin/countries/${encodeURIComponent(code)}/text`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ introduction }),
+  });
   const data = await readJson<{ country: Country }>(response);
   if (!response.ok) {
     throw new Error(data.message ?? "Could not update country text.");
@@ -170,10 +164,7 @@ export function addOrderOptions(
     country: Country;
     added: number;
     enrichmentQueued?: number;
-  }>(
-    `/api/admin/countries/${encodeURIComponent(code)}/order-options`,
-    { options },
-  );
+  }>(`/api/admin/countries/${encodeURIComponent(code)}/order-options`, { options });
 }
 
 export function removeOrderOption(code: string, optionId: string) {
@@ -203,9 +194,7 @@ export function findDrinkImages(code: string) {
     skipped: number;
     missing: number;
     notes: string;
-  }>(
-    `/api/admin/countries/${encodeURIComponent(code)}/find-drink-images`,
-  );
+  }>(`/api/admin/countries/${encodeURIComponent(code)}/find-drink-images`);
 }
 
 export function composeDinner(code: string) {

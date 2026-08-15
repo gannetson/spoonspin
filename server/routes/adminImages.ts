@@ -13,14 +13,8 @@ import {
   updateOrderOption,
   updateRecipeImage,
 } from "../db/content.ts";
-import {
-  findVisibleCommunityRecipe,
-  updateCommunityRecipe,
-} from "../db/submissions.ts";
-import {
-  getRestaurantById,
-  updateRestaurantPhoto,
-} from "../db/restaurants.ts";
+import { findVisibleCommunityRecipe, updateCommunityRecipe } from "../db/submissions.ts";
+import { getRestaurantById, updateRestaurantPhoto } from "../db/restaurants.ts";
 import { searchCommonsImagesPage } from "../lib/wikimedia.ts";
 import { fetchWebsiteImageCandidates } from "../lib/websiteImages.ts";
 import { getCountryDrinks } from "../../src/content/countries/menuAccessors.ts";
@@ -126,9 +120,7 @@ function toPublicRestaurant(
     photoUrl: row.photoUrl ?? undefined,
     photoAttribution: row.photoAttribution ?? undefined,
     location:
-      row.lat != null && row.lng != null
-        ? { lat: row.lat, lng: row.lng }
-        : undefined,
+      row.lat != null && row.lng != null ? { lat: row.lat, lng: row.lng } : undefined,
     authenticityRating: row.authenticityRating ?? undefined,
     authenticityNotes: row.authenticityNotes ?? undefined,
     reviewed: row.reviewed,
@@ -186,15 +178,11 @@ async function applyImage(
         imageAttribution,
       );
     } else if (community) {
-      updatedRecipe = await updateCommunityRecipe(
-        target.countryCode,
-        target.recipeId,
-        {
-          ...community.recipe,
-          imageUrl,
-          imageAttribution: imageAttribution ?? undefined,
-        },
-      );
+      updatedRecipe = await updateCommunityRecipe(target.countryCode, target.recipeId, {
+        ...community.recipe,
+        imageUrl,
+        imageAttribution: imageAttribution ?? undefined,
+      });
     }
 
     return {
@@ -214,14 +202,10 @@ async function applyImage(
     if (!drink) {
       throw Object.assign(new Error("Drink not found."), { status: 404 });
     }
-    const result = await updateCountryDrink(
-      target.countryCode,
-      target.drinkKey,
-      {
-        imageUrl,
-        imageAttribution: imageAttribution ?? undefined,
-      },
-    );
+    const result = await updateCountryDrink(target.countryCode, target.drinkKey, {
+      imageUrl,
+      imageAttribution: imageAttribution ?? undefined,
+    });
     return {
       country: result.country,
       drink: result.drink,
@@ -305,10 +289,7 @@ export function registerAdminImageRoutes(app: Express): void {
       try {
         const q = String(req.query.q ?? "").trim();
         const offset = Math.max(0, Number(req.query.offset ?? 0) || 0);
-        const limit = Math.min(
-          24,
-          Math.max(1, Number(req.query.limit ?? 12) || 12),
-        );
+        const limit = Math.min(24, Math.max(1, Number(req.query.limit ?? 12) || 12));
         const restaurantId = String(req.query.restaurantId ?? "").trim();
 
         let websiteResults: Array<{
@@ -320,13 +301,10 @@ export function registerAdminImageRoutes(app: Express): void {
           try {
             const restaurant = await getRestaurantById(restaurantId);
             if (restaurant?.website) {
-              websiteResults = await fetchWebsiteImageCandidates(
-                restaurant.website,
-                {
-                  restaurantName: restaurant.name,
-                  excludeUrls: [restaurant.photoUrl],
-                },
-              );
+              websiteResults = await fetchWebsiteImageCandidates(restaurant.website, {
+                restaurantName: restaurant.name,
+                excludeUrls: [restaurant.photoUrl],
+              });
             }
           } catch (error) {
             console.warn("Restaurant website image prepend failed", error);
@@ -369,10 +347,7 @@ export function registerAdminImageRoutes(app: Express): void {
       } catch (error) {
         console.error("Admin image search failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error
-              ? error.message
-              : "Could not search images.",
+          message: error instanceof Error ? error.message : "Could not search images.",
         });
       }
     },
@@ -395,8 +370,7 @@ export function registerAdminImageRoutes(app: Express): void {
       } catch (error) {
         console.error("Admin set image failed", error);
         res.status(statusFromError(error)).json({
-          message:
-            error instanceof Error ? error.message : "Could not set image.",
+          message: error instanceof Error ? error.message : "Could not set image.",
         });
       }
     },
@@ -409,8 +383,7 @@ export function registerAdminImageRoutes(app: Express): void {
       upload.single("image")(req, res, (err) => {
         if (err) {
           res.status(400).json({
-            message:
-              err instanceof Error ? err.message : "Could not upload image.",
+            message: err instanceof Error ? err.message : "Could not upload image.",
           });
           return;
         }
@@ -460,11 +433,7 @@ export function registerAdminImageRoutes(app: Express): void {
             ? req.body.imageAttribution.trim()
             : "Uploaded by admin";
 
-        const result = await applyImage(
-          targetParsed.data,
-          imageUrl,
-          imageAttribution,
-        );
+        const result = await applyImage(targetParsed.data, imageUrl, imageAttribution);
         res.json(result);
       } catch (error) {
         console.error("Admin upload image failed", error);
@@ -476,10 +445,7 @@ export function registerAdminImageRoutes(app: Express): void {
           }
         }
         res.status(statusFromError(error)).json({
-          message:
-            error instanceof Error
-              ? error.message
-              : "Could not upload image.",
+          message: error instanceof Error ? error.message : "Could not upload image.",
         });
       }
     },

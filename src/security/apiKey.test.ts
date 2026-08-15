@@ -11,10 +11,7 @@ function walk(dir: string): string[] {
     if (stats.isDirectory()) {
       if (entry === "node_modules" || entry === "dist") continue;
       files.push(...walk(full));
-    } else if (
-      /\.(ts|tsx|js|jsx)$/.test(entry) &&
-      !entry.endsWith(".test.ts")
-    ) {
+    } else if (/\.(ts|tsx|js|jsx)$/.test(entry) && !entry.endsWith(".test.ts")) {
       files.push(full);
     }
   }

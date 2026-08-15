@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import type { Restaurant } from "./types";
 import { defaultRankScore, sortRestaurants } from "./sortRestaurants";
 
-function place(partial: Partial<Restaurant> & Pick<Restaurant, "id" | "name">): Restaurant {
+function place(
+  partial: Partial<Restaurant> & Pick<Restaurant, "id" | "name">,
+): Restaurant {
   return {
     address: "Test",
     city: "Leiden",

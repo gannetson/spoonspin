@@ -47,10 +47,7 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
   const intent = isPlanned ? "want" : "did";
 
   const viewingOther =
-    !isPlanned &&
-    Boolean(routeUserId) &&
-    Boolean(user) &&
-    routeUserId !== user?.id;
+    !isPlanned && Boolean(routeUserId) && Boolean(user) && routeUserId !== user?.id;
   const isOwnProfile = isPlanned || !routeUserId || routeUserId === user?.id;
   const canViewOther = user?.role === "admin";
 
@@ -119,24 +116,12 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
     return () => {
       cancelled = true;
     };
-  }, [
-    authLoading,
-    user,
-    routeUserId,
-    viewingOther,
-    canViewOther,
-    intent,
-    isPlanned,
-    t,
-  ]);
+  }, [authLoading, user, routeUserId, viewingOther, canViewOther, intent, isPlanned, t]);
 
   const filtered = useMemo(() => {
     return tags.filter((tag) => {
       if (typeFilter !== "all" && tag.entityType !== typeFilter) return false;
-      if (
-        countryFilter !== "all" &&
-        tag.countryCode !== countryFilter.toLowerCase()
-      ) {
+      if (countryFilter !== "all" && tag.countryCode !== countryFilter.toLowerCase()) {
         return false;
       }
       if (!isPlanned && minRating != null) {
@@ -155,14 +140,10 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
   }, [tags]);
 
   const progress = resolveLevelProgress(summary?.countriesTasted ?? 0);
-  const levelTitle = progress.current
-    ? t(progress.current.titleKey)
-    : t("levels.none");
+  const levelTitle = progress.current ? t(progress.current.titleKey) : t("levels.none");
   const nextTitle = progress.next ? t(progress.next.titleKey) : null;
   const levelArt = levelArtSrc(progress.current?.id ?? "none");
-  const nextLevelNumber = progress.next
-    ? progress.levelNumber + 1
-    : null;
+  const nextLevelNumber = progress.next ? progress.levelNumber + 1 : null;
 
   const plannedCountryCodes = summary?.plannedCountryCodes ?? [];
   const countriesPlanned = summary?.countriesPlanned ?? 0;
@@ -321,10 +302,7 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                 {isOwnProfile ? (
                   <p className="mt-2 text-sm text-ink-soft">
                     {t("profile.plannedLinkHint")}{" "}
-                    <Link
-                      to="/planned"
-                      className="font-semibold text-tomato underline"
-                    >
+                    <Link to="/planned" className="font-semibold text-tomato underline">
                       {t("app.planned")}
                     </Link>
                     .
@@ -368,35 +346,31 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
           </section>
         )}
 
-        {(isPlanned ? plannedCountryCodes : summary?.countryCodes ?? [])
-          .length > 0 ? (
+        {(isPlanned ? plannedCountryCodes : (summary?.countryCodes ?? [])).length > 0 ? (
           <section>
             <h2 className="mb-3 font-display text-2xl">
-              {isPlanned
-                ? t("planned.countriesHeading")
-                : t("profile.countriesHeading")}
+              {isPlanned ? t("planned.countriesHeading") : t("profile.countriesHeading")}
             </h2>
             <ul className="flex flex-wrap gap-2">
-              {(isPlanned
-                ? plannedCountryCodes
-                : summary?.countryCodes ?? []
-              ).map((code) => {
-                const entry = catalogByCode.get(code);
-                if (!entry) return null;
-                return (
-                  <li key={code}>
-                    <Link
-                      to={`/?country=${code}&mode=cook`}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-cream px-3 py-1.5 text-sm font-semibold ring-1 ring-ink/10 hover:ring-tomato/40"
-                    >
-                      <span aria-hidden="true" className="flag-glow">
-                        {entry.flag}
-                      </span>
-                      {entry.name}
-                    </Link>
-                  </li>
-                );
-              })}
+              {(isPlanned ? plannedCountryCodes : (summary?.countryCodes ?? [])).map(
+                (code) => {
+                  const entry = catalogByCode.get(code);
+                  if (!entry) return null;
+                  return (
+                    <li key={code}>
+                      <Link
+                        to={`/?country=${code}&mode=cook`}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-cream px-3 py-1.5 text-sm font-semibold ring-1 ring-ink/10 hover:ring-tomato/40"
+                      >
+                        <span aria-hidden="true" className="flag-glow">
+                          {entry.flag}
+                        </span>
+                        {entry.name}
+                      </Link>
+                    </li>
+                  );
+                },
+              )}
             </ul>
           </section>
         ) : null}
@@ -514,18 +488,14 @@ export function ProfilePage({ variant = "tasted" }: ProfilePageProps) {
                             <> · {t(`profile.filter.${tag.intent}`)}</>
                           ) : null}
                         </p>
-                        <h3 className="mt-1 font-display text-xl">
-                          {tag.entityName}
-                        </h3>
+                        <h3 className="mt-1 font-display text-xl">{tag.entityName}</h3>
                         {tag.intent === "did" && tag.rating != null ? (
                           <p className="mt-1 inline-flex items-center gap-1 text-sm text-saffron">
                             {Array.from({ length: 5 }, (_, i) => (
                               <Star
                                 key={i}
                                 className={`size-3.5 ${
-                                  i < tag.rating!
-                                    ? "fill-current"
-                                    : "text-ink/20"
+                                  i < tag.rating! ? "fill-current" : "text-ink/20"
                                 }`}
                                 aria-hidden="true"
                               />

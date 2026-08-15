@@ -1,8 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  AWIN_THUISBEZORGD_MID,
-  wrapThuisbezorgdAffiliateUrl,
-} from "./affiliateLinks";
+import { AWIN_THUISBEZORGD_MID, wrapThuisbezorgdAffiliateUrl } from "./affiliateLinks";
 import { getPublicConfig } from "../lib/publicConfig";
 
 vi.mock("../lib/publicConfig", () => ({
@@ -25,16 +22,14 @@ describe("wrapThuisbezorgdAffiliateUrl", () => {
 
   it("returns the destination when marketing is not allowed", () => {
     vi.stubEnv("VITE_AWIN_PUBLISHER_ID", "99999");
-    expect(
-      wrapThuisbezorgdAffiliateUrl(TB_URL, { marketingAllowed: false }),
-    ).toBe(TB_URL);
+    expect(wrapThuisbezorgdAffiliateUrl(TB_URL, { marketingAllowed: false })).toBe(
+      TB_URL,
+    );
   });
 
   it("returns the destination when publisher id is missing", () => {
     vi.stubEnv("VITE_AWIN_PUBLISHER_ID", "");
-    expect(
-      wrapThuisbezorgdAffiliateUrl(TB_URL, { marketingAllowed: true }),
-    ).toBe(TB_URL);
+    expect(wrapThuisbezorgdAffiliateUrl(TB_URL, { marketingAllowed: true })).toBe(TB_URL);
   });
 
   it("wraps Thuisbezorgd.nl URLs with Awin when consent and publisher id are set", () => {
@@ -65,9 +60,7 @@ describe("wrapThuisbezorgdAffiliateUrl", () => {
   it("does not wrap non-Thuisbezorgd destinations", () => {
     vi.stubEnv("VITE_AWIN_PUBLISHER_ID", "424242");
     const uber = "https://www.ubereats.com/nl/city/amsterdam-noord-holland";
-    expect(
-      wrapThuisbezorgdAffiliateUrl(uber, { marketingAllowed: true }),
-    ).toBe(uber);
+    expect(wrapThuisbezorgdAffiliateUrl(uber, { marketingAllowed: true })).toBe(uber);
   });
 
   it("respects VITE_AWIN_THUISBEZORGD_MID override", () => {

@@ -170,12 +170,11 @@ async function nationalDishImage(code: string): Promise<CuisineImage | null> {
   return null;
 }
 
-async function wikipediaCuisineImage(
-  code: string,
-): Promise<CuisineImage | null> {
-  const wikiByCode = loadJson<
-    Record<string, { title?: string; url?: string }>
-  >(WIKI_PATH, {});
+async function wikipediaCuisineImage(code: string): Promise<CuisineImage | null> {
+  const wikiByCode = loadJson<Record<string, { title?: string; url?: string }>>(
+    WIKI_PATH,
+    {},
+  );
   const wiki = wikiByCode[code];
   if (!wiki?.title) return null;
 
@@ -234,11 +233,8 @@ async function findCommonsImage(
     if (image.mime && !IMAGE_MIME.test(image.mime)) continue;
     if (!isPhotoUrl(image.url)) continue;
 
-    const license =
-      image.extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
-    const artist = image.extmetadata?.Artist?.value
-      ?.replace(/<[^>]+>/g, "")
-      .trim();
+    const license = image.extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
+    const artist = image.extmetadata?.Artist?.value?.replace(/<[^>]+>/g, "").trim();
     const attribution = artist
       ? `${artist} / ${license}`
       : `Wikimedia Commons / ${license}`;
@@ -255,9 +251,7 @@ async function commonsCuisineImage(
 ): Promise<CuisineImage | null> {
   const country = await getCountryFromDb(code);
   const national = country?.nationalDishId
-    ? getCountryRecipes(country).find(
-        (recipe) => recipe.id === country.nationalDishId,
-      )
+    ? getCountryRecipes(country).find((recipe) => recipe.id === country.nationalDishId)
     : undefined;
 
   const queries = [
@@ -284,10 +278,7 @@ async function commonsCuisineImage(
   return null;
 }
 
-async function enrichCountry(
-  code: string,
-  name: string,
-): Promise<CuisineImage | null> {
+async function enrichCountry(code: string, name: string): Promise<CuisineImage | null> {
   const fromDish = await nationalDishImage(code);
   if (fromDish) return fromDish;
 
@@ -316,8 +307,7 @@ async function main() {
   const entries = args.all
     ? countryCatalog
     : countryCatalog.filter(
-        (entry) =>
-          cookReadyCodes.has(entry.code) || !images[entry.code]?.imageUrl,
+        (entry) => cookReadyCodes.has(entry.code) || !images[entry.code]?.imageUrl,
       );
 
   const ordered = [

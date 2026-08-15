@@ -1,9 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import {
-  closeDb,
-  ensureDb,
-  resetAllTables,
-} from "../../server/db/restaurants.ts";
+import { closeDb, ensureDb, resetAllTables } from "../../server/db/restaurants.ts";
 import {
   insertDrinkSubmission,
   insertRecipeSubmission,
@@ -18,8 +14,7 @@ import {
 } from "../../server/db/submissions.ts";
 
 const TEST_DATABASE_URL =
-  process.env.TEST_DATABASE_URL?.trim() ||
-  "postgresql://localhost:5432/spoonspin_test";
+  process.env.TEST_DATABASE_URL?.trim() || "postgresql://localhost:5432/spoonspin_test";
 
 describe("suggestion submissions", () => {
   beforeEach(async () => {
@@ -45,8 +40,7 @@ describe("suggestion submissions", () => {
     const recipe = {
       id: "suggest-test-1",
       name: "Test Dish",
-      description:
-        "A tasty test dish used only for unit tests of community suggestions.",
+      description: "A tasty test dish used only for unit tests of community suggestions.",
       category: "main" as const,
       servings: 2,
       prepMinutes: 10,
@@ -72,14 +66,14 @@ describe("suggestion submissions", () => {
       recipe,
     });
 
-    expect(
-      (await listVisibleRecipesForCountry("bg")).map((r) => r.id),
-    ).toContain(recipe.id);
+    expect((await listVisibleRecipesForCountry("bg")).map((r) => r.id)).toContain(
+      recipe.id,
+    );
 
     await setRecipeSubmissionStatus(recipe.id, "rejected");
-    expect(
-      (await listVisibleRecipesForCountry("bg")).map((r) => r.id),
-    ).not.toContain(recipe.id);
+    expect((await listVisibleRecipesForCountry("bg")).map((r) => r.id)).not.toContain(
+      recipe.id,
+    );
   });
 
   it("lists pending drinks and hides rejected ones", async () => {
@@ -100,14 +94,14 @@ describe("suggestion submissions", () => {
       drink,
     });
 
-    expect(
-      (await listVisibleDrinksForCountry("bg")).map((d) => d.id),
-    ).toContain(drink.id);
+    expect((await listVisibleDrinksForCountry("bg")).map((d) => d.id)).toContain(
+      drink.id,
+    );
 
     await setDrinkSubmissionStatus(drink.id, "rejected");
-    expect(
-      (await listVisibleDrinksForCountry("bg")).map((d) => d.id),
-    ).not.toContain(drink.id);
+    expect((await listVisibleDrinksForCountry("bg")).map((d) => d.id)).not.toContain(
+      drink.id,
+    );
   });
 
   it("lists pending shops and hides rejected ones", async () => {
@@ -128,13 +122,11 @@ describe("suggestion submissions", () => {
       shop,
     });
 
-    expect(
-      (await listVisibleShopsForCountry("id")).map((s) => s.id),
-    ).toContain(shop.id);
+    expect((await listVisibleShopsForCountry("id")).map((s) => s.id)).toContain(shop.id);
 
     await setShopSubmissionStatus(shop.id, "rejected");
-    expect(
-      (await listVisibleShopsForCountry("id")).map((s) => s.id),
-    ).not.toContain(shop.id);
+    expect((await listVisibleShopsForCountry("id")).map((s) => s.id)).not.toContain(
+      shop.id,
+    );
   });
 });

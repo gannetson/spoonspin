@@ -60,9 +60,7 @@ function clientIp(ip: string | undefined): string {
   return value || "unknown";
 }
 
-export async function pruneAnalyticsOlderThan(
-  days = RETENTION_DAYS,
-): Promise<void> {
+export async function pruneAnalyticsOlderThan(days = RETENTION_DAYS): Promise<void> {
   const db = await ensureDb();
   await db.query(
     `DELETE FROM api_request_logs WHERE created_at < NOW() - ($1::text || ' days')::interval`,

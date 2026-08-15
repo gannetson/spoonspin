@@ -69,8 +69,9 @@ export function AdminItemMenu({
 }: AdminItemMenuProps) {
   const t = useT();
   const menuId = useId();
-  const { open, setOpen, rootRef, triggerRef, panelRef, position } =
-    usePortalMenu({ estimatedHeight: 280 });
+  const { open, setOpen, rootRef, triggerRef, panelRef, position } = usePortalMenu({
+    estimatedHeight: 280,
+  });
   const { position: statusPosition } = useAnchoredToast({
     active: Boolean(status || error),
     triggerRef,

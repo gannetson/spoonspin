@@ -44,34 +44,25 @@ export async function fetchGoogleRestaurantPhoto(place: {
   const apiKey = getGooglePlacesApiKey();
   if (!apiKey) return null;
 
-  const textQuery = [
-    place.name,
-    "restaurant",
-    place.address,
-    place.city,
-    "Netherlands",
-  ]
+  const textQuery = [place.name, "restaurant", place.address, place.city, "Netherlands"]
     .filter(Boolean)
     .join(" ");
 
-  const response = await fetch(
-    "https://places.googleapis.com/v1/places:searchText",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Goog-Api-Key": apiKey,
-        "X-Goog-FieldMask":
-          "places.id,places.displayName,places.photos,places.formattedAddress",
-      },
-      body: JSON.stringify({
-        textQuery,
-        languageCode: "en",
-        regionCode: "NL",
-        maxResultCount: 5,
-      }),
+  const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Goog-Api-Key": apiKey,
+      "X-Goog-FieldMask":
+        "places.id,places.displayName,places.photos,places.formattedAddress",
     },
-  );
+    body: JSON.stringify({
+      textQuery,
+      languageCode: "en",
+      regionCode: "NL",
+      maxResultCount: 5,
+    }),
+  });
   if (!response.ok) {
     const body = await response.text();
     throw new Error(`Google search ${response.status}: ${body.slice(0, 200)}`);
@@ -93,9 +84,7 @@ export async function fetchGoogleRestaurantPhoto(place: {
       namesLikelyMatch(place.name, candidate.displayName?.text ?? ""),
     ) ?? places[0];
 
-  const photos = shuffleInPlace([...(match?.photos ?? [])]).filter(
-    (photo) => photo.name,
-  );
+  const photos = shuffleInPlace([...(match?.photos ?? [])]).filter((photo) => photo.name);
   if (photos.length === 0) return null;
 
   for (const photo of photos) {
@@ -119,8 +108,7 @@ export async function fetchGoogleRestaurantPhoto(place: {
       continue;
     }
 
-    const credit =
-      photo.authorAttributions?.[0]?.displayName ?? "Google";
+    const credit = photo.authorAttributions?.[0]?.displayName ?? "Google";
     return {
       url: payload.photoUri,
       attribution: `Photo: ${credit} via Google`,
@@ -138,8 +126,7 @@ export async function fetchGoogleRestaurantPhoto(place: {
   if (!media.ok) return null;
   const payload = (await media.json()) as { photoUri?: string };
   if (!payload.photoUri) return null;
-  const credit =
-    fallback.authorAttributions?.[0]?.displayName ?? "Google";
+  const credit = fallback.authorAttributions?.[0]?.displayName ?? "Google";
   return {
     url: payload.photoUri,
     attribution: `Photo: ${credit} via Google`,

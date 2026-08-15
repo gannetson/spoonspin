@@ -113,8 +113,7 @@ export function isGoogleMapsPlaceUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     return (
-      /(^|\.)google\./i.test(parsed.hostname) ||
-      parsed.hostname === "maps.app.goo.gl"
+      /(^|\.)google\./i.test(parsed.hostname) || parsed.hostname === "maps.app.goo.gl"
     );
   } catch {
     return false;
@@ -132,9 +131,7 @@ function cleanUrl(url: string): string {
 
   // Normalize Tripadvisor review/pagination URLs to the restaurant profile.
   if (/(^|\.)tripadvisor\./i.test(parsed.hostname)) {
-    const showUser = parsed.pathname.match(
-      /\/ShowUserReviews-(g\d+)-(d\d+)-r\d+-(.+)$/i,
-    );
+    const showUser = parsed.pathname.match(/\/ShowUserReviews-(g\d+)-(d\d+)-r\d+-(.+)$/i);
     if (showUser) {
       parsed.pathname = `/Restaurant_Review-${showUser[1]}-${showUser[2]}-Reviews-${showUser[3]}`;
     }
@@ -231,10 +228,7 @@ export function listReviewLinks(input: {
     if (source === "tripadvisor" && !isTripadvisorRestaurantUrl(href)) continue;
     if (source === "theFork" && !isTheForkRestaurantUrl(href)) continue;
     if (source === "openTable" && !isOpenTableRestaurantUrl(href)) continue;
-    if (
-      source !== "google" &&
-      !urlMatchesRestaurantName(href, input.name)
-    ) {
+    if (source !== "google" && !urlMatchesRestaurantName(href, input.name)) {
       continue;
     }
 

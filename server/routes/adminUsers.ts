@@ -12,9 +12,7 @@ const roleSchema = z.object({
   role: z.enum(USER_ROLES),
 });
 
-export function registerAdminUserRoutes(
-  app: import("express").Express,
-): void {
+export function registerAdminUserRoutes(app: import("express").Express): void {
   app.get("/api/admin/users", requireAdmin, async (_req, res) => {
     try {
       const users = await listUsersForAdmin();
@@ -63,15 +61,10 @@ export function registerAdminUserRoutes(
         return;
       }
       try {
-        const user = await updateUserRole(
-          userId,
-          parsed.data.role,
-          req.user!.id,
-        );
+        const user = await updateUserRole(userId, parsed.data.role, req.user!.id);
         res.json({ user });
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Could not update role.";
+        const message = error instanceof Error ? error.message : "Could not update role.";
         const status =
           message === "User not found."
             ? 404

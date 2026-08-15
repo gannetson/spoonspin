@@ -176,9 +176,7 @@ export function ReviewModal({
                       aria-pressed={filled}
                       onClick={() => onRatingChange(value)}
                       className={`rounded p-0.5 transition ${
-                        filled
-                          ? "text-saffron"
-                          : "text-ink/25 hover:text-saffron/70"
+                        filled ? "text-saffron" : "text-ink/25 hover:text-saffron/70"
                       }`}
                     >
                       <Star
@@ -238,9 +236,7 @@ export function ReviewModal({
 
           <div>
             <div className="mb-2 flex items-center justify-between gap-2">
-              <p className="text-sm font-semibold text-ink">
-                {t("review.photos")}
-              </p>
+              <p className="text-sm font-semibold text-ink">{t("review.photos")}</p>
               <p className="text-xs text-ink-soft">
                 {t("review.photosHint", { count: photos.length, max: 5 })}
               </p>
@@ -263,9 +259,7 @@ export function ReviewModal({
                           else setPhotos((prev) => prev.filter((p) => p !== url));
                         } catch (err) {
                           setError(
-                            err instanceof Error
-                              ? err.message
-                              : t("review.error.upload"),
+                            err instanceof Error ? err.message : t("review.error.upload"),
                           );
                         }
                       })();
@@ -304,9 +298,7 @@ export function ReviewModal({
               onChange={(event) => void handleFiles(event.target.files)}
             />
             {!tagId ? (
-              <p className="mt-2 text-xs text-ink-soft">
-                {t("review.photosAfterSave")}
-              </p>
+              <p className="mt-2 text-xs text-ink-soft">{t("review.photosAfterSave")}</p>
             ) : null}
           </div>
 

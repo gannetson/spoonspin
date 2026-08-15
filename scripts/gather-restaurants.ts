@@ -31,20 +31,11 @@ import {
   osmTagsForCountry,
 } from "../src/restaurants/osmCuisineMap.ts";
 import { publishedCountries } from "../src/content/countries/published.ts";
-import {
-  HUBS,
-  harvestCountryAtHub,
-  sleep,
-  type Hub,
-} from "./lib/overpassRestaurants.ts";
+import { HUBS, harvestCountryAtHub, sleep, type Hub } from "./lib/overpassRestaurants.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PROGRESS_PATH = path.join(rootDir, "data", "gather-progress.json");
-const GATHERED_LOG_PATH = path.join(
-  rootDir,
-  "data",
-  "gathered-promotions.jsonl",
-);
+const GATHERED_LOG_PATH = path.join(rootDir, "data", "gathered-promotions.jsonl");
 
 type GatherJob = {
   id: string;
@@ -140,9 +131,7 @@ function defaultProgress(options: CliOptions): GatherProgress {
 function loadProgress(options: CliOptions): GatherProgress {
   if (!fs.existsSync(PROGRESS_PATH)) return defaultProgress(options);
   try {
-    const parsed = JSON.parse(
-      fs.readFileSync(PROGRESS_PATH, "utf8"),
-    ) as GatherProgress;
+    const parsed = JSON.parse(fs.readFileSync(PROGRESS_PATH, "utf8")) as GatherProgress;
     if (parsed.version !== 1) return defaultProgress(options);
     return parsed;
   } catch {
@@ -177,7 +166,10 @@ async function buildJobs(options: CliOptions): Promise<GatherJob[]> {
   return jobs;
 }
 
-function scoreAuthenticity(restaurant: StoredRestaurant, countryCode: string): {
+function scoreAuthenticity(
+  restaurant: StoredRestaurant,
+  countryCode: string,
+): {
   rating: number;
   notes: string;
 } {

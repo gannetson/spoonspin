@@ -32,10 +32,7 @@ describe("restaurant ratings", () => {
       tripadvisor: { score: 4.2, count: 10 },
       google: { score: 4.5, count: 20 },
     });
-    expect(listed.map((item) => item.source)).toEqual([
-      "google",
-      "tripadvisor",
-    ]);
+    expect(listed.map((item) => item.source)).toEqual(["google", "tripadvisor"]);
   });
 
   it("only lists real stored profile URLs (no search fallbacks)", () => {
@@ -54,10 +51,7 @@ describe("restaurant ratings", () => {
         },
       },
     });
-    expect(links.map((link) => link.source)).toEqual([
-      "google",
-      "tripadvisor",
-    ]);
+    expect(links.map((link) => link.source)).toEqual(["google", "tripadvisor"]);
     expect(links[0]?.href).toBe("https://maps.google.com/?cid=123");
     expect(links[1]?.href).toContain("Restaurant_Review");
     expect(links[1]?.href).not.toContain("/Search");
@@ -83,15 +77,11 @@ describe("review profile URL matching", () => {
       ),
     ).toBe(true);
     expect(
-      isTheForkRestaurantUrl(
-        "https://www.thefork.nl/restaurant/foo-bar-r123456",
-      ),
+      isTheForkRestaurantUrl("https://www.thefork.nl/restaurant/foo-bar-r123456"),
     ).toBe(true);
-    expect(
-      isTripadvisorRestaurantUrl(
-        "https://www.tripadvisor.nl/Search?q=foo",
-      ),
-    ).toBe(false);
+    expect(isTripadvisorRestaurantUrl("https://www.tripadvisor.nl/Search?q=foo")).toBe(
+      false,
+    );
   });
 
   it("picks a matching profile from search sources", () => {
@@ -104,8 +94,6 @@ describe("review profile URL matching", () => {
       ],
       { name: "Marani", city: "Delft" },
     );
-    expect(url).toBe(
-      "https://www.thefork.nl/restaurant/marani-delft-r654321",
-    );
+    expect(url).toBe("https://www.thefork.nl/restaurant/marani-delft-r654321");
   });
 });

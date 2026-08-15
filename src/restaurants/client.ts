@@ -1,9 +1,7 @@
 import type { Restaurant, RestaurantSearchParams, RestaurantSearchResult } from "./types";
 import { buildMapsSearchUrl, withDistances } from "./shared";
 
-export async function fetchRestaurantById(
-  id: string,
-): Promise<Restaurant | null> {
+export async function fetchRestaurantById(id: string): Promise<Restaurant | null> {
   const response = await fetch(`/api/restaurants/${encodeURIComponent(id)}`);
   if (response.status === 404) return null;
   if (!response.ok) {

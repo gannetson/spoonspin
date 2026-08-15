@@ -10,12 +10,7 @@ import {
 } from "@/admin/overview";
 import { useT } from "@/i18n/LocaleContext";
 
-type SortKey =
-  | "name"
-  | "recipes"
-  | "restaurants"
-  | "drinks"
-  | "shops";
+type SortKey = "name" | "recipes" | "restaurants" | "drinks" | "shops";
 
 function compareRows(
   a: AdminCountryOverviewRow,
@@ -53,9 +48,7 @@ export function AdminOverviewPage() {
       } catch (err) {
         if (!cancelled) {
           setData(null);
-          setError(
-            err instanceof Error ? err.message : t("admin.overview.error"),
-          );
+          setError(err instanceof Error ? err.message : t("admin.overview.error"));
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -85,10 +78,7 @@ export function AdminOverviewPage() {
     <div className="passport-grid min-h-screen">
       <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="text-sm font-semibold text-tomato hover:underline"
-          >
+          <Link to="/" className="text-sm font-semibold text-tomato hover:underline">
             {t("admin.back")}
           </Link>
           {isAdmin ? (
@@ -128,15 +118,10 @@ export function AdminOverviewPage() {
         <h1 className="mt-4 font-display text-5xl text-burgundy">
           {t("admin.overview.title")}
         </h1>
-        <p className="mt-2 max-w-2xl text-ink-soft">
-          {t("admin.overview.subtitle")}
-        </p>
+        <p className="mt-2 max-w-2xl text-ink-soft">{t("admin.overview.subtitle")}</p>
 
         {authLoading ? (
-          <p
-            className="mt-8 inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="mt-8 inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             {t("admin.checkingAccess")}
           </p>
@@ -175,10 +160,7 @@ export function AdminOverviewPage() {
         ) : null}
 
         {isAdmin && loading ? (
-          <p
-            className="mt-8 inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="mt-8 inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             {t("admin.overview.loading")}
           </p>
@@ -227,24 +209,16 @@ export function AdminOverviewPage() {
                 </span>
                 <select
                   value={sortKey}
-                  onChange={(event) =>
-                    setSortKey(event.target.value as SortKey)
-                  }
+                  onChange={(event) => setSortKey(event.target.value as SortKey)}
                   className="mt-1 block min-h-11 rounded-xl border border-ink/20 bg-white px-3 text-sm"
                 >
                   <option value="name">{t("admin.overview.sort.name")}</option>
-                  <option value="recipes">
-                    {t("admin.overview.sort.recipes")}
-                  </option>
+                  <option value="recipes">{t("admin.overview.sort.recipes")}</option>
                   <option value="restaurants">
                     {t("admin.overview.sort.restaurants")}
                   </option>
-                  <option value="drinks">
-                    {t("admin.overview.sort.drinks")}
-                  </option>
-                  <option value="shops">
-                    {t("admin.overview.sort.shops")}
-                  </option>
+                  <option value="drinks">{t("admin.overview.sort.drinks")}</option>
+                  <option value="shops">{t("admin.overview.sort.shops")}</option>
                 </select>
               </label>
             </div>
@@ -292,22 +266,14 @@ export function AdminOverviewPage() {
                             {row.code.toUpperCase()}
                           </span>
                         </Link>
-                        <p className="mt-0.5 text-xs text-ink-soft">
-                          {row.region}
-                        </p>
+                        <p className="mt-0.5 text-xs text-ink-soft">{row.region}</p>
                       </td>
-                      <td className="px-4 py-3 tabular-nums text-ink">
-                        {row.recipes}
-                      </td>
+                      <td className="px-4 py-3 tabular-nums text-ink">{row.recipes}</td>
                       <td className="px-4 py-3 tabular-nums text-ink">
                         {row.restaurants}
                       </td>
-                      <td className="px-4 py-3 tabular-nums text-ink">
-                        {row.drinks}
-                      </td>
-                      <td className="px-4 py-3 tabular-nums text-ink">
-                        {row.shops}
-                      </td>
+                      <td className="px-4 py-3 tabular-nums text-ink">{row.drinks}</td>
+                      <td className="px-4 py-3 tabular-nums text-ink">{row.shops}</td>
                       <td className="px-4 py-3 text-ink-soft">
                         {row.cookReady
                           ? t("admin.overview.status.cookReady")
@@ -320,9 +286,7 @@ export function AdminOverviewPage() {
                 </tbody>
               </table>
               {rows.length === 0 ? (
-                <p className="px-4 py-6 text-ink-soft">
-                  {t("admin.overview.empty")}
-                </p>
+                <p className="px-4 py-6 text-ink-soft">{t("admin.overview.empty")}</p>
               ) : null}
             </div>
           </>

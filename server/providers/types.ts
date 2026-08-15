@@ -15,7 +15,5 @@ export interface LiveRestaurantProvider {
 }
 
 export function locationHint(cityOrPostcode?: string): string {
-  return cityOrPostcode?.trim()
-    ? `${cityOrPostcode.trim()}, Netherlands`
-    : "Netherlands";
+  return cityOrPostcode?.trim() ? `${cityOrPostcode.trim()}, Netherlands` : "Netherlands";
 }

@@ -46,47 +46,47 @@ npm run dev
 
 ### Required commands
 
-| Command                    | Purpose                                |
-| -------------------------- | -------------------------------------- |
-| `npm run dev`              | API + Vite client together             |
-| `npm run build`            | Typecheck + production bundle          |
-| `npm start`                | Production API (`tsx server/index.ts`) |
-| `npm run preview`          | Preview the production client build    |
-| `npm run lint`             | Lint with oxlint                       |
-| `npm run format`           | Format with Prettier                   |
-| `npm run typecheck`        | TypeScript project build check         |
-| `npm test`                 | Unit / component tests                 |
-| `npm run test:e2e`         | Playwright main journey                |
-| `npm run validate:content` | Zod validation for thin catalog stubs |
-| `npm run content:wikipedia` | Refresh Wikipedia cuisine summaries → `data/` (optional research) |
-| `npm run agent:recipes` | Enrich recipe photos/links in Postgres |
-| `npm run agent:restaurant-photos` | Enrich restaurants with photos (Postgres) |
-| `npm run agent:restaurants`| One-shot OSM harvest for chosen hubs/cuisines |
-| `npm run agent:gather`     | Incremental gather over time (resumable batches) |
-| `npm run agent:curate`     | Import `data/curated-restaurants.json` → Postgres |
-| `npm run agent:ratings`    | Enrich guest ratings in Postgres (Google / Tripadvisor) |
-| `npm run db:export-content` | Export countries/recipes/restaurants → `data/content-dump.json` |
-| `npm run db:import-content` | Import content dump into Postgres |
-| `npm run db:seed-content`  | Alias for `db:import-content` |
-| `npm run deploy:prod`      | SSH → pull → build → restart API |
+| Command                           | Purpose                                                           |
+| --------------------------------- | ----------------------------------------------------------------- |
+| `npm run dev`                     | API + Vite client together                                        |
+| `npm run build`                   | Typecheck + production bundle                                     |
+| `npm start`                       | Production API (`tsx server/index.ts`)                            |
+| `npm run preview`                 | Preview the production client build                               |
+| `npm run lint`                    | Lint with oxlint                                                  |
+| `npm run format`                  | Format with Prettier                                              |
+| `npm run typecheck`               | TypeScript project build check                                    |
+| `npm test`                        | Unit / component tests                                            |
+| `npm run test:e2e`                | Playwright main journey                                           |
+| `npm run validate:content`        | Zod validation for thin catalog stubs                             |
+| `npm run content:wikipedia`       | Refresh Wikipedia cuisine summaries → `data/` (optional research) |
+| `npm run agent:recipes`           | Enrich recipe photos/links in Postgres                            |
+| `npm run agent:restaurant-photos` | Enrich restaurants with photos (Postgres)                         |
+| `npm run agent:restaurants`       | One-shot OSM harvest for chosen hubs/cuisines                     |
+| `npm run agent:gather`            | Incremental gather over time (resumable batches)                  |
+| `npm run agent:curate`            | Import `data/curated-restaurants.json` → Postgres                 |
+| `npm run agent:ratings`           | Enrich guest ratings in Postgres (Google / Tripadvisor)           |
+| `npm run db:export-content`       | Export countries/recipes/restaurants → `data/content-dump.json`   |
+| `npm run db:import-content`       | Import content dump into Postgres                                 |
+| `npm run db:seed-content`         | Alias for `db:import-content`                                     |
+| `npm run deploy:prod`             | SSH → pull → build → restart API                                  |
 
 ## Environment variables
 
 Copy `.env.example` to `.env`:
 
-| Variable                | Required                     | Description                             |
-| ----------------------- | ---------------------------- | --------------------------------------- |
-| `MAPBOX_ACCESS_TOKEN`   | No (live fallback)           | Server-only Mapbox access token         |
-| `GOOGLE_PLACES_API_KEY` | No (ratings + live fallback) | Google Places key for rating enrichment |
-| `TRIPADVISOR_API_KEY`   | No                           | Tripadvisor Content API key (optional)  |
-| `OPENAI_API_KEY`        | No (suggestions)             | Confirms community recipe/restaurant suggestions |
-| `OPENAI_MODEL`          | No                           | Defaults to `gpt-4o-mini`               |
-| `APIFY_TOKEN`           | No (order options / TA)      | Admin discover: delivery actors + Tripadvisor restaurants (English) |
-| `RESTAURANT_PROVIDER`   | No                           | `auto` (default), `mapbox`, or `google` |
-| `RESTAURANT_LIVE_FALLBACK` | No                        | Set `1` to allow Mapbox/Google when curated DB has no match (off by default) |
-| `DATABASE_URL`          | No                           | Defaults to `postgresql://localhost:5432/spoonspin` |
-| `API_PORT`              | No                           | Defaults to `3007`                      |
-| `AWIN_PUBLISHER_ID`     | No (affiliate)               | Awin publisher id for Thuisbezorgd links (also accepts `VITE_AWIN_PUBLISHER_ID`). Served via `/api/public-config` after restart. TB links wrap only after marketing cookie consent. |
+| Variable                   | Required                     | Description                                                                                                                                                                         |
+| -------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `MAPBOX_ACCESS_TOKEN`      | No (live fallback)           | Server-only Mapbox access token                                                                                                                                                     |
+| `GOOGLE_PLACES_API_KEY`    | No (ratings + live fallback) | Google Places key for rating enrichment                                                                                                                                             |
+| `TRIPADVISOR_API_KEY`      | No                           | Tripadvisor Content API key (optional)                                                                                                                                              |
+| `OPENAI_API_KEY`           | No (suggestions)             | Confirms community recipe/restaurant suggestions                                                                                                                                    |
+| `OPENAI_MODEL`             | No                           | Defaults to `gpt-4o-mini`                                                                                                                                                           |
+| `APIFY_TOKEN`              | No (order options / TA)      | Admin discover: delivery actors + Tripadvisor restaurants (English)                                                                                                                 |
+| `RESTAURANT_PROVIDER`      | No                           | `auto` (default), `mapbox`, or `google`                                                                                                                                             |
+| `RESTAURANT_LIVE_FALLBACK` | No                           | Set `1` to allow Mapbox/Google when curated DB has no match (off by default)                                                                                                        |
+| `DATABASE_URL`             | No                           | Defaults to `postgresql://localhost:5432/spoonspin`                                                                                                                                 |
+| `API_PORT`                 | No                           | Defaults to `3007`                                                                                                                                                                  |
+| `AWIN_PUBLISHER_ID`        | No (affiliate)               | Awin publisher id for Thuisbezorgd links (also accepts `VITE_AWIN_PUBLISHER_ID`). Served via `/api/public-config` after restart. TB links wrap only after marketing cookie consent. |
 
 Never put provider secrets in Vite `VITE_*` variables or client code. Awin publisher IDs are public in click URLs and are fine in `AWIN_*` / `VITE_AWIN_*`.
 
@@ -124,13 +124,13 @@ Dine searches a local PostgreSQL database first (default database `spoonspin`). 
 
 ### Authenticity scale
 
-| Rating | Meaning |
-| ------ | ------- |
-| 5 | Highly authentic specialty kitchen |
-| 4 | Strong specialty focus |
-| 3 | Solid specialty with some adaptation |
-| 2 | Partial / thin specialty signal |
-| 1 | Weak |
+| Rating | Meaning                              |
+| ------ | ------------------------------------ |
+| 5      | Highly authentic specialty kitchen   |
+| 4      | Strong specialty focus               |
+| 3      | Solid specialty with some adaptation |
+| 2      | Partial / thin specialty signal      |
+| 1      | Weak                                 |
 
 ### Quality curation agent
 

@@ -7,10 +7,7 @@ import { formatQuantity, scaleIngredients } from "@/lib/scaleIngredients";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
-import {
-  handleRecipeAdminAction,
-  useAdminItemBusy,
-} from "@/admin/itemActions";
+import { handleRecipeAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useEditRecipe } from "@/admin/EditRecipeContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
@@ -139,7 +136,10 @@ export function RecipeView({
               {t("recipe.iconicNationalDish")}
             </p>
           ) : null}
-          <h2 id="recipe-heading" className="font-display text-4xl text-burgundy sm:text-5xl">
+          <h2
+            id="recipe-heading"
+            className="font-display text-4xl text-burgundy sm:text-5xl"
+          >
             {recipe.name}
           </h2>
           {recipe.localName ? (

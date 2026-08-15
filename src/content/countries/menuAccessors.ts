@@ -11,8 +11,7 @@ import { specialtyShopsFor } from "../shops/specialtyShops";
 import { applyRecipeEnrichment } from "../recipes/enrichments";
 
 export function getCountryRecipes(country: Country): Recipe[] {
-  const enrich = (recipe: Recipe) =>
-    applyRecipeEnrichment(country.code, recipe);
+  const enrich = (recipe: Recipe) => applyRecipeEnrichment(country.code, recipe);
 
   if (country.menu) {
     return [
@@ -45,8 +44,7 @@ export function getCountryDrinks(country: Country): Drink[] {
   if (
     country.nationalDrink &&
     !drinks.some(
-      (item) =>
-        item.name.toLowerCase() === country.nationalDrink!.name.toLowerCase(),
+      (item) => item.name.toLowerCase() === country.nationalDrink!.name.toLowerCase(),
     )
   ) {
     drinks.unshift(country.nationalDrink);
@@ -67,18 +65,12 @@ export function getOrderOptions(country: Country): OrderOption[] {
 
 export type RecipeDietFilter = "all" | "vegan" | "vegetarian" | "meat";
 
-export function recipeMatchesDiet(
-  recipe: Recipe,
-  diet: RecipeDietFilter,
-): boolean {
+export function recipeMatchesDiet(recipe: Recipe, diet: RecipeDietFilter): boolean {
   if (diet === "all") return true;
   const labels = recipe.dietaryLabels.map((label) => label.toLowerCase());
-  const vegan = labels.some((label) =>
-    ["vegan", "plant-based"].includes(label),
-  );
+  const vegan = labels.some((label) => ["vegan", "plant-based"].includes(label));
   const vegetarian =
-    vegan ||
-    labels.some((label) => label === "vegetarian" || label === "veggie");
+    vegan || labels.some((label) => label === "vegetarian" || label === "veggie");
   if (diet === "vegan") return vegan;
   if (diet === "vegetarian") return vegetarian;
   return !vegetarian;
@@ -93,16 +85,9 @@ export function recipeMatchesCategory(
 }
 
 export type DrinkAlcoholFilter =
-  | "all"
-  | "other-alcoholic"
-  | "non-alcoholic"
-  | "beer"
-  | "wine";
+  "all" | "other-alcoholic" | "non-alcoholic" | "beer" | "wine";
 
-export function drinkMatchesAlcohol(
-  drink: Drink,
-  filter: DrinkAlcoholFilter,
-): boolean {
+export function drinkMatchesAlcohol(drink: Drink, filter: DrinkAlcoholFilter): boolean {
   if (filter === "all") return true;
   if (filter === "beer") return drink.type === "beer";
   if (filter === "wine") return drink.type === "wine";
@@ -112,11 +97,7 @@ export function drinkMatchesAlcohol(
   return !drink.alcoholic;
 }
 
-export type DrinkSectionId =
-  | "beers"
-  | "wines"
-  | "alcoholicOther"
-  | "nonAlcoholic";
+export type DrinkSectionId = "beers" | "wines" | "alcoholicOther" | "nonAlcoholic";
 
 export type DrinkSection = {
   id: DrinkSectionId;
@@ -159,9 +140,7 @@ export function groupDrinksIntoSections(drinks: Drink[]): DrinkSection[] {
  * menu. If dinner_json only has drinks (no courses), keep those drinks on the
  * derived menu courses so add/remove pour still matches what the UI shows.
  */
-export function getDinnerSuggestion(
-  country: Country,
-): DinnerSuggestion | undefined {
+export function getDinnerSuggestion(country: Country): DinnerSuggestion | undefined {
   if (country.dinner && country.dinner.courses.length > 0) {
     return country.dinner;
   }

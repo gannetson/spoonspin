@@ -2,10 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ExternalLink, MapPin, Star } from "lucide-react";
 import type { Country } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
-import {
-  cuisineFlagsFor,
-  matchMenuItemNationalDishes,
-} from "@/restaurants/cuisineFlags";
+import { cuisineFlagsFor, matchMenuItemNationalDishes } from "@/restaurants/cuisineFlags";
 import {
   formatPriceLevel,
   listReviewLinks,
@@ -21,10 +18,7 @@ import type {
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
-import {
-  handleRestaurantAdminAction,
-  useAdminItemBusy,
-} from "@/admin/itemActions";
+import { handleRestaurantAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -124,10 +118,7 @@ export function RestaurantView({
   );
   const priceLabel = formatPriceLevel(restaurant?.priceLevel);
   const adminKey = restaurant ? `restaurant:${restaurant.id}` : "";
-  const menuGroups = useMemo(
-    () => groupMenu(restaurant?.menu ?? []),
-    [restaurant?.menu],
-  );
+  const menuGroups = useMemo(() => groupMenu(restaurant?.menu ?? []), [restaurant?.menu]);
 
   if (loading) {
     return (
@@ -166,10 +157,7 @@ export function RestaurantView({
           />
         ) : (
           <div className="h-56 w-full sm:h-72">
-            <MediaPlaceholder
-              labelKey="media.placeholder.restaurant"
-              tone="dark"
-            />
+            <MediaPlaceholder labelKey="media.placeholder.restaurant" tone="dark" />
           </div>
         )}
         <div
@@ -282,9 +270,7 @@ export function RestaurantView({
               <p className="inline-flex items-center gap-1 rounded-full bg-parchment px-3 py-1 text-sm font-semibold">
                 <Star aria-hidden="true" className="size-4 text-saffron" />
                 {restaurant.rating.toFixed(1)}
-                {restaurant.reviewCount != null
-                  ? ` (${restaurant.reviewCount})`
-                  : ""}
+                {restaurant.reviewCount != null ? ` (${restaurant.reviewCount})` : ""}
               </p>
             ) : null}
             {priceLabel ? (
@@ -372,9 +358,7 @@ export function RestaurantView({
           </h3>
           {menuGroups.length === 0 ? (
             <p className="text-sm text-ink-soft">
-              {isAdmin
-                ? t("restaurant.menuEmptyAdmin")
-                : t("restaurant.menuEmpty")}
+              {isAdmin ? t("restaurant.menuEmptyAdmin") : t("restaurant.menuEmpty")}
             </p>
           ) : (
             <div className="space-y-6">
@@ -416,7 +400,10 @@ export function RestaurantView({
                                           })
                                     }
                                   >
-                                    <span aria-hidden="true" className="flag-glow text-sm leading-none">
+                                    <span
+                                      aria-hidden="true"
+                                      className="flag-glow text-sm leading-none"
+                                    >
                                       {match.flag}
                                     </span>
                                     {match.isNationalDish
@@ -426,17 +413,12 @@ export function RestaurantView({
                                 ))}
                               </p>
                               {item.localName ? (
-                                <p className="text-sm text-ink-soft">
-                                  {item.localName}
-                                </p>
+                                <p className="text-sm text-ink-soft">{item.localName}</p>
                               ) : null}
                             </div>
                             {item.priceEur != null ? (
                               <p className="shrink-0 font-semibold text-ink">
-                                €
-                                {item.priceEur.toFixed(
-                                  item.priceEur % 1 ? 2 : 0,
-                                )}
+                                €{item.priceEur.toFixed(item.priceEur % 1 ? 2 : 0)}
                               </p>
                             ) : null}
                           </div>

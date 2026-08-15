@@ -37,11 +37,7 @@ export function CountryCard({
     >
       <div className="relative h-44 overflow-hidden sm:h-56">
         {bannerUrl ? (
-          <img
-            src={bannerUrl}
-            alt=""
-            className="size-full object-cover"
-          />
+          <img src={bannerUrl} alt="" className="size-full object-cover" />
         ) : (
           <MediaPlaceholder
             labelKey="media.placeholder.country"
@@ -55,10 +51,7 @@ export function CountryCard({
         />
         {isAdmin && onCountryUpdated && !spinning ? (
           <div className="absolute right-3 top-3 z-20 sm:right-5 sm:top-5">
-            <AdminCountryHeroMenu
-              country={country}
-              onCountryUpdated={onCountryUpdated}
-            />
+            <AdminCountryHeroMenu country={country} onCountryUpdated={onCountryUpdated} />
           </div>
         ) : null}
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
@@ -66,9 +59,7 @@ export function CountryCard({
             <p className="text-sm uppercase tracking-[0.18em] text-cream/75">
               {spinning ? t("country.card.choosing") : country.region}
             </p>
-            <h2 className="mt-1 font-display text-4xl text-ochre sm:text-5xl">
-              {name}
-            </h2>
+            <h2 className="mt-1 font-display text-4xl text-ochre sm:text-5xl">{name}</h2>
           </div>
           <span
             aria-hidden="true"

@@ -27,10 +27,7 @@ import { fetchGoogleRestaurantPhoto } from "../server/lib/googlePlacesPhoto.ts";
 import { findCommonsImage } from "../server/lib/wikimedia.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const PROGRESS_PATH = path.join(
-  rootDir,
-  "data/restaurant-photo-progress.json",
-);
+const PROGRESS_PATH = path.join(rootDir, "data/restaurant-photo-progress.json");
 
 type Progress = {
   completedIds: string[];
@@ -66,9 +63,10 @@ function saveJson(filePath: string, value: unknown) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
 
-async function fetchCommonsPhoto(
-  place: { name: string; city: string },
-): Promise<{ url: string; attribution: string } | null> {
+async function fetchCommonsPhoto(place: {
+  name: string;
+  city: string;
+}): Promise<{ url: string; attribution: string } | null> {
   return findCommonsImage(`${place.name} ${place.city} restaurant`);
 }
 
@@ -96,9 +94,7 @@ async function main() {
     console.log(
       `Restaurant photos: ${completed.size} skipped/done · ${pending.length} pending`,
     );
-    console.log(
-      `Google key: ${googleKey ? "set" : "empty (Wikimedia fallback only)"}`,
-    );
+    console.log(`Google key: ${googleKey ? "set" : "empty (Wikimedia fallback only)"}`);
     console.log(`Lifetime enriched: ${progress.lifetimeEnriched}`);
     console.log("Next:");
     for (const item of pending.slice(0, 8)) {

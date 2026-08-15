@@ -21,11 +21,7 @@ import { zClass } from "@/lib/stacking";
 import { getPreferredDineCity } from "@/restaurants/locationPreference";
 
 export type AdminDiscoverKind =
-  | "recipes"
-  | "restaurants"
-  | "shops"
-  | "drinks"
-  | "orderOptions";
+  "recipes" | "restaurants" | "shops" | "drinks" | "orderOptions";
 
 type AdminDiscoverModalProps = {
   kind: AdminDiscoverKind;
@@ -59,9 +55,7 @@ function itemKey(kind: AdminDiscoverKind, index: number, name: string): string {
 
 function addedMessageKey(kind: AdminDiscoverKind, count: number): string {
   if (kind === "recipes") {
-    return count === 1
-      ? "admin.discover.added.recipe"
-      : "admin.discover.added.recipes";
+    return count === 1 ? "admin.discover.added.recipe" : "admin.discover.added.recipes";
   }
   if (kind === "restaurants") {
     return count === 1
@@ -69,18 +63,14 @@ function addedMessageKey(kind: AdminDiscoverKind, count: number): string {
       : "admin.discover.added.restaurants";
   }
   if (kind === "drinks") {
-    return count === 1
-      ? "admin.discover.added.drink"
-      : "admin.discover.added.drinks";
+    return count === 1 ? "admin.discover.added.drink" : "admin.discover.added.drinks";
   }
   if (kind === "orderOptions") {
     return count === 1
       ? "admin.discover.added.orderOption"
       : "admin.discover.added.orderOptions";
   }
-  return count === 1
-    ? "admin.discover.added.shop"
-    : "admin.discover.added.shops";
+  return count === 1 ? "admin.discover.added.shop" : "admin.discover.added.shops";
 }
 
 export function AdminDiscoverModal({
@@ -96,9 +86,7 @@ export function AdminDiscoverModal({
   const titleId = useId();
   const cityFieldId = useId();
   const [query, setQuery] = useState("");
-  const [city, setCity] = useState(() =>
-    defaultCity?.trim() || getPreferredDineCity(),
-  );
+  const [city, setCity] = useState(() => defaultCity?.trim() || getPreferredDineCity());
   const [state, setState] = useState<State>({ status: "idle" });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
@@ -187,9 +175,7 @@ export function AdminDiscoverModal({
       setState({
         status: "error",
         message:
-          error instanceof Error
-            ? error.message
-            : t("admin.discover.error.generic"),
+          error instanceof Error ? error.message : t("admin.discover.error.generic"),
       });
     }
   }
@@ -330,10 +316,7 @@ export function AdminDiscoverModal({
     } catch (error) {
       setState({
         status: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : t("admin.discover.error.save"),
+        message: error instanceof Error ? error.message : t("admin.discover.error.save"),
       });
     } finally {
       setSaving(false);
@@ -374,10 +357,7 @@ export function AdminDiscoverModal({
           <div className="mt-5 flex flex-col gap-3">
             {kind === "orderOptions" ? (
               <div>
-                <label
-                  htmlFor={cityFieldId}
-                  className="text-sm font-semibold text-ink"
-                >
+                <label htmlFor={cityFieldId} className="text-sm font-semibold text-ink">
                   {t("admin.discover.orderOptions.city")}
                 </label>
                 <input
@@ -494,9 +474,7 @@ export function AdminDiscoverModal({
                               </span>
                               <span className="mt-1 block text-sm text-ink-soft">
                                 {entry.item.address}, {entry.item.city}
-                                {entry.item.cuisine
-                                  ? ` · ${entry.item.cuisine}`
-                                  : null}
+                                {entry.item.cuisine ? ` · ${entry.item.cuisine}` : null}
                                 {entry.item.authenticityRating != null
                                   ? ` · ${t("admin.discover.restaurants.authenticity", {
                                       rating: entry.item.authenticityRating,
@@ -510,8 +488,7 @@ export function AdminDiscoverModal({
                                     entry.item.authenticityNotes}
                                 </span>
                               ) : null}
-                              {entry.item.website ||
-                              entry.item.evidenceSourceUrl ? (
+                              {entry.item.website || entry.item.evidenceSourceUrl ? (
                                 <span className="mt-1 block text-sm text-ink-soft">
                                   {entry.item.website ? (
                                     <a
@@ -525,13 +502,11 @@ export function AdminDiscoverModal({
                                   ) : null}
                                   {entry.item.website &&
                                   entry.item.evidenceSourceUrl &&
-                                  entry.item.evidenceSourceUrl !==
-                                    entry.item.website
+                                  entry.item.evidenceSourceUrl !== entry.item.website
                                     ? " · "
                                     : null}
                                   {entry.item.evidenceSourceUrl &&
-                                  entry.item.evidenceSourceUrl !==
-                                    entry.item.website ? (
+                                  entry.item.evidenceSourceUrl !== entry.item.website ? (
                                     <a
                                       href={entry.item.evidenceSourceUrl}
                                       target="_blank"
@@ -563,9 +538,7 @@ export function AdminDiscoverModal({
                               <span className="block font-semibold text-ink">
                                 {entry.item.name}
                                 <span className="ml-2 text-xs font-medium uppercase tracking-wide text-ink-soft">
-                                  {t(
-                                    `dine.order.platform.${entry.item.platform}`,
-                                  )}
+                                  {t(`dine.order.platform.${entry.item.platform}`)}
                                 </span>
                               </span>
                               {entry.item.signatureDish ? (
@@ -576,9 +549,7 @@ export function AdminDiscoverModal({
                                 </span>
                               ) : null}
                               <span className="mt-1 block text-sm text-ink-soft">
-                                {entry.item.city
-                                  ? `${entry.item.city} · `
-                                  : null}
+                                {entry.item.city ? `${entry.item.city} · ` : null}
                                 {entry.item.notes ?? entry.item.url}
                               </span>
                             </>

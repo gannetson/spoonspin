@@ -11,8 +11,7 @@ export function registerContentRoutes(app: import("express").Express): void {
       const countries = await listCountriesFromDb();
       if (countries.length === 0) {
         res.status(503).json({
-          message:
-            "Country content is not seeded yet. Run npm run db:import-content.",
+          message: "Country content is not seeded yet. Run npm run db:import-content.",
           countries: [],
         });
         return;

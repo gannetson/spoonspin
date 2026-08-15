@@ -52,10 +52,7 @@ export async function searchOsmRestaurantsForCountry(input: {
       try {
         elements = await fetchOverpass(query);
       } catch (error) {
-        console.warn(
-          `OSM discover failed for ${input.countryCode} @ ${hub.id}`,
-          error,
-        );
+        console.warn(`OSM discover failed for ${input.countryCode} @ ${hub.id}`, error);
         continue;
       }
 

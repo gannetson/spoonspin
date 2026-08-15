@@ -52,9 +52,7 @@ function TrafficChart({
 }) {
   const t = useT();
   if (series.length === 0) {
-    return (
-      <p className="text-sm text-ink-soft">{t("admin.reports.chartEmpty")}</p>
-    );
+    return <p className="text-sm text-ink-soft">{t("admin.reports.chartEmpty")}</p>;
   }
 
   const max = Math.max(1, ...series.map((point) => point.requests));
@@ -141,9 +139,7 @@ export function AdminReportsPage() {
       } catch (err) {
         if (!cancelled) {
           setData(null);
-          setError(
-            err instanceof Error ? err.message : t("admin.reports.error"),
-          );
+          setError(err instanceof Error ? err.message : t("admin.reports.error"));
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -161,10 +157,7 @@ export function AdminReportsPage() {
     <div className="passport-grid min-h-screen">
       <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link
-            to="/"
-            className="text-sm font-semibold text-tomato hover:underline"
-          >
+          <Link to="/" className="text-sm font-semibold text-tomato hover:underline">
             {t("admin.back")}
           </Link>
           {isAdmin ? (
@@ -197,15 +190,10 @@ export function AdminReportsPage() {
         <h1 className="mt-4 font-display text-5xl text-burgundy">
           {t("admin.reports.title")}
         </h1>
-        <p className="mt-2 max-w-2xl text-ink-soft">
-          {t("admin.reports.subtitle")}
-        </p>
+        <p className="mt-2 max-w-2xl text-ink-soft">{t("admin.reports.subtitle")}</p>
 
         {authLoading ? (
-          <p
-            className="mt-8 inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="mt-8 inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             {t("admin.checkingAccess")}
           </p>
@@ -267,10 +255,7 @@ export function AdminReportsPage() {
         ) : null}
 
         {isAdmin && loading ? (
-          <p
-            className="mt-8 inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="mt-8 inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             {t("admin.reports.loading")}
           </p>
@@ -315,9 +300,8 @@ export function AdminReportsPage() {
               </div>
               <div className="mt-4 flex flex-wrap gap-4 text-sm text-ink-soft">
                 <span>
-                  2xx: {data.statusBreakdown["2xx"]} · 4xx:{" "}
-                  {data.statusBreakdown["4xx"]} · 5xx:{" "}
-                  {data.statusBreakdown["5xx"]}
+                  2xx: {data.statusBreakdown["2xx"]} · 4xx: {data.statusBreakdown["4xx"]}{" "}
+                  · 5xx: {data.statusBreakdown["5xx"]}
                   {data.statusBreakdown.other > 0
                     ? ` · other: ${data.statusBreakdown.other}`
                     : ""}
@@ -331,9 +315,7 @@ export function AdminReportsPage() {
                   {t("admin.reports.topIps")}
                 </h2>
                 {data.topIps.length === 0 ? (
-                  <p className="mt-3 text-sm text-ink-soft">
-                    {t("admin.reports.empty")}
-                  </p>
+                  <p className="mt-3 text-sm text-ink-soft">{t("admin.reports.empty")}</p>
                 ) : (
                   <div className="mt-3 overflow-x-auto">
                     <table className="w-full min-w-[16rem] text-left text-sm">
@@ -352,13 +334,8 @@ export function AdminReportsPage() {
                       </thead>
                       <tbody>
                         {data.topIps.map((row) => (
-                          <tr
-                            key={row.ip}
-                            className="border-b border-ink/5 text-ink"
-                          >
-                            <td className="py-2 pr-3 font-mono text-xs">
-                              {row.ip}
-                            </td>
+                          <tr key={row.ip} className="border-b border-ink/5 text-ink">
+                            <td className="py-2 pr-3 font-mono text-xs">{row.ip}</td>
                             <td className="py-2 pr-3">{row.count}</td>
                             <td className="py-2 text-ink-soft">
                               {formatWhen(row.lastSeen)}
@@ -376,9 +353,7 @@ export function AdminReportsPage() {
                   {t("admin.reports.topPaths")}
                 </h2>
                 {data.topPaths.length === 0 ? (
-                  <p className="mt-3 text-sm text-ink-soft">
-                    {t("admin.reports.empty")}
-                  </p>
+                  <p className="mt-3 text-sm text-ink-soft">{t("admin.reports.empty")}</p>
                 ) : (
                   <div className="mt-3 overflow-x-auto">
                     <table className="w-full min-w-[16rem] text-left text-sm">
@@ -394,13 +369,8 @@ export function AdminReportsPage() {
                       </thead>
                       <tbody>
                         {data.topPaths.map((row) => (
-                          <tr
-                            key={row.path}
-                            className="border-b border-ink/5 text-ink"
-                          >
-                            <td className="py-2 pr-3 font-mono text-xs">
-                              {row.path}
-                            </td>
+                          <tr key={row.path} className="border-b border-ink/5 text-ink">
+                            <td className="py-2 pr-3 font-mono text-xs">{row.path}</td>
                             <td className="py-2">{row.count}</td>
                           </tr>
                         ))}
@@ -430,10 +400,7 @@ export function AdminReportsPage() {
                     ["restaurant_view", "restaurantViews"],
                   ] as const
                 ).map(([eventType, labelKey]) => (
-                  <div
-                    key={eventType}
-                    className="rounded-xl bg-parchment/60 px-3 py-2"
-                  >
+                  <div key={eventType} className="rounded-xl bg-parchment/60 px-3 py-2">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
                       {t(`admin.reports.product.${labelKey}`)}
                     </p>

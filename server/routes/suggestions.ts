@@ -73,7 +73,10 @@ const recipeConfirmSchema = z.object({
     cookMinutes: z.coerce.number().int().nonnegative(),
     waitTime: optionalText,
     difficulty: z.enum(["easy", "medium", "challenging"]),
-    dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
+    dietaryLabels: z
+      .array(z.string())
+      .nullish()
+      .transform((v) => v ?? []),
     ingredients: z
       .array(
         z.object({
@@ -123,15 +126,7 @@ const drinkConfirmSchema = z.object({
   drink: z.object({
     name: z.string().min(1),
     localName: optionalText,
-    type: z.enum([
-      "beer",
-      "wine",
-      "spirit",
-      "cocktail",
-      "soft-drink",
-      "tea",
-      "coffee",
-    ]),
+    type: z.enum(["beer", "wine", "spirit", "cocktail", "soft-drink", "tea", "coffee"]),
     alcoholic: z.boolean(),
     description: z.string().min(20),
     grape: optionalText,
@@ -163,9 +158,7 @@ const confirmBodySchema = z.discriminatedUnion("kind", [
   shopConfirmSchema,
 ]);
 
-export function registerSuggestionRoutes(
-  app: import("express").Express,
-): void {
+export function registerSuggestionRoutes(app: import("express").Express): void {
   app.get("/api/suggestions/status", (_req, res) => {
     res.json({
       openaiConfigured: isOpenAiConfigured(),
@@ -407,9 +400,7 @@ export function registerSuggestionRoutes(
         lng: place.lng ?? null,
         cuisineCodes: [code],
         cuisineTags:
-          cuisineTags.length > 0
-            ? cuisineTags
-            : [parsed.data.countryName.toLowerCase()],
+          cuisineTags.length > 0 ? cuisineTags : [parsed.data.countryName.toLowerCase()],
         website: place.website ?? null,
         phone: place.phone ?? null,
         source: "user-suggestion",
@@ -439,18 +430,15 @@ export function registerSuggestionRoutes(
       console.error("Suggestion create failed", error);
       res.status(500).json({
         message:
-          error instanceof Error
-            ? error.message
-            : "Could not save this suggestion.",
+          error instanceof Error ? error.message : "Could not save this suggestion.",
       });
     }
   }
 
   app.get("/api/admin/submissions", requireAdmin, async (req, res) => {
-    const status = (String(req.query.status ?? "pending") ||
-      "pending") as SubmissionStatus | "all";
-    const kind = (String(req.query.kind ?? "all") ||
-      "all") as SubmissionKind | "all";
+    const status = (String(req.query.status ?? "pending") || "pending") as
+      SubmissionStatus | "all";
+    const kind = (String(req.query.kind ?? "all") || "all") as SubmissionKind | "all";
     res.json({
       submissions: await listSubmissions({
         status: status === "all" ? "all" : status,
@@ -465,8 +453,7 @@ export function registerSuggestionRoutes(
       res.status(400).json({ message: "Use approve or reject." });
       return;
     }
-    const nextStatus: SubmissionStatus =
-      action === "approve" ? "approved" : "rejected";
+    const nextStatus: SubmissionStatus = action === "approve" ? "approved" : "rejected";
     const kind = String(req.query.kind ?? req.body?.kind ?? "");
 
     if (kind === "recipe") {
@@ -480,10 +467,7 @@ export function registerSuggestionRoutes(
     }
 
     if (kind === "restaurant") {
-      const updated = await setRestaurantSubmissionStatus(
-        req.params.id,
-        nextStatus,
-      );
+      const updated = await setRestaurantSubmissionStatus(req.params.id, nextStatus);
       if (!updated) {
         res.status(404).json({ message: "Submission not found." });
         return;

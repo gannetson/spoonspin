@@ -67,11 +67,8 @@ function rowToRecipe(row: QueryResultRow): Recipe {
       return value.length > 0 ? value : undefined;
     })(),
     servingSuggestion:
-      row.serving_suggestion == null
-        ? undefined
-        : String(row.serving_suggestion),
-    drinkPairing:
-      row.drink_pairing == null ? undefined : String(row.drink_pairing),
+      row.serving_suggestion == null ? undefined : String(row.serving_suggestion),
+    drinkPairing: row.drink_pairing == null ? undefined : String(row.drink_pairing),
     imageUrl: row.image_url == null ? undefined : String(row.image_url),
     imageAttribution:
       row.image_attribution == null ? undefined : String(row.image_attribution),
@@ -80,10 +77,7 @@ function rowToRecipe(row: QueryResultRow): Recipe {
   };
 }
 
-function assembleCountry(
-  row: QueryResultRow,
-  recipes: Array<QueryResultRow>,
-): Country {
+function assembleCountry(row: QueryResultRow, recipes: Array<QueryResultRow>): Country {
   const bySlot = new Map<MenuSlot, Recipe[]>();
   for (const recipeRow of recipes) {
     const slot = String(recipeRow.menu_slot) as MenuSlot;
@@ -129,16 +123,12 @@ function assembleCountry(
     orderOptions: asArray<OrderOption>(row.order_options),
     imageUrl: row.image_url == null ? undefined : String(row.image_url),
     imageAttribution:
-      row.image_attribution == null
-        ? undefined
-        : String(row.image_attribution),
+      row.image_attribution == null ? undefined : String(row.image_attribution),
     cookReady,
     status: String(row.status) as Country["status"],
     dinner,
-    standaloneRecipes:
-      standaloneRecipes.length > 0 ? standaloneRecipes : undefined,
-    moreDrinks:
-      !hasFullMenu && moreDrinksList.length > 0 ? moreDrinksList : undefined,
+    standaloneRecipes: standaloneRecipes.length > 0 ? standaloneRecipes : undefined,
+    moreDrinks: !hasFullMenu && moreDrinksList.length > 0 ? moreDrinksList : undefined,
     menu: hasFullMenu
       ? {
           starter: starter!,
@@ -153,11 +143,19 @@ function assembleCountry(
   };
 }
 
+export async function listPublishedCountryCodes(): Promise<string[]> {
+  const db = await ensureDb();
+  const result = await db.query(
+    `SELECT code FROM countries
+     WHERE status = 'published'
+     ORDER BY code ASC`,
+  );
+  return result.rows.map((row) => String(row.code).toLowerCase());
+}
+
 export async function listCountriesFromDb(): Promise<Country[]> {
   const db = await ensureDb();
-  const countries = await db.query(
-    `SELECT * FROM countries ORDER BY name ASC`,
-  );
+  const countries = await db.query(`SELECT * FROM countries ORDER BY name ASC`);
   const recipes = await db.query(
     `SELECT * FROM recipes ORDER BY country_code, menu_slot, sort_order, id`,
   );
@@ -173,9 +171,7 @@ export async function listCountriesFromDb(): Promise<Country[]> {
   );
 }
 
-export async function getCountryFromDb(
-  code: string,
-): Promise<Country | undefined> {
+export async function getCountryFromDb(code: string): Promise<Country | undefined> {
   const db = await ensureDb();
   const country = await db.query(`SELECT * FROM countries WHERE code = $1`, [
     code.toLowerCase(),
@@ -236,9 +232,7 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
       country.nationalDishId ?? null,
       country.nationalDrink ? JSON.stringify(country.nationalDrink) : null,
       country.menu?.drink ? JSON.stringify(country.menu.drink) : null,
-      JSON.stringify(
-        country.menu?.moreDrinks ?? country.moreDrinks ?? [],
-      ),
+      JSON.stringify(country.menu?.moreDrinks ?? country.moreDrinks ?? []),
       country.wikipedia ? JSON.stringify(country.wikipedia) : null,
       JSON.stringify(country.specialtyShops ?? []),
       JSON.stringify(country.orderOptions ?? []),
@@ -328,9 +322,7 @@ export type AdminCountryOverviewRow = {
   restaurants: number;
 };
 
-export async function getAdminCountryOverview(): Promise<
-  AdminCountryOverviewRow[]
-> {
+export async function getAdminCountryOverview(): Promise<AdminCountryOverviewRow[]> {
   const [countries, restaurantCounts] = await Promise.all([
     listCountriesFromDb(),
     countByCuisineCode(),
@@ -380,9 +372,7 @@ export async function updateCountryText(
   const existing = await getCountryFromDb(code);
   if (!existing) return undefined;
 
-  const wikipedia = existing.wikipedia
-    ? { ...existing.wikipedia, summary: text }
-    : null;
+  const wikipedia = existing.wikipedia ? { ...existing.wikipedia, summary: text } : null;
 
   const db = await ensureDb();
   await db.query(
@@ -391,23 +381,16 @@ export async function updateCountryText(
          wikipedia = $3,
          updated_at = NOW()
      WHERE code = $1`,
-    [
-      code.toLowerCase(),
-      text,
-      wikipedia ? JSON.stringify(wikipedia) : null,
-    ],
+    [code.toLowerCase(), text, wikipedia ? JSON.stringify(wikipedia) : null],
   );
   return getCountryFromDb(code);
 }
 
-export async function listRecipeIdsForCountry(
-  countryCode: string,
-): Promise<string[]> {
+export async function listRecipeIdsForCountry(countryCode: string): Promise<string[]> {
   const db = await ensureDb();
-  const result = await db.query(
-    `SELECT id FROM recipes WHERE country_code = $1`,
-    [countryCode.toLowerCase()],
-  );
+  const result = await db.query(`SELECT id FROM recipes WHERE country_code = $1`, [
+    countryCode.toLowerCase(),
+  ]);
   return result.rows.map((row) => String(row.id));
 }
 
@@ -619,9 +602,7 @@ export async function removeSpecialtyShop(
 ): Promise<Country | undefined> {
   const country = await getCountryFromDb(countryCode);
   if (!country) return undefined;
-  const shops = (country.specialtyShops ?? []).filter(
-    (shop) => shop.id !== shopId,
-  );
+  const shops = (country.specialtyShops ?? []).filter((shop) => shop.id !== shopId);
   const db = await ensureDb();
   await db.query(
     `UPDATE countries
@@ -663,9 +644,7 @@ export async function appendSpecialtyShops(
   const country = await getCountryFromDb(countryCode);
   if (!country) return undefined;
 
-  const byId = new Map(
-    (country.specialtyShops ?? []).map((shop) => [shop.id, shop]),
-  );
+  const byId = new Map((country.specialtyShops ?? []).map((shop) => [shop.id, shop]));
   for (const shop of shops) {
     const id =
       shop.id?.trim() ||
@@ -690,9 +669,7 @@ export async function removeOrderOption(
 ): Promise<Country | undefined> {
   const country = await getCountryFromDb(countryCode);
   if (!country) return undefined;
-  const options = (country.orderOptions ?? []).filter(
-    (option) => option.id !== optionId,
-  );
+  const options = (country.orderOptions ?? []).filter((option) => option.id !== optionId);
   const db = await ensureDb();
   await db.query(
     `UPDATE countries
@@ -734,9 +711,7 @@ export async function appendOrderOptions(
   const country = await getCountryFromDb(countryCode);
   if (!country) return undefined;
 
-  const byId = new Map(
-    (country.orderOptions ?? []).map((option) => [option.id, option]),
-  );
+  const byId = new Map((country.orderOptions ?? []).map((option) => [option.id, option]));
   for (const option of options) {
     const id =
       option.id?.trim() ||
@@ -897,9 +872,7 @@ export async function removeDinnerCourse(
   const country = await getCountryFromDb(countryCode);
   if (!country) return undefined;
   const base = dinnerBaseForMutation(country);
-  const nextCourses = base.courses.filter(
-    (course) => course.recipeId !== recipeId,
-  );
+  const nextCourses = base.courses.filter((course) => course.recipeId !== recipeId);
   if (nextCourses.length === base.courses.length) {
     return country;
   }
@@ -942,8 +915,7 @@ export async function appendMoreDrinks(
   const country = await getCountryFromDb(countryCode);
   if (!country) return undefined;
 
-  const existing =
-    country.menu?.moreDrinks ?? country.moreDrinks ?? [];
+  const existing = country.menu?.moreDrinks ?? country.moreDrinks ?? [];
   const byName = new Map(existing.map((drink) => [drinkKey(drink), drink]));
   for (const drink of drinks) {
     const key = drinkKey(drink);
@@ -1021,17 +993,12 @@ export async function selectRecipeForDinner(
   const role = row.recipe.category;
   const base = dinnerBaseForMutation(country);
 
-  const withoutRecipe = base.courses.filter(
-    (course) => course.recipeId !== recipeId,
-  );
+  const withoutRecipe = base.courses.filter((course) => course.recipeId !== recipeId);
   const existingIndex = withoutRecipe.findIndex((course) => course.role === role);
   const nextCourse = {
     recipeId,
     role,
-    note:
-      existingIndex >= 0
-        ? withoutRecipe[existingIndex]?.note
-        : undefined,
+    note: existingIndex >= 0 ? withoutRecipe[existingIndex]?.note : undefined,
   };
 
   let courses: DinnerSuggestion["courses"];

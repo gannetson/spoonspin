@@ -137,11 +137,8 @@ export function SuggestModal({
   if (!open) return null;
 
   const lookupReady =
-    kind === "restaurant"
-      ? placesConfigured === true
-      : openaiConfigured === true;
-  const lookupDisabled =
-    preview.status === "loading" || saving || !lookupReady;
+    kind === "restaurant" ? placesConfigured === true : openaiConfigured === true;
+  const lookupDisabled = preview.status === "loading" || saving || !lookupReady;
 
   async function runPreview() {
     const trimmed = query.trim();
@@ -189,11 +186,7 @@ export function SuggestModal({
         });
         return;
       }
-      if (
-        kind === "restaurant" &&
-        "restaurant" in result &&
-        result.restaurant
-      ) {
+      if (kind === "restaurant" && "restaurant" in result && result.restaurant) {
         setPreview({
           status: "ready-restaurant",
           notes: result.confirmationNotes,
@@ -224,10 +217,7 @@ export function SuggestModal({
     } catch (error) {
       setPreview({
         status: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : t("suggest.error.lookupFailed"),
+        message: error instanceof Error ? error.message : t("suggest.error.lookupFailed"),
       });
     }
   }
@@ -262,8 +252,7 @@ export function SuggestModal({
         });
         if (submission.kind === "restaurant") {
           const id =
-            submission.restaurantRowId?.trim() ||
-            `user:${preview.restaurant.name}`;
+            submission.restaurantRowId?.trim() || `user:${preview.restaurant.name}`;
           onAdded({
             kind: "restaurant",
             restaurant: {
@@ -307,10 +296,7 @@ export function SuggestModal({
     } catch (error) {
       setPreview({
         status: "error",
-        message:
-          error instanceof Error
-            ? error.message
-            : t("suggest.error.saveFailed"),
+        message: error instanceof Error ? error.message : t("suggest.error.saveFailed"),
       });
     } finally {
       setSaving(false);
@@ -358,7 +344,10 @@ export function SuggestModal({
           </button>
         </div>
 
-        <label htmlFor="suggest-query" className="mt-5 block text-sm font-semibold text-ink">
+        <label
+          htmlFor="suggest-query"
+          className="mt-5 block text-sm font-semibold text-ink"
+        >
           {t("suggest.queryLabel")}
         </label>
         <textarea
@@ -412,13 +401,19 @@ export function SuggestModal({
         </div>
 
         {preview.status === "error" ? (
-          <p role="alert" className="mt-4 rounded-2xl border border-tomato/30 bg-white px-4 py-3 text-sm text-tomato">
+          <p
+            role="alert"
+            className="mt-4 rounded-2xl border border-tomato/30 bg-white px-4 py-3 text-sm text-tomato"
+          >
             {preview.message}
           </p>
         ) : null}
 
         {preview.status === "not-found" ? (
-          <p role="status" className="mt-4 rounded-2xl border border-dashed border-stamp/40 bg-white/60 px-4 py-3 text-sm text-ink-soft">
+          <p
+            role="status"
+            className="mt-4 rounded-2xl border border-dashed border-stamp/40 bg-white/60 px-4 py-3 text-sm text-ink-soft"
+          >
             {preview.notes}
           </p>
         ) : null}
@@ -431,8 +426,7 @@ export function SuggestModal({
             <p className="text-xs font-semibold uppercase tracking-wide text-stamp">
               {t("suggest.preview.meta", {
                 category: t(COURSE_KEYS[preview.recipe.category]),
-                minutes:
-                  preview.recipe.prepMinutes + preview.recipe.cookMinutes,
+                minutes: preview.recipe.prepMinutes + preview.recipe.cookMinutes,
                 difficulty: t(DIFFICULTY_KEYS[preview.recipe.difficulty]),
               })}
             </p>
@@ -492,9 +486,7 @@ export function SuggestModal({
               {preview.shop.address}
               {preview.shop.city ? ` · ${preview.shop.city}` : ""}
             </p>
-            <p className="text-sm font-semibold text-ink">
-              {preview.shop.specialty}
-            </p>
+            <p className="text-sm font-semibold text-ink">{preview.shop.specialty}</p>
             <ConfirmButton
               saving={saving}
               label={t(ADD_KEYS.shop)}

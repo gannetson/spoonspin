@@ -7,10 +7,7 @@ import cookieParser from "cookie-parser";
 import express from "express";
 import { z } from "zod";
 import { buildMapsSearchUrl, stableMapsUrl } from "../src/restaurants/utils.ts";
-import type {
-  Restaurant,
-  RestaurantSearchResult,
-} from "../src/restaurants/types.ts";
+import type { Restaurant, RestaurantSearchResult } from "../src/restaurants/types.ts";
 import { haversineKm } from "../src/lib/haversine.ts";
 import {
   ensureDb,
@@ -30,6 +27,7 @@ import { registerAdminReportRoutes } from "./routes/adminReports.ts";
 import { registerAdminFlagRoutes } from "./routes/adminFlags.ts";
 import { registerAdminUserRoutes } from "./routes/adminUsers.ts";
 import { registerContentRoutes } from "./routes/content.ts";
+import { registerSitemapRoutes } from "./routes/sitemap.ts";
 import { registerSuggestionRoutes } from "./routes/suggestions.ts";
 import { getUploadsRoot, registerMeRoutes } from "./routes/me.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
@@ -115,6 +113,7 @@ app.get("/api/public-config", (_req, res) => {
 
 registerAuthRoutes(app);
 registerContentRoutes(app);
+registerSitemapRoutes(app);
 registerAdminUserRoutes(app);
 registerAdminCountryRoutes(app);
 registerAdminImageRoutes(app);
@@ -185,9 +184,7 @@ app.post("/api/restaurants", async (req, res) => {
         maxDistanceKm: 100,
         limit: 50,
       })
-    ).map((row) =>
-      toApiRestaurant(row, params.visitorLocation, params.cityOrPostcode),
-    );
+    ).map((row) => toApiRestaurant(row, params.visitorLocation, params.cityOrPostcode));
 
     if (local.length > 0) {
       res.json({
@@ -274,9 +271,7 @@ function toApiRestaurant(
   cityOrPostcode?: string,
 ): Restaurant {
   const location =
-    row.lat != null && row.lng != null
-      ? { lat: row.lat, lng: row.lng }
-      : undefined;
+    row.lat != null && row.lng != null ? { lat: row.lat, lng: row.lng } : undefined;
 
   const anchors: Record<string, { lat: number; lng: number }> = {
     leiden: { lat: 52.1601, lng: 4.497 },
@@ -292,8 +287,7 @@ function toApiRestaurant(
   if (!anchor) {
     const key = cityOrPostcode?.trim().toLowerCase() ?? "leiden";
     anchor =
-      Object.entries(anchors).find(([city]) => key.includes(city))?.[1] ??
-      anchors.leiden;
+      Object.entries(anchors).find(([city]) => key.includes(city))?.[1] ?? anchors.leiden;
   }
 
   return {
@@ -314,8 +308,7 @@ function toApiRestaurant(
     ratings: row.ratings ?? undefined,
     priceLevel: row.priceLevel ?? undefined,
     menu: row.menu ?? undefined,
-    distanceKm:
-      anchor && location ? haversineKm(anchor, location) : undefined,
+    distanceKm: anchor && location ? haversineKm(anchor, location) : undefined,
     authenticityRating: row.authenticityRating ?? undefined,
     authenticityNotes: row.authenticityNotes ?? undefined,
     reviewed: row.reviewed,

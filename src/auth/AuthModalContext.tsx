@@ -38,10 +38,7 @@ export function AuthModalProvider({ children }: { children: ReactNode }) {
     setOnSuccess(null);
   }, []);
 
-  const value = useMemo(
-    () => ({ openAuth, closeAuth }),
-    [openAuth, closeAuth],
-  );
+  const value = useMemo(() => ({ openAuth, closeAuth }), [openAuth, closeAuth]);
 
   return (
     <AuthModalContext.Provider value={value}>

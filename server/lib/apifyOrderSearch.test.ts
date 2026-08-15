@@ -21,17 +21,13 @@ describe("resolveSearchHubs", () => {
 
   it("accepts a freeform city hint", () => {
     const { hubs, focusTerms } = resolveSearchHubs(undefined, "Haarlem");
-    expect(hubs).toEqual([
-      { city: "Haarlem", address: "Haarlem Netherlands" },
-    ]);
+    expect(hubs).toEqual([{ city: "Haarlem", address: "Haarlem Netherlands" }]);
     expect(focusTerms).toEqual([]);
   });
 
   it("picks a city from the query and keeps cuisine focus", () => {
     const { hubs, focusTerms } = resolveSearchHubs("Amsterdam Thai");
-    expect(hubs).toEqual([
-      { city: "Amsterdam", address: "1012AB Amsterdam" },
-    ]);
+    expect(hubs).toEqual([{ city: "Amsterdam", address: "1012AB Amsterdam" }]);
     expect(focusTerms.join(" ").toLowerCase()).toContain("thai");
   });
 
@@ -108,8 +104,6 @@ describe("mapUberEatsItem", () => {
       signatureDishHint: "Pad Thai",
       rating: 4.6,
     });
-    expect(listing?.url).toBe(
-      "https://www.ubereats.com/nl/store/thai-garden/abc123",
-    );
+    expect(listing?.url).toBe("https://www.ubereats.com/nl/store/thai-garden/abc123");
   });
 });

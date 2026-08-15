@@ -51,16 +51,12 @@ const BLOCKED_CATEGORIES = new Set([
  * Mapbox Search Box forward search.
  * Free monthly allowance on Mapbox accounts; token must stay server-side.
  */
-export function createMapboxProvider(
-  accessToken: string,
-): LiveRestaurantProvider {
+export function createMapboxProvider(accessToken: string): LiveRestaurantProvider {
   return {
     id: "mapbox",
     async search(input: ProviderSearchInput): Promise<Restaurant[]> {
       const batches = await Promise.all(
-        input.cuisineAliases.map((alias) =>
-          forwardSearch(alias, input, accessToken),
-        ),
+        input.cuisineAliases.map((alias) => forwardSearch(alias, input, accessToken)),
       );
       return dedupeRestaurantsByPlaceId(batches.flat()).filter((restaurant) =>
         looksLikeSpecialtyMatch(restaurant, input),
@@ -104,9 +100,7 @@ async function forwardSearch(
 }
 
 function isFoodPoi(feature: MapboxFeature): boolean {
-  const categories = (feature.properties?.poi_category ?? []).map((c) =>
-    c.toLowerCase(),
-  );
+  const categories = (feature.properties?.poi_category ?? []).map((c) => c.toLowerCase());
   if (categories.length === 0) return false;
   if (categories.some((c) => BLOCKED_CATEGORIES.has(c))) return false;
   return categories.some((c) => FOOD_CATEGORIES.has(c));
@@ -117,10 +111,7 @@ function looksLikeSpecialtyMatch(
   input: ProviderSearchInput,
 ): boolean {
   const haystack = `${restaurant.name} ${restaurant.address}`.toLowerCase();
-  const needles = [
-    input.countryName,
-    ...input.cuisineAliases,
-  ]
+  const needles = [input.countryName, ...input.cuisineAliases]
     .flatMap((value) => value.toLowerCase().split(/\s+/))
     .map((part) => part.replace(/[^a-zà-öø-ÿ]/gi, ""))
     .filter((part) => part.length >= 4);
@@ -129,14 +120,9 @@ function looksLikeSpecialtyMatch(
   // (e.g. "Georgian", "Georgisch", "Kaukasisch", "Bulgaars").
   const distinctive = needles.filter(
     (part) =>
-      ![
-        "restaurant",
-        "restaurants",
-        "italiaans",
-        "italian",
-        "food",
-        "keuken",
-      ].includes(part),
+      !["restaurant", "restaurants", "italiaans", "italian", "food", "keuken"].includes(
+        part,
+      ),
   );
 
   if (distinctive.length === 0) return false;
@@ -153,14 +139,10 @@ function toRestaurant(feature: MapboxFeature): Restaurant | null {
     props.full_address ??
     [props.address, props.place_formatted].filter(Boolean).join(", ");
   const city =
-    props.context?.place?.name ??
-    props.context?.locality?.name ??
-    extractCity(address);
+    props.context?.place?.name ?? props.context?.locality?.name ?? extractCity(address);
 
-  const lat =
-    props.coordinates?.latitude ?? feature.geometry?.coordinates?.[1];
-  const lng =
-    props.coordinates?.longitude ?? feature.geometry?.coordinates?.[0];
+  const lat = props.coordinates?.latitude ?? feature.geometry?.coordinates?.[1];
+  const lng = props.coordinates?.longitude ?? feature.geometry?.coordinates?.[0];
 
   const mapsQuery = encodeURIComponent(address || name);
 

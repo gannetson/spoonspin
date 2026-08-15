@@ -34,11 +34,7 @@ const credentialsSchema = z.object({
 
 export type AuthedRequest = Request & { user?: PublicUser };
 
-export async function requireUser(
-  req: AuthedRequest,
-  res: Response,
-  next: NextFunction,
-) {
+export async function requireUser(req: AuthedRequest, res: Response, next: NextFunction) {
   const token = req.cookies?.[SESSION_COOKIE] as string | undefined;
   const user = await getUserBySessionToken(token);
   if (!user) {
@@ -140,18 +136,11 @@ export function registerAuthRoutes(app: import("express").Express): void {
     const nextPath = safeNextPath(
       (req.cookies?.[OAUTH_NEXT_COOKIE] as string | undefined) ?? null,
     );
-    const expectedState = req.cookies?.[OAUTH_STATE_COOKIE] as
-      | string
-      | undefined;
-    const codeVerifier = req.cookies?.[OAUTH_VERIFIER_COOKIE] as
-      | string
-      | undefined;
-    const state =
-      typeof req.query.state === "string" ? req.query.state : undefined;
-    const code =
-      typeof req.query.code === "string" ? req.query.code : undefined;
-    const oauthError =
-      typeof req.query.error === "string" ? req.query.error : undefined;
+    const expectedState = req.cookies?.[OAUTH_STATE_COOKIE] as string | undefined;
+    const codeVerifier = req.cookies?.[OAUTH_VERIFIER_COOKIE] as string | undefined;
+    const state = typeof req.query.state === "string" ? req.query.state : undefined;
+    const code = typeof req.query.code === "string" ? req.query.code : undefined;
+    const oauthError = typeof req.query.error === "string" ? req.query.error : undefined;
 
     clearOAuthCookies(res);
 
@@ -223,8 +212,7 @@ export function registerAuthRoutes(app: import("express").Express): void {
       res.status(201).json({ user });
     } catch (error) {
       res.status(400).json({
-        message:
-          error instanceof Error ? error.message : "Could not create account.",
+        message: error instanceof Error ? error.message : "Could not create account.",
       });
     }
   });
@@ -237,10 +225,7 @@ export function registerAuthRoutes(app: import("express").Express): void {
       res.status(400).json({ message: "Enter email and password." });
       return;
     }
-    const user = await authenticateUser(
-      parsed.data.email,
-      parsed.data.password,
-    );
+    const user = await authenticateUser(parsed.data.email, parsed.data.password);
     if (!user) {
       recordProductEvent({
         eventType: "auth_login_failure",

@@ -8,14 +8,10 @@ import {
   aggregateGuestRating,
   type RestaurantRatings,
 } from "../../src/restaurants/ratings.ts";
-import type {
-  PriceLevel,
-  RestaurantMenuItem,
-} from "../../src/restaurants/types.ts";
+import type { PriceLevel, RestaurantMenuItem } from "../../src/restaurants/types.ts";
 
 /** Default: Unix socket peer auth (no password). Override with DATABASE_URL. */
-export const DEFAULT_DATABASE_URL =
-  "postgresql:///spoonspin?host=/var/run/postgresql";
+export const DEFAULT_DATABASE_URL = "postgresql:///spoonspin?host=/var/run/postgresql";
 
 export type StoredRestaurant = {
   id: string;
@@ -93,11 +89,7 @@ export function getDatabaseUrl(): string {
 const DEFAULT_SOCKET_DIR = "/var/run/postgresql";
 
 function isLoopbackHost(hostname: string): boolean {
-  return (
-    hostname === "localhost" ||
-    hostname === "127.0.0.1" ||
-    hostname === "::1"
-  );
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
 }
 
 /**
@@ -184,10 +176,8 @@ export function getPool(connectionString = getDatabaseUrl()): Pool {
     typeof process.getuid === "function" && process.getuid() === 0
       ? "root"
       : (process.env.USER ?? process.env.LOGNAME ?? "unknown");
-  const usingSocket =
-    typeof options?.host === "string" && options.host.startsWith("/");
-  const usingPassword =
-    Boolean(options && "password" in options && options.password);
+  const usingSocket = typeof options?.host === "string" && options.host.startsWith("/");
+  const usingPassword = Boolean(options && "password" in options && options.password);
 
   // Peer auth maps OS user → DB role. Root has no DB role on a normal install.
   if (usingSocket && !usingPassword && osUser === "root") {
@@ -206,9 +196,7 @@ export function getPool(connectionString = getDatabaseUrl()): Pool {
       osUser,
       host: options?.host ?? null,
       port:
-        "port" in (options ?? {})
-          ? ((options as { port?: number }).port ?? null)
-          : null,
+        "port" in (options ?? {}) ? ((options as { port?: number }).port ?? null) : null,
       database: options?.database ?? null,
       user: options?.user ?? `(os:${osUser})`,
       password: usingPassword ? "(set)" : "(none)",
@@ -257,9 +245,9 @@ export async function getDb(): Promise<Pool> {
 function isInsufficientPrivilege(error: unknown): boolean {
   return Boolean(
     error &&
-      typeof error === "object" &&
-      "code" in error &&
-      (error as { code: unknown }).code === "42501",
+    typeof error === "object" &&
+    "code" in error &&
+    (error as { code: unknown }).code === "42501",
   );
 }
 
@@ -679,8 +667,7 @@ function asStringArray(value: unknown): string[] {
 function parseRatings(value: unknown): RestaurantRatings | null {
   if (value == null || value === "") return null;
   try {
-    const parsed: unknown =
-      typeof value === "string" ? JSON.parse(value) : value;
+    const parsed: unknown = typeof value === "string" ? JSON.parse(value) : value;
     if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
       return null;
     }
@@ -699,8 +686,7 @@ function parsePriceLevel(value: unknown): PriceLevel | null {
 function parseMenu(value: unknown): RestaurantMenuItem[] | null {
   if (value == null || value === "") return null;
   try {
-    const parsed: unknown =
-      typeof value === "string" ? JSON.parse(value) : value;
+    const parsed: unknown = typeof value === "string" ? JSON.parse(value) : value;
     if (!Array.isArray(parsed)) return null;
     const items: RestaurantMenuItem[] = [];
     for (const entry of parsed) {
@@ -781,12 +767,9 @@ export function rowToStored(row: QueryResultRow): StoredRestaurant {
     authenticityNotes:
       row.authenticity_notes == null ? null : String(row.authenticity_notes),
     reviewedAt: toIsoOrNull(row.reviewed_at),
-    reviewSource:
-      row.review_source == null ? null : String(row.review_source),
-    userRating:
-      toNumberOrNull(row.user_rating) ?? aggregated.rating ?? null,
-    reviewCount:
-      toNumberOrNull(row.review_count) ?? aggregated.reviewCount ?? null,
+    reviewSource: row.review_source == null ? null : String(row.review_source),
+    userRating: toNumberOrNull(row.user_rating) ?? aggregated.rating ?? null,
+    reviewCount: toNumberOrNull(row.review_count) ?? aggregated.reviewCount ?? null,
     ratings,
     priceLevel: parsePriceLevel(row.price_level),
     menu: parseMenu(row.menu_json),
@@ -796,14 +779,11 @@ export function rowToStored(row: QueryResultRow): StoredRestaurant {
   };
 }
 
-export async function upsertRestaurant(
-  restaurant: RestaurantUpsert,
-): Promise<void> {
+export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<void> {
   const db = await ensureDb();
-  const existingResult = await db.query(
-    `SELECT * FROM restaurants WHERE osm_id = $1`,
-    [restaurant.osmId],
-  );
+  const existingResult = await db.query(`SELECT * FROM restaurants WHERE osm_id = $1`, [
+    restaurant.osmId,
+  ]);
   const existing = existingResult.rows[0] as QueryResultRow | undefined;
   const now = new Date().toISOString();
 
@@ -820,8 +800,7 @@ export async function upsertRestaurant(
       ? { ...(current.ratings ?? {}), ...restaurant.ratings }
       : current.ratings;
     const aggregated = aggregateGuestRating(ratings);
-    const userRating =
-      restaurant.userRating ?? aggregated.rating ?? current.userRating;
+    const userRating = restaurant.userRating ?? aggregated.rating ?? current.userRating;
     const reviewCount =
       restaurant.reviewCount ?? aggregated.reviewCount ?? current.reviewCount;
 
@@ -989,9 +968,7 @@ export async function listRestaurants(options?: {
   return result.rows.map(rowToStored);
 }
 
-export async function getRestaurantById(
-  id: string,
-): Promise<StoredRestaurant | null> {
+export async function getRestaurantById(id: string): Promise<StoredRestaurant | null> {
   const db = await ensureDb();
   const result = await db.query(`SELECT * FROM restaurants WHERE id = $1`, [id]);
   const row = result.rows[0];
@@ -1151,10 +1128,7 @@ export async function searchLocalRestaurants(
   const maxDistance = options.maxDistanceKm ?? 100;
   const limit = options.limit ?? 50;
   const reviewedOnly = options.reviewedOnly ?? true;
-  const anchor = resolveSearchAnchor(
-    options.cityOrPostcode,
-    options.visitorLocation,
-  );
+  const anchor = resolveSearchAnchor(options.cityOrPostcode, options.visitorLocation);
 
   const matched = rows
     .filter((restaurant) => restaurant.cuisineCodes.includes(code))
@@ -1235,9 +1209,7 @@ export async function rebuildCuisineCodes(): Promise<{
       const tags = asStringArray(row.cuisine_tags);
       const codes = countryCodesFromOsmTags(tags);
       if (codes.length === 0 && !row.reviewed) {
-        await client.query(`DELETE FROM restaurants WHERE osm_id = $1`, [
-          row.osm_id,
-        ]);
+        await client.query(`DELETE FROM restaurants WHERE osm_id = $1`, [row.osm_id]);
         deleted += 1;
         continue;
       }
@@ -1300,7 +1272,6 @@ function haversineKm(
   const lat1 = toRad(a.lat);
   const lat2 = toRad(b.lat);
   const h =
-    Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
+    Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLng / 2) ** 2;
   return 2 * 6371 * Math.asin(Math.min(1, Math.sqrt(h)));
 }

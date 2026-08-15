@@ -29,10 +29,7 @@ import {
   type SuggestReviewTarget,
 } from "@/components/SuggestedItemReview";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
-import {
-  handleOrderOptionAdminAction,
-  useAdminItemBusy,
-} from "@/admin/itemActions";
+import { handleOrderOptionAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -52,9 +49,7 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
   const savedCity = getSavedDineCity();
   const rememberPreferred = getRememberCityPreference();
 
-  const [cityOrPostcode, setCityOrPostcode] = useState(
-    savedCity ?? DEFAULT_DINE_CITY,
-  );
+  const [cityOrPostcode, setCityOrPostcode] = useState(savedCity ?? DEFAULT_DINE_CITY);
   const [rememberCity, setRememberCity] = useState(rememberPreferred);
   const [editingLocation, setEditingLocation] = useState(
     !rememberPreferred || !savedCity,
@@ -64,9 +59,7 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
   >(() => getSavedDineCoords());
   const [locationError, setLocationError] = useState<string | null>(null);
   const [suggestOpen, setSuggestOpen] = useState(false);
-  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(
-    null,
-  );
+  const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(null);
 
   function onRememberChange(next: boolean) {
     setRememberCity(next);
@@ -154,17 +147,10 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
     <section aria-labelledby="order-heading" className="space-y-5">
       <div className="relative overflow-hidden rounded-[2rem]">
         {bannerUrl ? (
-          <img
-            src={bannerUrl}
-            alt=""
-            className="h-40 w-full object-cover sm:h-52"
-          />
+          <img src={bannerUrl} alt="" className="h-40 w-full object-cover sm:h-52" />
         ) : (
           <div className="h-40 w-full sm:h-52">
-            <MediaPlaceholder
-              labelKey="media.placeholder.country"
-              tone="dark"
-            />
+            <MediaPlaceholder labelKey="media.placeholder.country" tone="dark" />
           </div>
         )}
         <div
@@ -222,9 +208,7 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
       />
 
       <div className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10 sm:p-6">
-        <h3 className="font-display text-2xl text-burgundy">
-          {t("dine.order.heading")}
-        </h3>
+        <h3 className="font-display text-2xl text-burgundy">{t("dine.order.heading")}</h3>
         <p className="mt-2 max-w-2xl text-ink-soft">
           {t("dine.order.subtitle", { name: country.name })}
         </p>
@@ -299,10 +283,7 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
                     ) : null}
                     {option.city ? (
                       <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
-                        <MapPin
-                          aria-hidden="true"
-                          className="mt-0.5 size-4 shrink-0"
-                        />
+                        <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
                         {option.city}
                       </p>
                     ) : null}
@@ -333,9 +314,7 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
         </ul>
       ) : (
         <div className="rounded-2xl border border-dashed border-stamp/40 bg-white/50 p-5">
-          <p className="text-ink">
-            {t("dine.order.empty", { name: country.name })}
-          </p>
+          <p className="text-ink">{t("dine.order.empty", { name: country.name })}</p>
         </div>
       )}
 
@@ -395,10 +374,7 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
           }
         }}
       />
-      <SuggestedItemReview
-        target={reviewTarget}
-        onClose={() => setReviewTarget(null)}
-      />
+      <SuggestedItemReview target={reviewTarget} onClose={() => setReviewTarget(null)} />
     </section>
   );
 }

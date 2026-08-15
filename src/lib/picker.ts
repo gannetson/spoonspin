@@ -29,9 +29,7 @@ export function pickRandomCountry(
   random: () => number = Math.random,
 ): Country {
   // Spin only lands on countries with a cook menu (recipes).
-  const published = countries.filter(
-    (c) => c.status === "published" && c.cookReady,
-  );
+  const published = countries.filter((c) => c.status === "published" && c.cookReady);
   if (published.length === 0) {
     throw new Error("No cook-ready countries available");
   }

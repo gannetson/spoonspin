@@ -7,11 +7,7 @@ import {
 } from "./menuAccessors";
 import type { Country, Drink, Recipe } from "@/types/content";
 
-const sample = (
-  name: string,
-  type: Drink["type"],
-  alcoholic: boolean,
-): Drink => ({
+const sample = (name: string, type: Drink["type"], alcoholic: boolean): Drink => ({
   name,
   type,
   alcoholic,
@@ -32,11 +28,7 @@ const recipe = (labels: string[]): Recipe => ({
     { name: "a", quantity: 1, unit: "g" },
     { name: "b", quantity: 1, unit: "g" },
   ],
-  steps: [
-    "Step one goes here.",
-    "Step two goes here.",
-    "Step three goes here.",
-  ],
+  steps: ["Step one goes here.", "Step two goes here.", "Step three goes here."],
 });
 
 describe("groupDrinksIntoSections", () => {
@@ -55,10 +47,7 @@ describe("groupDrinksIntoSections", () => {
       "wines",
       "alcoholicOther",
     ]);
-    expect(sections[0]?.drinks.map((d) => d.name)).toEqual([
-      "Chocomel",
-      "Espresso",
-    ]);
+    expect(sections[0]?.drinks.map((d) => d.name)).toEqual(["Chocomel", "Espresso"]);
     expect(sections[1]?.drinks.map((d) => d.name)).toEqual(["Heineken"]);
     expect(sections[2]?.drinks.map((d) => d.name)).toEqual(["Riesling"]);
     expect(sections[3]?.drinks.map((d) => d.name)).toEqual(["Jenever"]);
@@ -136,10 +125,7 @@ describe("getDinnerSuggestion", () => {
       },
     });
     expect(dinner?.courses).toHaveLength(4);
-    expect(dinner?.drinks.map((item) => item.drinkName)).toEqual([
-      "Heineken",
-      "Jenever",
-    ]);
+    expect(dinner?.drinks.map((item) => item.drinkName)).toEqual(["Heineken", "Jenever"]);
   });
 
   it("prefers stored dinner when courses exist", () => {

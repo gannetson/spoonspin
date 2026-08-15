@@ -61,10 +61,7 @@ export function DineLocationControl({
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1">
-              <label
-                htmlFor={inputId}
-                className="text-sm font-semibold text-ink"
-              >
+              <label htmlFor={inputId} className="text-sm font-semibold text-ink">
                 {t("dine.cityOrPostcode")}
               </label>
               <input

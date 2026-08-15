@@ -21,10 +21,7 @@ import "dotenv/config";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import {
-  listCountriesFromDb,
-  updateRecipeFields,
-} from "../server/db/content.ts";
+import { listCountriesFromDb, updateRecipeFields } from "../server/db/content.ts";
 import { closeDb, getDb } from "../server/db/restaurants.ts";
 import { getCountryRecipes } from "../src/content/countries/menuAccessors.ts";
 import type { RecipeEnrichment } from "../src/content/recipes/enrichments.ts";
@@ -235,9 +232,7 @@ async function findCommonsImage(
   return null;
 }
 
-async function findWikipediaPage(
-  titleCandidates: string[],
-): Promise<WikiSummary | null> {
+async function findWikipediaPage(titleCandidates: string[]): Promise<WikiSummary | null> {
   for (const title of titleCandidates) {
     const encoded = encodeURIComponent(title.replace(/ /g, "_"));
     const page = await fetchJson<WikiSummary>(
@@ -258,17 +253,12 @@ async function findWikipediaPage(
   return null;
 }
 
-async function findWikibooksCookbook(
-  titleCandidates: string[],
-): Promise<string | null> {
+async function findWikibooksCookbook(titleCandidates: string[]): Promise<string | null> {
   const variants: string[] = [];
   for (const title of titleCandidates) {
     const clean = title.replace(/^Cookbook:/i, "").trim();
     if (!clean) continue;
-    variants.push(
-      `Cookbook:${clean}`,
-      `Cookbook:${clean.replace(/\s+/g, "_")}`,
-    );
+    variants.push(`Cookbook:${clean}`, `Cookbook:${clean.replace(/\s+/g, "_")}`);
     // Drop leading country/language adjectives for broader matches
     const stripped = clean.replace(
       /^(Dutch|Italian|Japanese|Mexican|Thai|Indian|French|German|Spanish|Greek|Turkish|Korean|Chinese|British|Polish|Portuguese|Brazilian|Peruvian|Argentine|Ethiopian|Moroccan|Lebanese|Vietnamese|Indonesian|Jamaican|Nigerian|Egyptian|Filipino|Bulgarian|Georgian|South African|Senegalese)\s+/i,
@@ -334,8 +324,7 @@ async function enrichJob(
   if (!options.keepPhoto) {
     const wikiPageForImage = await findWikipediaPage(nameCandidates);
     const wikiImage =
-      wikiPageForImage?.originalimage?.source ??
-      wikiPageForImage?.thumbnail?.source;
+      wikiPageForImage?.originalimage?.source ?? wikiPageForImage?.thumbnail?.source;
     if (isPhotoUrl(wikiImage)) {
       image = {
         url: wikiImage,
@@ -354,14 +343,16 @@ async function enrichJob(
 
   const wikiPage = await findWikipediaPage(nameCandidates);
 
-  const cookbookUrl = await findWikibooksCookbook([
-    job.localName ?? "",
-    job.recipeName,
-    job.recipeName.replace(
-      /^(Dutch|Italian|Japanese|Mexican|Thai|Indian|French|German|Spanish|Greek|Turkish|Korean|Chinese|British|Polish|Portuguese|Brazilian|Peruvian|Argentine|Ethiopian|Moroccan|Lebanese|Vietnamese|Indonesian|Jamaican|Nigerian|Egyptian|Filipino|Bulgarian|Georgian|South African|Senegalese)\s+/i,
-      "",
-    ),
-  ].filter(Boolean));
+  const cookbookUrl = await findWikibooksCookbook(
+    [
+      job.localName ?? "",
+      job.recipeName,
+      job.recipeName.replace(
+        /^(Dutch|Italian|Japanese|Mexican|Thai|Indian|French|German|Spanish|Greek|Turkish|Korean|Chinese|British|Polish|Portuguese|Brazilian|Peruvian|Argentine|Ethiopian|Moroccan|Lebanese|Vietnamese|Indonesian|Jamaican|Nigerian|Egyptian|Filipino|Bulgarian|Georgian|South African|Senegalese)\s+/i,
+        "",
+      ),
+    ].filter(Boolean),
+  );
 
   const wikiUrl =
     wikiPage?.content_urls?.desktop?.page ??
@@ -381,9 +372,7 @@ async function enrichJob(
   const candidates = [cookbookUrl, wikiUrl, existingSource, googleUrl].filter(
     (url): url is string => Boolean(url),
   );
-  const sourceUrl = candidates.sort(
-    (a, b) => sourceRank(b) - sourceRank(a),
-  )[0]!;
+  const sourceUrl = candidates.sort((a, b) => sourceRank(b) - sourceRank(a))[0]!;
 
   const result: RecipeEnrichment = {
     sourceUrl,
@@ -433,19 +422,14 @@ async function main() {
     ) {
       return false;
     }
-    return !(
-      isPhotoUrl(existing?.imageUrl) &&
-      existing?.sourceUrl &&
-      existing?.videoUrl
-    );
+    return !(isPhotoUrl(existing?.imageUrl) && existing?.sourceUrl && existing?.videoUrl);
   });
 
   if (args.status) {
     const withPhoto = jobs.filter((job) =>
       isPhotoUrl(enrichments[job.id]?.imageUrl),
     ).length;
-    const withSource = jobs.filter((job) => enrichments[job.id]?.sourceUrl)
-      .length;
+    const withSource = jobs.filter((job) => enrichments[job.id]?.sourceUrl).length;
     console.log(
       `Recipe enrich: ${withPhoto} photos · ${withSource} sources · ${pending.length} pending · ${jobs.length} total`,
     );
@@ -494,13 +478,9 @@ async function main() {
           : result.sourceUrl?.includes("google")
             ? "google"
             : "source";
-      const photo = isPhotoUrl(enrichments[job.id]?.imageUrl)
-        ? "photo"
-        : "no-photo";
+      const photo = isPhotoUrl(enrichments[job.id]?.imageUrl) ? "photo" : "no-photo";
       console.log(
-        [photo, sourceKind, result.videoUrl ? "video" : null]
-          .filter(Boolean)
-          .join("+"),
+        [photo, sourceKind, result.videoUrl ? "video" : null].filter(Boolean).join("+"),
       );
     } catch (error) {
       console.log("failed");

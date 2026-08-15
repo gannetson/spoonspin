@@ -1,11 +1,5 @@
 import { useCallback, useState } from "react";
-import type {
-  Country,
-  Drink,
-  OrderOption,
-  Recipe,
-  SpecialtyShop,
-} from "@/types/content";
+import type { Country, Drink, OrderOption, Recipe, SpecialtyShop } from "@/types/content";
 import type { Restaurant } from "@/restaurants/types";
 import {
   removeDinnerCourse,
@@ -91,9 +85,7 @@ export async function handleRecipeAdminAction(input: {
       onApplied: (result) => {
         if (result.country) input.onCountryUpdated(result.country);
         input.onCommunityRecipesChange?.(
-          community.map((item) =>
-            item.id === recipe.id ? result.recipe : item,
-          ),
+          community.map((item) => (item.id === recipe.id ? result.recipe : item)),
         );
       },
     });
@@ -106,9 +98,7 @@ export async function handleRecipeAdminAction(input: {
     }
     const result = await removeRecipe(country.code, recipe.id);
     if (result.country) input.onCountryUpdated(result.country);
-    input.onCommunityRecipesChange?.(
-      community.filter((item) => item.id !== recipe.id),
-    );
+    input.onCommunityRecipesChange?.(community.filter((item) => item.id !== recipe.id));
     input.onRemoved?.();
     return "Removed";
   }
@@ -128,9 +118,7 @@ export async function handleRecipeAdminAction(input: {
         if (result.country) input.onCountryUpdated(result.country);
         if (result.recipe) {
           input.onCommunityRecipesChange?.(
-            community.map((item) =>
-              item.id === recipe.id ? result.recipe! : item,
-            ),
+            community.map((item) => (item.id === recipe.id ? result.recipe! : item)),
           );
         }
       },
@@ -142,9 +130,7 @@ export async function handleRecipeAdminAction(input: {
     if (result.country) input.onCountryUpdated(result.country);
     if (result.recipe) {
       input.onCommunityRecipesChange?.(
-        community.map((item) =>
-          item.id === recipe.id ? result.recipe! : item,
-        ),
+        community.map((item) => (item.id === recipe.id ? result.recipe! : item)),
       );
     }
     return "Image updated";
@@ -235,9 +221,7 @@ export async function handleDinnerCourseAdminAction(input: {
   const community = input.communityRecipes ?? [];
 
   if (action === "remove") {
-    if (
-      !window.confirm(`Remove “${recipe.name}” from tonight’s dinner?`)
-    ) {
+    if (!window.confirm(`Remove “${recipe.name}” from tonight’s dinner?`)) {
       return "";
     }
     const result = await removeDinnerCourse(country.code, recipe.id);
@@ -333,9 +317,7 @@ export async function handleOrderOptionAdminAction(input: {
 }): Promise<string> {
   const { action, country, option } = input;
   if (action === "remove") {
-    if (
-      !window.confirm(`Remove “${option.name}” from order options?`)
-    ) {
+    if (!window.confirm(`Remove “${option.name}” from order options?`)) {
       return "";
     }
     const result = await deleteOrderOption(country.code, option.id);
@@ -386,9 +368,7 @@ export async function handleRestaurantAdminAction(input: {
 }): Promise<string> {
   const { action, countryName, countryCode, restaurant } = input;
   if (action === "remove") {
-    if (
-      !window.confirm(`Remove “${restaurant.name}”? This cannot be undone.`)
-    ) {
+    if (!window.confirm(`Remove “${restaurant.name}”? This cannot be undone.`)) {
       return "";
     }
     await removeRestaurant(restaurant.id);
@@ -415,11 +395,7 @@ export async function handleRestaurantAdminAction(input: {
     return "Image updated";
   }
   if (action === "find-menu") {
-    const result = await findRestaurantMenu(
-      restaurant.id,
-      countryName,
-      countryCode,
-    );
+    const result = await findRestaurantMenu(restaurant.id, countryName, countryCode);
     input.onUpdated(result.restaurant);
     return `Menu saved · ${result.itemCount} dishes`;
   }
@@ -429,11 +405,7 @@ export async function handleRestaurantAdminAction(input: {
     return "Scores & authenticity updated";
   }
   if (action === "replace-text") {
-    const result = await replaceRestaurantText(
-      restaurant.id,
-      countryName,
-      countryCode,
-    );
+    const result = await replaceRestaurantText(restaurant.id, countryName, countryCode);
     input.onUpdated(result.restaurant);
     return "Text updated";
   }

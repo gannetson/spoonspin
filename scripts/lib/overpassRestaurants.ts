@@ -73,8 +73,7 @@ export async function fetchOverpass(
   attempt = 1,
   endpointIndex = 0,
 ): Promise<OverpassElement[]> {
-  const endpoint =
-    OVERPASS_ENDPOINTS[endpointIndex % OVERPASS_ENDPOINTS.length]!;
+  const endpoint = OVERPASS_ENDPOINTS[endpointIndex % OVERPASS_ENDPOINTS.length]!;
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
@@ -85,9 +84,7 @@ export async function fetchOverpass(
   });
 
   if (
-    (response.status === 429 ||
-      response.status === 504 ||
-      response.status === 502) &&
+    (response.status === 429 || response.status === 504 || response.status === 502) &&
     attempt < 6
   ) {
     const waitMs = attempt * 10000;
@@ -130,15 +127,12 @@ export function elementToRestaurant(
     .filter(Boolean)
     .join(" ")
     .trim();
-  const city =
-    tags["addr:city"] || tags["addr:place"] || tags["addr:town"] || "";
+  const city = tags["addr:city"] || tags["addr:place"] || tags["addr:town"] || "";
   const postcode = tags["addr:postcode"] || null;
   const addressParts = [street, postcode, city].filter(Boolean);
   const address =
     addressParts.join(", ") ||
-    (lat != null && lng != null
-      ? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
-      : "Netherlands");
+    (lat != null && lng != null ? `${lat.toFixed(5)}, ${lng.toFixed(5)}` : "Netherlands");
 
   const osmId = `${element.type}/${element.id}`;
   const mapsQuery = encodeURIComponent(`${name} ${address}`);

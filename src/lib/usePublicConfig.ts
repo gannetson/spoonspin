@@ -13,11 +13,7 @@ const EMPTY: PublicConfig = {
 
 /** Subscribe to runtime public config (Awin ids from `/api/public-config`). */
 export function usePublicConfig(): PublicConfig {
-  return useSyncExternalStore(
-    subscribePublicConfig,
-    getPublicConfig,
-    () => EMPTY,
-  );
+  return useSyncExternalStore(subscribePublicConfig, getPublicConfig, () => EMPTY);
 }
 
 /** Kick off the fetch once (safe to call from module scope / main). */

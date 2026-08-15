@@ -1,8 +1,4 @@
-export type RatingSourceId =
-  | "google"
-  | "theFork"
-  | "tripadvisor"
-  | "openTable";
+export type RatingSourceId = "google" | "theFork" | "tripadvisor" | "openTable";
 
 export type SourceRating = {
   /** Raw score on the source's scale (default 5; The Fork often uses 10). */
@@ -13,9 +9,7 @@ export type SourceRating = {
   fetchedAt?: string;
 };
 
-export type RestaurantRatings = Partial<
-  Record<RatingSourceId, SourceRating>
->;
+export type RestaurantRatings = Partial<Record<RatingSourceId, SourceRating>>;
 
 export const RATING_SOURCE_LABELS: Record<RatingSourceId, string> = {
   google: "Google",
@@ -69,20 +63,13 @@ export function aggregateGuestRating(ratings?: RestaurantRatings | null): {
   };
 }
 
-export function listSourceRatings(
-  ratings?: RestaurantRatings | null,
-): Array<{
+export function listSourceRatings(ratings?: RestaurantRatings | null): Array<{
   source: RatingSourceId;
   label: string;
   rating: SourceRating & { score: number };
 }> {
   if (!ratings) return [];
-  const order: RatingSourceId[] = [
-    "google",
-    "theFork",
-    "tripadvisor",
-    "openTable",
-  ];
+  const order: RatingSourceId[] = ["google", "theFork", "tripadvisor", "openTable"];
   return order.flatMap((source) => {
     const rating = ratings[source];
     if (rating?.score == null || !Number.isFinite(rating.score)) return [];
@@ -97,14 +84,9 @@ export function listSourceRatings(
 }
 
 /** Render price level 1–4 as €–€€€€. */
-export function formatPriceLevel(
-  level: 1 | 2 | 3 | 4 | null | undefined,
-): string | null {
+export function formatPriceLevel(level: 1 | 2 | 3 | 4 | null | undefined): string | null {
   if (level == null || level < 1 || level > 4) return null;
   return "€".repeat(level);
 }
 
-export {
-  listReviewLinks,
-  type ReviewLink,
-} from "./reviewLinks";
+export { listReviewLinks, type ReviewLink } from "./reviewLinks";

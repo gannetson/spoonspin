@@ -127,10 +127,9 @@ export function FlagSpinner({ current, compact = false }: FlagSpinnerProps) {
         {current?.flag ?? "🌍"}
       </p>
       <p
-        className={[
-          "font-display text-burgundy",
-          compact ? "text-xl" : "text-2xl",
-        ].join(" ")}
+        className={["font-display text-burgundy", compact ? "text-xl" : "text-2xl"].join(
+          " ",
+        )}
       >
         {current?.name ?? t("spin.flag.finding")}
       </p>

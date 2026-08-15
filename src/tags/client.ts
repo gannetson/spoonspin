@@ -13,9 +13,7 @@ export type ListTagsParams = {
   minRating?: number;
 };
 
-export async function fetchMyTags(
-  params: ListTagsParams = {},
-): Promise<UserTag[]> {
+export async function fetchMyTags(params: ListTagsParams = {}): Promise<UserTag[]> {
   const query = new URLSearchParams();
   if (params.intent) query.set("intent", params.intent);
   if (params.entityType) query.set("entity_type", params.entityType);
@@ -77,22 +75,16 @@ export async function deleteMyTag(id: string): Promise<void> {
   }
 }
 
-export async function uploadTagPhotos(
-  tagId: string,
-  files: File[],
-): Promise<UserTag> {
+export async function uploadTagPhotos(tagId: string, files: File[]): Promise<UserTag> {
   const form = new FormData();
   for (const file of files) {
     form.append("photos", file);
   }
-  const response = await fetch(
-    `/api/me/tags/${encodeURIComponent(tagId)}/photos`,
-    {
-      method: "POST",
-      credentials: "include",
-      body: form,
-    },
-  );
+  const response = await fetch(`/api/me/tags/${encodeURIComponent(tagId)}/photos`, {
+    method: "POST",
+    credentials: "include",
+    body: form,
+  });
   const data = await readJson<{ tag?: UserTag }>(response);
   if (!response.ok || !data.tag) {
     throw new Error(data.message ?? "Could not upload photos.");
@@ -100,19 +92,13 @@ export async function uploadTagPhotos(
   return data.tag;
 }
 
-export async function removeTagPhoto(
-  tagId: string,
-  url: string,
-): Promise<UserTag> {
-  const response = await fetch(
-    `/api/me/tags/${encodeURIComponent(tagId)}/photos`,
-    {
-      method: "DELETE",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    },
-  );
+export async function removeTagPhoto(tagId: string, url: string): Promise<UserTag> {
+  const response = await fetch(`/api/me/tags/${encodeURIComponent(tagId)}/photos`, {
+    method: "DELETE",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url }),
+  });
   const data = await readJson<{ tag?: UserTag }>(response);
   if (!response.ok || !data.tag) {
     throw new Error(data.message ?? "Could not remove photo.");

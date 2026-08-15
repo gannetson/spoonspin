@@ -1,13 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Check,
-  Flag,
-  LoaderCircle,
-  LogIn,
-  RotateCcw,
-  X,
-} from "lucide-react";
+import { Check, Flag, LoaderCircle, LogIn, RotateCcw, X } from "lucide-react";
 import { useAuth } from "@/auth/AuthContext";
 import { useAuthModal } from "@/auth/AuthModalContext";
 import {
@@ -55,9 +48,7 @@ export function AdminFlagsPage() {
       } catch (err) {
         if (!cancelled) {
           setFlags([]);
-          setError(
-            err instanceof Error ? err.message : t("admin.flags.error.load"),
-          );
+          setError(err instanceof Error ? err.message : t("admin.flags.error.load"));
         }
       } finally {
         if (!cancelled) setLoading(false);
@@ -78,9 +69,7 @@ export function AdminFlagsPage() {
       const rows = await fetchAdminFlags(statusFilter);
       setFlags(rows);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : t("admin.flags.error.update"),
-      );
+      setError(err instanceof Error ? err.message : t("admin.flags.error.update"));
     } finally {
       setBusyId(null);
     }
@@ -90,10 +79,7 @@ export function AdminFlagsPage() {
     <div className="passport-grid min-h-screen">
       <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link
-            to="/admin"
-            className="text-sm font-semibold text-tomato hover:underline"
-          >
+          <Link to="/admin" className="text-sm font-semibold text-tomato hover:underline">
             {t("admin.flags.backToOverview")}
           </Link>
           {isAdmin ? (
@@ -112,10 +98,7 @@ export function AdminFlagsPage() {
         <p className="mt-2 max-w-2xl text-ink-soft">{t("admin.flags.subtitle")}</p>
 
         {authLoading ? (
-          <p
-            className="mt-8 inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="mt-8 inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             {t("admin.checkingAccess")}
           </p>
@@ -155,16 +138,12 @@ export function AdminFlagsPage() {
             <select
               id="flag-status-filter"
               value={statusFilter}
-              onChange={(event) =>
-                setStatusFilter(event.target.value as StatusFilter)
-              }
+              onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}
               className="min-h-11 rounded-xl border border-burgundy/20 bg-white px-3 text-sm text-burgundy"
             >
               <option value="open">{t("admin.flags.filter.open")}</option>
               <option value="resolved">{t("admin.flags.filter.resolved")}</option>
-              <option value="dismissed">
-                {t("admin.flags.filter.dismissed")}
-              </option>
+              <option value="dismissed">{t("admin.flags.filter.dismissed")}</option>
               <option value="all">{t("admin.flags.filter.all")}</option>
             </select>
             {statusFilter === "open" ? (
@@ -185,10 +164,7 @@ export function AdminFlagsPage() {
         ) : null}
 
         {isAdmin && loading ? (
-          <p
-            className="mt-8 inline-flex items-center gap-2 text-ink-soft"
-            role="status"
-          >
+          <p className="mt-8 inline-flex items-center gap-2 text-ink-soft" role="status">
             <LoaderCircle className="size-5 animate-spin" aria-hidden="true" />
             {t("admin.flags.loading")}
           </p>
@@ -201,10 +177,7 @@ export function AdminFlagsPage() {
         {isAdmin ? (
           <ul className="mt-6 grid gap-4">
             {flags.map((item) => (
-              <li
-                key={item.id}
-                className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10"
-              >
+              <li key={item.id} className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">

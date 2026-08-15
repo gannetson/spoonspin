@@ -3,7 +3,7 @@ import type { Messages } from "./types";
 export const nl: Messages = {
   "app.skipToContent": "Ga naar inhoud",
   "app.brand": "Spoon Spin",
-  "app.tagline": "Eten & reizen, bij toeval",
+  "app.tagline": "Ontdek nieuwe keukens",
   "app.signIn": "Inloggen",
   "app.signOut": "Uitloggen",
   "app.admin": "Beheer",
@@ -28,9 +28,9 @@ export const nl: Messages = {
   "app.lang.nl": "NL",
   "app.lang.switchAria": "Taal",
 
-  "cookie.banner.title": "Cookies & affiliate-tracking",
+  "cookie.banner.title": "Cookies & optionele tracking",
   "cookie.banner.body":
-    "We gebruiken noodzakelijke cookies om je ingelogd te houden. Met jouw toestemming gebruiken we ook marketingcookies, zodat bestellinks naar Thuisbezorgd.nl via ons affiliateprogramma gevolgd kunnen worden. Die commissie helpt Spoonspin te financieren en draaiende te houden — zonder toestemming blijven die links ongevolgd en verdienen we er niets aan.",
+    "We gebruiken noodzakelijke cookies om je ingelogd te houden. Met jouw toestemming kunnen sommige bestellinks affiliatetracking gebruiken wanneer een affiliateprogramma beschikbaar is. Als je na het volgen van zo’n link een bestelling plaatst, kan Spoonspin een commissie ontvangen zonder extra kosten voor jou. Zonder toestemming openen die links het platform direct zonder affiliatetracking.",
   "cookie.banner.accept": "Marketingcookies accepteren",
   "cookie.banner.reject": "Alleen noodzakelijk",
   "cookie.banner.privacyLink": "Privacy & cookies",
@@ -42,9 +42,12 @@ export const nl: Messages = {
   "privacy.necessary.title": "Noodzakelijke cookies",
   "privacy.necessary.body":
     "Sessie- en inlogcookies (bijvoorbeeld spoonspin_session en kortlevende OAuth-cookies) zijn nodig voor login en accountfuncties. Die staan altijd aan.",
-  "privacy.marketing.title": "Marketing- / affiliatecookies",
+  "privacy.marketing.title": "Marketing / optionele affiliatetracking",
   "privacy.marketing.body":
-    "Als je accepteert, gaan bestellinks naar Thuisbezorgd.nl via Awin, zodat een klik kan worden toegeschreven als je binnen het cookievenster van 7 dagen bestelt. Affiliatecommissies helpen Spoonspin te financieren. Kies je alleen noodzakelijk, dan openen links Thuisbezorgd.nl direct zonder affiliate-tracking.",
+    "Als je marketingcookies accepteert, kunnen sommige bestellinks (bijvoorbeeld naar Thuisbezorgd.nl) affiliatetracking gebruiken via een partnernetwerk zoals Awin wanneer een programma beschikbaar is. Attributie volgt doorgaans het cookievenster van de partner. Kies je alleen noodzakelijk, dan openen links het platform direct zonder affiliatetracking.",
+  "privacy.affiliate.title": "Affiliatevermelding",
+  "privacy.affiliate.body":
+    "Sommige links naar bestelplatforms kunnen affiliatelinks zijn. Als je na het volgen van zo’n link een bestelling plaatst, kan Spoonspin een commissie ontvangen zonder extra kosten voor jou. Daarmee kunnen we het platform onderhouden en verbeteren. Affiliate-relaties bepalen niet welke keukens Spoonspin toont, en betekenen niet dat een platform Spoonspin sponsort of onderschrijft.",
   "privacy.analytics.title": "First-party analytics",
   "privacy.analytics.body":
     "We bewaren beperkte serverlogs van verzoeken en productevents (bijvoorbeeld IP en user-agent, ongeveer 30 dagen bewaard) om de dienst te laten werken en te verbeteren. Dit zijn geen third-party advertentietrackers.",
@@ -54,13 +57,38 @@ export const nl: Messages = {
   "privacy.preference.accepted": "Marketingcookies geaccepteerd",
   "privacy.preference.essential": "Alleen noodzakelijke cookies",
 
-  "hero.heading": "Waar ga je vandaag eten?",
+  "hero.heading": "Wat ga je vandaag in de wereld eten?",
   "hero.subtitle":
     "Draai de globe, land op een keuken, en kook thuis of eet uit in Nederland.",
 
+  "home.explainer.heading": "Ontdek wat de wereld eet",
+  "home.explainer.body":
+    "Met Spoonspin ontdek je keukens van over de hele wereld. Draai voor een land, ontdek traditionele gerechten en drankjes, kook zelf, vind restaurants in Nederland of bekijk mogelijkheden voor bezorgen en afhalen.",
+
+  "about.title": "Over Spoonspin",
+  "about.intro":
+    "Spoonspin is een onafhankelijk platform voor voedselontdekking. Draai voor een land, ontdek de keuken, en kies hoe je ervan wilt genieten.",
+  "about.cook.title": "Koken",
+  "about.cook.body":
+    "Bekijk traditionele gerechten, drankjes, recepten en specialistenwinkels zodat je authentiek thuis kunt koken.",
+  "about.dine.title": "Uit eten",
+  "about.dine.body":
+    "Vind restaurants in Nederland die de keuken serveren die je ontdekte.",
+  "about.order.title": "Bestellen",
+  "about.order.body":
+    "Ontdek bezorg- en afhaalopties voor die keuken, en ga waar relevant door naar bestelplatforms.",
+  "about.affiliate.title": "Affiliatelinks",
+  "about.affiliate.body":
+    "Sommige links naar bestelplatforms kunnen affiliatelinks zijn. Als je na het volgen van zo’n link een bestelling plaatst, kan Spoonspin een commissie ontvangen zonder extra kosten voor jou. Daarmee kunnen we het platform onderhouden en verbeteren. Affiliate-relaties bepalen niet welke keukens worden getoond, en betekenen niet dat een platform Spoonspin sponsort of onderschrijft.",
+  "about.back": "Terug naar Spoonspin",
+
+  "footer.nav": "Sitelinks",
+  "footer.about": "Over Spoonspin",
+  "footer.privacy": "Privacy & cookies",
+  "footer.tagline": "Voedselontdekking — koken, uit eten of bestellen.",
+
   "home.progress.aria": "Jouw proefvoortgang",
-  "home.progress.digested":
-    "Je hebt {dishes} gerechten uit {countries} landen geproefd.",
+  "home.progress.digested": "Je hebt {dishes} gerechten uit {countries} landen geproefd.",
   "home.progress.digested.one":
     "Je hebt {dishes} gerecht uit {countries} landen geproefd.",
   "home.progress.digested.oneCountry":
@@ -68,14 +96,11 @@ export const nl: Messages = {
   "home.progress.digested.oneEach":
     "Je hebt {dishes} gerecht uit {countries} land geproefd.",
   "home.progress.plannedTitle": "Op je lijst",
-  "home.progress.planned":
-    "Je hebt {items} borden gepland in {countries} landen.",
-  "home.progress.planned.one":
-    "Je hebt {items} bord gepland in {countries} landen.",
+  "home.progress.planned": "Je hebt {items} borden gepland in {countries} landen.",
+  "home.progress.planned.one": "Je hebt {items} bord gepland in {countries} landen.",
   "home.progress.planned.oneCountry":
     "Je hebt {items} borden gepland in {countries} land.",
-  "home.progress.planned.oneEach":
-    "Je hebt {items} bord gepland in {countries} land.",
+  "home.progress.planned.oneEach": "Je hebt {items} bord gepland in {countries} land.",
 
   "spin.ariaLabel": "Draai de lepel",
   "spin.ariaLabel.spinning": "Aan het draaien",
@@ -215,11 +240,9 @@ export const nl: Messages = {
     "Vind beoordeelde restaurants met keuken uit {name} binnen ongeveer 100 km.",
   "dine.subtitle.out":
     "Vind beoordeelde restaurants met keuken uit {name} binnen ongeveer 100 km.",
-  "dine.subtitle.home":
-    "Samengestelde bezorg- en afhaalopties voor keuken uit {name}.",
+  "dine.subtitle.home": "Samengestelde bezorg- en afhaalopties voor keuken uit {name}.",
   "order.heading": "Thuis bestellen",
-  "order.subtitle":
-    "Samengestelde bezorg- en afhaalopties voor keuken uit {name}.",
+  "order.subtitle": "Samengestelde bezorg- en afhaalopties voor keuken uit {name}.",
   "dine.tabs.label": "Uit eten-secties",
   "dine.tabs.out": "Uit eten",
   "dine.tabs.home": "Thuis bestellen",
@@ -266,18 +289,15 @@ export const nl: Messages = {
   "dine.retry": "Opnieuw",
   "dine.empty.default":
     "Nog geen beoordeelde restaurants voor {name} in de buurt. Open Google Maps, of probeer een andere plaats.",
-  "dine.results.count":
-    "{count} beoordeeld adres binnen 100 km van {location}",
-  "dine.results.countPlural":
-    "{count} beoordeelde adressen binnen 100 km van {location}",
+  "dine.results.count": "{count} beoordeeld adres binnen 100 km van {location}",
+  "dine.results.countPlural": "{count} beoordeelde adressen binnen 100 km van {location}",
   "dine.sortBy": "Sorteren op",
   "dine.sort.default": "Beste match (afstand + beoordelingen)",
   "dine.sort.authenticity": "Authenticiteit",
   "dine.sort.rating": "Gastbeoordeling (Google / Fork / TA)",
   "dine.distanceAway": "{distance} verderop",
   "dine.authenticityBadge": "Authenticiteit {rating}/5",
-  "dine.authenticityTitle":
-    "Redactionele authenticiteitsbeoordeling voor deze keuken",
+  "dine.authenticityTitle": "Redactionele authenticiteitsbeoordeling voor deze keuken",
   "dine.sourceRatingTitle": "Gastbeoordeling {label}",
   "dine.website": "Website",
   "dine.openInGoogleMaps": "Google Maps",
@@ -286,8 +306,7 @@ export const nl: Messages = {
   "dine.reviews.tripadvisor": "Tripadvisor",
   "dine.reviews.theFork": "The Fork",
   "dine.reviews.openTable": "OpenTable",
-  "dine.idleHint":
-    "Voer een plaats of postcode in, of gebruik je locatie om te zoeken.",
+  "dine.idleHint": "Voer een plaats of postcode in, of gebruik je locatie om te zoeken.",
   "dine.openRestaurantAria": "Open {name}",
   "dine.cuisinesAria": "Keukens die ze serveren",
   "dine.priceTitle": "Typisch prijsniveau",
@@ -330,18 +349,15 @@ export const nl: Messages = {
     "Voor {flag} {name}. We zoeken het adres op via Google Places en voegen alleen een geverifieerd Nederlands adres toe.",
   "suggest.closeAria": "Sluiten",
   "suggest.queryLabel": "Naam of korte omschrijving",
-  "suggest.placeholder.recipe":
-    "bijv. Banitsa, of “kaas-filodeeg als ontbijt”",
+  "suggest.placeholder.recipe": "bijv. Banitsa, of “kaas-filodeeg als ontbijt”",
   "suggest.placeholder.restaurant":
     "bijv. exacte restaurantnaam en stad (Amsterdam, Rotterdam…)",
-  "suggest.placeholder.drink":
-    "bijv. Rakija, of een alcoholvrije yoghurt drank met munt",
+  "suggest.placeholder.drink": "bijv. Rakija, of een alcoholvrije yoghurt drank met munt",
   "suggest.placeholder.shop":
     "bijv. Toko Dun Yong Amsterdam, of een Balkan-supermarkt in Rotterdam",
   "suggest.openaiMissing.banner":
     "Voorstellen hebben OPENAI_API_KEY in .env nodig; herstart daarna npm run dev.",
-  "suggest.openaiMissing.error":
-    "Zet OPENAI_API_KEY in je .env en herstart npm run dev.",
+  "suggest.openaiMissing.error": "Zet OPENAI_API_KEY in je .env en herstart npm run dev.",
   "suggest.placesMissing.banner":
     "Restaurantvoorstellen hebben GOOGLE_PLACES_API_KEY in .env nodig; herstart daarna npm run dev.",
   "suggest.placesMissing.error":
@@ -436,8 +452,7 @@ export const nl: Messages = {
   "admin.flags.error.update": "Kon melding niet bijwerken.",
 
   "admin.overview.title": "Landenoverzicht",
-  "admin.overview.subtitle":
-    "Recepten, restaurants, dranken en winkels per land.",
+  "admin.overview.subtitle": "Recepten, restaurants, dranken en winkels per land.",
   "admin.overview.loading": "Overzicht laden…",
   "admin.overview.error": "Kon landenoverzicht niet laden.",
   "admin.overview.empty": "Geen landen komen overeen met deze zoekopdracht.",
@@ -497,8 +512,7 @@ export const nl: Messages = {
   "admin.reports.col.count": "Aantal",
   "admin.reports.col.lastSeen": "Laatst gezien",
   "admin.reports.product": "Productevents",
-  "admin.reports.productHint":
-    "Belangrijke acties naast het access-log.",
+  "admin.reports.productHint": "Belangrijke acties naast het access-log.",
   "admin.reports.product.countryViews": "Landweergaven",
   "admin.reports.product.restaurantSearches": "Dine-zoekopdrachten",
   "admin.reports.product.restaurantViews": "Restaurantweergaven",
@@ -535,18 +549,17 @@ export const nl: Messages = {
   "admin.dine.menu": "Uit eten-tools",
   "admin.order.menu": "Bestel-tools",
   "admin.dine.findRestaurants": "Restaurants zoeken",
-  "admin.dine.findRestaurants.hint":
-    "Ontdek beoordeelde restaurants om uit eten te gaan",
+  "admin.dine.findRestaurants.hint": "Ontdek beoordeelde restaurants om uit eten te gaan",
   "admin.dine.findOrderOptions": "Bestelopties zoeken",
   "admin.dine.findOrderOptions.hint":
     "Thuisbezorgd.nl, Uber Eats, directe bestellinks en meer",
   "admin.country.overview": "Overzicht",
-  "admin.country.overview.hint":
-    "Aantallen recepten, restaurants, dranken, winkels",
+  "admin.country.overview.hint": "Aantallen recepten, restaurants, dranken, winkels",
   "admin.country.reports": "Rapporten",
   "admin.country.reports.hint": "Verkeer, IPs en productgebruik",
   "admin.country.review": "Review",
-  "admin.country.review.hint": "Beoordeel communityvoorstellen voor recepten, dranken, winkels en restaurants",
+  "admin.country.review.hint":
+    "Beoordeel communityvoorstellen voor recepten, dranken, winkels en restaurants",
   "admin.country.flags": "Meldingen",
   "admin.country.flags.hint": "Gebruikersmeldingen over verkeerde of kapotte content",
   "admin.country.users": "Gebruikers",
@@ -578,8 +591,7 @@ export const nl: Messages = {
   "admin.country.findRecipes.hint":
     "Zoek nationale gerechten en voeg geselecteerde recepten toe",
   "admin.country.composeDinner": "Diner samenstellen",
-  "admin.country.composeDinner.hint":
-    "Kies 3–5 gangen en dranken voor het Diner-tabblad",
+  "admin.country.composeDinner.hint": "Kies 3–5 gangen en dranken voor het Diner-tabblad",
   "admin.country.composingDinner": "Diner samenstellen…",
   "admin.country.dinnerComposed": "Diner klaar: {title}",
   "admin.country.dinnerError": "Kon diner niet samenstellen.",
@@ -624,14 +636,14 @@ export const nl: Messages = {
   "admin.selectImage.searchError": "Kon afbeeldingen niet zoeken.",
   "admin.selectImage.applyError": "Kon de gekozen afbeelding niet toepassen.",
   "admin.selectImage.uploadError": "Kon de afbeelding niet uploaden.",
-  "admin.selectImage.empty": "Geen afbeeldingen gevonden. Probeer een andere zoekopdracht.",
+  "admin.selectImage.empty":
+    "Geen afbeeldingen gevonden. Probeer een andere zoekopdracht.",
   "admin.selectImage.use": "Gebruik deze",
   "admin.selectImage.pageInfo": "{from}–{to} van {total}",
   "admin.selectImage.prev": "Vorige",
   "admin.selectImage.next": "Volgende",
   "admin.selectImage.uploadHeading": "Afbeelding uploaden",
-  "admin.selectImage.uploadHint":
-    "JPEG, PNG of WebP tot 5 MB. Wordt meteen toegepast.",
+  "admin.selectImage.uploadHint": "JPEG, PNG of WebP tot 5 MB. Wordt meteen toegepast.",
   "admin.selectImage.upload": "Bestand kiezen",
   "admin.item.editRecipe": "Recept bewerken",
   "admin.item.editRecipe.hint":
@@ -664,8 +676,7 @@ export const nl: Messages = {
   "admin.recipe.edit.steps": "Stappen (één per regel)",
   "admin.recipe.edit.steps.hint": "Minimaal drie stappen; één instructie per regel.",
   "admin.recipe.edit.dietary": "Dieetlabels",
-  "admin.recipe.edit.dietary.hint":
-    "Kommagescheiden, bijv. vegetarisch, glutenvrij",
+  "admin.recipe.edit.dietary.hint": "Kommagescheiden, bijv. vegetarisch, glutenvrij",
   "admin.recipe.edit.substitutions": "Vervangingen",
   "admin.recipe.edit.listHint": "Eén item per regel.",
   "admin.recipe.edit.serving": "Serveersuggestie",
@@ -673,8 +684,7 @@ export const nl: Messages = {
   "admin.recipe.edit.save": "Wijzigingen opslaan",
   "admin.recipe.edit.saving": "Opslaan…",
   "admin.recipe.edit.cancel": "Annuleren",
-  "admin.recipe.edit.error.description":
-    "Beschrijving moet minstens 20 tekens zijn.",
+  "admin.recipe.edit.error.description": "Beschrijving moet minstens 20 tekens zijn.",
   "admin.recipe.edit.error.servings": "Porties moeten minstens 1 zijn.",
   "admin.recipe.edit.error.times":
     "Voorbereidings- en bereidingstijd mogen niet negatief zijn.",
@@ -692,8 +702,7 @@ export const nl: Messages = {
   "admin.item.findMenu": "Menu zoeken",
   "admin.item.findMenu.hint": "Onderzoek gerechten en sla een menu op",
   "admin.item.findScores": "Scores zoeken",
-  "admin.item.findScores.hint":
-    "Google, Tripadvisor, The Fork, prijs & authenticiteit",
+  "admin.item.findScores.hint": "Google, Tripadvisor, The Fork, prijs & authenticiteit",
 
   "admin.discover.recipes.title": "Recepten zoeken",
   "admin.discover.recipes.hint":
@@ -719,15 +728,13 @@ export const nl: Messages = {
     "Zoek winkels met ingrediënten in Nederland en kies welke je toevoegt.",
   "admin.discover.shops.placeholder":
     "bijv. Aziatische supermarkten in Rotterdam, kruidenwinkels",
-  "admin.discover.shops.empty":
-    "Geen winkels teruggekregen. Probeer een andere focus.",
+  "admin.discover.shops.empty": "Geen winkels teruggekregen. Probeer een andere focus.",
   "admin.discover.orderOptions.title": "Bestelopties zoeken",
   "admin.discover.orderOptions.hint":
     "Live Thuisbezorgd.nl + Uber Eats via Apify (echte restaurantmenu-/store-URL’s). Vereist APIFY_TOKEN.",
   "admin.discover.orderOptions.city": "Plaats of postcode",
   "admin.discover.orderOptions.cityPlaceholder": "bijv. Leiden of 2312",
-  "admin.discover.orderOptions.placeholder":
-    "Optionele focus, bijv. Thai, sushi, pizza",
+  "admin.discover.orderOptions.placeholder": "Optionele focus, bijv. Thai, sushi, pizza",
   "admin.discover.orderOptions.empty":
     "Geen bestelopties teruggekregen. Probeer een andere stad of focus.",
   "admin.discover.drinks.title": "Dranken zoeken",
@@ -735,8 +742,7 @@ export const nl: Messages = {
     "Zoek bieren (bekende merken + flesfoto’s), wijnen (druiven + foodpairing), overige alcoholisch en non-alcoholisch.",
   "admin.discover.drinks.placeholder":
     "bijv. bekende biermerken, klassieke druiven, aperitieven",
-  "admin.discover.drinks.empty":
-    "Geen dranken teruggekregen. Probeer een andere focus.",
+  "admin.discover.drinks.empty": "Geen dranken teruggekregen. Probeer een andere focus.",
   "admin.discover.drinks.alcoholic": "alcoholisch",
   "admin.discover.drinks.nonAlcoholic": "alcoholvrij",
   "admin.discover.drinks.grape": "Druif",
@@ -847,8 +853,7 @@ export const nl: Messages = {
     "Dankjewel voor je eerlijke oordeel over {name} — niet elk glas is een winnaar.",
   "review.thanks.drink.mid":
     "Dankjewel dat je je slok {name} deelde — genoteerd voor de volgende ronde!",
-  "review.thanks.drink.high":
-    "Dankjewel voor de perfecte pour van {name} — proost!",
+  "review.thanks.drink.high": "Dankjewel voor de perfecte pour van {name} — proost!",
   "review.thanks.shop.low":
     "Dankjewel voor je eerlijke notitie over {name} — dat helpt de volgende kok plannen.",
   "review.thanks.shop.mid":
@@ -872,12 +877,10 @@ export const nl: Messages = {
     "Niet jouw glas? Te zoet, vlak, scherp — of gewoon het verkeerde moment?",
   "review.guide.drink.mid":
     "Prima slok. Zou je ’m opnieuw bestellen bij een bepaald gerecht?",
-  "review.guide.drink.high":
-    "Perfecte pour! Wanneer drinken we dit, en hoe smaakt het?",
+  "review.guide.drink.high": "Perfecte pour! Wanneer drinken we dit, en hoe smaakt het?",
   "review.guide.shop.low":
     "Misgeschoten? Weinig voorraad, prijzen, of een lange rit voor weinig?",
-  "review.guide.shop.mid":
-    "Nuttige stop — wat was de moeite waard, en wat miste je?",
+  "review.guide.shop.mid": "Nuttige stop — wat was de moeite waard, en wat miste je?",
   "review.guide.shop.high":
     "Voorraadjackpot! Wat moeten we meenemen, en tips om de goede spullen te vinden?",
 
@@ -885,21 +888,15 @@ export const nl: Messages = {
     "Ingrediënten moeilijk te vinden? Stappen onduidelijk? Smaak mis?",
   "review.placeholder.recipe.mid":
     "Wat ging bijna goed — en wat verander je volgende keer?",
-  "review.placeholder.recipe.high":
-    "Smaak, gemak, keukenwins en een tip voor anderen…",
-  "review.placeholder.restaurant.low":
-    "Service, wachttijd, sfeer, authenticiteit…",
-  "review.placeholder.restaurant.mid":
-    "Wat was goed, wat was meh?",
-  "review.placeholder.restaurant.high":
-    "Must-order gerecht, service, sfeer…",
+  "review.placeholder.recipe.high": "Smaak, gemak, keukenwins en een tip voor anderen…",
+  "review.placeholder.restaurant.low": "Service, wachttijd, sfeer, authenticiteit…",
+  "review.placeholder.restaurant.mid": "Wat was goed, wat was meh?",
+  "review.placeholder.restaurant.high": "Must-order gerecht, service, sfeer…",
   "review.placeholder.drink.low": "Wat werkte niet voor jou?",
   "review.placeholder.drink.mid": "Zou je ’m bij iets anders serveren?",
   "review.placeholder.drink.high": "Beschrijf het perfecte moment voor dit drankje…",
-  "review.placeholder.shop.low":
-    "Wat miste er, was te duur, of moeilijk te vinden?",
-  "review.placeholder.shop.mid":
-    "Wat was prima — en wat maakt een volgende keer beter?",
+  "review.placeholder.shop.low": "Wat miste er, was te duur, of moeilijk te vinden?",
+  "review.placeholder.shop.mid": "Wat was prima — en wat maakt een volgende keer beter?",
   "review.placeholder.shop.high":
     "Beste vondsten, tip van het personeel, en waarom je terugkomt…",
 
@@ -958,19 +955,15 @@ export const nl: Messages = {
   "profile.title": "Hapjes verteerd",
   "profile.userTitle": "Digest van {name}",
   "profile.unknownUser": "Lid",
-  "profile.subtitle":
-    "Landen die je thuis kookte of uitprobeerde — je proefpaspoort.",
-  "profile.subtitleOther":
-    "Landen die {name} thuis kookte of uitprobeerde.",
+  "profile.subtitle": "Landen die je thuis kookte of uitprobeerde — je proefpaspoort.",
+  "profile.subtitleOther": "Landen die {name} thuis kookte of uitprobeerde.",
   "profile.plannedLinkHint": "Nog iets in gedachten? Bekijk",
   "profile.adminOnly": "Alleen admins kunnen borden van andere leden bekijken.",
   "profile.backToUsers": "Gebruikers",
-  "profile.emptyOther":
-    "{name} heeft nog geen gekookte of geprobeerde gerechten gelogd.",
+  "profile.emptyOther": "{name} heeft nog geen gekookte of geprobeerde gerechten gelogd.",
   "profile.levelHeading": "Level {level}: {title}",
   "profile.countriesTasted": "{count} / {total} landen geproefd",
-  "profile.nextLevel":
-    "Hierna — Level {level}: {title} (bij {threshold} landen)",
+  "profile.nextLevel": "Hierna — Level {level}: {title} (bij {threshold} landen)",
   "profile.maxLevel": "Je hebt de wereld geproefd — Koning der keukens!",
   "profile.filter.intent": "Status",
   "profile.filter.all": "Alles",
@@ -1009,6 +1002,19 @@ export const nl: Messages = {
     "Log in om gerechten en plekken te bewaren die je wilt proberen.",
   "planned.notOnPassport": "Deze tellen niet mee voor je proefpaspoort op",
 
+  "meta.title": "Spoonspin — Ontdek wereldkeukens, recepten & restaurants",
   "meta.description":
-    "Spoon Spin — ontdek willekeurig een land, kook het eten of eet uit in Nederland.",
+    "Ontdek eten van over de hele wereld met Spoonspin. Draai voor een land, ontdek traditionele gerechten en recepten, vind restaurants in Nederland, of bestel de keuken thuis.",
+  "meta.country.title": "{name} eten — Recepten, restaurants & bezorgen | Spoonspin",
+  "meta.country.description":
+    "Ontdek de keuken van {name} met Spoonspin. Verken traditionele gerechten en recepten uit {name}, vind restaurants in Nederland, of bestel eten uit {name} thuis.",
+  "meta.recipe.title": "{recipe} — Recept uit {name} | Spoonspin",
+  "meta.recipe.description":
+    "Kook {recipe} uit de keuken van {name} met Spoonspin. Bekijk het recept, eet uit of bestel gerelateerd eten in Nederland.",
+  "meta.about.title": "Over Spoonspin — Platform voor voedselontdekking",
+  "meta.about.description":
+    "Spoonspin is een onafhankelijk platform voor voedselontdekking. Draai voor een land, ontdek recepten en drankjes, vind restaurants in Nederland, of bekijk bezorg- en afhaalopties.",
+  "meta.privacy.title": "Privacy & cookies | Spoonspin",
+  "meta.privacy.description":
+    "Hoe Spoonspin cookies, optionele affiliatetracking voor bestellinks en first-party analytics gebruikt.",
 };

@@ -9,9 +9,7 @@ import {
   setRuntimeCountries,
 } from "./runtimeRegistry";
 
-const catalogByCode = new Map(
-  allCountries.map((country) => [country.code, country]),
-);
+const catalogByCode = new Map(allCountries.map((country) => [country.code, country]));
 
 /** Thin catalog stubs (no menus). Prefer API / setRuntimeCountries for full data. */
 export function getPublishedCountries(): Country[] {
