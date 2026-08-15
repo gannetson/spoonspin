@@ -1,26 +1,27 @@
 import { useId, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Store } from "lucide-react";
+import { ChevronDown, ShoppingBag } from "lucide-react";
 import type { Country } from "@/types/content";
 import { AdminDiscoverModal } from "@/components/AdminDiscoverModal";
 import { useT } from "@/i18n/LocaleContext";
 import { zClass } from "@/lib/stacking";
 import { usePortalMenu } from "@/lib/usePortalMenu";
 
-type AdminDineMenuProps = {
+type AdminOrderMenuProps = {
   country: Country;
+  /** Current “Ordering near …” city — used when finding order options. */
+  cityOrPostcode?: string;
   onCountryUpdated: (country: Country) => void;
-  onRestaurantsAdded: () => void;
   tone?: "light" | "dark";
 };
 
-/** Dine-mode admin tools: find restaurants. */
-export function AdminDineMenu({
+/** Order-mode admin tools: find delivery / takeaway options. */
+export function AdminOrderMenu({
   country,
+  cityOrPostcode,
   onCountryUpdated,
-  onRestaurantsAdded,
   tone = "light",
-}: AdminDineMenuProps) {
+}: AdminOrderMenuProps) {
   const t = useT();
   const menuId = useId();
   const { open, setOpen, rootRef, triggerRef, panelRef, position } =
@@ -46,13 +47,13 @@ export function AdminDineMenu({
               }}
               className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
             >
-              <Store className="mt-0.5 size-4 shrink-0 text-tomato" />
+              <ShoppingBag className="mt-0.5 size-4 shrink-0 text-tomato" />
               <span>
                 <span className="block font-semibold text-ink">
-                  {t("admin.dine.findRestaurants")}
+                  {t("admin.dine.findOrderOptions")}
                 </span>
                 <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.dine.findRestaurants.hint")}
+                  {t("admin.dine.findOrderOptions.hint")}
                 </span>
               </span>
             </button>
@@ -76,7 +77,7 @@ export function AdminDineMenu({
             : "border border-ink/15 bg-ink text-cream hover:bg-ink/90"
         }`}
       >
-        {t("admin.dine.menu")}
+        {t("admin.order.menu")}
         <ChevronDown
           className={`size-3.5 transition ${open ? "rotate-180" : ""}`}
           aria-hidden="true"
@@ -87,12 +88,12 @@ export function AdminDineMenu({
 
       {discoverOpen ? (
         <AdminDiscoverModal
-          kind="restaurants"
+          kind="orderOptions"
           country={country}
           open
+          defaultCity={cityOrPostcode}
           onClose={() => setDiscoverOpen(false)}
           onCountryUpdated={onCountryUpdated}
-          onRestaurantsAdded={onRestaurantsAdded}
         />
       ) : null}
     </div>

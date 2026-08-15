@@ -10,6 +10,8 @@ export const images = {
   cook: u("photo-1556910103-1c02745aae4d"),
   /** Dine mode — restaurant dining room */
   dine: u("photo-1517248135467-4c7edcad34c4"),
+  /** Order mode — delivery / takeaway */
+  order: u("photo-1526367796308-acf70ce50b94"),
   /** Country / cuisine atmosphere */
   cuisine: u("photo-1504674900247-0877df9cc836"),
   recipes: {

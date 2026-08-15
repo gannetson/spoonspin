@@ -31,6 +31,7 @@ const recipeDraftSchema = z.object({
       servings: z.coerce.number().int().positive(),
       prepMinutes: z.coerce.number().int().nonnegative(),
       cookMinutes: z.coerce.number().int().nonnegative(),
+      waitTime: optionalString,
       difficulty: z.enum(["easy", "medium", "challenging"]),
       dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
       ingredients: z
@@ -200,6 +201,7 @@ JSON shape:
     "servings": number,
     "prepMinutes": number,
     "cookMinutes": number,
+    "waitTime": string? (passive rest/ferment/soak, e.g. "48 hours", "overnight"; omit if none),
     "difficulty": "easy"|"medium"|"challenging",
     "dietaryLabels": string[],
     "ingredients": [{"name":string,"quantity":number,"unit":string,"note":string?}],

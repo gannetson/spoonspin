@@ -36,6 +36,7 @@ export const recipeSchema = z.object({
   servings: z.number().int().positive(),
   prepMinutes: z.number().int().nonnegative(),
   cookMinutes: z.number().int().nonnegative(),
+  waitTime: z.string().min(1).max(120).optional(),
   difficulty: z.enum(["easy", "medium", "challenging"]),
   dietaryLabels: z.array(z.string()),
   ingredients: z.array(ingredientSchema).min(2),

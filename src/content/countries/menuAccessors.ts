@@ -155,7 +155,9 @@ export function groupDrinksIntoSections(drinks: Drink[]): DrinkSection[] {
 }
 
 /**
- * Prefer stored dinner_json; otherwise derive a simple dinner from the cook menu slots.
+ * Prefer stored dinner_json when it has courses; otherwise derive from the cook
+ * menu. If dinner_json only has drinks (no courses), keep those drinks on the
+ * derived menu courses so add/remove pour still matches what the UI shows.
  */
 export function getDinnerSuggestion(
   country: Country,
@@ -163,18 +165,30 @@ export function getDinnerSuggestion(
   if (country.dinner && country.dinner.courses.length > 0) {
     return country.dinner;
   }
-  if (!country.menu) return undefined;
-  return {
-    title: `A taste of ${country.name}`,
-    description: country.introduction,
-    courses: [
-      { recipeId: country.menu.starter.id, role: "starter" },
-      { recipeId: country.menu.main.id, role: "main" },
-      { recipeId: country.menu.side.id, role: "side" },
-      { recipeId: country.menu.dessert.id, role: "dessert" },
-    ],
-    drinks: [{ drinkName: country.menu.drink.name }],
-  };
+
+  if (country.menu) {
+    return {
+      title: country.dinner?.title ?? `A taste of ${country.name}`,
+      description: country.dinner?.description ?? country.introduction,
+      courses: [
+        { recipeId: country.menu.starter.id, role: "starter" },
+        { recipeId: country.menu.main.id, role: "main" },
+        { recipeId: country.menu.side.id, role: "side" },
+        { recipeId: country.menu.dessert.id, role: "dessert" },
+      ],
+      drinks:
+        country.dinner?.drinks && country.dinner.drinks.length > 0
+          ? country.dinner.drinks
+          : [{ drinkName: country.menu.drink.name }],
+      composedAt: country.dinner?.composedAt,
+    };
+  }
+
+  if (country.dinner && country.dinner.drinks.length > 0) {
+    return country.dinner;
+  }
+
+  return undefined;
 }
 
 export function dinnerRecipeIdSet(country: Country): Set<string> {

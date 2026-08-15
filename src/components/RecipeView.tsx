@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ExternalLink, PlayCircle, Printer } from "lucide-react";
 import type { Country, Drink, Recipe } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
@@ -47,6 +47,9 @@ export function RecipeView({
   const { openSelectImage } = useSelectImage();
   const { openEditRecipe } = useEditRecipe();
   const [servings, setServings] = useState(recipe.servings);
+  useEffect(() => {
+    setServings(recipe.servings);
+  }, [recipe.id, recipe.servings]);
   const scaled = useMemo(
     () => scaleIngredients(recipe.ingredients, recipe.servings, servings),
     [recipe.ingredients, recipe.servings, servings],
@@ -183,14 +186,19 @@ export function RecipeView({
 
         <dl className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Meta label={t("recipe.meta.servings")} value={String(servings)} />
-          <Meta
-            label={t("recipe.meta.prep")}
-            value={t("recipe.meta.minutes", { minutes: recipe.prepMinutes })}
-          />
+          {recipe.prepMinutes > 0 ? (
+            <Meta
+              label={t("recipe.meta.prep")}
+              value={t("recipe.meta.minutes", { minutes: recipe.prepMinutes })}
+            />
+          ) : null}
           <Meta
             label={t("recipe.meta.cook")}
             value={t("recipe.meta.minutes", { minutes: recipe.cookMinutes })}
           />
+          {recipe.waitTime?.trim() ? (
+            <Meta label={t("recipe.meta.wait")} value={recipe.waitTime.trim()} />
+          ) : null}
           <Meta
             label={t("recipe.meta.difficulty")}
             value={t(DIFFICULTY_KEYS[recipe.difficulty])}

@@ -18,6 +18,7 @@ import { CountryCard } from "@/components/CountryCard";
 import { CountrySelect } from "@/components/CountrySelect";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
+import { OrderHome } from "@/components/OrderHome";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeProgressCards } from "@/components/HomeProgressCards";
 import { AdminNavMenu } from "@/components/AdminNavMenu";
@@ -35,7 +36,7 @@ import type { Restaurant } from "@/restaurants/types";
 import { useT } from "@/i18n/LocaleContext";
 import { TagsProvider } from "@/tags/TagsContext";
 
-export type AppMode = "choose" | "cook" | "dine";
+export type AppMode = "choose" | "cook" | "dine" | "order";
 
 const FALLBACK_DRINK: Drink = {
   name: "Water",
@@ -45,7 +46,7 @@ const FALLBACK_DRINK: Drink = {
 };
 
 function parseMode(value: string | null): AppMode {
-  if (value === "cook" || value === "dine") return value;
+  if (value === "cook" || value === "dine" || value === "order") return value;
   // Country pages default to Cook when no mode was chosen yet.
   return "cook";
 }
@@ -266,7 +267,9 @@ export default function App() {
           const keptMode = prev.get("mode");
           params.set(
             "mode",
-            keptMode === "cook" || keptMode === "dine" ? keptMode : "cook",
+            keptMode === "cook" || keptMode === "dine" || keptMode === "order"
+              ? keptMode
+              : "cook",
           );
           return params;
         },
@@ -510,11 +513,16 @@ export default function App() {
             />
 
             <div className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-3">
                 <ModeButton
                   active={mode === "cook"}
                   onClick={() =>
-                    updateParams({ mode: "cook", recipe: null, restaurant: null })
+                    updateParams({
+                      mode: "cook",
+                      recipe: null,
+                      restaurant: null,
+                      shop: null,
+                    })
                   }
                   label={t("app.mode.cook")}
                   description={
@@ -527,11 +535,30 @@ export default function App() {
                 <ModeButton
                   active={mode === "dine"}
                   onClick={() =>
-                    updateParams({ mode: "dine", recipe: null, restaurant: null })
+                    updateParams({
+                      mode: "dine",
+                      recipe: null,
+                      restaurant: null,
+                      shop: null,
+                    })
                   }
                   label={t("app.mode.dine")}
                   description={t("app.mode.dine.description")}
                   iconSrc="/modes/dine.png"
+                />
+                <ModeButton
+                  active={mode === "order"}
+                  onClick={() =>
+                    updateParams({
+                      mode: "order",
+                      recipe: null,
+                      restaurant: null,
+                      shop: null,
+                    })
+                  }
+                  label={t("app.mode.order")}
+                  description={t("app.mode.order.description")}
+                  iconSrc="/modes/order.png"
                 />
               </div>
               <CountrySelect
@@ -624,6 +651,13 @@ export default function App() {
                 onRestaurantsAdded={() =>
                   setDineRefreshKey((value) => value + 1)
                 }
+              />
+            ) : null}
+
+            {mode === "order" ? (
+              <OrderHome
+                country={selectedCountry}
+                onCountryUpdated={handleCountryUpdated}
               />
             ) : null}
           </section>

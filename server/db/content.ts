@@ -11,6 +11,7 @@ import type {
 import {
   getCountryDrinks,
   getCountryRecipes,
+  getDinnerSuggestion,
   getSpecialtyShops,
 } from "../../src/content/countries/menuAccessors.ts";
 import { countByCuisineCode, ensureDb } from "./restaurants.ts";
@@ -53,6 +54,10 @@ function rowToRecipe(row: QueryResultRow): Recipe {
     servings: Number(row.servings),
     prepMinutes: Number(row.prep_minutes),
     cookMinutes: Number(row.cook_minutes),
+    waitTime:
+      row.wait_time == null || !String(row.wait_time).trim()
+        ? undefined
+        : String(row.wait_time).trim(),
     difficulty: String(row.difficulty) as Recipe["difficulty"],
     dietaryLabels: asArray<string>(row.dietary_labels),
     ingredients: asArray(row.ingredients),
@@ -259,14 +264,14 @@ export async function replaceCountryRecipes(
     await db.query(
       `INSERT INTO recipes (
         country_code, id, menu_slot, sort_order, name, local_name, description,
-        category, servings, prep_minutes, cook_minutes, difficulty, dietary_labels,
+        category, servings, prep_minutes, cook_minutes, wait_time, difficulty, dietary_labels,
         ingredients, steps, substitutions, serving_suggestion, drink_pairing,
         image_url, image_attribution, source_url, video_url, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7,
-        $8, $9, $10, $11, $12, $13::jsonb,
-        $14::jsonb, $15::jsonb, $16::jsonb, $17, $18,
-        $19, $20, $21, $22, NOW()
+        $8, $9, $10, $11, $12, $13, $14::jsonb,
+        $15::jsonb, $16::jsonb, $17::jsonb, $18, $19,
+        $20, $21, $22, $23, NOW()
       )`,
       [
         code,
@@ -280,6 +285,7 @@ export async function replaceCountryRecipes(
         recipe.servings,
         recipe.prepMinutes,
         recipe.cookMinutes,
+        recipe.waitTime?.trim() || null,
         recipe.difficulty,
         JSON.stringify(recipe.dietaryLabels),
         JSON.stringify(recipe.ingredients),
@@ -440,14 +446,14 @@ export async function appendMoreRecipes(
     await db.query(
       `INSERT INTO recipes (
         country_code, id, menu_slot, sort_order, name, local_name, description,
-        category, servings, prep_minutes, cook_minutes, difficulty, dietary_labels,
+        category, servings, prep_minutes, cook_minutes, wait_time, difficulty, dietary_labels,
         ingredients, steps, substitutions, serving_suggestion, drink_pairing,
         image_url, image_attribution, source_url, video_url, updated_at
       ) VALUES (
         $1, $2, 'more', $3, $4, $5, $6,
-        $7, $8, $9, $10, $11, $12::jsonb,
-        $13::jsonb, $14::jsonb, $15::jsonb, $16, $17,
-        $18, $19, $20, $21, NOW()
+        $7, $8, $9, $10, $11, $12, $13::jsonb,
+        $14::jsonb, $15::jsonb, $16::jsonb, $17, $18,
+        $19, $20, $21, $22, NOW()
       )
       ON CONFLICT (country_code, id) DO UPDATE SET
         menu_slot = EXCLUDED.menu_slot,
@@ -459,6 +465,7 @@ export async function appendMoreRecipes(
         servings = EXCLUDED.servings,
         prep_minutes = EXCLUDED.prep_minutes,
         cook_minutes = EXCLUDED.cook_minutes,
+        wait_time = EXCLUDED.wait_time,
         difficulty = EXCLUDED.difficulty,
         dietary_labels = EXCLUDED.dietary_labels,
         ingredients = EXCLUDED.ingredients,
@@ -482,6 +489,7 @@ export async function appendMoreRecipes(
         saved.servings,
         saved.prepMinutes,
         saved.cookMinutes,
+        saved.waitTime?.trim() || null,
         saved.difficulty,
         JSON.stringify(saved.dietaryLabels),
         JSON.stringify(saved.ingredients),
@@ -549,17 +557,18 @@ export async function updateRecipeFields(
       servings = $7,
       prep_minutes = $8,
       cook_minutes = $9,
-      difficulty = $10,
-      dietary_labels = $11::jsonb,
-      ingredients = $12::jsonb,
-      steps = $13::jsonb,
-      substitutions = $14::jsonb,
-      serving_suggestion = $15,
-      drink_pairing = $16,
-      image_url = $17,
-      image_attribution = $18,
-      source_url = $19,
-      video_url = $20,
+      wait_time = $10,
+      difficulty = $11,
+      dietary_labels = $12::jsonb,
+      ingredients = $13::jsonb,
+      steps = $14::jsonb,
+      substitutions = $15::jsonb,
+      serving_suggestion = $16,
+      drink_pairing = $17,
+      image_url = $18,
+      image_attribution = $19,
+      source_url = $20,
+      video_url = $21,
       updated_at = NOW()
      WHERE country_code = $1 AND id = $2`,
     [
@@ -572,6 +581,7 @@ export async function updateRecipeFields(
       next.servings,
       next.prepMinutes,
       next.cookMinutes,
+      next.waitTime?.trim() || null,
       next.difficulty,
       JSON.stringify(next.dietaryLabels),
       JSON.stringify(next.ingredients),
@@ -585,6 +595,9 @@ export async function updateRecipeFields(
       next.videoUrl ?? null,
     ],
   );
+  if (!next.waitTime?.trim()) {
+    delete next.waitTime;
+  }
   return next;
 }
 
@@ -836,6 +849,17 @@ export async function updateCountryDrink(
   return { country: next, drink: updatedDrink };
 }
 
+function dinnerBaseForMutation(country: Country): DinnerSuggestion {
+  const suggestion = getDinnerSuggestion(country);
+  if (suggestion) return suggestion;
+  return {
+    title: `A taste of ${country.name}`,
+    description: country.introduction,
+    courses: [],
+    drinks: country.dinner?.drinks ?? [],
+  };
+}
+
 /** Append a drink to the dinner pour list (does not replace existing drinks). */
 export async function addDrinkToDinner(
   countryCode: string,
@@ -849,15 +873,7 @@ export async function addDrinkToDinner(
   );
   if (!drink) throw new Error("Drink not found.");
 
-  const base =
-    country.dinner && country.dinner.courses.length > 0
-      ? country.dinner
-      : {
-          title: `A taste of ${country.name}`,
-          description: country.introduction,
-          courses: [] as DinnerSuggestion["courses"],
-          drinks: [] as DinnerSuggestion["drinks"],
-        };
+  const base = dinnerBaseForMutation(country);
 
   const already = base.drinks.some(
     (item) => item.drinkName.trim().toLowerCase() === drinkKey(drink),
@@ -879,12 +895,17 @@ export async function removeDinnerCourse(
   recipeId: string,
 ): Promise<Country | undefined> {
   const country = await getCountryFromDb(countryCode);
-  if (!country?.dinner) return country;
+  if (!country) return undefined;
+  const base = dinnerBaseForMutation(country);
+  const nextCourses = base.courses.filter(
+    (course) => course.recipeId !== recipeId,
+  );
+  if (nextCourses.length === base.courses.length) {
+    return country;
+  }
   const dinner: DinnerSuggestion = {
-    ...country.dinner,
-    courses: country.dinner.courses.filter(
-      (course) => course.recipeId !== recipeId,
-    ),
+    ...base,
+    courses: nextCourses,
     composedAt: new Date().toISOString(),
   };
   return saveDinnerSuggestion(countryCode, dinner);
@@ -895,13 +916,20 @@ export async function removeDinnerDrink(
   drinkName: string,
 ): Promise<Country | undefined> {
   const country = await getCountryFromDb(countryCode);
-  if (!country?.dinner) return country;
+  if (!country) return undefined;
+
+  const base = dinnerBaseForMutation(country);
   const needle = drinkName.trim().toLowerCase();
+  const nextDrinks = base.drinks.filter(
+    (item) => item.drinkName.trim().toLowerCase() !== needle,
+  );
+  if (nextDrinks.length === base.drinks.length) {
+    return country;
+  }
+
   const dinner: DinnerSuggestion = {
-    ...country.dinner,
-    drinks: country.dinner.drinks.filter(
-      (item) => item.drinkName.trim().toLowerCase() !== needle,
-    ),
+    ...base,
+    drinks: nextDrinks,
     composedAt: new Date().toISOString(),
   };
   return saveDinnerSuggestion(countryCode, dinner);
@@ -991,30 +1019,7 @@ export async function selectRecipeForDinner(
   }
 
   const role = row.recipe.category;
-  const base =
-    country.dinner && country.dinner.courses.length > 0
-      ? country.dinner
-      : {
-          title: `A taste of ${country.name}`,
-          description: country.introduction,
-          courses: [] as DinnerSuggestion["courses"],
-          drinks: country.dinner?.drinks ??
-            (country.menu?.drink
-              ? [
-                  {
-                    drinkName: country.menu.drink.name,
-                    note: "The pour that belongs with this table.",
-                  },
-                ]
-              : country.nationalDrink
-                ? [
-                    {
-                      drinkName: country.nationalDrink.name,
-                      note: "A classic pour with this cuisine.",
-                    },
-                  ]
-                : []),
-        };
+  const base = dinnerBaseForMutation(country);
 
   const withoutRecipe = base.courses.filter(
     (course) => course.recipeId !== recipeId,

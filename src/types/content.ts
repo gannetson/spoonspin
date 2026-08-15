@@ -43,6 +43,8 @@ export type Recipe = {
   servings: number;
   prepMinutes: number;
   cookMinutes: number;
+  /** Passive wait / rest / ferment time as free text (e.g. "48 hours", "4 days"). */
+  waitTime?: string;
   difficulty: Difficulty;
   dietaryLabels: string[];
   ingredients: Ingredient[];

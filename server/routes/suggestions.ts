@@ -71,6 +71,7 @@ const recipeConfirmSchema = z.object({
     servings: z.coerce.number().int().positive(),
     prepMinutes: z.coerce.number().int().nonnegative(),
     cookMinutes: z.coerce.number().int().nonnegative(),
+    waitTime: optionalText,
     difficulty: z.enum(["easy", "medium", "challenging"]),
     dietaryLabels: z.array(z.string()).nullish().transform((v) => v ?? []),
     ingredients: z

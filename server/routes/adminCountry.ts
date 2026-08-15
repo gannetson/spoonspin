@@ -106,6 +106,7 @@ const recipeSchema = z.object({
   servings: z.number().int().positive(),
   prepMinutes: z.number().int().nonnegative(),
   cookMinutes: z.number().int().nonnegative(),
+  waitTime: z.string().min(1).max(120).nullish(),
   difficulty: z.enum(["easy", "medium", "challenging"]),
   dietaryLabels: z.array(z.string()),
   ingredients: z
@@ -133,6 +134,11 @@ const recipeCopyPatchSchema = z
   .object({
     localName: z.string().max(200).nullish(),
     description: z.string().min(20).max(8000).optional(),
+    servings: z.number().int().positive().max(100).optional(),
+    prepMinutes: z.number().int().nonnegative().max(24 * 60).optional(),
+    cookMinutes: z.number().int().nonnegative().max(24 * 60).optional(),
+    waitTime: z.string().max(120).nullish(),
+    difficulty: z.enum(["easy", "medium", "challenging"]).optional(),
     dietaryLabels: z.array(z.string().min(1).max(80)).max(24).optional(),
     ingredients: z
       .array(
@@ -154,6 +160,11 @@ const recipeCopyPatchSchema = z
     (value) =>
       value.localName !== undefined ||
       value.description !== undefined ||
+      value.servings !== undefined ||
+      value.prepMinutes !== undefined ||
+      value.cookMinutes !== undefined ||
+      value.waitTime !== undefined ||
+      value.difficulty !== undefined ||
       value.dietaryLabels !== undefined ||
       value.ingredients !== undefined ||
       value.steps !== undefined ||
@@ -1895,6 +1906,21 @@ export function registerAdminCountryRoutes(
         }
         if (body.description !== undefined) {
           patch.description = body.description.trim();
+        }
+        if (body.servings !== undefined) {
+          patch.servings = body.servings;
+        }
+        if (body.prepMinutes !== undefined) {
+          patch.prepMinutes = body.prepMinutes;
+        }
+        if (body.cookMinutes !== undefined) {
+          patch.cookMinutes = body.cookMinutes;
+        }
+        if (body.waitTime !== undefined) {
+          patch.waitTime = body.waitTime?.trim() || undefined;
+        }
+        if (body.difficulty !== undefined) {
+          patch.difficulty = body.difficulty;
         }
         if (body.dietaryLabels !== undefined) {
           patch.dietaryLabels = body.dietaryLabels.map((label) => label.trim());

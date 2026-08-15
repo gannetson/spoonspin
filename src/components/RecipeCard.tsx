@@ -144,6 +144,11 @@ export function RecipeCard({
                     minutes: recipe.prepMinutes + recipe.cookMinutes,
                   })}
                 </span>
+                {recipe.waitTime?.trim() ? (
+                  <span className="inline-flex items-center gap-1">
+                    {t("cook.meta.wait", { wait: recipe.waitTime.trim() })}
+                  </span>
+                ) : null}
                 <span className="inline-flex items-center gap-1 capitalize">
                   <Flame aria-hidden="true" className="size-3.5" />
                   {t(DIFFICULTY_KEYS[recipe.difficulty])}

@@ -39,6 +39,12 @@ export function EditRecipeModal({
   const [section, setSection] = useState<SectionId>("description");
   const [localName, setLocalName] = useState("");
   const [description, setDescription] = useState("");
+  const [servings, setServings] = useState(4);
+  const [prepMinutes, setPrepMinutes] = useState(0);
+  const [cookMinutes, setCookMinutes] = useState(0);
+  const [waitTime, setWaitTime] = useState("");
+  const [difficulty, setDifficulty] =
+    useState<Recipe["difficulty"]>("medium");
   const [dietaryLabels, setDietaryLabels] = useState("");
   const [ingredients, setIngredients] = useState<Ingredient[]>([]);
   const [stepsText, setStepsText] = useState("");
@@ -53,6 +59,11 @@ export function EditRecipeModal({
     setSection("description");
     setLocalName(recipe.localName ?? "");
     setDescription(recipe.description);
+    setServings(recipe.servings);
+    setPrepMinutes(recipe.prepMinutes);
+    setCookMinutes(recipe.cookMinutes);
+    setWaitTime(recipe.waitTime ?? "");
+    setDifficulty(recipe.difficulty);
     setDietaryLabels((recipe.dietaryLabels ?? []).join(", "));
     setIngredients(
       recipe.ingredients.map((item) => ({
@@ -90,6 +101,12 @@ export function EditRecipeModal({
       if (description.trim().length < 20) {
         throw new Error(t("admin.recipe.edit.error.description"));
       }
+      if (!(servings >= 1)) {
+        throw new Error(t("admin.recipe.edit.error.servings"));
+      }
+      if (prepMinutes < 0 || cookMinutes < 0) {
+        throw new Error(t("admin.recipe.edit.error.times"));
+      }
       if (ingredients.length < 2) {
         throw new Error(t("admin.recipe.edit.error.ingredients"));
       }
@@ -105,6 +122,11 @@ export function EditRecipeModal({
       const result = await patchRecipeFields(country.code, recipe.id, {
         localName: localName.trim() || null,
         description: description.trim(),
+        servings,
+        prepMinutes,
+        cookMinutes,
+        waitTime: waitTime.trim() || null,
+        difficulty,
         dietaryLabels: dietaryLabels
           .split(",")
           .map((label) => label.trim())
@@ -217,6 +239,93 @@ export function EditRecipeModal({
                     className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
                   />
                 </label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="text-sm font-medium text-ink-soft">
+                      {t("admin.recipe.edit.servings")}
+                    </span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={100}
+                      step={1}
+                      value={servings}
+                      onChange={(event) =>
+                        setServings(Number(event.target.value))
+                      }
+                      className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-ink-soft">
+                      {t("admin.recipe.edit.difficulty")}
+                    </span>
+                    <select
+                      value={difficulty}
+                      onChange={(event) =>
+                        setDifficulty(
+                          event.target.value as Recipe["difficulty"],
+                        )
+                      }
+                      className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                    >
+                      <option value="easy">
+                        {t("recipe.difficulty.easy")}
+                      </option>
+                      <option value="medium">
+                        {t("recipe.difficulty.medium")}
+                      </option>
+                      <option value="challenging">
+                        {t("recipe.difficulty.challenging")}
+                      </option>
+                    </select>
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-ink-soft">
+                      {t("admin.recipe.edit.prepMinutes")}
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={1440}
+                      step={1}
+                      value={prepMinutes}
+                      onChange={(event) =>
+                        setPrepMinutes(Number(event.target.value))
+                      }
+                      className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                    />
+                  </label>
+                  <label className="block">
+                    <span className="text-sm font-medium text-ink-soft">
+                      {t("admin.recipe.edit.cookMinutes")}
+                    </span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={1440}
+                      step={1}
+                      value={cookMinutes}
+                      onChange={(event) =>
+                        setCookMinutes(Number(event.target.value))
+                      }
+                      className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                    />
+                  </label>
+                  <label className="block sm:col-span-2">
+                    <span className="text-sm font-medium text-ink-soft">
+                      {t("admin.recipe.edit.waitTime")}
+                    </span>
+                    <input
+                      type="text"
+                      value={waitTime}
+                      onChange={(event) => setWaitTime(event.target.value)}
+                      placeholder={t("admin.recipe.edit.waitTime.placeholder")}
+                      maxLength={120}
+                      className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                    />
+                  </label>
+                </div>
                 <label className="block">
                   <span className="text-sm font-medium text-ink-soft">
                     {t("admin.recipe.edit.description")}

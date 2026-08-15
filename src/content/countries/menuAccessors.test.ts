@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   drinkMatchesAlcohol,
+  getDinnerSuggestion,
   groupDrinksIntoSections,
   recipeMatchesDiet,
 } from "./menuAccessors";
-import type { Drink, Recipe } from "@/types/content";
+import type { Country, Drink, Recipe } from "@/types/content";
 
 const sample = (
   name: string,
@@ -95,5 +96,64 @@ describe("recipeMatchesDiet", () => {
     expect(recipeMatchesDiet(meat, "vegetarian")).toBe(false);
     expect(recipeMatchesDiet(meat, "meat")).toBe(true);
     expect(recipeMatchesDiet(vegan, "meat")).toBe(false);
+  });
+});
+
+describe("getDinnerSuggestion", () => {
+  const dish = (id: string, category: Recipe["category"]): Recipe => ({
+    ...recipe([]),
+    id,
+    category,
+  });
+
+  const countryWithMenu = {
+    code: "nl",
+    name: "Netherlands",
+    introduction: "Intro",
+    menu: {
+      starter: dish("starter-1", "starter"),
+      main: dish("main-1", "main"),
+      side: dish("side-1", "side"),
+      dessert: dish("dessert-1", "dessert"),
+      drink: sample("Jenever", "spirit", true),
+    },
+  } as Country;
+
+  it("derives dinner drinks from the cook menu when dinner_json is missing", () => {
+    const dinner = getDinnerSuggestion(countryWithMenu);
+    expect(dinner?.drinks.map((item) => item.drinkName)).toEqual(["Jenever"]);
+    expect(dinner?.courses).toHaveLength(4);
+  });
+
+  it("keeps drink-only dinner_json pours on derived menu courses", () => {
+    const dinner = getDinnerSuggestion({
+      ...countryWithMenu,
+      dinner: {
+        title: "Custom",
+        description: "Desc",
+        courses: [],
+        drinks: [{ drinkName: "Heineken" }, { drinkName: "Jenever" }],
+      },
+    });
+    expect(dinner?.courses).toHaveLength(4);
+    expect(dinner?.drinks.map((item) => item.drinkName)).toEqual([
+      "Heineken",
+      "Jenever",
+    ]);
+  });
+
+  it("prefers stored dinner when courses exist", () => {
+    const dinner = getDinnerSuggestion({
+      ...countryWithMenu,
+      dinner: {
+        title: "Stored",
+        description: "Desc",
+        courses: [{ recipeId: "main-1", role: "main" }],
+        drinks: [{ drinkName: "Heineken" }],
+      },
+    });
+    expect(dinner?.title).toBe("Stored");
+    expect(dinner?.courses).toHaveLength(1);
+    expect(dinner?.drinks.map((item) => item.drinkName)).toEqual(["Heineken"]);
   });
 });

@@ -257,6 +257,11 @@ export function replaceRecipeText(code: string, recipeId: string) {
 export type RecipeCopyPatch = {
   localName?: string | null;
   description?: string;
+  servings?: number;
+  prepMinutes?: number;
+  cookMinutes?: number;
+  waitTime?: string | null;
+  difficulty?: Recipe["difficulty"];
   dietaryLabels?: string[];
   ingredients?: Recipe["ingredients"];
   steps?: string[];

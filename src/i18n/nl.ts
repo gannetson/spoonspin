@@ -16,10 +16,12 @@ export const nl: Messages = {
   "app.spin.ariaLabel": "Draaien voor een land",
   "app.result.ariaLabel": "Resultaat voor {name}",
   "app.mode.cook": "Koken",
-  "app.mode.cook.descriptionReady": "Kook een typisch menu thuis",
-  "app.mode.cook.descriptionSoon": "Recepten komen eraan — overzicht beschikbaar",
+  "app.mode.cook.descriptionReady": "Thuis koken",
+  "app.mode.cook.descriptionSoon": "Recepten komen eraan",
   "app.mode.dine": "Uit eten",
-  "app.mode.dine.description": "Eet buiten de deur of bestel bezorging in Nederland",
+  "app.mode.dine.description": "Buiten de deur",
+  "app.mode.order": "Bestellen",
+  "app.mode.order.description": "Thuis bestellen",
   "app.countrySelect.labelResult": "Of kies een land",
   "app.share.title": "Spoon Spin: {name}",
   "app.lang.en": "EN",
@@ -158,6 +160,7 @@ export const nl: Messages = {
   "cook.badge.dinner": "vanavond op tafel",
   "cook.badge.community": "community",
   "cook.meta.minutes": "{minutes} min",
+  "cook.meta.wait": "+ {wait} wachten",
   "cook.empty.recipes":
     "Geen recepten passen bij deze filters. Probeer een andere gang of dieet.",
   "cook.drinks.heading": "Dranken",
@@ -192,6 +195,7 @@ export const nl: Messages = {
   "recipe.meta.servings": "Porties",
   "recipe.meta.prep": "Voorbereiding",
   "recipe.meta.cook": "Bereiding",
+  "recipe.meta.wait": "Wachttijd",
   "recipe.meta.difficulty": "Moeilijkheid",
   "recipe.meta.minutes": "{minutes} min",
   "recipe.dietaryLabels.aria": "Dieetlabels",
@@ -212,6 +216,9 @@ export const nl: Messages = {
   "dine.subtitle.out":
     "Vind beoordeelde restaurants met keuken uit {name} binnen ongeveer 100 km.",
   "dine.subtitle.home":
+    "Samengestelde bezorg- en afhaalopties voor keuken uit {name}.",
+  "order.heading": "Thuis bestellen",
+  "order.subtitle":
     "Samengestelde bezorg- en afhaalopties voor keuken uit {name}.",
   "dine.tabs.label": "Uit eten-secties",
   "dine.tabs.out": "Uit eten",
@@ -526,6 +533,7 @@ export const nl: Messages = {
   "admin.country.menu": "Admin-tools",
   "admin.cook.menu": "Menutools",
   "admin.dine.menu": "Uit eten-tools",
+  "admin.order.menu": "Bestel-tools",
   "admin.dine.findRestaurants": "Restaurants zoeken",
   "admin.dine.findRestaurants.hint":
     "Ontdek beoordeelde restaurants om uit eten te gaan",
@@ -627,19 +635,25 @@ export const nl: Messages = {
   "admin.selectImage.upload": "Bestand kiezen",
   "admin.item.editRecipe": "Recept bewerken",
   "admin.item.editRecipe.hint":
-    "Bewerk handmatig beschrijving, ingrediënten, stappen en meer",
+    "Bewerk handmatig beschrijving, porties, tijden, ingrediënten, stappen en meer",
   "admin.item.replaceText": "Tekst vervangen",
   "admin.item.replaceText.hint": "Onderzoek en werk de tekst bij",
   "admin.recipe.edit.eyebrow": "Recept",
   "admin.recipe.edit.title": "{name} bewerken",
   "admin.recipe.edit.subtitle":
-    "Werk tekstvelden bij. Naam, tijden en categorie blijven zoals ze zijn.",
+    "Pas beschrijving, porties, tijden, moeilijkheid, ingrediënten, stappen en extra’s aan.",
   "admin.recipe.edit.close": "Sluiten",
   "admin.recipe.edit.section.description": "Beschrijving",
   "admin.recipe.edit.section.ingredients": "Ingrediënten",
   "admin.recipe.edit.section.steps": "Stappen",
   "admin.recipe.edit.section.extras": "Extra",
   "admin.recipe.edit.localName": "Lokale naam",
+  "admin.recipe.edit.servings": "Porties",
+  "admin.recipe.edit.prepMinutes": "Voorbereiding (minuten)",
+  "admin.recipe.edit.cookMinutes": "Bereiding (minuten)",
+  "admin.recipe.edit.waitTime": "Wachttijd (optioneel)",
+  "admin.recipe.edit.waitTime.placeholder": "bijv. 48 uur, overnight, 4 dagen",
+  "admin.recipe.edit.difficulty": "Moeilijkheid",
   "admin.recipe.edit.description": "Beschrijving",
   "admin.recipe.edit.ingredient.name": "Ingrediënt",
   "admin.recipe.edit.ingredient.qty": "Hvh",
@@ -661,6 +675,9 @@ export const nl: Messages = {
   "admin.recipe.edit.cancel": "Annuleren",
   "admin.recipe.edit.error.description":
     "Beschrijving moet minstens 20 tekens zijn.",
+  "admin.recipe.edit.error.servings": "Porties moeten minstens 1 zijn.",
+  "admin.recipe.edit.error.times":
+    "Voorbereidings- en bereidingstijd mogen niet negatief zijn.",
   "admin.recipe.edit.error.ingredients": "Voeg minstens twee ingrediënten toe.",
   "admin.recipe.edit.error.steps": "Voeg minstens drie stappen toe (één per regel).",
   "admin.recipe.edit.error.ingredientRow":

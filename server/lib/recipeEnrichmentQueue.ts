@@ -129,6 +129,7 @@ async function expandStub(job: RecipeEnrichmentJob): Promise<void> {
     servings: recipe.servings,
     prepMinutes: recipe.prepMinutes,
     cookMinutes: recipe.cookMinutes,
+    ...(recipe.waitTime ? { waitTime: recipe.waitTime } : {}),
     difficulty: recipe.difficulty,
     dietaryLabels: recipe.dietaryLabels,
     ingredients: recipe.ingredients,

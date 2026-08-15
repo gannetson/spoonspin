@@ -1,21 +1,8 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import {
-  ExternalLink,
-  Home,
-  LoaderCircle,
-  MapPin,
-  Plus,
-  RotateCcw,
-  Utensils,
-} from "lucide-react";
-import type { Country, OrderPlatform } from "@/types/content";
+import { ExternalLink, LoaderCircle, Plus, RotateCcw } from "lucide-react";
+import type { Country } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
-import { useConsent } from "@/consent/ConsentContext";
-import { usePublicConfig } from "@/lib/usePublicConfig";
 import { fetchRestaurants } from "@/restaurants/client";
-import { getOrderOptions } from "@/content/countries/menuAccessors";
-import { deliveryPlatformLinks, resolveOrderOptionHref } from "@/restaurants/deliveryLinks";
-import { platformLogoSrc } from "@/restaurants/platformLogos";
 import type { Restaurant } from "@/restaurants/types";
 import {
   sortRestaurants,
@@ -32,7 +19,6 @@ import {
 import { dineBannerUrl } from "@/content/countries/cuisineImages";
 import { SuggestModal } from "@/components/SuggestModal";
 import { RestaurantCard } from "@/components/RestaurantCard";
-import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { AdminDineMenu } from "@/components/AdminDineMenu";
 import { DineLocationControl } from "@/components/DineLocationControl";
 import {
@@ -42,7 +28,6 @@ import {
 } from "@/components/SuggestedItemReview";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import {
-  handleOrderOptionAdminAction,
   handleRestaurantAdminAction,
   useAdminItemBusy,
 } from "@/admin/itemActions";
@@ -90,10 +75,6 @@ const SORT_OPTION_KEYS: Record<RestaurantSortMode, string> = {
   rating: "dine.sort.rating",
 };
 
-type DineTab = "out" | "home";
-
-const DINE_TABS: DineTab[] = ["out", "home"];
-
 export function DineSearch({
   country,
   onOpenRestaurant,
@@ -102,8 +83,6 @@ export function DineSearch({
   onRestaurantsAdded,
 }: DineSearchProps) {
   const t = useT();
-  const { marketingAllowed } = useConsent();
-  const publicConfig = usePublicConfig();
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
@@ -112,7 +91,6 @@ export function DineSearch({
   const savedCity = getSavedDineCity();
   const rememberPreferred = getRememberCityPreference();
 
-  const [tab, setTab] = useState<DineTab>("out");
   const [cityOrPostcode, setCityOrPostcode] = useState(
     savedCity ?? DEFAULT_DINE_CITY,
   );
@@ -196,8 +174,7 @@ export function DineSearch({
         status: "empty",
         mapsSearchUrl: result.mapsSearchUrl,
         message:
-          result.message ??
-          t("dine.empty.default", { name: country.name }),
+          result.message ?? t("dine.empty.default", { name: country.name }),
       });
       return;
     }
@@ -292,15 +269,7 @@ export function DineSearch({
           lng: position.coords.longitude,
         };
         setVisitorLocation(next);
-        if (tab === "out") {
-          void runSearch(next);
-        } else {
-          const city = cityOrPostcode.trim();
-          if (rememberCity && city) {
-            saveDineLocation(city, next);
-            setEditingLocation(false);
-          }
-        }
+        void runSearch(next);
       },
       () => {
         setLocationError(t("dine.locationDenied"));
@@ -322,47 +291,8 @@ export function DineSearch({
     setVisitorLocation(undefined);
   }
 
-  function confirmHomeLocation() {
-    const city = cityOrPostcode.trim();
-    setLocationError(null);
-    if (!city) {
-      setLocationError(t("dine.locationRequired"));
-      return;
-    }
-    if (rememberCity) {
-      saveDineLocation(city, visitorLocation);
-    }
-    setEditingLocation(false);
-  }
-
   const showLocationForm = editingLocation || !rememberCity;
   const bannerUrl = dineBannerUrl(country);
-  const orderOptions = useMemo(() => getOrderOptions(country), [country]);
-  const filteredOrderOptions = useMemo(() => {
-    const needle = cityOrPostcode.trim().toLowerCase();
-    if (!needle || /^\d{4}/.test(needle)) return orderOptions;
-    const matched = orderOptions.filter((option) =>
-      option.city?.toLowerCase().includes(needle),
-    );
-    return matched.length > 0 ? matched : orderOptions;
-  }, [orderOptions, cityOrPostcode]);
-  const orderLinks = useMemo(
-    () =>
-      deliveryPlatformLinks({
-        countryCode: country.code,
-        countryName: country.name,
-        cityOrPostcode,
-        marketingAllowed,
-      }),
-    [
-      country.code,
-      country.name,
-      cityOrPostcode,
-      marketingAllowed,
-      publicConfig.awinPublisherId,
-      publicConfig.awinThuisbezorgdMid,
-    ],
-  );
 
   return (
     <section aria-labelledby="dine-heading" className="space-y-5">
@@ -395,16 +325,12 @@ export function DineSearch({
                 {t("dine.heading")}
               </h2>
               <p className="mt-2 max-w-lg text-cream/85">
-                {t(
-                  tab === "home" ? "dine.subtitle.home" : "dine.subtitle.out",
-                  { name: country.name },
-                )}
+                {t("dine.subtitle.out", { name: country.name })}
               </p>
             </div>
             {isAdmin && onCountryUpdated && onRestaurantsAdded ? (
               <AdminDineMenu
                 country={country}
-                cityOrPostcode={cityOrPostcode}
                 onCountryUpdated={onCountryUpdated}
                 onRestaurantsAdded={onRestaurantsAdded}
                 tone="dark"
@@ -414,396 +340,170 @@ export function DineSearch({
         </div>
       </div>
 
-      <div
-        role="tablist"
-        aria-label={t("dine.tabs.label")}
-        className="flex flex-wrap gap-2 rounded-2xl bg-cream p-2 ring-1 ring-ink/10"
-      >
-        {DINE_TABS.map((value) => {
-          const active = tab === value;
-          return (
-            <button
-              key={value}
-              type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => setTab(value)}
-              className={`inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-sm font-semibold transition ${
-                active
-                  ? "bg-burgundy text-cream"
-                  : "text-burgundy hover:bg-burgundy/5"
-              }`}
-            >
-              {value === "out" ? (
-                <Utensils aria-hidden="true" className="size-4" />
-              ) : (
-                <Home aria-hidden="true" className="size-4" />
-              )}
-              {t(`dine.tabs.${value}`)}
-            </button>
-          );
-        })}
-      </div>
-
-      {tab === "out" ? (
-        <div role="tabpanel" className="space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => setSuggestOpen(true)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              {t("dine.suggestRestaurant")}
-            </button>
-          </div>
-
-          <DineLocationControl
-            cityOrPostcode={cityOrPostcode}
-            onCityChange={onCityChange}
-            rememberCity={rememberCity}
-            onRememberChange={onRememberChange}
-            showForm={showLocationForm}
-            onEdit={() => setEditingLocation(true)}
-            onSubmit={() => {
-              void runSearch();
-            }}
-            onUseMyLocation={useMyLocation}
-            locationError={locationError}
-            summaryKey="dine.searchingNear"
-            submitKey="dine.searchRestaurants"
-          />
-
-          {state.status === "loading" ? (
-            <p
-              className="inline-flex items-center gap-2 text-ink-soft"
-              role="status"
-            >
-              <LoaderCircle
-                aria-hidden="true"
-                className="size-5 animate-spin"
-              />
-              {t("dine.searching")}
-            </p>
-          ) : null}
-
-          {state.status === "error" ? (
-            <div
-              className="rounded-2xl border border-tomato/30 bg-cream p-5"
-              role="alert"
-            >
-              <p className="font-semibold text-ink">{state.message}</p>
-              <div className="mt-3 flex flex-wrap gap-3">
-                <button
-                  type="button"
-                  onClick={() => void runSearch()}
-                  className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-cream"
-                >
-                  <RotateCcw aria-hidden="true" className="size-4" />
-                  {t("dine.retry")}
-                </button>
-                <MapsLink href={state.mapsSearchUrl} />
-              </div>
-            </div>
-          ) : null}
-
-          {state.status === "empty" ? (
-            <div className="rounded-2xl border border-dashed border-stamp/40 bg-white/50 p-5">
-              <p className="text-ink">{state.message}</p>
-              <div className="mt-3">
-                <MapsLink href={state.mapsSearchUrl} />
-              </div>
-            </div>
-          ) : null}
-
-          {state.status === "ready" ? (
-            <div className="grid gap-3">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-sm text-ink-soft">
-                  {sortedRestaurants.length === 1
-                    ? t("dine.results.count", {
-                        count: sortedRestaurants.length,
-                        location: cityOrPostcode,
-                      })
-                    : t("dine.results.countPlural", {
-                        count: sortedRestaurants.length,
-                        location: cityOrPostcode,
-                      })}
-                </p>
-                <div className="flex items-center gap-2">
-                  <label
-                    htmlFor={sortId}
-                    className="text-sm font-semibold text-ink"
-                  >
-                    {t("dine.sortBy")}
-                  </label>
-                  <select
-                    id={sortId}
-                    value={sortMode}
-                    onChange={(event) =>
-                      setSortMode(event.target.value as RestaurantSortMode)
-                    }
-                    className="min-h-11 rounded-xl border border-ink/20 bg-white px-3 text-sm text-ink"
-                  >
-                    {sortOptions.map((option) => (
-                      <option key={option.value} value={option.value}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              <ul className="grid gap-3">
-                {sortedRestaurants.map((restaurant) => (
-                  <RestaurantCard
-                    key={restaurant.id}
-                    restaurant={restaurant}
-                    countryCode={country.code}
-                    onOpen={() => onOpenRestaurant(restaurant)}
-                    isAdmin={isAdmin}
-                    adminBusy={Boolean(busy[`restaurant:${restaurant.id}`])}
-                    adminStatus={status[`restaurant:${restaurant.id}`]}
-                    adminError={error[`restaurant:${restaurant.id}`]}
-                    onAdminAction={(action) => {
-                      void run(`restaurant:${restaurant.id}`, () =>
-                        handleRestaurantAdminAction({
-                          action,
-                          countryName: country.name,
-                          countryCode: country.code,
-                          restaurant,
-                          openSelectImage,
-                          onUpdated: (next) => {
-                            setState((prev) => {
-                              if (prev.status !== "ready") return prev;
-                              return {
-                                ...prev,
-                                restaurants: prev.restaurants.map((item) =>
-                                  item.id === next.id
-                                    ? {
-                                        ...item,
-                                        ...next,
-                                        distanceKm: item.distanceKm,
-                                      }
-                                    : item,
-                                ),
-                              };
-                            });
-                          },
-                          onRemoved: (id) => {
-                            setState((prev) => {
-                              if (prev.status !== "ready") return prev;
-                              return {
-                                ...prev,
-                                restaurants: prev.restaurants.filter(
-                                  (item) => item.id !== id,
-                                ),
-                              };
-                            });
-                          },
-                        }),
-                      );
-                    }}
-                  />
-                ))}
-              </ul>
-            </div>
-          ) : null}
-
-          {state.status === "idle" && showLocationForm ? (
-            <p className="text-sm text-ink-soft">{t("dine.idleHint")}</p>
-          ) : null}
+      <div className="space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setSuggestOpen(true)}
+            className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+          >
+            <Plus aria-hidden="true" className="size-4" />
+            {t("dine.suggestRestaurant")}
+          </button>
         </div>
-      ) : null}
 
-      {tab === "home" ? (
-        <div role="tabpanel" className="space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => setSuggestOpen(true)}
-              className="inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 bg-cream px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              {t("dine.suggestOrder")}
-            </button>
+        <DineLocationControl
+          cityOrPostcode={cityOrPostcode}
+          onCityChange={onCityChange}
+          rememberCity={rememberCity}
+          onRememberChange={onRememberChange}
+          showForm={showLocationForm}
+          onEdit={() => setEditingLocation(true)}
+          onSubmit={() => {
+            void runSearch();
+          }}
+          onUseMyLocation={useMyLocation}
+          locationError={locationError}
+          summaryKey="dine.searchingNear"
+          submitKey="dine.searchRestaurants"
+        />
+
+        {state.status === "loading" ? (
+          <p
+            className="inline-flex items-center gap-2 text-ink-soft"
+            role="status"
+          >
+            <LoaderCircle aria-hidden="true" className="size-5 animate-spin" />
+            {t("dine.searching")}
+          </p>
+        ) : null}
+
+        {state.status === "error" ? (
+          <div
+            className="rounded-2xl border border-tomato/30 bg-cream p-5"
+            role="alert"
+          >
+            <p className="font-semibold text-ink">{state.message}</p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => void runSearch()}
+                className="inline-flex min-h-11 items-center gap-2 rounded-full bg-ink px-4 text-sm font-semibold text-cream"
+              >
+                <RotateCcw aria-hidden="true" className="size-4" />
+                {t("dine.retry")}
+              </button>
+              <MapsLink href={state.mapsSearchUrl} />
+            </div>
           </div>
+        ) : null}
 
-          <DineLocationControl
-            cityOrPostcode={cityOrPostcode}
-            onCityChange={onCityChange}
-            rememberCity={rememberCity}
-            onRememberChange={onRememberChange}
-            showForm={showLocationForm}
-            onEdit={() => setEditingLocation(true)}
-            onSubmit={confirmHomeLocation}
-            onUseMyLocation={useMyLocation}
-            locationError={locationError}
-            summaryKey="dine.orderingNear"
-            submitKey="dine.setLocation"
-          />
-
-          <div className="rounded-2xl bg-cream p-5 ring-1 ring-ink/10 sm:p-6">
-            <h3 className="font-display text-2xl text-burgundy">
-              {t("dine.order.heading")}
-            </h3>
-            <p className="mt-2 max-w-2xl text-ink-soft">
-              {t("dine.order.subtitle", { name: country.name })}
-            </p>
-            <p className="mt-3 text-sm text-ink-soft">{t("dine.order.note")}</p>
+        {state.status === "empty" ? (
+          <div className="rounded-2xl border border-dashed border-stamp/40 bg-white/50 p-5">
+            <p className="text-ink">{state.message}</p>
+            <div className="mt-3">
+              <MapsLink href={state.mapsSearchUrl} />
+            </div>
           </div>
+        ) : null}
 
-          {filteredOrderOptions.length > 0 ? (
-            <ul className="grid gap-3">
-              {filteredOrderOptions.map((option) => (
-                <li
-                  key={option.id}
-                  className="relative overflow-hidden rounded-2xl bg-cream ring-1 ring-ink/10"
-                >
-                  {isAdmin && onCountryUpdated ? (
-                    <AdminItemMenu
-                      className="absolute right-3 top-3 z-10"
-                      label={option.name}
-                      busy={Boolean(busy[`order:${option.id}`])}
-                      status={status[`order:${option.id}`]}
-                      error={error[`order:${option.id}`]}
-                      onAction={(action) => {
-                        void run(`order:${option.id}`, () =>
-                          handleOrderOptionAdminAction({
-                            action,
-                            country,
-                            option,
-                            onCountryUpdated,
-                            openSelectImage,
-                          }),
-                        );
-                      }}
-                    />
-                  ) : null}
-                  <div
-                    className={`flex flex-col gap-4 p-5 sm:flex-row sm:items-stretch ${
-                      isAdmin && onCountryUpdated ? "pr-12" : ""
-                    }`}
-                  >
-                    <div className="relative h-36 w-full shrink-0 overflow-hidden rounded-xl sm:h-auto sm:w-40">
-                      {option.imageUrl ? (
-                        <img
-                          src={option.imageUrl}
-                          alt=""
-                          className="h-full w-full object-cover"
-                        />
-                      ) : (
-                        <MediaPlaceholder
-                          labelKey="media.placeholder.recipe"
-                          className="h-full min-h-36"
-                        />
-                      )}
-                    </div>
-                    <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-                      <div>
-                        <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
-                          <img
-                            src={platformLogoSrc(
-                              option.platform as OrderPlatform,
-                            )}
-                            alt=""
-                            className="size-5 rounded-md object-cover"
-                          />
-                          {t(`dine.order.platform.${option.platform}`)}
-                        </p>
-                        <p className="mt-1 font-display text-xl text-burgundy">
-                          {option.name}
-                        </p>
-                        {option.signatureDish ? (
-                          <p className="mt-1 text-sm font-semibold text-tomato">
-                            {t("dine.order.signatureDish", {
-                              dish: option.signatureDish,
-                            })}
-                          </p>
-                        ) : null}
-                        {option.city ? (
-                          <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
-                            <MapPin
-                              aria-hidden="true"
-                              className="mt-0.5 size-4 shrink-0"
-                            />
-                            {option.city}
-                          </p>
-                        ) : null}
-                        {option.notes ? (
-                          <p className="mt-2 text-sm text-ink-soft">
-                            {option.notes}
-                          </p>
-                        ) : null}
-                      </div>
-                      <a
-                        href={resolveOrderOptionHref({
-                          platform: option.platform,
-                          url: option.url,
-                          countryCode: country.code,
-                          countryName: country.name,
-                          cityOrPostcode: option.city || cityOrPostcode,
-                          marketingAllowed,
-                        })}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                      >
-                        {t("dine.order.open")}
-                        <ExternalLink aria-hidden="true" className="size-4" />
-                      </a>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="rounded-2xl border border-dashed border-stamp/40 bg-white/50 p-5">
-              <p className="text-ink">
-                {t("dine.order.empty", { name: country.name })}
+        {state.status === "ready" ? (
+          <div className="grid gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm text-ink-soft">
+                {sortedRestaurants.length === 1
+                  ? t("dine.results.count", {
+                      count: sortedRestaurants.length,
+                      location: cityOrPostcode,
+                    })
+                  : t("dine.results.countPlural", {
+                      count: sortedRestaurants.length,
+                      location: cityOrPostcode,
+                    })}
               </p>
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor={sortId}
+                  className="text-sm font-semibold text-ink"
+                >
+                  {t("dine.sortBy")}
+                </label>
+                <select
+                  id={sortId}
+                  value={sortMode}
+                  onChange={(event) =>
+                    setSortMode(event.target.value as RestaurantSortMode)
+                  }
+                  className="min-h-11 rounded-xl border border-ink/20 bg-white px-3 text-sm text-ink"
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          )}
-
-          <div className="space-y-3">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.14em] text-stamp">
-              {t("dine.order.browsePlatforms")}
-            </h4>
-            <ul className="grid gap-3 sm:grid-cols-2">
-              {orderLinks.map((link) => (
-                <li key={link.id}>
-                  <a
-                    href={link.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex h-full flex-col justify-between gap-3 rounded-2xl border border-ink/10 bg-cream p-4 transition hover:border-tomato/40"
-                  >
-                    <div>
-                      <p className="inline-flex items-center gap-2 font-display text-xl text-burgundy">
-                        <img
-                          src={platformLogoSrc(link.id)}
-                          alt=""
-                          className="size-8 rounded-lg object-cover"
-                        />
-                        {t(`dine.order.${link.id}.title`)}
-                      </p>
-                      <p className="mt-1 text-sm text-ink-soft">
-                        {t(`dine.order.${link.id}.hint`, {
-                          name: country.name,
-                          query: link.searchLabel,
-                        })}
-                      </p>
-                    </div>
-                    <span className="inline-flex min-h-10 w-fit items-center gap-2 rounded-full border border-ink/15 px-3 text-sm font-semibold text-ink">
-                      {t(`dine.order.${link.id}.cta`)}
-                      <ExternalLink aria-hidden="true" className="size-4" />
-                    </span>
-                  </a>
-                </li>
+            <ul className="grid gap-3">
+              {sortedRestaurants.map((restaurant) => (
+                <RestaurantCard
+                  key={restaurant.id}
+                  restaurant={restaurant}
+                  countryCode={country.code}
+                  onOpen={() => onOpenRestaurant(restaurant)}
+                  isAdmin={isAdmin}
+                  adminBusy={Boolean(busy[`restaurant:${restaurant.id}`])}
+                  adminStatus={status[`restaurant:${restaurant.id}`]}
+                  adminError={error[`restaurant:${restaurant.id}`]}
+                  onAdminAction={(action) => {
+                    void run(`restaurant:${restaurant.id}`, () =>
+                      handleRestaurantAdminAction({
+                        action,
+                        countryName: country.name,
+                        countryCode: country.code,
+                        restaurant,
+                        openSelectImage,
+                        onUpdated: (next) => {
+                          setState((prev) => {
+                            if (prev.status !== "ready") return prev;
+                            return {
+                              ...prev,
+                              restaurants: prev.restaurants.map((item) =>
+                                item.id === next.id
+                                  ? {
+                                      ...item,
+                                      ...next,
+                                      distanceKm: item.distanceKm,
+                                    }
+                                  : item,
+                              ),
+                            };
+                          });
+                        },
+                        onRemoved: (id) => {
+                          setState((prev) => {
+                            if (prev.status !== "ready") return prev;
+                            return {
+                              ...prev,
+                              restaurants: prev.restaurants.filter(
+                                (item) => item.id !== id,
+                              ),
+                            };
+                          });
+                        },
+                      }),
+                    );
+                  }}
+                />
               ))}
             </ul>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+
+        {state.status === "idle" && showLocationForm ? (
+          <p className="text-sm text-ink-soft">{t("dine.idleHint")}</p>
+        ) : null}
+      </div>
 
       <SuggestModal
         kind="restaurant"

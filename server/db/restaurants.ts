@@ -551,6 +551,8 @@ async function migrate(db: Pool) {
     CREATE INDEX IF NOT EXISTS idx_recipes_country_slot
       ON recipes (country_code, menu_slot, sort_order);
 
+    ALTER TABLE recipes ADD COLUMN IF NOT EXISTS wait_time TEXT;
+
     CREATE TABLE IF NOT EXISTS user_tags (
       id TEXT PRIMARY KEY,
       user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
