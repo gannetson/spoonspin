@@ -159,6 +159,7 @@ async function enrichText(
       name: restaurant.name,
       address: restaurant.address,
       city: restaurant.city,
+      website: restaurant.website,
       authenticityNotes: restaurant.authenticityNotes,
     },
   });
@@ -179,11 +180,7 @@ async function enrichMenu(
   const researched = await researchRestaurantMenu({
     countryName,
     countryCode,
-    knownCuisineCodes: Array.from(
-      new Set(
-        [countryCode, ...restaurant.cuisineCodes].map((code) => code.toLowerCase()),
-      ),
-    ),
+    knownCuisineCodes: restaurant.cuisineCodes.map((code) => code.toLowerCase()),
     restaurant: {
       name: restaurant.name,
       address: restaurant.address,

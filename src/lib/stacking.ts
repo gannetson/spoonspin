@@ -14,6 +14,8 @@ export const Z_INDEX = {
   popover: 80,
   select: 90,
   modal: 100,
+  /** Combobox / select panels opened from inside a modal. */
+  modalSelect: 110,
 } as const;
 
 /** Tailwind class strings matching {@link Z_INDEX}. */
@@ -22,4 +24,5 @@ export const zClass = {
   popover: "z-[80]",
   select: "z-[90]",
   modal: "z-[100]",
+  modalSelect: "z-[110]",
 } as const;

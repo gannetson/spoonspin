@@ -32,6 +32,7 @@ import {
 import {
   deleteRestaurantById,
   getRestaurantById,
+  updateRestaurantFields,
   updateRestaurantMenu,
   updateRestaurantNotes,
   updateRestaurantPhoto,
@@ -87,6 +88,7 @@ import {
   getCountryRecipes,
 } from "../../src/content/countries/menuAccessors.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
+import { countryCatalog } from "../../src/content/countries/catalog.ts";
 import { stableMapsUrl } from "../../src/restaurants/utils.ts";
 
 const querySchema = z.object({
@@ -185,6 +187,29 @@ const recipeCopyPatchSchema = z
     { message: "Provide at least one recipe field to update." },
   );
 
+/** Manual restaurant edits — partial; omit unchanged fields. */
+const restaurantCopyPatchSchema = z
+  .object({
+    name: z.string().min(1).max(200).optional(),
+    website: z
+      .union([z.string().url().max(2000), z.literal(""), z.null()])
+      .optional(),
+    authenticityNotes: z.string().max(4000).nullish(),
+    cuisineCodes: z
+      .array(z.string().regex(/^[a-z]{2}$/i))
+      .min(1)
+      .max(12)
+      .optional(),
+  })
+  .refine(
+    (value) =>
+      value.name !== undefined ||
+      value.website !== undefined ||
+      value.authenticityNotes !== undefined ||
+      value.cuisineCodes !== undefined,
+    { message: "Provide at least one restaurant field to update." },
+  );
+
 const restaurantSchema = z.object({
   name: z.string().min(1),
   address: z.string().min(1),
@@ -202,6 +227,7 @@ const restaurantSchema = z.object({
   authenticityRating: z.number().min(1).max(5).nullish(),
   phone: z.string().nullish(),
   verified: z.boolean().nullish(),
+  cuisineCodes: z.array(z.string().regex(/^[a-z]{2}$/i)).max(12).nullish(),
 });
 
 const shopSchema = z.object({
@@ -220,12 +246,43 @@ const orderOptionSchema = z.object({
   name: z.string().min(1),
   platform: z.enum(["thuisbezorgd", "ubereats", "deliveroo", "direct", "other"]),
   url: z.string().url(),
+  thuisbezorgdUrl: z.string().url().nullish(),
+  ubereatsUrl: z.string().url().nullish(),
   city: z.string().nullish(),
   notes: z.string().nullish(),
   signatureDish: z.string().nullish(),
   imageUrl: z.string().nullish(),
   imageAttribution: z.string().nullish(),
+  cuisineCodes: z.array(z.string().regex(/^[a-z]{2}$/i)).max(12).nullish(),
 });
+
+const orderOptionCopyPatchSchema = z
+  .object({
+    name: z.string().min(1).max(200).optional(),
+    notes: z.string().max(4000).nullish(),
+    signatureDish: z.string().max(200).nullish(),
+    thuisbezorgdUrl: z
+      .union([z.string().url().max(2000), z.literal(""), z.null()])
+      .optional(),
+    ubereatsUrl: z
+      .union([z.string().url().max(2000), z.literal(""), z.null()])
+      .optional(),
+    cuisineCodes: z
+      .array(z.string().regex(/^[a-z]{2}$/i))
+      .min(1)
+      .max(12)
+      .optional(),
+  })
+  .refine(
+    (value) =>
+      value.name !== undefined ||
+      value.notes !== undefined ||
+      value.signatureDish !== undefined ||
+      value.thuisbezorgdUrl !== undefined ||
+      value.ubereatsUrl !== undefined ||
+      value.cuisineCodes !== undefined,
+    { message: "Provide at least one order-option field to update." },
+  );
 
 const drinkSchema = z.object({
   name: z.string().min(1),
@@ -693,18 +750,30 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           countryCode: string;
           countryName: string;
         }> = [];
-        const osmTags = osmTagsForCountry(country.code);
-        const cuisineTags =
-          osmTags.length > 0
-            ? osmTags
-            : country.cuisineAliases
-                .map((alias) => alias.trim().toLowerCase())
-                .filter(Boolean)
-                .slice(0, 4);
         for (const place of parsed.data.restaurants) {
+          const placeCuisineCodes = Array.from(
+            new Set(
+              (place.cuisineCodes?.length
+                ? place.cuisineCodes
+                : [country.code]
+              ).map((code) => code.trim().toLowerCase()).filter((code) => /^[a-z]{2}$/.test(code)),
+            ),
+          );
+          const primaryCode = placeCuisineCodes[0] ?? country.code;
+          const osmTags = osmTagsForCountry(primaryCode);
+          const cuisineTags =
+            osmTags.length > 0
+              ? osmTags
+              : primaryCode === country.code
+                ? country.cuisineAliases
+                    .map((alias) => alias.trim().toLowerCase())
+                    .filter(Boolean)
+                    .slice(0, 4)
+                : placeCuisineCodes;
+
           const key = createHash("sha1")
             .update(
-              `${country.code}|${place.name}|${place.city}|${place.address}`.toLowerCase(),
+              `${primaryCode}|${place.name}|${place.city}|${place.address}`.toLowerCase(),
             )
             .digest("hex")
             .slice(0, 16);
@@ -780,9 +849,9 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             postcode,
             lat,
             lng,
-            cuisineCodes: [country.code],
+            cuisineCodes: placeCuisineCodes,
             cuisineTags:
-              cuisineTags.length > 0 ? cuisineTags : [country.name.toLowerCase()],
+              cuisineTags.length > 0 ? cuisineTags : placeCuisineCodes,
             website,
             phone,
             source: "admin-discover",
@@ -796,8 +865,10 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           if (shouldReview) {
             enrichmentJobs.push({
               restaurantId,
-              countryCode: country.code,
-              countryName: country.name,
+              countryCode: primaryCode,
+              countryName:
+                countryCatalog.find((entry) => entry.code === primaryCode)?.name ??
+                country.name,
             });
           }
           added += 1;
@@ -933,20 +1004,41 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           res.status(404).json({ message: "Country not found." });
           return;
         }
-        const options: OrderOption[] = parsed.data.options.map((option) => ({
-          id:
-            option.id?.trim() ||
-            slugify(`${option.platform}-${option.name}-${option.city ?? "nl"}`) ||
-            "order",
-          name: option.name.trim(),
-          platform: option.platform,
-          url: option.url.trim(),
-          city: option.city?.trim() || undefined,
-          notes: option.notes?.trim() || undefined,
-          signatureDish: option.signatureDish?.trim() || undefined,
-          imageUrl: option.imageUrl?.trim() || undefined,
-          imageAttribution: option.imageAttribution?.trim() || undefined,
-        }));
+        const options: OrderOption[] = parsed.data.options.map((option) => {
+          const cuisineCodes = Array.from(
+            new Set(
+              (option.cuisineCodes?.length
+                ? option.cuisineCodes
+                : [country.code]
+              )
+                .map((code) => code.trim().toLowerCase())
+                .filter((code) => /^[a-z]{2}$/.test(code)),
+            ),
+          );
+          const thuisbezorgdUrl =
+            option.thuisbezorgdUrl?.trim() ||
+            (option.platform === "thuisbezorgd" ? option.url.trim() : undefined);
+          const ubereatsUrl =
+            option.ubereatsUrl?.trim() ||
+            (option.platform === "ubereats" ? option.url.trim() : undefined);
+          return {
+            id:
+              option.id?.trim() ||
+              slugify(`${option.platform}-${option.name}-${option.city ?? "nl"}`) ||
+              "order",
+            name: option.name.trim(),
+            platform: option.platform,
+            url: option.url.trim(),
+            thuisbezorgdUrl: thuisbezorgdUrl || undefined,
+            ubereatsUrl: ubereatsUrl || undefined,
+            city: option.city?.trim() || undefined,
+            notes: option.notes?.trim() || undefined,
+            signatureDish: option.signatureDish?.trim() || undefined,
+            imageUrl: option.imageUrl?.trim() || undefined,
+            imageAttribution: option.imageAttribution?.trim() || undefined,
+            cuisineCodes: cuisineCodes.length > 0 ? cuisineCodes : [country.code],
+          };
+        });
         const updated = await appendOrderOptions(country.code, options);
         if (!updated) {
           res.status(404).json({ message: "Country not found." });
@@ -995,6 +1087,111 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         console.error("Remove order option failed", error);
         res.status(500).json({
           message: publicErrorMessage(error, "Could not remove order option."),
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/countries/:code/order-options/:optionId",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      const parsed = orderOptionCopyPatchSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        res.status(400).json({
+          message:
+            parsed.error.issues[0]?.message ?? "Invalid order option edit payload.",
+        });
+        return;
+      }
+      try {
+        const code = String(req.params.code ?? "");
+        const optionId = decodeURIComponent(String(req.params.optionId ?? ""));
+        const country = await getCountryFromDb(code);
+        if (!country) {
+          res.status(404).json({ message: "Country not found." });
+          return;
+        }
+        const existing = (country.orderOptions ?? []).find(
+          (option) => option.id === optionId,
+        );
+        if (!existing) {
+          res.status(404).json({ message: "Order option not found." });
+          return;
+        }
+
+        const body = parsed.data;
+        const nextName = body.name?.trim() || existing.name;
+        const nextNotes =
+          body.notes === undefined
+            ? existing.notes
+            : body.notes?.trim() || undefined;
+        const nextSignature =
+          body.signatureDish === undefined
+            ? existing.signatureDish
+            : body.signatureDish?.trim() || undefined;
+        const nextTb =
+          body.thuisbezorgdUrl === undefined
+            ? existing.thuisbezorgdUrl
+            : body.thuisbezorgdUrl?.trim() || undefined;
+        const nextUe =
+          body.ubereatsUrl === undefined
+            ? existing.ubereatsUrl
+            : body.ubereatsUrl?.trim() || undefined;
+        const nextCuisineCodes =
+          body.cuisineCodes !== undefined
+            ? Array.from(
+                new Set(
+                  body.cuisineCodes
+                    .map((item) => item.trim().toLowerCase())
+                    .filter((item) => /^[a-z]{2}$/.test(item)),
+                ),
+              )
+            : existing.cuisineCodes;
+
+        const tbUrl =
+          nextTb ||
+          (existing.platform === "thuisbezorgd" && !nextUe ? existing.url : undefined);
+        const ueUrl =
+          nextUe ||
+          (existing.platform === "ubereats" && !nextTb ? existing.url : undefined);
+        const primaryUrl = tbUrl || ueUrl || existing.url;
+        const primaryPlatform =
+          tbUrl && (!ueUrl || existing.platform !== "ubereats")
+            ? "thuisbezorgd"
+            : ueUrl
+              ? "ubereats"
+              : existing.platform;
+
+        if (!primaryUrl.trim()) {
+          res.status(400).json({
+            message: "Provide at least one Thuisbezorgd or Uber Eats link.",
+          });
+          return;
+        }
+
+        const result = await updateOrderOption(code, optionId, {
+          name: nextName,
+          notes: nextNotes,
+          signatureDish: nextSignature,
+          thuisbezorgdUrl: tbUrl,
+          ubereatsUrl: ueUrl,
+          platform: primaryPlatform,
+          url: primaryUrl,
+          cuisineCodes:
+            nextCuisineCodes && nextCuisineCodes.length > 0
+              ? nextCuisineCodes
+              : [code.toLowerCase()],
+        });
+        if (!result) {
+          res.status(404).json({ message: "Order option not found." });
+          return;
+        }
+        res.json(result);
+      } catch (error) {
+        console.error("Patch order option failed", error);
+        res.status(500).json({
+          message: publicErrorMessage(error, "Could not update order option."),
         });
       }
     },
@@ -1977,6 +2174,55 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         res.status(500).json({
           message:
             error instanceof Error ? error.message : "Could not delete restaurant.",
+        });
+      }
+    },
+  );
+
+  app.patch(
+    "/api/admin/restaurants/:id",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      const parsed = restaurantCopyPatchSchema.safeParse(req.body ?? {});
+      if (!parsed.success) {
+        res.status(400).json({
+          message:
+            parsed.error.issues[0]?.message ?? "Invalid restaurant edit payload.",
+        });
+        return;
+      }
+      try {
+        const id = String(req.params.id ?? "");
+        const existing = await getRestaurantById(id);
+        if (!existing) {
+          res.status(404).json({ message: "Restaurant not found." });
+          return;
+        }
+        const body = parsed.data;
+        const updated = await updateRestaurantFields(id, {
+          name: body.name,
+          website:
+            body.website === undefined
+              ? undefined
+              : body.website === null || body.website === ""
+                ? null
+                : body.website,
+          authenticityNotes:
+            body.authenticityNotes === undefined
+              ? undefined
+              : body.authenticityNotes?.trim() || null,
+          cuisineCodes: body.cuisineCodes?.map((code) => code.toLowerCase()),
+        });
+        if (!updated) {
+          res.status(404).json({ message: "Restaurant not found." });
+          return;
+        }
+        res.json({ restaurant: toPublicRestaurant(updated) });
+      } catch (error) {
+        console.error("Patch restaurant failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error ? error.message : "Could not update restaurant.",
         });
       }
     },

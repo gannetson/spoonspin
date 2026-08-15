@@ -73,9 +73,14 @@ export type OrderPlatform =
 export type OrderOption = {
   id: string;
   name: string;
+  /** Primary / legacy platform (kept in sync with dual links when possible). */
   platform: OrderPlatform;
-  /** Order / listing URL (platform page or restaurant own ordering). */
+  /** Primary / legacy order URL. Prefer thuisbezorgdUrl / ubereatsUrl when set. */
   url: string;
+  /** Optional Thuisbezorgd restaurant menu URL. */
+  thuisbezorgdUrl?: string;
+  /** Optional Uber Eats store URL. */
+  ubereatsUrl?: string;
   city?: string;
   notes?: string;
   /** Hero / food photo for this order option. */
@@ -83,6 +88,8 @@ export type OrderOption = {
   imageAttribution?: string;
   /** Must-order dish to highlight for this place. */
   signatureDish?: string;
+  /** Cuisine countries this place belongs to (ISO-2). */
+  cuisineCodes?: string[];
 };
 
 export type Menu = {

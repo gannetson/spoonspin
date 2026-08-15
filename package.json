@@ -26,6 +26,7 @@
     "agent:restaurant-photos": "tsx --tsconfig tsconfig.app.json scripts/enrich-restaurant-photos.ts",
     "agent:restaurants": "tsx --tsconfig tsconfig.app.json scripts/restaurant-agent.ts",
     "agent:gather": "tsx --tsconfig tsconfig.app.json scripts/gather-restaurants.ts",
+    "agent:fill": "tsx --tsconfig tsconfig.app.json scripts/fill-country-content.ts",
     "agent:curate": "tsx --tsconfig tsconfig.app.json scripts/curate-restaurants.ts",
     "agent:proef": "tsx --tsconfig tsconfig.app.json scripts/import-proef-de-wereld.ts",
     "agent:ratings": "tsx --tsconfig tsconfig.app.json scripts/enrich-ratings.ts",

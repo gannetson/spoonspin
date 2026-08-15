@@ -19,6 +19,7 @@ import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { handleRestaurantAdminAction, useAdminItemBusy } from "@/admin/itemActions";
+import { useEditRestaurant } from "@/admin/EditRestaurantContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -70,6 +71,7 @@ export function RestaurantView({
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
   const { openSelectImage } = useSelectImage();
+  const { openEditRestaurant } = useEditRestaurant();
   const [restaurant, setRestaurant] = useState<Restaurant | null>(
     initialRestaurant?.id === restaurantId ? initialRestaurant : null,
   );
@@ -169,6 +171,9 @@ export function RestaurantView({
             className="absolute right-4 top-4"
             label={restaurant.name}
             tone="dark"
+            showEditText
+            editTextLabelKey="admin.item.editRestaurant"
+            editTextHintKey="admin.item.editRestaurant.hint"
             showRestaurantResearch
             busy={Boolean(busy[adminKey])}
             status={status[adminKey]}
@@ -181,6 +186,7 @@ export function RestaurantView({
                   countryCode: country.code,
                   restaurant,
                   openSelectImage,
+                  openEditRestaurant,
                   onUpdated: (next) => {
                     setRestaurant(next);
                     onUpdated?.(next);

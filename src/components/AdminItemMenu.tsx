@@ -30,8 +30,10 @@ type AdminItemMenuProps = {
   /** Hide replace-image for items without photos (e.g. specialty shops). */
   showReplaceImage?: boolean;
   showReplaceText?: boolean;
-  /** Manual sectioned recipe copy editor. */
+  /** Manual sectioned recipe / restaurant copy editor. */
   showEditText?: boolean;
+  editTextLabelKey?: string;
+  editTextHintKey?: string;
   /** Recipe/drink: add to the Dinner tab composition. */
   showSelectForDinner?: boolean;
   /** Only show the remove action (e.g. dinner membership). */
@@ -54,6 +56,8 @@ export function AdminItemMenu({
   showReplaceImage = true,
   showReplaceText = true,
   showEditText = false,
+  editTextLabelKey = "admin.item.editRecipe",
+  editTextHintKey = "admin.item.editRecipe.hint",
   showSelectForDinner = false,
   removeOnly = false,
   removeHintKey = "admin.item.remove.hint",
@@ -159,10 +163,10 @@ export function AdminItemMenu({
                 <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
                 <span>
                   <span className="block font-semibold text-ink">
-                    {t("admin.item.editRecipe")}
+                    {t(editTextLabelKey)}
                   </span>
                   <span className="mt-0.5 block text-xs text-ink-soft">
-                    {t("admin.item.editRecipe.hint")}
+                    {t(editTextHintKey)}
                   </span>
                 </span>
               </button>

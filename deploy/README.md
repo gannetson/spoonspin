@@ -9,6 +9,8 @@ App path on the server: `/var/www/spoonspin/spoonspin`
 | [`nginx/spoonspin.nl.conf`](nginx/spoonspin.nl.conf)         | `/etc/nginx/sites-available/spoonspin.nl` (HTTP / certbot) |
 | [`nginx/spoonspin.nl.ssl.conf`](nginx/spoonspin.nl.ssl.conf) | same path after TLS (or merge with certbot)                |
 | [`supervisor/spoonspin.conf`](supervisor/spoonspin.conf)     | `/etc/supervisor/conf.d/spoonspin.conf`                    |
+| [`cron/spoonspin-content.cron`](cron/spoonspin-content.cron) | sample crontab for content fill                            |
+| [`systemd/spoonspin-content-fill.*`](systemd/)               | optional oneshot timer for `agent:fill`                    |
 | [`install-server.sh`](install-server.sh)                     | copies configs + reloads services                          |
 
 ## Remote deploy (from your laptop)

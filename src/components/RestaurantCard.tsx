@@ -218,6 +218,9 @@ export function RestaurantCard({
             <AdminItemMenu
               className="absolute right-2 top-2"
               label={restaurant.name}
+              showEditText
+              editTextLabelKey="admin.item.editRestaurant"
+              editTextHintKey="admin.item.editRestaurant.hint"
               showRestaurantResearch
               busy={adminBusy}
               status={adminStatus}

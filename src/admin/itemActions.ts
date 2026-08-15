@@ -24,6 +24,8 @@ import {
   selectRecipeForDinner,
 } from "@/admin/countryTools";
 import type { OpenEditRecipeOptions } from "@/admin/EditRecipeContext";
+import type { OpenEditRestaurantOptions } from "@/admin/EditRestaurantContext";
+import type { OpenEditOrderOptionOptions } from "@/admin/EditOrderOptionContext";
 import type { OpenSelectImageOptions } from "@/admin/SelectImageContext";
 import type { AdminItemAction } from "@/components/AdminItemMenu";
 
@@ -314,8 +316,22 @@ export async function handleOrderOptionAdminAction(input: {
   option: OrderOption;
   onCountryUpdated: (country: Country) => void;
   openSelectImage?: (options: OpenSelectImageOptions) => void;
+  openEditOrderOption?: (options: OpenEditOrderOptionOptions) => void;
 }): Promise<string> {
   const { action, country, option } = input;
+  if (action === "edit-text") {
+    if (!input.openEditOrderOption) {
+      throw new Error("Edit order option is not available.");
+    }
+    input.openEditOrderOption({
+      country,
+      option,
+      onApplied: (result) => {
+        input.onCountryUpdated(result.country);
+      },
+    });
+    return "";
+  }
   if (action === "remove") {
     if (!window.confirm(`Remove “${option.name}” from order options?`)) {
       return "";
@@ -365,8 +381,21 @@ export async function handleRestaurantAdminAction(input: {
   onUpdated: (restaurant: Restaurant) => void;
   onRemoved: (id: string) => void;
   openSelectImage?: (options: OpenSelectImageOptions) => void;
+  openEditRestaurant?: (options: OpenEditRestaurantOptions) => void;
 }): Promise<string> {
   const { action, countryName, countryCode, restaurant } = input;
+  if (action === "edit-text") {
+    if (!input.openEditRestaurant) {
+      throw new Error("Edit restaurant is not available.");
+    }
+    input.openEditRestaurant({
+      restaurant,
+      onApplied: (result) => {
+        input.onUpdated(result.restaurant);
+      },
+    });
+    return "";
+  }
   if (action === "remove") {
     if (!window.confirm(`Remove “${restaurant.name}”? This cannot be undone.`)) {
       return "";

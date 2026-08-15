@@ -25,6 +25,7 @@ import {
 } from "@/components/SuggestedItemReview";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { handleRestaurantAdminAction, useAdminItemBusy } from "@/admin/itemActions";
+import { useEditRestaurant } from "@/admin/EditRestaurantContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
@@ -77,6 +78,7 @@ export function DineSearch({
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
   const { openSelectImage } = useSelectImage();
+  const { openEditRestaurant } = useEditRestaurant();
   const sortId = useId();
   const savedCity = getSavedDineCity();
   const rememberPreferred = getRememberCityPreference();
@@ -432,6 +434,7 @@ export function DineSearch({
                         countryCode: country.code,
                         restaurant,
                         openSelectImage,
+                        openEditRestaurant,
                         onUpdated: (next) => {
                           setState((prev) => {
                             if (prev.status !== "ready") return prev;

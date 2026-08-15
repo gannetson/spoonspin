@@ -13,12 +13,13 @@ import {
   pickRandomCountry,
   rememberCountryCode,
 } from "@/lib/picker";
-import type { Country, Drink, Recipe, SpecialtyShop } from "@/types/content";
+import type { Country, Drink, OrderOption, Recipe, SpecialtyShop } from "@/types/content";
 import { CountryCard } from "@/components/CountryCard";
 import { CountrySelect } from "@/components/CountrySelect";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
 import { OrderHome } from "@/components/OrderHome";
+import { OrderOptionView } from "@/components/OrderOptionView";
 import { HomeExplainer } from "@/components/HomeExplainer";
 import { HomeHero } from "@/components/HomeHero";
 import { HomeProgressCards } from "@/components/HomeProgressCards";
@@ -78,6 +79,7 @@ export default function App() {
   const recipeId = searchParams.get("recipe");
   const shopId = searchParams.get("shop");
   const restaurantId = searchParams.get("restaurant");
+  const orderOptionId = searchParams.get("orderOption");
   const [dineRestaurantCache, setDineRestaurantCache] = useState<Restaurant | null>(null);
   const [dineRefreshKey, setDineRefreshKey] = useState(0);
 
@@ -174,6 +176,7 @@ export default function App() {
       recipe?: string | null;
       shop?: string | null;
       restaurant?: string | null;
+      orderOption?: string | null;
     }) => {
       setSearchParams(
         (prev) => {
@@ -187,6 +190,8 @@ export default function App() {
           else if (next.shop) params.set("shop", next.shop);
           if (next.restaurant === null) params.delete("restaurant");
           else if (next.restaurant) params.set("restaurant", next.restaurant);
+          if (next.orderOption === null) params.delete("orderOption");
+          else if (next.orderOption) params.set("orderOption", next.orderOption);
           return params;
         },
         { replace: false },
@@ -207,12 +212,18 @@ export default function App() {
     setSpinning(true);
     setSearchParams(
       (prev) => {
-        if (!prev.get("recipe") && !prev.get("restaurant") && !prev.get("shop"))
+        if (
+          !prev.get("recipe") &&
+          !prev.get("restaurant") &&
+          !prev.get("shop") &&
+          !prev.get("orderOption")
+        )
           return prev;
         const params = new URLSearchParams(prev);
         params.delete("recipe");
         params.delete("restaurant");
         params.delete("shop");
+        params.delete("orderOption");
         return params;
       },
       { replace: true },
@@ -302,6 +313,7 @@ export default function App() {
       recipe: recipe.id,
       shop: null,
       restaurant: null,
+      orderOption: null,
     });
   };
 
@@ -315,6 +327,7 @@ export default function App() {
       shop: shop.id,
       recipe: null,
       restaurant: null,
+      orderOption: null,
     });
   };
 
@@ -329,11 +342,26 @@ export default function App() {
       restaurant: restaurant.id,
       recipe: null,
       shop: null,
+      orderOption: null,
     });
   };
 
   const closeRestaurant = () => {
     updateParams({ mode: "dine", restaurant: null });
+  };
+
+  const openOrderOption = (option: OrderOption) => {
+    updateParams({
+      mode: "order",
+      orderOption: option.id,
+      recipe: null,
+      shop: null,
+      restaurant: null,
+    });
+  };
+
+  const closeOrderOption = () => {
+    updateParams({ mode: "order", orderOption: null });
   };
 
   useEffect(() => {
@@ -347,10 +375,25 @@ export default function App() {
   }, [mode, restaurantId, updateParams]);
 
   useEffect(() => {
+    if (mode !== "order" && orderOptionId) {
+      updateParams({ orderOption: null });
+    }
+  }, [mode, orderOptionId, updateParams]);
+
+  useEffect(() => {
     if (mode !== "cook" && (recipeId || shopId)) {
       updateParams({ recipe: null, shop: null });
     }
   }, [mode, recipeId, shopId, updateParams]);
+
+  const selectedOrderOption = useMemo(() => {
+    if (!selectedCountry || !orderOptionId) return null;
+    return (
+      (selectedCountry.orderOptions ?? []).find(
+        (option) => option.id === orderOptionId,
+      ) ?? null
+    );
+  }, [selectedCountry, orderOptionId]);
 
   useEffect(() => {
     if (!selectedCountry) {
@@ -575,6 +618,7 @@ export default function App() {
                         recipe: null,
                         restaurant: null,
                         shop: null,
+                        orderOption: null,
                       })
                     }
                     label={t("app.mode.cook")}
@@ -593,6 +637,7 @@ export default function App() {
                         recipe: null,
                         restaurant: null,
                         shop: null,
+                        orderOption: null,
                       })
                     }
                     label={t("app.mode.dine")}
@@ -607,6 +652,7 @@ export default function App() {
                         recipe: null,
                         restaurant: null,
                         shop: null,
+                        orderOption: null,
                       })
                     }
                     label={t("app.mode.order")}
@@ -701,10 +747,34 @@ export default function App() {
                 />
               ) : null}
 
-              {mode === "order" ? (
+              {mode === "order" && orderOptionId && selectedOrderOption ? (
+                <OrderOptionView
+                  country={selectedCountry}
+                  option={selectedOrderOption}
+                  onBack={closeOrderOption}
+                  onCountryUpdated={handleCountryUpdated}
+                  onRemoved={closeOrderOption}
+                />
+              ) : null}
+
+              {mode === "order" && orderOptionId && !selectedOrderOption ? (
+                <div className="rounded-2xl bg-cream p-6 ring-1 ring-ink/10">
+                  <p className="text-ink-soft">{t("order.option.notFound")}</p>
+                  <button
+                    type="button"
+                    onClick={closeOrderOption}
+                    className="mt-4 text-sm font-semibold text-tomato underline-offset-2 hover:underline"
+                  >
+                    {t("order.option.back")}
+                  </button>
+                </div>
+              ) : null}
+
+              {mode === "order" && !orderOptionId ? (
                 <OrderHome
                   country={selectedCountry}
                   onCountryUpdated={handleCountryUpdated}
+                  onOpenOrderOption={openOrderOption}
                 />
               ) : null}
             </section>

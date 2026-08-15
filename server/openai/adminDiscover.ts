@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { z } from "zod";
 import type {
   Drink,
@@ -6,7 +7,9 @@ import type {
   SpecialtyShop,
 } from "../../src/types/content.ts";
 import { countryCatalog } from "../../src/content/countries/catalog.ts";
-import { OSM_CUISINE_BY_COUNTRY } from "../../src/restaurants/osmCuisineMap.ts";
+import {
+  osmTagsForCountry,
+} from "../../src/restaurants/osmCuisineMap.ts";
 import {
   isGooglePlacesConfigured,
   officialWebsiteOrUndefined,
@@ -14,6 +17,10 @@ import {
   type GroundedPlace,
 } from "../lib/googlePlacesLookup.ts";
 import { searchOsmRestaurantsForCountry } from "../lib/osmRestaurantSearch.ts";
+import {
+  fetchPageEvidenceMany,
+  formatPageEvidence,
+} from "../lib/pageEvidence.ts";
 import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
 import { chatJson, isOpenAiConfigured } from "./suggest.ts";
 import {
@@ -22,6 +29,16 @@ import {
   type GroundedOrderListing,
 } from "../lib/apifyOrderSearch.ts";
 import { searchTripadvisorRestaurants } from "../lib/apifyTripadvisorSearch.ts";
+import {
+  appendOrderOptions,
+  getCountryFromDb,
+} from "../db/content.ts";
+import {
+  findRestaurantByNameAndCity,
+  updateRestaurantFields,
+  updateRestaurantNotes,
+  upsertRestaurant,
+} from "../db/restaurants.ts";
 
 export { isOpenAiConfigured, isApifyConfigured };
 
@@ -54,15 +71,27 @@ function normalizeCountryCodes(codes: string[] | undefined): string[] {
 
 /** Compact reference of country codes the model may assign. */
 function cuisineCodeReference(): string {
-  const byCode = new Map(
-    countryCatalog.map((entry) => [entry.code, entry.name] as const),
-  );
-  return Object.keys(OSM_CUISINE_BY_COUNTRY)
-    .map((code) => {
-      const name = byCode.get(code);
-      return name ? `${code}=${name}` : code;
-    })
+  // Prefer full catalog so reassignment works for countries without OSM tags yet.
+  return countryCatalog
+    .map((entry) => `${entry.code}=${entry.name}`)
     .join(", ");
+}
+
+function countryNameForCode(code: string): string {
+  return (
+    countryCatalog.find((entry) => entry.code === code.toLowerCase())?.name ??
+    code.toUpperCase()
+  );
+}
+
+function cuisineTagsForCodes(codes: string[]): string[] {
+  const tags = new Set<string>();
+  for (const code of codes) {
+    for (const tag of osmTagsForCountry(code)) {
+      tags.add(tag);
+    }
+  }
+  return Array.from(tags);
 }
 
 const recipeItemSchema = z.object({
@@ -119,6 +148,11 @@ const restaurantVerifyItemSchema = z.object({
   evidenceSourceUrl: optionalString,
   confidence: restaurantConfidenceSchema.optional(),
   reason: optionalString,
+  /** ISO country codes this place actually serves (when wrong for search cuisine). */
+  actualCuisineCodes: z
+    .array(z.string())
+    .nullish()
+    .transform((value) => value ?? undefined),
 });
 
 const restaurantsVerifySchema = z.object({
@@ -348,6 +382,8 @@ export type DiscoveredRestaurant = {
   authenticityRating?: number;
   phone?: string;
   verified?: boolean;
+  /** Verified cuisine countries (ISO-2); set after authenticity check. */
+  cuisineCodes?: string[];
 };
 
 export type DishCandidate = {
@@ -593,8 +629,32 @@ export async function discoverCountryRestaurants(input: {
         countryName: input.countryName,
         restaurants: grounded.slice(0, 20),
       });
-      const rejected = grounded.length - verification.restaurants.length;
       if (verification.notes) parts.push(verification.notes);
+
+      const reassigned = await persistReassignedRestaurants(
+        verification.reassigned,
+      );
+      if (reassigned.created > 0 || reassigned.updated > 0) {
+        parts.push(
+          `Reassigned ${reassigned.created + reassigned.updated} wrong-cuisine hit(s) to their actual countries` +
+            (reassigned.labels.length > 0
+              ? ` (${reassigned.labels.join(", ")})`
+              : "") +
+            (reassigned.skipped > 0
+              ? `; ${reassigned.skipped} already stored`
+              : "") +
+            ".",
+        );
+      } else if (verification.reassigned.length > 0) {
+        parts.push(
+          `${verification.reassigned.length} wrong-cuisine hit(s) already stored under their actual countries.`,
+        );
+      }
+
+      const rejected =
+        grounded.length -
+        verification.restaurants.length -
+        verification.reassigned.length;
       if (rejected > 0) {
         parts.push(
           `Dropped ${rejected} candidate(s) that failed the authenticity check.`,
@@ -602,11 +662,14 @@ export async function discoverCountryRestaurants(input: {
       }
       if (verification.restaurants.length === 0) {
         parts.push(
-          "No authentic specialists remained after verification. Showing unfiltered Places/Tripadvisor/OSM hits instead.",
+          reassigned.created + reassigned.updated > 0 ||
+            verification.reassigned.length > 0
+            ? "No matches remained for this cuisine after verification (mismatches were filed under the correct countries)."
+            : "No authentic specialists remained after verification.",
         );
         return {
           notes: parts.join(" "),
-          restaurants: grounded.slice(0, 16),
+          restaurants: [],
         };
       }
       return {
@@ -628,14 +691,134 @@ export async function discoverCountryRestaurants(input: {
   };
 }
 
+async function persistReassignedRestaurants(
+  places: DiscoveredRestaurant[],
+): Promise<{
+  created: number;
+  updated: number;
+  skipped: number;
+  labels: string[];
+}> {
+  let created = 0;
+  let updated = 0;
+  let skipped = 0;
+  const labelCounts = new Map<string, number>();
+
+  for (const place of places) {
+    const codes = normalizeCountryCodes(place.cuisineCodes);
+    if (codes.length === 0) {
+      skipped += 1;
+      continue;
+    }
+    const result = await ensureRestaurantUnderCuisines(place, codes);
+    if (result === "created") created += 1;
+    else if (result === "updated") updated += 1;
+    else skipped += 1;
+
+    for (const code of codes) {
+      const label = countryNameForCode(code);
+      labelCounts.set(label, (labelCounts.get(label) ?? 0) + 1);
+    }
+  }
+
+  const labels = [...labelCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => (count > 1 ? `${name}×${count}` : name))
+    .slice(0, 6);
+
+  return { created, updated, skipped, labels };
+}
+
+async function ensureRestaurantUnderCuisines(
+  place: DiscoveredRestaurant,
+  cuisineCodes: string[],
+): Promise<"created" | "updated" | "exists"> {
+  const codes = normalizeCountryCodes(cuisineCodes);
+  if (codes.length === 0) return "exists";
+
+  const existing = await findRestaurantByNameAndCity(place.name, place.city);
+  const notes =
+    place.authenticityNotes?.trim() ||
+    place.cuisineEvidence?.trim() ||
+    `Verified as ${codes.map(countryNameForCode).join(" / ")} cuisine.`;
+  const website = officialWebsiteOrUndefined(place.website) ?? null;
+  const rating =
+    place.authenticityRating != null && place.authenticityRating >= 3
+      ? place.authenticityRating
+      : place.confidence === "high"
+        ? 5
+        : 4;
+
+  if (existing) {
+    const merged = Array.from(new Set([...existing.cuisineCodes, ...codes]));
+    const alreadyHadAll = codes.every((code) =>
+      existing.cuisineCodes.includes(code),
+    );
+    if (alreadyHadAll && merged.length === existing.cuisineCodes.length) {
+      return "exists";
+    }
+    await updateRestaurantFields(existing.id, {
+      website: website ?? undefined,
+      cuisineCodes: merged,
+    });
+    await updateRestaurantNotes(existing.id, notes, { cuisineCodes: merged });
+    return "updated";
+  }
+
+  const key = createHash("sha1")
+    .update(
+      `${codes.slice().sort().join(",")}|${place.name}|${place.city}|${place.address}`.toLowerCase(),
+    )
+    .digest("hex")
+    .slice(0, 16);
+  const tags = cuisineTagsForCodes(codes);
+  await upsertRestaurant({
+    id: `admin-${key}`,
+    osmId: `admin-reassign:${key}`,
+    name: place.name,
+    address: place.address,
+    city: place.city,
+    postcode: place.postcode ?? null,
+    lat: place.lat ?? null,
+    lng: place.lng ?? null,
+    cuisineCodes: codes,
+    cuisineTags: tags.length > 0 ? tags : codes,
+    website,
+    phone: place.phone ?? null,
+    source: "admin-discover-reassign",
+    mapsUrl: place.mapsUrl,
+    reviewed: true,
+    authenticityRating: rating,
+    authenticityNotes: notes,
+    reviewedAt: new Date().toISOString(),
+    reviewSource: "admin-discover-reassign",
+  });
+  return "created";
+}
+
 async function verifyRestaurantAuthenticity(input: {
   countryCode: string;
   countryName: string;
   restaurants: DiscoveredRestaurant[];
-}): Promise<{ notes: string; restaurants: DiscoveredRestaurant[] }> {
+}): Promise<{
+  notes: string;
+  restaurants: DiscoveredRestaurant[];
+  reassigned: DiscoveredRestaurant[];
+}> {
   if (input.restaurants.length === 0) {
-    return { notes: "", restaurants: [] };
+    return { notes: "", restaurants: [], reassigned: [] };
   }
+
+  const searchCode = input.countryCode.toLowerCase();
+
+  const evidenceByIndex = await Promise.all(
+    input.restaurants.map((place) =>
+      fetchPageEvidenceMany(
+        [place.website, place.evidenceSourceUrl],
+        { maxPages: 2, concurrency: 2 },
+      ),
+    ),
+  );
 
   const listing = input.restaurants
     .map((place, index) => {
@@ -645,24 +828,29 @@ async function verifyRestaurantAuthenticity(input: {
         place.cuisineEvidence ? `claimed evidence: ${place.cuisineEvidence}` : null,
         place.evidenceSourceUrl ? `evidence source: ${place.evidenceSourceUrl}` : null,
         place.confidence ? `claimed confidence: ${place.confidence}` : null,
+        `page text:\n${formatPageEvidence(evidenceByIndex[index] ?? [])}`,
       ];
-      return parts.filter(Boolean).join(" | ");
+      return parts.filter(Boolean).join("\n");
     })
-    .join("\n");
+    .join("\n\n");
 
   const raw = await chatJson(
     `You verify whether restaurants in the Netherlands are genuine specialists for a given national cuisine.
 Reply with JSON only.
 
-Accept only when the place mainly serves that cuisine (or a closely related regional cuisine diners would expect under that flag), is currently operating, and has a real NL address.
-Reject: wrong cuisine, incidental single-dish mentions, caterers, supermarkets, recipe sites, closed venues, directory-only listings, fusion-first concepts, hotel restaurants, chains with token dishes, or anything you are not confident about.
+Use the fetched page text (website / Tripadvisor / delivery pages) as primary evidence when present. Trust clear cuisine wording in titles and descriptions (e.g. “Yemeni Restaurant”, “Albanese keuken”) over the search query that surfaced the place.
+
+Accept (accept=true) only when the place mainly serves the SEARCH cuisine (or a closely related regional cuisine diners would expect under that flag), is currently operating, and has a real NL address.
+When the place clearly serves a DIFFERENT national cuisine: set accept=false and set actualCuisineCodes to the ISO country code(s) it actually matches (1–3). Do not invent weak matches.
+When cuisine is unclear, closed, directory-only, fusion-first, hotel, supermarket, or not a restaurant: accept=false and omit actualCuisineCodes (or leave empty).
 Prefer fewer accepts over uncertain ones.
-confidence: "high" | "medium" | "low" — only accept high or medium.
+confidence: "high" | "medium" | "low" — only accept high or medium for accept=true.
 authenticityRating 1–5 (only accept if rating >= 4).
-cuisineEvidence: short note citing menu/About/description proof.
-evidenceSourceUrl: official page URL if known, otherwise null (never invent; never use Tripadvisor/TheFork/Thuisbezorgd/Uber Eats).
-authenticityNotes: 1–3 sentences explaining the accept/reject.`,
-    `Cuisine country: ${input.countryName} (${input.countryCode})
+cuisineEvidence: short note citing menu/About/description proof from the page text when available.
+evidenceSourceUrl: official venue website if known, otherwise null (never invent; do not invent Tripadvisor/Thuisbezorgd/Uber Eats URLs).
+authenticityNotes: 1–3 sentences explaining the accept/reject/reassign.
+Allowed cuisine codes: ${cuisineCodeReference()}`,
+    `Search cuisine country: ${input.countryName} (${searchCode})
 
 Candidates:
 ${listing}
@@ -681,6 +869,7 @@ JSON shape:
     "cuisineEvidence": string?,
     "evidenceSourceUrl": string | null,
     "confidence": "high" | "medium" | "low",
+    "actualCuisineCodes": string[]?,
     "reason": string?
   }]
 }`,
@@ -695,18 +884,18 @@ JSON shape:
   );
 
   const accepted: DiscoveredRestaurant[] = [];
+  const reassigned: DiscoveredRestaurant[] = [];
+
   for (const place of input.restaurants) {
     const key = `${place.name.trim().toLowerCase()}|${place.city.trim().toLowerCase()}`;
     let verdict = byKey.get(key);
     if (!verdict) {
-      // Fuzzy fallback: match by name only.
       verdict = parsed.verifications.find(
         (item) => item.name.trim().toLowerCase() === place.name.trim().toLowerCase(),
       );
     }
-    if (!verdict?.accept) continue;
-    if (verdict.confidence === "low") continue;
-    if (verdict.authenticityRating < 4) continue;
+    if (!verdict) continue;
+
     const confidence =
       verdict.confidence === "high" || verdict.confidence === "medium"
         ? verdict.confidence
@@ -721,7 +910,7 @@ JSON shape:
       officialWebsiteOrUndefined(verdict.evidenceSourceUrl) ??
       place.evidenceSourceUrl ??
       place.website;
-    accepted.push({
+    const base: DiscoveredRestaurant = {
       ...place,
       website: officialWebsiteOrUndefined(place.website),
       cuisineEvidence,
@@ -730,10 +919,41 @@ JSON shape:
       authenticityRating: Math.round(verdict.authenticityRating * 10) / 10,
       authenticityNotes: verdict.authenticityNotes,
       verified: true,
-    });
+    };
+
+    if (
+      verdict.accept &&
+      verdict.confidence !== "low" &&
+      verdict.authenticityRating >= 4
+    ) {
+      accepted.push({
+        ...base,
+        cuisineCodes: [searchCode],
+      });
+      continue;
+    }
+
+    const actualCodes = normalizeCountryCodes(verdict.actualCuisineCodes).filter(
+      (code) => code !== searchCode,
+    );
+    if (
+      actualCodes.length > 0 &&
+      verdict.confidence !== "low" &&
+      verdict.authenticityRating >= 3
+    ) {
+      reassigned.push({
+        ...base,
+        cuisine: countryNameForCode(actualCodes[0]!),
+        cuisineCodes: actualCodes,
+      });
+    }
   }
 
-  return { notes: parsed.notes, restaurants: accepted };
+  return {
+    notes: parsed.notes,
+    restaurants: accepted,
+    reassigned,
+  };
 }
 
 export async function discoverCountryShops(input: {
@@ -807,6 +1027,23 @@ const orderOptionAnnotateSchema = z.object({
     .max(30),
 });
 
+const orderOptionVerifyItemSchema = z.object({
+  index: z.coerce.number().int().nonnegative(),
+  accept: z.boolean(),
+  actualCuisineCodes: z
+    .array(z.string())
+    .nullish()
+    .transform((value) => value ?? undefined),
+  reason: optionalString,
+  optionNotes: optionalString,
+  signatureDish: optionalString,
+});
+
+const orderOptionsVerifySchema = z.object({
+  notes: z.string(),
+  items: z.array(orderOptionVerifyItemSchema).max(30),
+});
+
 async function annotateGroundedOrderOptions(input: {
   countryName: string;
   listings: GroundedOrderListing[];
@@ -860,9 +1097,185 @@ JSON shape:
   return out;
 }
 
+async function verifyOrderOptionCuisines(input: {
+  countryCode: string;
+  countryName: string;
+  listings: GroundedOrderListing[];
+}): Promise<{
+  notes: string;
+  acceptedIndexes: number[];
+  reassigned: Array<{
+    index: number;
+    cuisineCodes: string[];
+    notes?: string;
+    signatureDish?: string;
+  }>;
+}> {
+  if (input.listings.length === 0) {
+    return { notes: "", acceptedIndexes: [], reassigned: [] };
+  }
+
+  const searchCode = input.countryCode.toLowerCase();
+  const evidenceByIndex = await Promise.all(
+    input.listings.map((listing) =>
+      fetchPageEvidenceMany([listing.url], { maxPages: 1, concurrency: 2 }),
+    ),
+  );
+
+  const catalog = input.listings
+    .map((listing, index) => {
+      const bits = [
+        `#${index}`,
+        listing.platform,
+        listing.name,
+        listing.city ? `@ ${listing.city}` : null,
+        listing.url,
+        listing.cuisines?.length ? `listed cuisines: ${listing.cuisines.join(", ")}` : null,
+        listing.signatureDishHint ? `featured: ${listing.signatureDishHint}` : null,
+        listing.notes ? `meta: ${listing.notes}` : null,
+        `page text:\n${formatPageEvidence(evidenceByIndex[index] ?? [])}`,
+      ].filter(Boolean);
+      return bits.join("\n");
+    })
+    .join("\n\n");
+
+  const raw = await chatJson(
+    `You verify whether meal-delivery listings match a SEARCH national cuisine.
+Reply with JSON only. Do NOT invent restaurants or URLs.
+
+Use listed cuisines and fetched Thuisbezorgd / Uber Eats page text (title + description) as primary evidence.
+Accept (accept=true) only when the venue mainly serves the SEARCH cuisine.
+When it clearly serves a DIFFERENT national cuisine: accept=false and set actualCuisineCodes to ISO codes (1–3).
+When unclear / fusion / multi-cuisine without a clear specialist match: accept=false and omit actualCuisineCodes.
+Allowed cuisine codes: ${cuisineCodeReference()}`,
+    `Search cuisine: ${input.countryName} (${searchCode})
+
+Listings:
+${catalog}
+
+JSON shape:
+{
+  "notes": string,
+  "items": [{
+    "index": number,
+    "accept": boolean,
+    "actualCuisineCodes": string[]?,
+    "reason": string?,
+    "optionNotes": string?,
+    "signatureDish": string?
+  }]
+}`,
+  );
+
+  const parsed = orderOptionsVerifySchema.parse(raw);
+  const acceptedIndexes: number[] = [];
+  const reassigned: Array<{
+    index: number;
+    cuisineCodes: string[];
+    notes?: string;
+    signatureDish?: string;
+  }> = [];
+  const seen = new Set<number>();
+
+  for (const item of parsed.items) {
+    if (item.index < 0 || item.index >= input.listings.length) continue;
+    if (seen.has(item.index)) continue;
+    seen.add(item.index);
+    if (item.accept) {
+      acceptedIndexes.push(item.index);
+      continue;
+    }
+    const codes = normalizeCountryCodes(item.actualCuisineCodes).filter(
+      (code) => code !== searchCode,
+    );
+    if (codes.length > 0) {
+      reassigned.push({
+        index: item.index,
+        cuisineCodes: codes,
+        notes: item.optionNotes?.trim() || item.reason?.trim() || undefined,
+        signatureDish: item.signatureDish?.trim() || undefined,
+      });
+    }
+  }
+
+  return { notes: parsed.notes, acceptedIndexes, reassigned };
+}
+
+async function persistReassignedOrderOptions(input: {
+  listings: GroundedOrderListing[];
+  reassigned: Array<{
+    index: number;
+    cuisineCodes: string[];
+    notes?: string;
+    signatureDish?: string;
+  }>;
+}): Promise<{ created: number; skipped: number; labels: string[] }> {
+  let created = 0;
+  let skipped = 0;
+  const labelCounts = new Map<string, number>();
+
+  for (const item of input.reassigned) {
+    const listing = input.listings[item.index];
+    if (!listing) {
+      skipped += 1;
+      continue;
+    }
+
+    let storedSomewhere = false;
+    for (const code of item.cuisineCodes) {
+      const country = await getCountryFromDb(code);
+      if (!country) continue;
+      const existing = country.orderOptions ?? [];
+      const already = existing.some(
+        (option) =>
+          option.url.trim().toLowerCase() === listing.url.trim().toLowerCase() ||
+          (option.platform === listing.platform &&
+            option.name.trim().toLowerCase() === listing.name.trim().toLowerCase() &&
+            (option.city ?? "").trim().toLowerCase() ===
+              (listing.city ?? "").trim().toLowerCase()),
+      );
+      if (already) {
+        storedSomewhere = true;
+        continue;
+      }
+      const option: OrderOption = {
+        id:
+          slugify(`${listing.platform}-${listing.name}-${listing.city ?? "nl"}-${code}`) ||
+          "order",
+        name: listing.name,
+        platform: listing.platform,
+        url: listing.url,
+        thuisbezorgdUrl:
+          listing.platform === "thuisbezorgd" ? listing.url : undefined,
+        ubereatsUrl: listing.platform === "ubereats" ? listing.url : undefined,
+        city: listing.city,
+        notes:
+          item.notes ||
+          listing.notes ||
+          `Verified as ${countryNameForCode(code)} cuisine (reassigned from another search).`,
+        signatureDish: item.signatureDish || listing.signatureDishHint || undefined,
+        cuisineCodes: [code],
+      };
+      await appendOrderOptions(code, [option]);
+      created += 1;
+      storedSomewhere = true;
+      const label = countryNameForCode(code);
+      labelCounts.set(label, (labelCounts.get(label) ?? 0) + 1);
+    }
+    if (!storedSomewhere) skipped += 1;
+  }
+
+  const labels = [...labelCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => (count > 1 ? `${name}×${count}` : name))
+    .slice(0, 6);
+
+  return { created, skipped, labels };
+}
+
 /**
  * Discover order options from live Thuisbezorgd / Uber Eats listings (Apify).
- * OpenAI is optional and only annotates signature dishes — never invents venues.
+ * OpenAI verifies cuisine from TB/UE page text and reassigns mismatches.
  */
 export async function discoverCountryOrderOptions(input: {
   countryCode: string;
@@ -884,12 +1297,59 @@ export async function discoverCountryOrderOptions(input: {
     maxPerPlatform: 10,
   });
 
+  const noteParts = [grounded.notes].filter(Boolean);
+  let keptListings = grounded.listings;
+
+  if (isOpenAiConfigured() && grounded.listings.length > 0) {
+    try {
+      const verified = await verifyOrderOptionCuisines({
+        countryCode: input.countryCode,
+        countryName: input.countryName,
+        listings: grounded.listings,
+      });
+      if (verified.notes) noteParts.push(verified.notes);
+
+      const persisted = await persistReassignedOrderOptions({
+        listings: grounded.listings,
+        reassigned: verified.reassigned,
+      });
+      if (persisted.created > 0) {
+        noteParts.push(
+          `Reassigned ${persisted.created} wrong-cuisine listing(s) to their actual countries` +
+            (persisted.labels.length > 0 ? ` (${persisted.labels.join(", ")})` : "") +
+            ".",
+        );
+      } else if (verified.reassigned.length > 0) {
+        noteParts.push(
+          `${verified.reassigned.length} wrong-cuisine listing(s) already stored or skipped (country missing).`,
+        );
+      }
+
+      const acceptSet = new Set(verified.acceptedIndexes);
+      const reassignSet = new Set(verified.reassigned.map((item) => item.index));
+      keptListings = grounded.listings.filter((_, index) => acceptSet.has(index));
+      const dropped =
+        grounded.listings.length - keptListings.length - reassignSet.size;
+      if (dropped > 0) {
+        noteParts.push(
+          `Dropped ${dropped} listing(s) that failed cuisine verification.`,
+        );
+      }
+    } catch (error) {
+      console.warn(
+        "Order option cuisine verify failed; keeping soft-filtered list",
+        error,
+      );
+      noteParts.push("Cuisine verification skipped due to an error.");
+    }
+  }
+
   const annotations = await annotateGroundedOrderOptions({
     countryName: input.countryName,
-    listings: grounded.listings,
+    listings: keptListings,
   });
 
-  const options: OrderOption[] = grounded.listings.map((listing, index) => {
+  const options: OrderOption[] = keptListings.map((listing, index) => {
     const annotation = annotations.get(index);
     const notes = [listing.notes, annotation?.notes].filter(Boolean).join(" — ");
     return {
@@ -898,14 +1358,18 @@ export async function discoverCountryOrderOptions(input: {
       name: listing.name,
       platform: listing.platform,
       url: listing.url,
+      thuisbezorgdUrl:
+        listing.platform === "thuisbezorgd" ? listing.url : undefined,
+      ubereatsUrl: listing.platform === "ubereats" ? listing.url : undefined,
       city: listing.city,
       notes: notes || undefined,
       signatureDish: annotation?.signatureDish || listing.signatureDishHint || undefined,
+      cuisineCodes: [input.countryCode.toLowerCase()],
     };
   });
 
   return {
-    notes: grounded.notes,
+    notes: noteParts.join(" "),
     options,
   };
 }
@@ -1397,6 +1861,7 @@ export async function rewriteRestaurantText(input: {
     name: string;
     address: string;
     city: string;
+    website?: string | null;
     authenticityNotes?: string | null;
   };
 }): Promise<{
@@ -1405,26 +1870,35 @@ export async function rewriteRestaurantText(input: {
   cuisineCodes: string[];
 }> {
   const seedCodes = normalizeCountryCodes([
-    ...(input.countryCode ? [input.countryCode] : []),
     ...(input.existingCuisineCodes ?? []),
+    ...(input.countryCode ? [input.countryCode] : []),
   ]);
+  const pageEvidence = await fetchPageEvidenceMany(
+    [input.restaurant.website],
+    { maxPages: 1 },
+  );
   const raw = await chatJson(
     `You write concise authenticity notes for restaurants in the Netherlands and identify which national cuisines they match.
 Reply with JSON only.
+Use website page text (title/description) as primary evidence when present.
 Restaurants often span multiple countries (e.g. Levantine, Horn of Africa, Balkan, pan-Asian). List every ISO country code that genuinely fits.
-Do not invent weak matches — only countries a diner would reasonably expect from this place.`,
-    `Context country (viewer may be browsing this cuisine): ${input.countryName}${
+Do not invent weak matches — only countries a diner would reasonably expect from this place.
+If the venue clearly serves a different cuisine than the context country, do NOT include the context country.`,
+    `Context country (viewer may be browsing this cuisine — may be wrong): ${input.countryName}${
       input.countryCode ? ` (${input.countryCode})` : ""
     }
 Restaurant: ${input.restaurant.name}
 Address: ${input.restaurant.address}, ${input.restaurant.city}
+Website: ${input.restaurant.website ?? "none"}
+Page evidence:
+${formatPageEvidence(pageEvidence)}
 Current notes: ${input.restaurant.authenticityNotes ?? "none"}
 Current cuisine codes: ${seedCodes.join(", ") || "none"}
 
 Allowed cuisine codes (use only these): ${cuisineCodeReference()}
 
 Write improved authenticity notes (2–4 sentences) covering the cuisines this place actually represents.
-Set cuisineCodes to all matching countries (1–6). Include the context country when it fits.
+Set cuisineCodes to all matching countries (1–6). Include the context country only when it truly fits.
 
 JSON shape:
 {
@@ -1437,10 +1911,6 @@ JSON shape:
   let cuisineCodes = normalizeCountryCodes(parsed.cuisineCodes);
   if (cuisineCodes.length === 0) {
     cuisineCodes = seedCodes.length > 0 ? seedCodes : [];
-  }
-  if (input.countryCode && !cuisineCodes.includes(input.countryCode.toLowerCase())) {
-    // Keep the page country if the model omitted it but notes still concern it.
-    cuisineCodes = [input.countryCode.toLowerCase(), ...cuisineCodes];
   }
   return {
     notes: parsed.notes,
@@ -1543,8 +2013,8 @@ JSON shape:
     }
     cuisineCodes = Array.from(fromItems);
   }
-  for (const code of seedCodes) {
-    if (!cuisineCodes.includes(code)) cuisineCodes.push(code);
+  if (cuisineCodes.length === 0) {
+    cuisineCodes = seedCodes;
   }
   if (cuisineCodes.length === 0 && input.countryCode) {
     cuisineCodes = [input.countryCode.toLowerCase()];

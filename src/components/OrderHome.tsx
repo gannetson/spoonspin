@@ -1,14 +1,17 @@
 import { useMemo, useState } from "react";
 import { ExternalLink, MapPin, Plus } from "lucide-react";
-import type { Country, OrderPlatform } from "@/types/content";
+import type { Country, OrderOption, OrderPlatform } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { useConsent } from "@/consent/ConsentContext";
 import { usePublicConfig } from "@/lib/usePublicConfig";
 import { getOrderOptions } from "@/content/countries/menuAccessors";
+import { cuisineFlagsFor } from "@/restaurants/cuisineFlags";
+import { deliveryPlatformLinks } from "@/restaurants/deliveryLinks";
 import {
-  deliveryPlatformLinks,
-  resolveOrderOptionHref,
-} from "@/restaurants/deliveryLinks";
+  orderOptionCuisineCodes,
+  orderOptionPlatformLinks,
+  resolveOrderPlatformHref,
+} from "@/restaurants/orderOptionLinks";
 import { platformLogoSrc } from "@/restaurants/platformLogos";
 import {
   DEFAULT_DINE_CITY,
@@ -30,15 +33,21 @@ import {
 } from "@/components/SuggestedItemReview";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { handleOrderOptionAdminAction, useAdminItemBusy } from "@/admin/itemActions";
+import { useEditOrderOption } from "@/admin/EditOrderOptionContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 
 type OrderHomeProps = {
   country: Country;
   onCountryUpdated?: (country: Country) => void;
+  onOpenOrderOption?: (option: OrderOption) => void;
 };
 
-export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
+export function OrderHome({
+  country,
+  onCountryUpdated,
+  onOpenOrderOption,
+}: OrderHomeProps) {
   const t = useT();
   const { marketingAllowed } = useConsent();
   const publicConfig = usePublicConfig();
@@ -46,6 +55,7 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
   const isAdmin = user?.role === "admin";
   const { busy, status, error, run } = useAdminItemBusy();
   const { openSelectImage } = useSelectImage();
+  const { openEditOrderOption } = useEditOrderOption();
   const savedCity = getSavedDineCity();
   const rememberPreferred = getRememberCityPreference();
 
@@ -217,100 +227,166 @@ export function OrderHome({ country, onCountryUpdated }: OrderHomeProps) {
 
       {filteredOrderOptions.length > 0 ? (
         <ul className="grid gap-3">
-          {filteredOrderOptions.map((option) => (
-            <li
-              key={option.id}
-              className="relative overflow-hidden rounded-2xl bg-cream ring-1 ring-ink/10"
-            >
-              {isAdmin && onCountryUpdated ? (
-                <AdminItemMenu
-                  className="absolute right-3 top-3 z-10"
-                  label={option.name}
-                  busy={Boolean(busy[`order:${option.id}`])}
-                  status={status[`order:${option.id}`]}
-                  error={error[`order:${option.id}`]}
-                  onAction={(action) => {
-                    void run(`order:${option.id}`, () =>
-                      handleOrderOptionAdminAction({
-                        action,
-                        country,
-                        option,
-                        onCountryUpdated,
-                        openSelectImage,
-                      }),
-                    );
-                  }}
-                />
-              ) : null}
-              <div
-                className={`flex flex-col gap-4 p-5 sm:flex-row sm:items-stretch ${
-                  isAdmin && onCountryUpdated ? "pr-12" : ""
-                }`}
+          {filteredOrderOptions.map((option) => {
+            const links = orderOptionPlatformLinks(option);
+            const flags = cuisineFlagsFor(
+              orderOptionCuisineCodes(option, country.code),
+            );
+            return (
+              <li
+                key={option.id}
+                className="relative overflow-hidden rounded-2xl bg-cream ring-1 ring-ink/10"
               >
-                <div className="relative h-36 w-full shrink-0 overflow-hidden rounded-xl sm:h-auto sm:w-40">
-                  {option.imageUrl ? (
-                    <img
-                      src={option.imageUrl}
-                      alt=""
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <MediaPlaceholder
-                      labelKey="media.placeholder.recipe"
-                      className="h-full min-h-36"
-                    />
-                  )}
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
-                  <div>
-                    <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
-                      <img
-                        src={platformLogoSrc(option.platform as OrderPlatform)}
-                        alt=""
-                        className="size-5 rounded-md object-cover"
-                      />
-                      {t(`dine.order.platform.${option.platform}`)}
-                    </p>
-                    <p className="mt-1 font-display text-xl text-burgundy">
-                      {option.name}
-                    </p>
-                    {option.signatureDish ? (
-                      <p className="mt-1 text-sm font-semibold text-tomato">
-                        {t("dine.order.signatureDish", {
-                          dish: option.signatureDish,
-                        })}
-                      </p>
-                    ) : null}
-                    {option.city ? (
-                      <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
-                        <MapPin aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
-                        {option.city}
-                      </p>
-                    ) : null}
-                    {option.notes ? (
-                      <p className="mt-2 text-sm text-ink-soft">{option.notes}</p>
-                    ) : null}
-                  </div>
-                  <a
-                    href={resolveOrderOptionHref({
-                      platform: option.platform,
-                      url: option.url,
-                      countryCode: country.code,
-                      countryName: country.name,
-                      cityOrPostcode: option.city || cityOrPostcode,
-                      marketingAllowed,
-                    })}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
+                {isAdmin && onCountryUpdated ? (
+                  <AdminItemMenu
+                    className="absolute right-3 top-3 z-10"
+                    label={option.name}
+                    showEditText
+                    editTextLabelKey="admin.item.editOrderOption"
+                    editTextHintKey="admin.item.editOrderOption.hint"
+                    busy={Boolean(busy[`order:${option.id}`])}
+                    status={status[`order:${option.id}`]}
+                    error={error[`order:${option.id}`]}
+                    onAction={(action) => {
+                      void run(`order:${option.id}`, () =>
+                        handleOrderOptionAdminAction({
+                          action,
+                          country,
+                          option,
+                          onCountryUpdated,
+                          openSelectImage,
+                          openEditOrderOption,
+                        }),
+                      );
+                    }}
+                  />
+                ) : null}
+                <div
+                  className={`flex flex-col gap-4 p-5 sm:flex-row sm:items-stretch ${
+                    isAdmin && onCountryUpdated ? "pr-12" : ""
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => onOpenOrderOption?.(option)}
+                    className="relative h-36 w-full shrink-0 overflow-hidden rounded-xl sm:h-auto sm:w-40"
+                    aria-label={t("order.option.openAria", { name: option.name })}
                   >
-                    {t("dine.order.open")}
-                    <ExternalLink aria-hidden="true" className="size-4" />
-                  </a>
+                    {option.imageUrl ? (
+                      <img
+                        src={option.imageUrl}
+                        alt=""
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <MediaPlaceholder
+                        labelKey="media.placeholder.recipe"
+                        className="h-full min-h-36"
+                      />
+                    )}
+                  </button>
+                  <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => onOpenOrderOption?.(option)}
+                      className="min-w-0 text-left"
+                    >
+                      <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-stamp">
+                        <img
+                          src={platformLogoSrc(option.platform as OrderPlatform)}
+                          alt=""
+                          className="size-5 rounded-md object-cover"
+                        />
+                        {t(`dine.order.platform.${option.platform}`)}
+                      </p>
+                      <p className="mt-1 font-display text-xl text-burgundy">
+                        {option.name}
+                      </p>
+                      {flags.length > 0 ? (
+                        <p className="mt-1 flex flex-wrap gap-1 text-base leading-none">
+                          {flags.map((flag) => (
+                            <span key={flag.code} title={flag.name}>
+                              {flag.flag}
+                            </span>
+                          ))}
+                        </p>
+                      ) : null}
+                      {option.signatureDish ? (
+                        <p className="mt-1 text-sm font-semibold text-tomato">
+                          {t("dine.order.signatureDish", {
+                            dish: option.signatureDish,
+                          })}
+                        </p>
+                      ) : null}
+                      {option.city ? (
+                        <p className="mt-1 inline-flex items-start gap-2 text-sm text-ink-soft">
+                          <MapPin
+                            aria-hidden="true"
+                            className="mt-0.5 size-4 shrink-0"
+                          />
+                          {option.city}
+                        </p>
+                      ) : null}
+                      {option.notes ? (
+                        <p className="mt-2 line-clamp-2 text-sm text-ink-soft">
+                          {option.notes}
+                        </p>
+                      ) : null}
+                    </button>
+                    <div className="flex flex-wrap gap-2">
+                      {links.thuisbezorgd ? (
+                        <a
+                          href={resolveOrderPlatformHref({
+                            platform: "thuisbezorgd",
+                            url: links.thuisbezorgd,
+                            countryCode: country.code,
+                            countryName: country.name,
+                            cityOrPostcode: option.city || cityOrPostcode,
+                            marketingAllowed,
+                          })}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(event) => event.stopPropagation()}
+                          className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
+                        >
+                          {t("order.option.open.thuisbezorgd")}
+                          <ExternalLink aria-hidden="true" className="size-4" />
+                        </a>
+                      ) : null}
+                      {links.ubereats ? (
+                        <a
+                          href={resolveOrderPlatformHref({
+                            platform: "ubereats",
+                            url: links.ubereats,
+                            countryCode: country.code,
+                            countryName: country.name,
+                            cityOrPostcode: option.city || cityOrPostcode,
+                            marketingAllowed,
+                          })}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(event) => event.stopPropagation()}
+                          className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full border border-ink/15 bg-white px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
+                        >
+                          {t("order.option.open.ubereats")}
+                          <ExternalLink aria-hidden="true" className="size-4" />
+                        </a>
+                      ) : null}
+                      {!links.thuisbezorgd && !links.ubereats ? (
+                        <button
+                          type="button"
+                          onClick={() => onOpenOrderOption?.(option)}
+                          className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
+                        >
+                          {t("order.option.view")}
+                        </button>
+                      ) : null}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       ) : (
         <div className="rounded-2xl border border-dashed border-stamp/40 bg-white/50 p-5">

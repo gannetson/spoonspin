@@ -26,11 +26,11 @@ import {
   upsertRestaurant,
   type StoredRestaurant,
 } from "../server/db/restaurants.ts";
+import { listCountriesFromDb } from "../server/db/content.ts";
 import {
   hasPrimaryCuisineMatch,
   osmTagsForCountry,
 } from "../src/restaurants/osmCuisineMap.ts";
-import { publishedCountries } from "../src/content/countries/published.ts";
 import { HUBS, harvestCountryAtHub, sleep, type Hub } from "./lib/overpassRestaurants.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -65,7 +65,7 @@ type CliOptions = {
   statusOnly: boolean;
   promoteOnly: boolean;
   reset: boolean;
-  countries: string[];
+  countries: string[] | null;
 };
 
 function parseArgs(argv: string[]): CliOptions {
@@ -78,7 +78,7 @@ function parseArgs(argv: string[]): CliOptions {
     statusOnly: false,
     promoteOnly: false,
     reset: false,
-    countries: publishedCountries.map((c) => c.code),
+    countries: null,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -144,9 +144,20 @@ function saveProgress(progress: GatherProgress) {
   fs.writeFileSync(PROGRESS_PATH, `${JSON.stringify(progress, null, 2)}\n`);
 }
 
+async function resolveCountryCodes(options: CliOptions): Promise<string[]> {
+  if (options.countries && options.countries.length > 0) {
+    return options.countries;
+  }
+  const countries = await listCountriesFromDb();
+  return countries
+    .filter((country) => country.status === "published")
+    .map((country) => country.code);
+}
+
 async function buildJobs(options: CliOptions): Promise<GatherJob[]> {
+  const countryCodes = await resolveCountryCodes(options);
   const reviewed = await countByCuisineCode();
-  const rankedCountries = [...options.countries].sort((a, b) => {
+  const rankedCountries = [...countryCodes].sort((a, b) => {
     const gap = (reviewed[a] ?? 0) - (reviewed[b] ?? 0);
     if (gap !== 0) return gap;
     return a.localeCompare(b);
@@ -262,6 +273,9 @@ async function printStatus(options: CliOptions, progress: GatherProgress) {
   const completed = new Set(progress.completedJobIds);
   const remaining = jobs.filter((job) => !completed.has(job.id));
   const reviewed = await countByCuisineCode();
+  const countryCodes = await resolveCountryCodes(options);
+  const countries = await listCountriesFromDb();
+  const byCode = new Map(countries.map((c) => [c.code, c]));
 
   console.log("Gather progress");
   console.log(`  preset: ${options.hubsPreset} · radius ${options.radiusKm} km`);
@@ -274,10 +288,10 @@ async function printStatus(options: CliOptions, progress: GatherProgress) {
   if (progress.lastRunAt) console.log(`  last run: ${progress.lastRunAt}`);
 
   console.log("\nReviewed coverage:");
-  for (const country of publishedCountries) {
-    if (!options.countries.includes(country.code)) continue;
-    const n = reviewed[country.code] ?? 0;
-    console.log(`  ${n > 0 ? "✓" : "·"} ${country.code} ${country.name}: ${n}`);
+  for (const code of countryCodes) {
+    const n = reviewed[code] ?? 0;
+    const name = byCode.get(code)?.name ?? code;
+    console.log(`  ${n > 0 ? "✓" : "·"} ${code} ${name}: ${n}`);
   }
 
   if (remaining.length > 0) {

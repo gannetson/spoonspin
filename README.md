@@ -174,6 +174,20 @@ npm run agent:gather -- --reset
 
 Progress lives in `data/gather-progress.json` (gitignored). Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Sparse cuisines are harvested first. Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in admin.
 
+### Scheduled fill (all countries × Randstad cities)
+
+See **[docs/content-fill-strategy.md](docs/content-fill-strategy.md)** for the full plan.
+
+Fills cook menus, restaurants, and order options for **Leiden, Amsterdam, Rotterdam, Den Haag, Utrecht**:
+
+```bash
+npm run agent:fill -- --status
+npm run agent:fill -- --lane daily --batch 2
+npm run agent:fill -- --lane orders --batch 3
+```
+
+Sample cron: [`deploy/cron/spoonspin-content.cron`](deploy/cron/spoonspin-content.cron). Sample systemd timer: [`deploy/systemd/`](deploy/systemd/).
+
 ### Guest ratings (Google / The Fork / Tripadvisor)
 
 ```bash

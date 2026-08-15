@@ -975,10 +975,89 @@ export async function getRestaurantById(id: string): Promise<StoredRestaurant | 
   return row ? rowToStored(row) : null;
 }
 
+/** Match by normalized name + city (for cuisine reassignment / dedupe). */
+export async function findRestaurantByNameAndCity(
+  name: string,
+  city: string,
+): Promise<StoredRestaurant | null> {
+  const needleName = name.trim().toLowerCase();
+  const needleCity = city.trim().toLowerCase();
+  if (!needleName || !needleCity) return null;
+  const db = await ensureDb();
+  const result = await db.query(
+    `SELECT * FROM restaurants
+     WHERE lower(trim(name)) = $1 AND lower(trim(city)) = $2
+     ORDER BY reviewed DESC NULLS LAST, updated_at DESC NULLS LAST
+     LIMIT 1`,
+    [needleName, needleCity],
+  );
+  const row = result.rows[0];
+  return row ? rowToStored(row) : null;
+}
+
 export async function deleteRestaurantById(id: string): Promise<boolean> {
   const db = await ensureDb();
   const result = await db.query(`DELETE FROM restaurants WHERE id = $1`, [id]);
   return (result.rowCount ?? 0) > 0;
+}
+
+export async function updateRestaurantFields(
+  id: string,
+  patch: {
+    name?: string;
+    website?: string | null;
+    cuisineCodes?: string[];
+    authenticityNotes?: string | null;
+  },
+): Promise<StoredRestaurant | null> {
+  const current = await getRestaurantById(id);
+  if (!current) return null;
+
+  const name = patch.name?.trim() || current.name;
+  const website =
+    patch.website === undefined
+      ? current.website
+      : patch.website?.trim() || null;
+  const authenticityNotes =
+    patch.authenticityNotes === undefined
+      ? current.authenticityNotes
+      : patch.authenticityNotes?.trim() || null;
+  const cuisineCodes =
+    patch.cuisineCodes !== undefined
+      ? Array.from(
+          new Set(
+            patch.cuisineCodes
+              .map((code) => code.trim().toLowerCase())
+              .filter((code) => /^[a-z]{2}$/.test(code)),
+          ),
+        )
+      : current.cuisineCodes;
+  const tags =
+    patch.cuisineCodes !== undefined
+      ? cuisineTagsForCodes(cuisineCodes)
+      : current.cuisineTags;
+
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE restaurants
+     SET name = $2,
+         website = $3,
+         cuisine_codes = $4::jsonb,
+         cuisine_tags = $5::jsonb,
+         authenticity_notes = $6,
+         updated_at = $7::timestamptz
+     WHERE id = $1`,
+    [
+      id,
+      name,
+      website,
+      JSON.stringify(cuisineCodes),
+      JSON.stringify(tags.length > 0 ? tags : cuisineCodes),
+      authenticityNotes,
+      new Date().toISOString(),
+    ],
+  );
+  return getRestaurantById(id);
 }
 
 export async function updateRestaurantPhoto(

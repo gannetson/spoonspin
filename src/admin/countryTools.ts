@@ -24,6 +24,7 @@ export type DiscoveredRestaurant = {
   authenticityRating?: number;
   phone?: string;
   verified?: boolean;
+  cuisineCodes?: string[];
 };
 
 export type DishCandidate = {
@@ -386,6 +387,43 @@ export function replaceOrderOptionText(code: string, optionId: string) {
   );
 }
 
+export type OrderOptionCopyPatch = {
+  name?: string;
+  notes?: string | null;
+  signatureDish?: string | null;
+  thuisbezorgdUrl?: string | null;
+  ubereatsUrl?: string | null;
+  cuisineCodes?: string[];
+};
+
+export async function patchOrderOptionFields(
+  code: string,
+  optionId: string,
+  patch: OrderOptionCopyPatch,
+) {
+  const response = await fetch(
+    `/api/admin/countries/${encodeURIComponent(code)}/order-options/${encodeURIComponent(optionId)}`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    },
+  );
+  const data = await readJson<{
+    country?: Country;
+    option?: OrderOption;
+    message?: string;
+  }>(response);
+  if (!response.ok) {
+    throw new Error(data.message ?? "Could not update order option.");
+  }
+  return data as {
+    country: Country;
+    option: OrderOption;
+  };
+}
+
 export function removeRestaurant(id: string) {
   return deleteAdmin<{ ok: true; id: string }>(
     `/api/admin/restaurants/${encodeURIComponent(id)}`,
@@ -399,6 +437,38 @@ export function replaceRestaurantImage(id: string, countryName: string) {
   }>(`/api/admin/restaurants/${encodeURIComponent(id)}/replace-image`, {
     countryName,
   });
+}
+
+export type RestaurantCopyPatch = {
+  name?: string;
+  website?: string | null;
+  authenticityNotes?: string | null;
+  cuisineCodes?: string[];
+};
+
+export async function patchRestaurantFields(
+  id: string,
+  patch: RestaurantCopyPatch,
+) {
+  const response = await fetch(
+    `/api/admin/restaurants/${encodeURIComponent(id)}`,
+    {
+      method: "PATCH",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(patch),
+    },
+  );
+  const data = await readJson<{
+    restaurant?: import("@/restaurants/types").Restaurant;
+    message?: string;
+  }>(response);
+  if (!response.ok) {
+    throw new Error(data.message ?? "Could not update restaurant.");
+  }
+  return data as {
+    restaurant: import("@/restaurants/types").Restaurant;
+  };
 }
 
 export function replaceRestaurantText(
