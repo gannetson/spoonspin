@@ -490,6 +490,30 @@ export const nl: Messages = {
   "admin.overview.status.cookReady": "Kookklaar",
   "admin.overview.status.spinOnly": "Alleen spin",
 
+  "admin.fill.title": "Content fill",
+  "admin.fill.subtitle":
+    "Voortgang van fill-lanes (bestellingen, kookmenu’s, Randstad-restaurants) plus actuele gaten.",
+  "admin.fill.loading": "Fill-status laden…",
+  "admin.fill.error": "Kon fill-status niet laden.",
+  "admin.fill.metric.lastRun": "Laatste fill-run",
+  "admin.fill.metric.orders": "Order-jobs",
+  "admin.fill.metric.ordersRemaining": "{count} resterend",
+  "admin.fill.metric.cook": "Kook-gaten",
+  "admin.fill.metric.cookHint": "Niet kookklaar of onder 20 recepten",
+  "admin.fill.metric.restaurants": "Restaurant-gaten",
+  "admin.fill.metric.enrichment":
+    "Nog te verrijken · rest. {restaurants} · orders {orders}",
+  "admin.fill.failedTitle": "Mislukte order-jobs",
+  "admin.fill.section.orders": "Orders per stad",
+  "admin.fill.section.cook": "Kook nog incompleet",
+  "admin.fill.section.restaurants": "Weinig restaurants",
+  "admin.fill.status.done": "klaar",
+  "admin.fill.status.pending": "open",
+  "admin.fill.status.failed": "mislukt",
+  "admin.fill.truncated": "Alleen eerste landen getoond.",
+  "admin.fill.cookEmpty": "Alle gepubliceerde landen zijn kookklaar.",
+  "admin.fill.restaurantsEmpty": "Geen landen met te weinig restaurants.",
+
   "admin.reports.title": "Rapporten",
   "admin.reports.subtitle":
     "API-verkeer per IP, populaire paden en productgebruik over tijd.",
@@ -694,7 +718,8 @@ export const nl: Messages = {
     "Geef minstens één Thuisbezorgd- of Uber Eats-link op.",
   "admin.orderOption.edit.error.save": "Kon besteloptie niet opslaan.",
   "admin.item.replaceText": "Tekst vervangen",
-  "admin.item.replaceText.hint": "Onderzoek en werk de tekst bij",
+  "admin.item.replaceText.hint":
+    "Scan gerelateerde website- / bezorgpagina’s en werk tekst en keukenlanden bij",
   "admin.restaurant.edit.eyebrow": "Restaurant",
   "admin.restaurant.edit.title": "{name} bewerken",
   "admin.restaurant.edit.subtitle":

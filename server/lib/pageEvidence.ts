@@ -9,6 +9,7 @@ const USER_AGENT =
 const FETCH_TIMEOUT_MS = 8_000;
 const MAX_HTML_BYTES = 800_000;
 const MAX_SNIPPET_CHARS = 900;
+const MAX_SNIPPET_CHARS_DEEP = 1_600;
 
 export type PageEvidence = {
   url: string;
@@ -16,6 +17,11 @@ export type PageEvidence = {
   title?: string;
   description?: string;
   snippet?: string;
+};
+
+export type FetchPageEvidenceOptions = {
+  /** Prefer longer body snippets for replace-text / rewrite. */
+  deep?: boolean;
 };
 
 function normalizeUrl(raw: string): string | null {
@@ -82,7 +88,7 @@ function extractTitle(html: string): string | undefined {
   return undefined;
 }
 
-function extractSnippet(html: string): string | undefined {
+function extractSnippet(html: string, maxChars = MAX_SNIPPET_CHARS): string | undefined {
   const withoutNoise = html
     .replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, " ")
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
@@ -95,7 +101,7 @@ function extractSnippet(html: string): string | undefined {
       .trim(),
   );
   if (text.length < 40) return undefined;
-  return text.slice(0, MAX_SNIPPET_CHARS);
+  return text.slice(0, maxChars);
 }
 
 /** Format evidence for LLM prompts. */
@@ -120,9 +126,11 @@ export function formatPageEvidence(evidence: PageEvidence[]): string {
  */
 export async function fetchPageEvidence(
   url: string | null | undefined,
+  options?: FetchPageEvidenceOptions,
 ): Promise<PageEvidence | null> {
   const pageUrl = normalizeUrl(url ?? "");
   if (!pageUrl) return null;
+  const maxSnippet = options?.deep ? MAX_SNIPPET_CHARS_DEEP : MAX_SNIPPET_CHARS;
 
   try {
     const controller = new AbortController();
@@ -155,7 +163,7 @@ export async function fetchPageEvidence(
       metaContent(html, "og:description") ??
       metaContent(html, "description") ??
       metaContent(html, "twitter:description");
-    const snippet = extractSnippet(html);
+    const snippet = extractSnippet(html, maxSnippet);
 
     if (!title && !description && !snippet) return null;
 
@@ -177,7 +185,7 @@ export async function fetchPageEvidence(
  */
 export async function fetchPageEvidenceMany(
   urls: Array<string | null | undefined>,
-  options?: { maxPages?: number; concurrency?: number },
+  options?: { maxPages?: number; concurrency?: number; deep?: boolean },
 ): Promise<PageEvidence[]> {
   const maxPages = options?.maxPages ?? 3;
   const concurrency = options?.concurrency ?? 4;
@@ -196,7 +204,9 @@ export async function fetchPageEvidenceMany(
   const out: PageEvidence[] = [];
   for (let i = 0; i < unique.length; i += concurrency) {
     const batch = unique.slice(i, i + concurrency);
-    const results = await Promise.all(batch.map((url) => fetchPageEvidence(url)));
+    const results = await Promise.all(
+      batch.map((url) => fetchPageEvidence(url, { deep: options?.deep })),
+    );
     for (const item of results) {
       if (item) out.push(item);
     }

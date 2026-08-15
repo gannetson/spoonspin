@@ -1,7 +1,8 @@
 #!/usr/bin/env tsx
 /**
  * Complete incomplete countries to cook-ready menus:
- * starter + main + side + dessert + menu drink, cook_ready = true.
+ * starter + main + side + dessert + menu drink, cook_ready = true,
+ * plus enough moreRecipes to reach TARGET_RECIPES (20+) per country.
  *
  *   npm run agent:complete-menus
  *   npm run agent:complete-menus -- --batch 5
@@ -20,6 +21,7 @@ import {
   upsertCountryRecord,
   type MenuSlot,
 } from "../server/db/content.ts";
+import { mergeFillProgress } from "../server/db/fillProgress.ts";
 import { closeDb, getDb } from "../server/db/restaurants.ts";
 import {
   discoverCountryDrinks,
@@ -45,6 +47,9 @@ const CORE_SLOTS: Array<"starter" | "main" | "side" | "dessert"> = [
   "side",
   "dessert",
 ];
+
+/** Aim for a rich Cook library per cuisine (core 4 + moreRecipes). */
+const TARGET_RECIPES = 20;
 
 type WikiDish = {
   name: string;
@@ -132,6 +137,22 @@ function loadProgress(): Progress {
     runs: raw.runs ?? 0,
     lastRunAt: raw.lastRunAt ?? null,
   };
+}
+
+async function syncFillProgress(progress: Progress) {
+  try {
+    await mergeFillProgress({
+      lastCookRunAt: progress.lastRunAt,
+      lastRunAt: progress.lastRunAt,
+      cookCompletedCodes: progress.completedCodes,
+      cookFailedCodes: progress.failedCodes,
+      totals: {
+        cookMenusCompleted: progress.lifetimeCompleted,
+      },
+    });
+  } catch (error) {
+    console.warn("Could not sync cook progress to content_fill_progress:", error);
+  }
 }
 
 function isFullRecipe(recipe: Recipe): boolean {
@@ -383,17 +404,46 @@ async function completeCountry(
     candidates.push(dish);
   }
 
+  // Top up candidate list when wiki + first discover are thin.
+  if (candidates.length < TARGET_RECIPES && isOpenAiConfigured()) {
+    try {
+      const extra = await withRetry(`discover more recipes ${country.code}`, () =>
+        discoverCountryRecipes({
+          countryCode: country.code,
+          countryName: country.name,
+          existingNames: candidates.map((dish) => dish.name),
+          query:
+            "Regional classics, street food, festive dishes, and everyday home cooking not already listed",
+        }),
+      );
+      for (const dish of extra.recipes) {
+        if (
+          candidates.some((item) => item.name.toLowerCase() === dish.name.toLowerCase())
+        ) {
+          continue;
+        }
+        candidates.push({
+          ...dish,
+          id: `${country.code}:${slugify(dish.name) || dish.id}`,
+        });
+      }
+    } catch (error) {
+      console.warn(`  extra dish discover failed for ${country.code}`, error);
+    }
+  }
+
   if (candidates.length < 4) {
     throw new Error(`Not enough dish candidates (${candidates.length})`);
   }
 
-  // Cap expansion budget: core 4 + up to 4 more.
+  // Cap expansion budget: core 4 + enough "more" dishes to hit TARGET_RECIPES.
+  const moreBudget = Math.max(0, TARGET_RECIPES - CORE_SLOTS.length);
   let slotIds: Record<"starter" | "main" | "side" | "dessert", string>;
   try {
     slotIds = await assignSlotsWithLlm({
       countryCode: country.code,
       countryName: country.name,
-      candidates: candidates.slice(0, 20),
+      candidates: candidates.slice(0, Math.max(24, TARGET_RECIPES + 4)),
     });
   } catch {
     // Heuristic fallback from candidate categories.
@@ -417,7 +467,9 @@ async function completeCountry(
   }
 
   const chosenIds = new Set(Object.values(slotIds));
-  const moreCandidates = candidates.filter((dish) => !chosenIds.has(dish.id)).slice(0, 2);
+  const moreCandidates = candidates
+    .filter((dish) => !chosenIds.has(dish.id))
+    .slice(0, moreBudget);
   const expandList: DishCandidate[] = [
     ...CORE_SLOTS.map((slot) => {
       const dish = candidates.find((item) => item.id === slotIds[slot])!;
@@ -597,8 +649,12 @@ async function completeCountry(
   };
 }
 
+function fullRecipeCount(country: Country): number {
+  return getCountryRecipes(country).filter(isFullRecipe).length;
+}
+
 function isIncomplete(country: Country): boolean {
-  return !country.cookReady;
+  return !country.cookReady || fullRecipeCount(country) < TARGET_RECIPES;
 }
 
 async function main() {
@@ -621,15 +677,18 @@ async function main() {
 
   if (args.status) {
     const ready = countries.filter((country) => country.cookReady).length;
+    const thin = countries.filter(
+      (country) => country.cookReady && fullRecipeCount(country) < TARGET_RECIPES,
+    ).length;
     console.log(
-      `Cook menus: ${ready} ready · ${pending.length} pending · ${countries.length} countries`,
+      `Cook menus: ${ready} ready · ${thin} under ${TARGET_RECIPES} recipes · ${pending.length} pending · ${countries.length} countries`,
     );
     console.log(`Dish research file: ${fs.existsSync(DISHES_PATH) ? "yes" : "MISSING"}`);
     console.log(`Lifetime completed: ${progress.lifetimeCompleted}`);
     console.log("Next:");
     for (const country of pending.slice(0, 15)) {
       console.log(
-        `  - ${country.code} ${country.name} (recipes=${getCountryRecipes(country).length} drinks=${getCountryDrinks(country).length})`,
+        `  - ${country.code} ${country.name} (recipes=${fullRecipeCount(country)}/${TARGET_RECIPES} drinks=${getCountryDrinks(country).length}${country.cookReady ? "" : " · not cook-ready"})`,
       );
     }
     await closeDb();
@@ -667,6 +726,7 @@ async function main() {
     }
     progress.lastRunAt = new Date().toISOString();
     saveJson(PROGRESS_PATH, progress);
+    await syncFillProgress(progress);
     await sleep(500);
   }
 
@@ -674,6 +734,7 @@ async function main() {
   progress.runs += 1;
   progress.lastRunAt = new Date().toISOString();
   saveJson(PROGRESS_PATH, progress);
+  await syncFillProgress(progress);
 
   await closeDb();
   console.log(`\nCompleted ${completed} country menu(s).`);

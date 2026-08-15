@@ -391,6 +391,20 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
     }
   });
 
+  app.get("/api/admin/fill-status", requireAdmin, async (_req: AuthedRequest, res) => {
+    try {
+      const { buildAdminFillStatus } = await import("../lib/adminFillStatus.ts");
+      const status = await buildAdminFillStatus();
+      res.json(status);
+    } catch (error) {
+      console.error("Admin fill-status failed", error);
+      res.status(500).json({
+        message:
+          error instanceof Error ? error.message : "Could not load fill status.",
+      });
+    }
+  });
+
   app.post(
     "/api/admin/countries/:code/replace-image",
     requireAdmin,
@@ -1296,6 +1310,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         }
         const rewritten = await rewriteOrderOptionText({
           countryName: country.name,
+          countryCode: country.code,
           option,
         });
         const result = await updateOrderOption(code, optionId, rewritten.patch);
@@ -2373,15 +2388,25 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             name: restaurant.name,
             address: restaurant.address,
             city: restaurant.city,
+            website: restaurant.website,
             authenticityNotes: restaurant.authenticityNotes,
+            evidenceUrls: [
+              restaurant.ratings?.tripadvisor?.url,
+              restaurant.ratings?.theFork?.url,
+              restaurant.ratings?.openTable?.url,
+            ],
           },
         });
         const updated = await updateRestaurantNotes(id, rewritten.authenticityNotes, {
-          cuisineCodes: rewritten.cuisineCodes,
+          cuisineCodes:
+            rewritten.cuisineVerdict === "clear" && rewritten.cuisineCodes.length > 0
+              ? rewritten.cuisineCodes
+              : undefined,
         });
         res.json({
           restaurant: toPublicRestaurant(updated!),
           notes: rewritten.notes,
+          cuisineVerdict: rewritten.cuisineVerdict,
         });
       } catch (error) {
         console.error("Replace restaurant text failed", error);

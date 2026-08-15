@@ -26,13 +26,25 @@ import {
   appendOrderOptions,
   listCountriesFromDb,
 } from "../server/db/content.ts";
+import {
+  defaultFillProgress,
+  loadFillProgress,
+  normalizeFillProgress,
+  saveFillProgress,
+  type ContentFillProgressPayload,
+} from "../server/db/fillProgress.ts";
 import { closeDb, getDb } from "../server/db/restaurants.ts";
 import { isApifyConfigured } from "../server/lib/apifyOrderSearch.ts";
+import {
+  scheduleOrderOptionEnrichments,
+  waitForOrderOptionEnrichmentIdle,
+} from "../server/lib/orderOptionEnrichmentQueue.ts";
 import {
   discoverCountryOrderOptions,
   isOpenAiConfigured,
 } from "../server/openai/adminDiscover.ts";
 import type { Country } from "../src/types/content.ts";
+import { getCountryRecipes } from "../src/content/countries/menuAccessors.ts";
 import { FILL_CITIES } from "./lib/fillCities.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -48,17 +60,7 @@ type OrderJob = {
   city: string;
 };
 
-type FillProgress = {
-  version: 1;
-  orderCompletedIds: string[];
-  orderFailedIds: string[];
-  lastRunAt: string | null;
-  totals: {
-    runs: number;
-    orderOptionsAdded: number;
-    orderJobsDone: number;
-  };
-};
+type FillProgress = ContentFillProgressPayload;
 
 type CliOptions = {
   lane: Lane;
@@ -120,30 +122,39 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function defaultProgress(): FillProgress {
-  return {
-    version: 1,
-    orderCompletedIds: [],
-    orderFailedIds: [],
-    lastRunAt: null,
-    totals: { runs: 0, orderOptionsAdded: 0, orderJobsDone: 0 },
-  };
-}
-
-function loadProgress(): FillProgress {
-  if (!fs.existsSync(PROGRESS_PATH)) return defaultProgress();
+function loadProgressFile(): FillProgress {
+  if (!fs.existsSync(PROGRESS_PATH)) return defaultFillProgress();
   try {
-    const parsed = JSON.parse(fs.readFileSync(PROGRESS_PATH, "utf8")) as FillProgress;
-    if (parsed.version !== 1) return defaultProgress();
-    return parsed;
+    return normalizeFillProgress(JSON.parse(fs.readFileSync(PROGRESS_PATH, "utf8")));
   } catch {
-    return defaultProgress();
+    return defaultFillProgress();
   }
 }
 
-function saveProgress(progress: FillProgress) {
+function writeProgressFile(progress: FillProgress) {
   fs.mkdirSync(path.dirname(PROGRESS_PATH), { recursive: true });
   fs.writeFileSync(PROGRESS_PATH, `${JSON.stringify(progress, null, 2)}\n`);
+}
+
+async function loadProgress(): Promise<FillProgress> {
+  const fromDb = await loadFillProgress();
+  const fromFile = loadProgressFile();
+  const dbEmpty =
+    fromDb.orderCompletedIds.length === 0 &&
+    fromDb.orderFailedIds.length === 0 &&
+    fromDb.totals.runs === 0 &&
+    !fromDb.lastRunAt;
+  if (dbEmpty && (fromFile.orderCompletedIds.length > 0 || fromFile.totals.runs > 0)) {
+    await saveFillProgress(fromFile);
+    return fromFile;
+  }
+  return fromDb;
+}
+
+async function saveProgress(progress: FillProgress) {
+  const normalized = normalizeFillProgress(progress);
+  writeProgressFile(normalized);
+  await saveFillProgress(normalized);
 }
 
 function runNpmScript(script: string, args: string[]): Promise<number> {
@@ -203,12 +214,14 @@ async function printStatus(options: CliOptions, progress: FillProgress) {
   const countries = await listCountriesFromDb();
   const published = countries.filter((c) => c.status === "published");
   const cookReady = published.filter((c) => c.cookReady);
-  const incomplete = published.filter((c) => !c.cookReady);
+  const incomplete = published.filter(
+    (c) => !c.cookReady || getCountryRecipes(c).length < 20,
+  );
 
   console.log("Content fill strategy status");
   console.log(`  cities: ${options.cities.join(", ")}`);
   console.log(
-    `  countries: ${published.length} published · ${cookReady.length} cook-ready · ${incomplete.length} cook-incomplete`,
+    `  countries: ${published.length} published · ${cookReady.length} cook-ready · ${incomplete.length} cook-incomplete / under 20 recipes`,
   );
   console.log(
     `  OpenAI: ${isOpenAiConfigured() ? "configured" : "missing OPENAI_API_KEY"}`,
@@ -248,9 +261,11 @@ async function printStatus(options: CliOptions, progress: FillProgress) {
   }
 
   if (incomplete.length > 0) {
-    console.log("\nCook-incomplete (sample):");
+    console.log("\nCook incomplete / under 20 recipes (sample):");
     for (const country of incomplete.slice(0, 12)) {
-      console.log(`  · ${country.code} ${country.name}`);
+      console.log(
+        `  · ${country.code} ${country.name} (${getCountryRecipes(country).length} recipes)`,
+      );
     }
   }
 
@@ -338,11 +353,12 @@ async function runOrdersLane(
     }
     return true;
   });
-  saveProgress(progress);
+  await saveProgress(progress);
 
   const batch = pending.slice(0, options.batch);
   if (batch.length === 0) {
     console.log("No pending order jobs for these cities.");
+    progress.lastOrdersRunAt = new Date().toISOString();
     return progress;
   }
 
@@ -360,10 +376,24 @@ async function runOrdersLane(
         countryName: country.name,
         city: job.city,
       });
+      const beforeIds = new Set((country.orderOptions ?? []).map((o) => o.id));
       const before = country.orderOptions?.length ?? 0;
       const updated = await appendOrderOptions(country.code, discovered.options);
       const after = updated?.orderOptions?.length ?? before;
       const added = Math.max(0, after - before);
+      const newOptions = (updated?.orderOptions ?? []).filter(
+        (option) => !beforeIds.has(option.id),
+      );
+      if (newOptions.length > 0 && isOpenAiConfigured()) {
+        const scheduled = scheduleOrderOptionEnrichments(
+          newOptions.map((option) => ({
+            countryCode: country.code,
+            countryName: country.name,
+            optionId: option.id,
+          })),
+        );
+        console.log(`  scheduled ${scheduled} order enrichment job(s)`);
+      }
       progress.orderCompletedIds.push(job.id);
       progress.totals.orderOptionsAdded += added;
       progress.totals.orderJobsDone += 1;
@@ -377,8 +407,14 @@ async function runOrdersLane(
         progress.orderFailedIds.push(job.id);
       }
     }
-    saveProgress(progress);
+    progress.lastOrdersRunAt = new Date().toISOString();
+    await saveProgress(progress);
     await sleep(options.delayMs);
+  }
+
+  if (isOpenAiConfigured()) {
+    console.log("Waiting for order option enrichment queue…");
+    await waitForOrderOptionEnrichmentIdle();
   }
 
   return progress;
@@ -388,11 +424,11 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   await getDb();
 
-  let progress = loadProgress();
+  let progress = await loadProgress();
   if (options.resetOrders) {
     progress.orderCompletedIds = [];
     progress.orderFailedIds = [];
-    saveProgress(progress);
+    await saveProgress(progress);
     console.log("Order progress reset.");
   }
 
@@ -404,7 +440,7 @@ async function main() {
 
   progress.totals.runs += 1;
   progress.lastRunAt = new Date().toISOString();
-  saveProgress(progress);
+  await saveProgress(progress);
 
   console.log(
     `Fill content · lane=${options.lane} · batch=${options.batch} · cities=${options.cities.join(",")}`,
@@ -413,15 +449,17 @@ async function main() {
   try {
     if (options.lane === "cook" || options.lane === "daily") {
       await runCookLane(options.batch);
+      progress = await loadProgress();
     }
     if (options.lane === "restaurants" || options.lane === "daily") {
       await runRestaurantsLane(options.batch, options.code);
+      progress = await loadProgress();
     }
     if (options.lane === "orders" || options.lane === "daily") {
       progress = await runOrdersLane(options, progress);
     }
   } finally {
-    saveProgress(progress);
+    await saveProgress(progress);
     await closeDb();
   }
 

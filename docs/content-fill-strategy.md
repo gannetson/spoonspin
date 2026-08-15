@@ -28,7 +28,11 @@ npm run agent:fill -- --lane orders --batch 3
 npm run agent:fill -- --lane orders --code it --cities Leiden,Amsterdam
 ```
 
-Progress for order jobs: `data/fill-content-progress.json` (gitignored).
+Progress for fill lanes is stored in Postgres (`content_fill_progress`) so cron on a content machine and the API share the same truth via `DATABASE_URL`. Local JSON under `data/` (`fill-content-progress.json`, `gather-progress.json`, `complete-menus-progress.json`) remains a CLI cache/backup.
+
+Admins can inspect gaps on **`/admin`** (Content fill panel): order jobs by city, cook-incomplete countries, low restaurant coverage, and pending enrichment counts. Failed Apify jobs are listed with a CLI retry hint (`npm run agent:fill -- --lane orders`, `--reset-orders`, etc.) — the UI does not start cron or re-run Apify.
+
+After new order options are saved, and after gather promotes restaurants, OpenAI enrichment is scheduled. Enrichment may **reassign** cuisine countries from page evidence, or **remove** restaurants / order options when evidence was fetched but cuisine remains unclear.
 
 ## Lanes
 
@@ -60,13 +64,13 @@ Or install the sample files under [`deploy/cron/`](../deploy/cron/) and [`deploy
 
 Rough throughput:
 
-- **Cook:** a few countries/day toward cook-ready menus
+- **Cook:** a few countries/day toward cook-ready menus with **20+ recipes** each (starter/main/side/dessert + moreRecipes)
 - **Restaurants:** 4 hub×cuisine OSM jobs/run across the 5 cities
 - **Orders:** ~3 Apify city jobs/run → full matrix (countries × 5 cities) over days/weeks
 
 ## Priority per country
 
-1. Dishes → complete cook menu + drink → cuisine/recipe images  
+1. Dishes → complete cook menu + drink → grow to 20+ recipes → cuisine/recipe images  
 2. OSM restaurants in Randstad → promote → (later) ratings/photos  
 3. Order options: Leiden first (default Order UI city), then Amsterdam, Rotterdam, Den Haag, Utrecht  
 4. Compose dinner once courses exist  

@@ -8,6 +8,7 @@ import {
   type AdminCountryOverviewRow,
   type AdminOverviewResponse,
 } from "@/admin/overview";
+import { AdminFillPanel } from "@/components/AdminFillPanel";
 import { useT } from "@/i18n/LocaleContext";
 
 type SortKey = "name" | "recipes" | "restaurants" | "drinks" | "shops";
@@ -165,6 +166,8 @@ export function AdminOverviewPage() {
             {t("admin.overview.loading")}
           </p>
         ) : null}
+
+        {isAdmin ? <AdminFillPanel /> : null}
 
         {isAdmin && data ? (
           <>

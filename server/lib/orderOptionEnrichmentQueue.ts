@@ -4,12 +4,18 @@
  * Runs in-process (no external queue); jobs are fire-and-forget after admin add.
  */
 
-import { getCountryFromDb, updateOrderOption } from "../db/content.ts";
+import {
+  appendOrderOptions,
+  getCountryFromDb,
+  removeOrderOption,
+  updateOrderOption,
+} from "../db/content.ts";
 import {
   discoverItemImageQueries,
   isOpenAiConfigured,
   rewriteOrderOptionText,
 } from "../openai/adminDiscover.ts";
+import type { OrderOption } from "../../src/types/content.ts";
 import { findCuisineImageFromQueries } from "./wikimedia.ts";
 
 export type OrderOptionEnrichmentJob = {
@@ -45,6 +51,15 @@ export function scheduleOrderOptionEnrichments(jobs: OrderOptionEnrichmentJob[])
   }
   if (scheduled > 0) void drainQueue();
   return scheduled;
+}
+
+/** Wait until the in-process queue is empty (for CLI agents). */
+export async function waitForOrderOptionEnrichmentIdle(
+  pollMs = 250,
+): Promise<void> {
+  while (running || queue.length > 0) {
+    await new Promise((resolve) => setTimeout(resolve, pollMs));
+  }
 }
 
 async function drainQueue(): Promise<void> {
@@ -83,31 +98,115 @@ export async function enrichOrderOptionFully(
     return;
   }
 
-  // Text first so signatureDish / specialty notes improve the image search.
-  await enrichText(countryCode, countryName, optionId).catch((error) => {
-    console.warn(`[order-enrich] text failed ${countryCode}/${optionId}`, error);
-  });
-  await enrichImage(countryCode, countryName, optionId).catch((error) => {
-    console.warn(`[order-enrich] image failed ${countryCode}/${optionId}`, error);
-  });
+  const textOutcome = await enrichText(countryCode, countryName, optionId).catch(
+    (error) => {
+      console.warn(`[order-enrich] text failed ${countryCode}/${optionId}`, error);
+      return { removed: false as const, hostCode: countryCode, optionId };
+    },
+  );
+  if (textOutcome.removed) {
+    console.info(
+      `[order-enrich] removed/reassigned ${countryCode}/${optionId}`,
+    );
+    return;
+  }
+
+  await enrichImage(textOutcome.hostCode, countryName, textOutcome.optionId).catch(
+    (error) => {
+      console.warn(
+        `[order-enrich] image failed ${textOutcome.hostCode}/${textOutcome.optionId}`,
+        error,
+      );
+    },
+  );
 
   console.info(`[order-enrich] done ${countryCode}/${optionId}`);
+}
+
+function optionUrlKey(option: OrderOption): string {
+  return (
+    option.thuisbezorgdUrl ||
+    option.ubereatsUrl ||
+    option.url ||
+    ""
+  )
+    .trim()
+    .toLowerCase();
+}
+
+async function reassignOrderOption(
+  hostCode: string,
+  option: OrderOption,
+  cuisineCodes: string[],
+  patch: Partial<OrderOption>,
+): Promise<void> {
+  const merged: OrderOption = {
+    ...option,
+    ...patch,
+    cuisineCodes,
+  };
+  await removeOrderOption(hostCode, option.id);
+
+  for (const code of cuisineCodes) {
+    const country = await getCountryFromDb(code);
+    if (!country) continue;
+    const existing = country.orderOptions ?? [];
+    const urlKey = optionUrlKey(merged);
+    const already = existing.some(
+      (row) =>
+        (urlKey && optionUrlKey(row) === urlKey) ||
+        (row.platform === merged.platform &&
+          row.name.trim().toLowerCase() === merged.name.trim().toLowerCase() &&
+          (row.city ?? "").trim().toLowerCase() ===
+            (merged.city ?? "").trim().toLowerCase()),
+    );
+    if (already) continue;
+    await appendOrderOptions(code, [
+      {
+        ...merged,
+        id: `${merged.id}-${code}`,
+        cuisineCodes: [code],
+      },
+    ]);
+  }
 }
 
 async function enrichText(
   countryCode: string,
   countryName: string,
   optionId: string,
-): Promise<void> {
+): Promise<{ removed: boolean; hostCode: string; optionId: string }> {
   const country = await getCountryFromDb(countryCode);
   const option = (country?.orderOptions ?? []).find((item) => item.id === optionId);
-  if (!option) return;
+  if (!option) return { removed: true, hostCode: countryCode, optionId };
 
   const rewritten = await rewriteOrderOptionText({
     countryName,
+    countryCode,
     option,
   });
+
+  if (rewritten.hadPageEvidence && rewritten.cuisineVerdict === "unclear") {
+    await removeOrderOption(countryCode, optionId);
+    return { removed: true, hostCode: countryCode, optionId };
+  }
+
+  if (
+    rewritten.cuisineVerdict === "clear" &&
+    rewritten.cuisineCodes.length > 0 &&
+    !rewritten.cuisineCodes.includes(countryCode.toLowerCase())
+  ) {
+    await reassignOrderOption(
+      countryCode,
+      option,
+      rewritten.cuisineCodes,
+      rewritten.patch,
+    );
+    return { removed: true, hostCode: countryCode, optionId };
+  }
+
   await updateOrderOption(countryCode, optionId, rewritten.patch);
+  return { removed: false, hostCode: countryCode, optionId };
 }
 
 async function enrichImage(

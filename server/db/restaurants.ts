@@ -644,6 +644,12 @@ async function migrate(db: Pool) {
       ON product_events (created_at);
     CREATE INDEX IF NOT EXISTS idx_product_events_type_created
       ON product_events (event_type, created_at);
+
+    CREATE TABLE IF NOT EXISTS content_fill_progress (
+      id TEXT PRIMARY KEY,
+      payload JSONB NOT NULL DEFAULT '{}'::jsonb,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
   `,
   );
 }
@@ -1336,7 +1342,8 @@ export async function resetAllTables(client?: PoolClient): Promise<void> {
       sessions,
       recipes,
       countries,
-      users
+      users,
+      content_fill_progress
     RESTART IDENTITY CASCADE
   `);
 }

@@ -485,6 +485,30 @@ export const en: Messages = {
   "admin.overview.status.cookReady": "Cook ready",
   "admin.overview.status.spinOnly": "Spin only",
 
+  "admin.fill.title": "Content fill",
+  "admin.fill.subtitle":
+    "Progress from cron fill lanes (orders, cook menus, Randstad restaurants) plus live gaps.",
+  "admin.fill.loading": "Loading fill status…",
+  "admin.fill.error": "Could not load fill status.",
+  "admin.fill.metric.lastRun": "Last fill run",
+  "admin.fill.metric.orders": "Order jobs",
+  "admin.fill.metric.ordersRemaining": "{count} remaining",
+  "admin.fill.metric.cook": "Cook gaps",
+  "admin.fill.metric.cookHint": "Below cook-ready or under 20 recipes",
+  "admin.fill.metric.restaurants": "Restaurant gaps",
+  "admin.fill.metric.enrichment":
+    "Pending enrich · rest. {restaurants} · orders {orders}",
+  "admin.fill.failedTitle": "Failed order jobs",
+  "admin.fill.section.orders": "Orders by city",
+  "admin.fill.section.cook": "Cook incomplete",
+  "admin.fill.section.restaurants": "Low restaurant coverage",
+  "admin.fill.status.done": "done",
+  "admin.fill.status.pending": "pending",
+  "admin.fill.status.failed": "failed",
+  "admin.fill.truncated": "Showing first countries only.",
+  "admin.fill.cookEmpty": "All published countries are cook-ready.",
+  "admin.fill.restaurantsEmpty": "No low-coverage cuisines.",
+
   "admin.reports.title": "Reports",
   "admin.reports.subtitle":
     "API traffic by IP, popular paths, and product usage over time.",
@@ -681,7 +705,8 @@ export const en: Messages = {
     "Provide at least one Thuisbezorgd or Uber Eats link.",
   "admin.orderOption.edit.error.save": "Could not save order option edits.",
   "admin.item.replaceText": "Replace text",
-  "admin.item.replaceText.hint": "Research and update the copy",
+  "admin.item.replaceText.hint":
+    "Scan related website / delivery pages and update copy and cuisine countries",
   "admin.restaurant.edit.eyebrow": "Restaurant",
   "admin.restaurant.edit.title": "Edit {name}",
   "admin.restaurant.edit.subtitle":

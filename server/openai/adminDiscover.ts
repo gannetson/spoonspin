@@ -133,7 +133,7 @@ const dishCandidateSchema = z.object({
 
 const recipesDiscoverSchema = z.object({
   notes: z.string(),
-  recipes: z.array(dishCandidateSchema).min(1).max(20),
+  recipes: z.array(dishCandidateSchema).min(1).max(30),
 });
 
 const restaurantConfidenceSchema = z.enum(["high", "medium", "low"]);
@@ -417,7 +417,7 @@ Avoid duplicates of existing dish names. Return dish candidates only (no full re
 Existing dishes (do not repeat): ${existing.join("; ") || "none"}
 ${focus}
 
-Return up to 15 distinct dishes (quality over quantity).
+Return 20–24 distinct dishes when possible (quality still matters; prefer real classics over filler).
 
 JSON shape:
 {
@@ -1616,6 +1616,7 @@ const shopRewriteSchema = z.object({
 const restaurantRewriteSchema = z.object({
   notes: z.string(),
   authenticityNotes: z.string().min(20),
+  cuisineVerdict: z.enum(["clear", "unclear"]).default("clear"),
   cuisineCodes: z
     .array(z.string().length(2))
     .nullish()
@@ -1811,22 +1812,58 @@ const orderOptionRewriteSchema = z.object({
   city: optionalString,
   signatureDish: optionalString,
   url: optionalString,
+  cuisineVerdict: z.enum(["clear", "unclear"]).default("clear"),
+  cuisineCodes: z
+    .array(z.string().length(2))
+    .nullish()
+    .transform((value) => value ?? undefined),
 });
 
 export async function rewriteOrderOptionText(input: {
   countryName: string;
+  countryCode?: string;
   option: OrderOption;
 }): Promise<{
   notes: string;
+  cuisineVerdict: "clear" | "unclear";
+  cuisineCodes: string[];
+  hadPageEvidence: boolean;
   patch: Partial<OrderOption>;
 }> {
+  const seedCodes = normalizeCountryCodes([
+    ...(input.option.cuisineCodes ?? []),
+    ...(input.countryCode ? [input.countryCode] : []),
+  ]);
+  const pageEvidence = await fetchPageEvidenceMany(
+    [
+      input.option.thuisbezorgdUrl,
+      input.option.ubereatsUrl,
+      input.option.url,
+    ],
+    { maxPages: 3, deep: true },
+  );
+  const hadPageEvidence = pageEvidence.length > 0;
+
   const raw = await chatJson(
     `You improve meal-delivery order option blurbs for diners in the Netherlands.
-Reply with JSON only. Keep the restaurant and platform identity.
-Improve notes and set a clear signatureDish (one must-order dish).`,
-    `Cuisine country: ${input.countryName}
+Reply with JSON only. Keep the restaurant and platform identity — do not invent a different venue.
+Use fetched Thuisbezorgd / Uber Eats page text (title, description, snippet) as PRIMARY evidence for notes, signature dish, and cuisine countries.
+Ground optionNotes in what the pages say about cuisine, specialties, and dishes. Do not invent claims the pages do not support.
+Identify cuisineCodes (ISO) from page cuisine labels / descriptions. Include the context country only when it truly fits.
+If page evidence is present and the cuisine country is not clearly attributable from those pages, set cuisineVerdict to "unclear" and cuisineCodes to [].
+If page evidence clearly names other countries, set cuisineVerdict to "clear" and list those codes (do not keep the context country unless it also fits).
+If page evidence is empty, set cuisineVerdict to "clear", improve carefully from the current JSON, and keep plausible existing codes.`,
+    `Context cuisine country: ${input.countryName}${
+      input.countryCode ? ` (${input.countryCode})` : ""
+    }
 Current order option JSON:
 ${JSON.stringify(input.option, null, 2)}
+
+Page evidence from delivery / listing pages:
+${formatPageEvidence(pageEvidence)}
+
+Current cuisine codes: ${seedCodes.join(", ") || "none"}
+Allowed cuisine codes (use only these): ${cuisineCodeReference()}
 
 JSON shape:
 {
@@ -1835,20 +1872,41 @@ JSON shape:
   "optionNotes": string?,
   "city": string?,
   "signatureDish": string?,
-  "url": string?
+  "url": string?,
+  "cuisineVerdict": "clear" | "unclear",
+  "cuisineCodes": ["et", "er"]
 }`,
   );
   const parsed = orderOptionRewriteSchema.parse(raw);
   const url =
     parsed.url && /^https?:\/\//i.test(parsed.url) ? parsed.url.trim() : undefined;
+  let cuisineCodes = normalizeCountryCodes(parsed.cuisineCodes);
+  let cuisineVerdict = parsed.cuisineVerdict;
+
+  if (hadPageEvidence) {
+    if (cuisineVerdict === "unclear" || cuisineCodes.length === 0) {
+      cuisineVerdict = "unclear";
+      cuisineCodes = [];
+    }
+  } else if (cuisineCodes.length === 0) {
+    cuisineCodes = seedCodes;
+    cuisineVerdict = "clear";
+  }
+
   return {
     notes: parsed.notes,
+    cuisineVerdict,
+    cuisineCodes,
+    hadPageEvidence,
     patch: {
       name: parsed.name.trim(),
       notes: parsed.optionNotes?.trim() || undefined,
       city: parsed.city?.trim() || undefined,
       signatureDish: parsed.signatureDish?.trim() || undefined,
       ...(url ? { url } : {}),
+      ...(cuisineVerdict === "clear" && cuisineCodes.length > 0
+        ? { cuisineCodes }
+        : {}),
     },
   };
 }
@@ -1863,27 +1921,36 @@ export async function rewriteRestaurantText(input: {
     city: string;
     website?: string | null;
     authenticityNotes?: string | null;
+    /** Extra pages to scan (Tripadvisor, TheFork, evidence URLs). */
+    evidenceUrls?: Array<string | null | undefined>;
   };
 }): Promise<{
   notes: string;
   authenticityNotes: string;
+  cuisineVerdict: "clear" | "unclear";
   cuisineCodes: string[];
+  hadPageEvidence: boolean;
 }> {
   const seedCodes = normalizeCountryCodes([
     ...(input.existingCuisineCodes ?? []),
     ...(input.countryCode ? [input.countryCode] : []),
   ]);
   const pageEvidence = await fetchPageEvidenceMany(
-    [input.restaurant.website],
-    { maxPages: 1 },
+    [input.restaurant.website, ...(input.restaurant.evidenceUrls ?? [])],
+    { maxPages: 3, deep: true },
   );
+  const hadPageEvidence = pageEvidence.length > 0;
   const raw = await chatJson(
     `You write concise authenticity notes for restaurants in the Netherlands and identify which national cuisines they match.
 Reply with JSON only.
-Use website page text (title/description) as primary evidence when present.
-Restaurants often span multiple countries (e.g. Levantine, Horn of Africa, Balkan, pan-Asian). List every ISO country code that genuinely fits.
+Use fetched page text (official website, Tripadvisor, TheFork, etc. — title, description, snippet) as PRIMARY evidence.
+Ground authenticityNotes in what those pages say about cuisine, specialties, and atmosphere. Prefer paraphrasing page claims over inventing.
+Restaurants often span multiple countries (e.g. Levantine, Horn of Africa, Balkan, pan-Asian). List every ISO country code that genuinely fits the page evidence.
 Do not invent weak matches — only countries a diner would reasonably expect from this place.
-If the venue clearly serves a different cuisine than the context country, do NOT include the context country.`,
+If the venue clearly serves a different cuisine than the context country, do NOT include the context country.
+If page evidence is present and cuisine is not clearly attributable, set cuisineVerdict to "unclear" and cuisineCodes to [].
+If page evidence clearly names matching countries, set cuisineVerdict to "clear" with those codes only.
+If page evidence is empty, set cuisineVerdict to "clear" and improve carefully from current notes without inventing cuisine.`,
     `Context country (viewer may be browsing this cuisine — may be wrong): ${input.countryName}${
       input.countryCode ? ` (${input.countryCode})` : ""
     }
@@ -1897,25 +1964,37 @@ Current cuisine codes: ${seedCodes.join(", ") || "none"}
 
 Allowed cuisine codes (use only these): ${cuisineCodeReference()}
 
-Write improved authenticity notes (2–4 sentences) covering the cuisines this place actually represents.
-Set cuisineCodes to all matching countries (1–6). Include the context country only when it truly fits.
+Write improved authenticity notes (2–4 sentences) covering the cuisines this place actually represents, grounded in the page evidence when available.
+Set cuisineCodes to all matching countries (1–6) when clear. Include the context country only when it truly fits.
 
 JSON shape:
 {
   "notes": string,
   "authenticityNotes": string,
+  "cuisineVerdict": "clear" | "unclear",
   "cuisineCodes": ["et", "er"]
 }`,
   );
   const parsed = restaurantRewriteSchema.parse(raw);
   let cuisineCodes = normalizeCountryCodes(parsed.cuisineCodes);
-  if (cuisineCodes.length === 0) {
+  let cuisineVerdict = parsed.cuisineVerdict;
+
+  if (hadPageEvidence) {
+    if (cuisineVerdict === "unclear" || cuisineCodes.length === 0) {
+      cuisineVerdict = "unclear";
+      cuisineCodes = [];
+    }
+  } else if (cuisineCodes.length === 0) {
     cuisineCodes = seedCodes.length > 0 ? seedCodes : [];
+    cuisineVerdict = "clear";
   }
+
   return {
     notes: parsed.notes,
     authenticityNotes: parsed.authenticityNotes,
+    cuisineVerdict,
     cuisineCodes,
+    hadPageEvidence,
   };
 }
 

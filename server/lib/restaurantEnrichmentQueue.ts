@@ -5,6 +5,7 @@
  */
 
 import {
+  deleteRestaurantById,
   getRestaurantById,
   updateRestaurantMenu,
   updateRestaurantNotes,
@@ -52,6 +53,15 @@ export function scheduleRestaurantEnrichments(jobs: RestaurantEnrichmentJob[]): 
   return scheduled;
 }
 
+/** Wait until the in-process queue is empty (for CLI agents). */
+export async function waitForRestaurantEnrichmentIdle(
+  pollMs = 250,
+): Promise<void> {
+  while (running || queue.length > 0) {
+    await new Promise((resolve) => setTimeout(resolve, pollMs));
+  }
+}
+
 async function drainQueue(): Promise<void> {
   if (running) return;
   running = true;
@@ -79,9 +89,18 @@ export async function enrichRestaurantFully(job: RestaurantEnrichmentJob): Promi
   await enrichImage(restaurantId, countryName).catch((error) => {
     console.warn(`[enrich] image failed ${restaurantId}`, error);
   });
-  await enrichText(restaurantId, countryName, countryCode).catch((error) => {
-    console.warn(`[enrich] text failed ${restaurantId}`, error);
-  });
+
+  const textOutcome = await enrichText(restaurantId, countryName, countryCode).catch(
+    (error) => {
+      console.warn(`[enrich] text failed ${restaurantId}`, error);
+      return { deleted: false as const };
+    },
+  );
+  if (textOutcome.deleted) {
+    console.info(`[enrich] deleted unclear cuisine ${restaurantId}`);
+    return;
+  }
+
   await enrichMenu(restaurantId, countryName, countryCode).catch((error) => {
     console.warn(`[enrich] menu failed ${restaurantId}`, error);
   });
@@ -147,9 +166,9 @@ async function enrichText(
   restaurantId: string,
   countryName: string,
   countryCode: string,
-): Promise<void> {
+): Promise<{ deleted: boolean }> {
   const restaurant = await getRestaurantById(restaurantId);
-  if (!restaurant) return;
+  if (!restaurant) return { deleted: false };
 
   const rewritten = await rewriteRestaurantText({
     countryName,
@@ -161,11 +180,26 @@ async function enrichText(
       city: restaurant.city,
       website: restaurant.website,
       authenticityNotes: restaurant.authenticityNotes,
+      evidenceUrls: [
+        restaurant.ratings?.tripadvisor?.url,
+        restaurant.ratings?.theFork?.url,
+        restaurant.ratings?.openTable?.url,
+      ],
     },
   });
+
+  if (rewritten.hadPageEvidence && rewritten.cuisineVerdict === "unclear") {
+    await deleteRestaurantById(restaurantId);
+    return { deleted: true };
+  }
+
   await updateRestaurantNotes(restaurantId, rewritten.authenticityNotes, {
-    cuisineCodes: rewritten.cuisineCodes,
+    cuisineCodes:
+      rewritten.cuisineVerdict === "clear" && rewritten.cuisineCodes.length > 0
+        ? rewritten.cuisineCodes
+        : undefined,
   });
+  return { deleted: false };
 }
 
 async function enrichMenu(

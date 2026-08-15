@@ -27,10 +27,16 @@ import {
   type StoredRestaurant,
 } from "../server/db/restaurants.ts";
 import { listCountriesFromDb } from "../server/db/content.ts";
+import { mergeFillProgress } from "../server/db/fillProgress.ts";
+import {
+  scheduleRestaurantEnrichments,
+  waitForRestaurantEnrichmentIdle,
+} from "../server/lib/restaurantEnrichmentQueue.ts";
 import {
   hasPrimaryCuisineMatch,
   osmTagsForCountry,
 } from "../src/restaurants/osmCuisineMap.ts";
+import { isOpenAiConfigured } from "../server/openai/adminDiscover.ts";
 import { HUBS, harvestCountryAtHub, sleep, type Hub } from "./lib/overpassRestaurants.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -144,6 +150,22 @@ function saveProgress(progress: GatherProgress) {
   fs.writeFileSync(PROGRESS_PATH, `${JSON.stringify(progress, null, 2)}\n`);
 }
 
+async function syncFillProgress(progress: GatherProgress) {
+  try {
+    await mergeFillProgress({
+      lastRestaurantsRunAt: progress.lastRunAt,
+      lastRunAt: progress.lastRunAt,
+      gatherCompletedJobIds: progress.completedJobIds,
+      totals: {
+        restaurantsHarvested: progress.totals.harvested,
+        restaurantsPromoted: progress.totals.promoted,
+      },
+    });
+  } catch (error) {
+    console.warn("Could not sync gather progress to content_fill_progress:", error);
+  }
+}
+
 async function resolveCountryCodes(options: CliOptions): Promise<string[]> {
   if (options.countries && options.countries.length > 0) {
     return options.countries;
@@ -205,11 +227,25 @@ function scoreAuthenticity(
   };
 }
 
-async function promoteUnreviewed(limit = 80): Promise<number> {
+async function promoteUnreviewed(limit = 80): Promise<{
+  promoted: number;
+  enrichmentJobs: Array<{
+    restaurantId: string;
+    countryCode: string;
+    countryName: string;
+  }>;
+}> {
   const rows = await listRestaurants({ reviewedOnly: false });
   const unreviewed = rows.filter((row) => !row.reviewed);
+  const countries = await listCountriesFromDb();
+  const nameByCode = new Map(countries.map((c) => [c.code, c.name]));
 
   let promoted = 0;
+  const enrichmentJobs: Array<{
+    restaurantId: string;
+    countryCode: string;
+    countryName: string;
+  }> = [];
   const now = new Date().toISOString();
 
   for (const restaurant of unreviewed) {
@@ -262,10 +298,15 @@ async function promoteUnreviewed(limit = 80): Promise<number> {
       })}\n`,
     );
 
+    enrichmentJobs.push({
+      restaurantId: restaurant.id,
+      countryCode,
+      countryName: nameByCode.get(countryCode) ?? countryCode.toUpperCase(),
+    });
     promoted += 1;
   }
 
-  return promoted;
+  return { promoted, enrichmentJobs };
 }
 
 async function printStatus(options: CliOptions, progress: GatherProgress) {
@@ -362,8 +403,20 @@ async function main() {
   }
 
   process.stdout.write("Promoting specialty OSM matches… ");
-  promoted = await promoteUnreviewed(120);
+  const promoteResult = await promoteUnreviewed(120);
+  promoted = promoteResult.promoted;
   console.log(`${promoted} promoted`);
+
+  if (promoteResult.enrichmentJobs.length > 0 && isOpenAiConfigured()) {
+    const scheduled = scheduleRestaurantEnrichments(promoteResult.enrichmentJobs);
+    console.log(`Scheduled ${scheduled} restaurant enrichment job(s)`);
+    console.log("Waiting for restaurant enrichment queue…");
+    await waitForRestaurantEnrichmentIdle();
+  } else if (promoteResult.enrichmentJobs.length > 0) {
+    console.log(
+      `Skipped enrichment for ${promoteResult.enrichmentJobs.length} promoted restaurant(s) — OPENAI_API_KEY not set.`,
+    );
+  }
 
   progress.lastRunAt = new Date().toISOString();
   progress.totals.harvested += harvested;
@@ -372,6 +425,7 @@ async function main() {
   progress.hubsPreset = options.hubsPreset;
   progress.radiusKm = options.radiusKm;
   saveProgress(progress);
+  await syncFillProgress(progress);
 
   console.log("");
   await printStatus(options, progress);

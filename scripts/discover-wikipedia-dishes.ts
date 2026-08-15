@@ -392,7 +392,7 @@ async function discoverForCountry(entry: {
   }
 
   // Prefer unique, capped list before enrichment (API budget)
-  const unique = [...new Set(candidates)].slice(0, 18);
+  const unique = [...new Set(candidates)].slice(0, 28);
   const dishes: DishRecord[] = [];
 
   for (const title of unique) {
