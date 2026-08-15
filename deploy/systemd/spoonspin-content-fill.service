@@ -1,0 +1,15 @@
+[Unit]
+Description=Spoonspin content fill (daily lanes)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=CONTENT_USER
+Group=CONTENT_USER
+WorkingDirectory=/home/CONTENT_USER/spoonspin
+Environment=NODE_ENV=production
+EnvironmentFile=-/home/CONTENT_USER/spoonspin/.env
+# Prefer a Node 20+ binary on PATH
+ExecStart=/usr/bin/npm run agent:fill -- --lane daily --batch 2
+Nice=10

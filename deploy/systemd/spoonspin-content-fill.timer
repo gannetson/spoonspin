@@ -1,0 +1,10 @@
+[Unit]
+Description=Spoonspin content fill timer (daily)
+
+[Timer]
+OnCalendar=*-*-* 06:15:00
+Persistent=true
+Unit=spoonspin-content-fill.service
+
+[Install]
+WantedBy=timers.target

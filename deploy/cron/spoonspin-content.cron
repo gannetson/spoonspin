@@ -1,0 +1,16 @@
+# Spoonspin content fill — sample crontab
+# Install: crontab -e  (or copy into /etc/cron.d/spoonspin-content)
+# Adjust APP_DIR and ensure NODE/npm are on PATH for that user.
+
+SHELL=/bin/bash
+PATH=/usr/local/bin:/usr/bin:/bin
+APP_DIR=/home/CONTENT_USER/spoonspin
+
+# Cook (OpenAI) — 06:15 daily
+15 6 * * * cd $APP_DIR && /usr/bin/npm run agent:fill -- --lane cook --batch 2 >>/var/log/spoonspin-fill-cook.log 2>&1
+
+# Restaurants OSM Randstad — 12:15 daily
+15 12 * * * cd $APP_DIR && /usr/bin/npm run agent:fill -- --lane restaurants --batch 4 >>/var/log/spoonspin-fill-restaurants.log 2>&1
+
+# Order options Apify (Leiden, Amsterdam, Rotterdam, Den Haag, Utrecht) — 20:30 daily
+30 20 * * * cd $APP_DIR && /usr/bin/npm run agent:fill -- --lane orders --batch 3 >>/var/log/spoonspin-fill-orders.log 2>&1

@@ -1,0 +1,573 @@
+import {
+  useEffect,
+  useId,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from "react";
+import { createPortal } from "react-dom";
+import { LoaderCircle, X } from "lucide-react";
+import type { Restaurant } from "@/restaurants/types";
+import { patchRestaurantFields } from "@/admin/countryTools";
+import { countryCatalog } from "@/content/countries/catalog";
+import { useT } from "@/i18n/LocaleContext";
+import { zClass } from "@/lib/stacking";
+
+export type EditRestaurantAppliedResult = {
+  restaurant: Restaurant;
+};
+
+type EditRestaurantModalProps = {
+  open: boolean;
+  restaurant: Restaurant;
+  onClose: () => void;
+  onApplied: (result: EditRestaurantAppliedResult) => void;
+};
+
+type CatalogEntry = (typeof countryCatalog)[number];
+
+type MenuPosition = {
+  top: number;
+  left: number;
+  width: number;
+  maxHeight: number;
+};
+
+function normalizeWebsiteInput(value: string): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  return `https://${trimmed}`;
+}
+
+function entryLabel(entry: CatalogEntry) {
+  return `${entry.flag} ${entry.name}`;
+}
+
+export function EditRestaurantModal({
+  open,
+  restaurant,
+  onClose,
+  onApplied,
+}: EditRestaurantModalProps) {
+  const t = useT();
+  const titleId = useId();
+  const listboxId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
+  const fieldRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [website, setWebsite] = useState("");
+  const [cuisineCodes, setCuisineCodes] = useState<string[]>([]);
+  const [query, setQuery] = useState("");
+  const [suggestOpen, setSuggestOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [menuPosition, setMenuPosition] = useState<MenuPosition | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const byCode = useMemo(() => {
+    const map = new Map<string, CatalogEntry>();
+    for (const entry of countryCatalog) {
+      map.set(entry.code, entry);
+    }
+    return map;
+  }, []);
+
+  const sortedCountries = useMemo(
+    () =>
+      [...countryCatalog].sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, { sensitivity: "base" }),
+      ),
+    [],
+  );
+
+  const selectedEntries = useMemo(
+    () =>
+      cuisineCodes
+        .map((code) => byCode.get(code))
+        .filter((entry): entry is CatalogEntry => Boolean(entry)),
+    [byCode, cuisineCodes],
+  );
+
+  const suggestions = useMemo(() => {
+    const selected = new Set(cuisineCodes);
+    const available = sortedCountries.filter((entry) => !selected.has(entry.code));
+    const needle = query.trim().toLowerCase();
+    if (!needle) return available.slice(0, 12);
+    return available
+      .filter(
+        (entry) =>
+          entry.name.toLowerCase().includes(needle) ||
+          entry.code.toLowerCase().includes(needle),
+      )
+      .slice(0, 12);
+  }, [cuisineCodes, query, sortedCountries]);
+
+  function updateMenuPosition() {
+    const field = fieldRef.current;
+    if (!field) return;
+    const rect = field.getBoundingClientRect();
+    const gap = 6;
+    const preferredMax = 240;
+    const spaceBelow = window.innerHeight - rect.bottom - gap - 8;
+    const spaceAbove = rect.top - gap - 8;
+    const placeBelow = spaceBelow >= 140 || spaceBelow >= spaceAbove;
+    const maxHeight = Math.max(
+      120,
+      Math.min(preferredMax, placeBelow ? spaceBelow : spaceAbove),
+    );
+    const top = placeBelow
+      ? rect.bottom + gap
+      : Math.max(8, rect.top - gap - maxHeight);
+    setMenuPosition({
+      top,
+      left: rect.left,
+      width: rect.width,
+      maxHeight,
+    });
+  }
+
+  useEffect(() => {
+    if (!open) return;
+    setName(restaurant.name);
+    setDescription(restaurant.authenticityNotes ?? "");
+    setWebsite(restaurant.website ?? "");
+    setCuisineCodes(
+      restaurant.cuisineCodes.map((code) => code.trim().toLowerCase()).filter(Boolean),
+    );
+    setQuery("");
+    setSuggestOpen(false);
+    setMenuPosition(null);
+    setActiveIndex(0);
+    setBusy(false);
+    setError(null);
+  }, [open, restaurant]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(event: globalThis.KeyboardEvent) {
+      if (event.key === "Escape" && !busy && !suggestOpen) onClose();
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, busy, onClose, suggestOpen]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query, cuisineCodes]);
+
+  useLayoutEffect(() => {
+    if (!suggestOpen) {
+      setMenuPosition(null);
+      return;
+    }
+    updateMenuPosition();
+  }, [suggestOpen, suggestions.length, selectedEntries.length, query]);
+
+  useEffect(() => {
+    if (!suggestOpen) return;
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as Node;
+      if (
+        fieldRef.current?.contains(target) ||
+        listRef.current?.contains(target)
+      ) {
+        return;
+      }
+      setSuggestOpen(false);
+    };
+    const onReposition = () => updateMenuPosition();
+    document.addEventListener("pointerdown", onPointerDown);
+    window.addEventListener("resize", onReposition);
+    window.addEventListener("scroll", onReposition, true);
+    return () => {
+      document.removeEventListener("pointerdown", onPointerDown);
+      window.removeEventListener("resize", onReposition);
+      window.removeEventListener("scroll", onReposition, true);
+    };
+  }, [suggestOpen]);
+
+  useEffect(() => {
+    if (!suggestOpen) return;
+    const option = listRef.current?.querySelector<HTMLElement>(
+      `[data-index="${activeIndex}"]`,
+    );
+    option?.scrollIntoView?.({ block: "nearest" });
+  }, [activeIndex, suggestOpen, suggestions]);
+
+  if (!open) return null;
+
+  function addCuisine(code: string) {
+    const normalized = code.toLowerCase();
+    setCuisineCodes((prev) =>
+      prev.includes(normalized) ? prev : [...prev, normalized],
+    );
+    setQuery("");
+    setSuggestOpen(true);
+    setActiveIndex(0);
+    inputRef.current?.focus();
+  }
+
+  function removeCuisine(code: string) {
+    setCuisineCodes((prev) => prev.filter((item) => item !== code));
+  }
+
+  function clearCuisines() {
+    setCuisineCodes([]);
+    setQuery("");
+    inputRef.current?.focus();
+  }
+
+  function onSuggestKeyDown(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Backspace" && !query && cuisineCodes.length > 0) {
+      event.preventDefault();
+      removeCuisine(cuisineCodes[cuisineCodes.length - 1]!);
+      return;
+    }
+
+    if (
+      !suggestOpen &&
+      (event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter")
+    ) {
+      if (event.key === "Enter" && !query.trim()) return;
+      event.preventDefault();
+      setSuggestOpen(true);
+      return;
+    }
+
+    if (!suggestOpen) return;
+
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveIndex((index) =>
+        suggestions.length === 0 ? 0 : (index + 1) % suggestions.length,
+      );
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveIndex((index) =>
+        suggestions.length === 0
+          ? 0
+          : (index - 1 + suggestions.length) % suggestions.length,
+      );
+      return;
+    }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      const entry = suggestions[activeIndex];
+      if (entry) addCuisine(entry.code);
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      setSuggestOpen(false);
+    }
+  }
+
+  async function onSubmit(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    try {
+      const trimmedName = name.trim();
+      if (!trimmedName) {
+        throw new Error(t("admin.restaurant.edit.error.name"));
+      }
+      if (cuisineCodes.length < 1) {
+        throw new Error(t("admin.restaurant.edit.error.countries"));
+      }
+      const nextWebsite = normalizeWebsiteInput(website);
+      if (website.trim() && !nextWebsite) {
+        throw new Error(t("admin.restaurant.edit.error.website"));
+      }
+      if (nextWebsite) {
+        try {
+          void new URL(nextWebsite);
+        } catch {
+          throw new Error(t("admin.restaurant.edit.error.website"));
+        }
+      }
+
+      const result = await patchRestaurantFields(restaurant.id, {
+        name: trimmedName,
+        authenticityNotes: description.trim() || null,
+        website: nextWebsite,
+        cuisineCodes,
+      });
+      onApplied({ restaurant: result.restaurant });
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : t("admin.restaurant.edit.error.save"),
+      );
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const activeOptionId =
+    suggestOpen && suggestions[activeIndex]
+      ? `${listboxId}-option-${suggestions[activeIndex]!.code}`
+      : undefined;
+
+  const listbox =
+    suggestOpen && menuPosition
+      ? createPortal(
+          <ul
+            ref={listRef}
+            id={listboxId}
+            role="listbox"
+            aria-label={t("admin.restaurant.edit.countries")}
+            style={{
+              top: menuPosition.top,
+              left: menuPosition.left,
+              width: menuPosition.width,
+              maxHeight: menuPosition.maxHeight,
+            }}
+            className={`fixed ${zClass.modalSelect} overflow-auto rounded-2xl border border-ink/10 bg-cream py-1 shadow-xl`}
+          >
+            {suggestions.length === 0 ? (
+              <li className="px-4 py-3 text-sm text-ink-soft">
+                {t("admin.restaurant.edit.countries.empty")}
+              </li>
+            ) : (
+              suggestions.map((entry, index) => {
+                const isActive = index === activeIndex;
+                return (
+                  <li
+                    key={entry.code}
+                    id={`${listboxId}-option-${entry.code}`}
+                    role="option"
+                    aria-selected={isActive}
+                    data-index={index}
+                    className={`cursor-pointer px-4 py-2.5 text-sm text-ink ${
+                      isActive ? "bg-stamp/15" : "hover:bg-parchment"
+                    }`}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onMouseDown={(event) => {
+                      event.preventDefault();
+                      addCuisine(entry.code);
+                    }}
+                  >
+                    {entryLabel(entry)}
+                  </li>
+                );
+              })
+            )}
+          </ul>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <div
+      className={`fixed inset-0 ${zClass.modal} flex items-end justify-center bg-ink/55 p-0 sm:items-center sm:p-4`}
+      role="presentation"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget && !busy) onClose();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-cream shadow-2xl sm:rounded-[1.75rem]"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3 border-b border-ink/10 px-5 py-4 sm:px-6">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stamp">
+              {t("admin.restaurant.edit.eyebrow")}
+            </p>
+            <h2
+              id={titleId}
+              className="font-display text-3xl leading-tight text-burgundy"
+            >
+              {t("admin.restaurant.edit.title", { name: restaurant.name })}
+            </h2>
+            <p className="mt-1 text-sm text-ink-soft">
+              {t("admin.restaurant.edit.subtitle")}
+            </p>
+          </div>
+          <button
+            type="button"
+            disabled={busy}
+            onClick={onClose}
+            className="rounded-full p-2 text-ink-soft hover:bg-parchment hover:text-ink disabled:opacity-60"
+            aria-label={t("admin.restaurant.edit.close")}
+          >
+            <X className="size-5" aria-hidden="true" />
+          </button>
+        </div>
+
+        <form
+          onSubmit={(event) => void onSubmit(event)}
+          className="flex min-h-0 flex-1 flex-col"
+        >
+          <div className="flex-1 space-y-4 overflow-y-auto px-5 py-5 sm:px-6">
+            <label className="block">
+              <span className="text-sm font-medium text-ink-soft">
+                {t("admin.restaurant.edit.name")}
+              </span>
+              <input
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                autoComplete="organization"
+              />
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-ink-soft">
+                {t("admin.restaurant.edit.description")}
+              </span>
+              <textarea
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                rows={4}
+                placeholder={t("admin.restaurant.edit.description.placeholder")}
+                className="mt-1 w-full resize-y rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+              />
+              <span className="mt-1 block text-xs text-ink-soft">
+                {t("admin.restaurant.edit.description.hint")}
+              </span>
+            </label>
+
+            <label className="block">
+              <span className="text-sm font-medium text-ink-soft">
+                {t("admin.restaurant.edit.website")}
+              </span>
+              <input
+                type="text"
+                inputMode="url"
+                value={website}
+                onChange={(event) => setWebsite(event.target.value)}
+                placeholder={t("admin.restaurant.edit.website.placeholder")}
+                className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                autoComplete="url"
+              />
+              <span className="mt-1 block text-xs text-ink-soft">
+                {t("admin.restaurant.edit.website.hint")}
+              </span>
+            </label>
+
+            <div>
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-sm font-medium text-ink-soft">
+                  {t("admin.restaurant.edit.countries")}
+                </span>
+                {cuisineCodes.length > 0 ? (
+                  <button
+                    type="button"
+                    onClick={clearCuisines}
+                    className="text-xs font-semibold text-ink-soft hover:text-tomato"
+                  >
+                    {t("admin.restaurant.edit.countries.clear")}
+                  </button>
+                ) : null}
+              </div>
+              <p className="mt-1 text-xs text-ink-soft">
+                {t("admin.restaurant.edit.countries.hint")}
+              </p>
+
+              <div
+                ref={fieldRef}
+                className="mt-2 rounded-2xl border-2 border-ink/15 bg-white px-3 py-2 focus-within:ring-2 focus-within:ring-tomato/30"
+                onMouseDown={() => inputRef.current?.focus()}
+              >
+                <div className="flex flex-wrap items-center gap-2">
+                  {selectedEntries.map((entry) => (
+                    <span
+                      key={entry.code}
+                      className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-parchment py-1 pl-2.5 pr-1 text-sm text-ink"
+                    >
+                      <span aria-hidden="true">{entry.flag}</span>
+                      <span className="truncate">{entry.name}</span>
+                      <button
+                        type="button"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          removeCuisine(entry.code);
+                        }}
+                        className="rounded-full p-1 text-ink-soft hover:bg-cream hover:text-ink"
+                        aria-label={t("admin.restaurant.edit.countries.remove", {
+                          name: entry.name,
+                        })}
+                      >
+                        <X className="size-3.5" aria-hidden="true" />
+                      </button>
+                    </span>
+                  ))}
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={suggestOpen}
+                    aria-controls={listboxId}
+                    aria-activedescendant={activeOptionId}
+                    autoComplete="off"
+                    spellCheck={false}
+                    value={query}
+                    placeholder={
+                      cuisineCodes.length === 0
+                        ? t("admin.restaurant.edit.countries.add")
+                        : t("admin.restaurant.edit.countries.addAnother")
+                    }
+                    onChange={(event) => {
+                      setQuery(event.target.value);
+                      setSuggestOpen(true);
+                    }}
+                    onFocus={() => setSuggestOpen(true)}
+                    onKeyDown={onSuggestKeyDown}
+                    className="min-w-[8rem] flex-1 border-0 bg-transparent py-1.5 text-sm text-ink outline-none placeholder:text-ink-soft/70"
+                  />
+                </div>
+              </div>
+              {listbox}
+            </div>
+
+            {error ? (
+              <p role="alert" className="text-sm text-tomato">
+                {error}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-wrap items-center justify-end gap-2 border-t border-ink/10 px-5 py-4 sm:px-6">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={onClose}
+              className="rounded-full px-4 py-2.5 text-sm font-semibold text-ink-soft hover:bg-parchment hover:text-ink disabled:opacity-60"
+            >
+              {t("admin.restaurant.edit.cancel")}
+            </button>
+            <button
+              type="submit"
+              disabled={busy}
+              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-burgundy px-5 text-sm font-semibold text-cream hover:bg-burgundy/90 disabled:opacity-60"
+            >
+              {busy ? (
+                <>
+                  <LoaderCircle className="size-4 animate-spin" aria-hidden="true" />
+                  {t("admin.restaurant.edit.saving")}
+                </>
+              ) : (
+                t("admin.restaurant.edit.save")
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
