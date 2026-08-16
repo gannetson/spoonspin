@@ -696,9 +696,10 @@ async function migrate(db: Pool) {
     const { seedDevCountries } = await import("./seeds/countries.ts");
     await seedDevCountries(db);
 
-    const { seedCountryRegions } = await import("./regions.ts");
     const { migrateRegionIdsToIso } = await import("./regions/migrateIds.ts");
     await migrateRegionIdsToIso(db);
+
+    const { seedCountryRegions } = await import("./regions.ts");
     await seedCountryRegions("cn", db);
 
     const { seedChineseRegionRecipes } = await import("./seeds/chineseRegionRecipes.ts");
