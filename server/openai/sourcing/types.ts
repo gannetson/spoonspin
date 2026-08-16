@@ -4,7 +4,7 @@ export const RECIPE_STORAGE_LANGUAGE = "English";
 /** Context passed when resolving recipe sourcing for OpenAI prompts. */
 export type RecipeSourcingContext = {
   countryCode: string;
-  /** Optional DB region id (e.g. cn:sichuan) for future region-specific sourcing. */
+  /** Optional DB region id (e.g. cn:CN-SC) for future region-specific sourcing. */
   regionId?: string;
   /** Optional display region name. */
   regionName?: string;

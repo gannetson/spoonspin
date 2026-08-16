@@ -91,7 +91,7 @@ describe("recipeMatchesDiet", () => {
 
 describe("recipeMatchesRegion", () => {
   it("includes all recipes when no region is selected", () => {
-    expect(recipeMatchesRegion({ ...recipe([]), regionId: "cn:sichuan" }, null)).toBe(
+    expect(recipeMatchesRegion({ ...recipe([]), regionId: "cn:CN-SC" }, null)).toBe(
       true,
     );
     expect(recipeMatchesRegion(recipe([]), null)).toBe(true);
@@ -99,12 +99,12 @@ describe("recipeMatchesRegion", () => {
 
   it("filters to matching region only when selected", () => {
     expect(
-      recipeMatchesRegion({ ...recipe([]), regionId: "cn:sichuan" }, "cn:sichuan"),
+      recipeMatchesRegion({ ...recipe([]), regionId: "cn:CN-SC" }, "cn:CN-SC"),
     ).toBe(true);
     expect(
-      recipeMatchesRegion({ ...recipe([]), regionId: "cn:guangdong" }, "cn:sichuan"),
+      recipeMatchesRegion({ ...recipe([]), regionId: "cn:CN-GD" }, "cn:CN-SC"),
     ).toBe(false);
-    expect(recipeMatchesRegion(recipe([]), "cn:sichuan")).toBe(false);
+    expect(recipeMatchesRegion(recipe([]), "cn:CN-SC")).toBe(false);
   });
 });
 

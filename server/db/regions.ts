@@ -1,188 +1,73 @@
 import type { Pool, QueryResultRow } from "pg";
 import { ensureDb } from "./restaurants.ts";
+import {
+  loadCountryCatalog,
+  lookupIsoCode,
+  normalizeRegionName,
+  regionIdFor,
+  regionIdFromIso,
+  regionSlug,
+  resolveCanonicalRegionName,
+} from "./regions/catalog.ts";
 
 export type Region = {
   id: string;
   countryCode: string;
   name: string;
+  isoCode?: string;
 };
 
-/** Provincial-level divisions of China (English names). */
-export const CHINESE_REGIONS = [
-  "Anhui",
-  "Beijing",
-  "Chongqing",
-  "Fujian",
-  "Gansu",
-  "Guangdong",
-  "Guangxi",
-  "Guizhou",
-  "Hainan",
-  "Hebei",
-  "Heilongjiang",
-  "Henan",
-  "Hong Kong",
-  "Hubei",
-  "Hunan",
-  "Inner Mongolia",
-  "Jiangsu",
-  "Jiangxi",
-  "Jilin",
-  "Liaoning",
-  "Macau",
-  "Ningxia",
-  "Qinghai",
-  "Shaanxi",
-  "Shandong",
-  "Shanghai",
-  "Shanxi",
-  "Sichuan",
-  "Tianjin",
-  "Tibet",
-  "Xinjiang",
-  "Yunnan",
-  "Zhejiang",
-] as const;
-
-/** Maps normalized alias → canonical English region name. */
-const REGION_ALIASES: Record<string, string> = {
-  // Sichuan variants
-  szechuan: "Sichuan",
-  szechwan: "Sichuan",
-  sichuan: "Sichuan",
-  "sichuan province": "Sichuan",
-  // Guangxi
-  guangxi: "Guangxi",
-  "guangxi zhuang": "Guangxi",
-  "guangxi zhuang autonomous region": "Guangxi",
-  // Inner Mongolia
-  "inner mongolia": "Inner Mongolia",
-  "inner mongol": "Inner Mongolia",
-  neimenggu: "Inner Mongolia",
-  // Tibet
-  tibet: "Tibet",
-  xizang: "Tibet",
-  "tibet autonomous region": "Tibet",
-  // Xinjiang
-  xinjiang: "Xinjiang",
-  "xinjiang uygur": "Xinjiang",
-  "xinjiang uighur": "Xinjiang",
-  // Ningxia
-  ningxia: "Ningxia",
-  "ningxia hui": "Ningxia",
-  // Hong Kong / Macau
-  "hong kong": "Hong Kong",
-  hk: "Hong Kong",
-  hksar: "Hong Kong",
-  macau: "Macau",
-  macao: "Macau",
-  // Municipalities & provinces (lowercase keys)
-  anhui: "Anhui",
-  beijing: "Beijing",
-  peking: "Beijing",
-  chongqing: "Chongqing",
-  chungking: "Chongqing",
-  fujian: "Fujian",
-  fukien: "Fujian",
-  gansu: "Gansu",
-  guangdong: "Guangdong",
-  canton: "Guangdong",
-  guizhou: "Guizhou",
-  kweichow: "Guizhou",
-  hainan: "Hainan",
-  hebei: "Hebei",
-  heilongjiang: "Heilongjiang",
-  henan: "Henan",
-  honan: "Henan",
-  hubei: "Hubei",
-  hunan: "Hunan",
-  jiangsu: "Jiangsu",
-  kiangsu: "Jiangsu",
-  jiangxi: "Jiangxi",
-  jilin: "Jilin",
-  kirin: "Jilin",
-  liaoning: "Liaoning",
-  qinghai: "Qinghai",
-  shaanxi: "Shaanxi",
-  shensi: "Shaanxi",
-  shandong: "Shandong",
-  shanghai: "Shanghai",
-  shanxi: "Shanxi",
-  shansi: "Shanxi",
-  tianjin: "Tianjin",
-  tientsin: "Tianjin",
-  yunnan: "Yunnan",
-  zhejiang: "Zhejiang",
-  chekiang: "Zhejiang",
+export {
+  loadCountryCatalog,
+  lookupIsoCode,
+  normalizeRegionName,
+  regionIdFor,
+  regionIdFromIso,
+  regionSlug,
+  resolveCanonicalRegionName,
 };
-
-export function normalizeRegionName(raw: string): string {
-  return raw
-    .trim()
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, " ")
-    .trim()
-    .replace(/\s+/g, " ");
-}
-
-export function resolveCanonicalRegionName(raw: string): string {
-  const normalized = normalizeRegionName(raw);
-  if (!normalized) return raw.trim();
-  const alias = REGION_ALIASES[normalized];
-  if (alias) return alias;
-  return titleCaseWords(raw.trim());
-}
-
-function titleCaseWords(value: string): string {
-  return value
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(" ");
-}
-
-export function regionSlug(countryCode: string, canonicalName: string): string {
-  const base = canonicalName
-    .normalize("NFKD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 48);
-  return `${countryCode.toLowerCase()}:${base || "region"}`;
-}
 
 function rowToRegion(row: QueryResultRow): Region {
   return {
     id: String(row.id),
     countryCode: String(row.country_code).toLowerCase(),
     name: String(row.name),
+    isoCode: row.iso_code == null ? undefined : String(row.iso_code),
   };
 }
 
-export async function seedChineseRegions(db?: Pool): Promise<number> {
+/** Seed ISO 3166-2 subdivisions for a country when catalog JSON exists. */
+export async function seedCountryRegions(countryCode: string, db?: Pool): Promise<number> {
+  const catalog = loadCountryCatalog(countryCode);
+  if (!catalog) return 0;
+
+  const code = countryCode.toLowerCase();
   const pool = db ?? (await ensureDb());
   let inserted = 0;
-  for (const name of CHINESE_REGIONS) {
-    const id = regionSlug("cn", name);
-    const normalized = normalizeRegionName(name);
+
+  for (const entry of catalog.subdivisions) {
+    const id = regionIdFromIso(code, entry.isoCode);
+    const normalized = normalizeRegionName(entry.name);
     const result = await pool.query(
-      `INSERT INTO regions (id, country_code, name, normalized_name)
-       VALUES ($1, 'cn', $2, $3)
-       ON CONFLICT (country_code, normalized_name) DO NOTHING`,
-      [id, name, normalized],
+      `INSERT INTO regions (id, country_code, name, normalized_name, iso_code)
+       VALUES ($1, $2, $3, $4, $5)
+       ON CONFLICT (id) DO UPDATE SET
+         name = EXCLUDED.name,
+         normalized_name = EXCLUDED.normalized_name,
+         iso_code = EXCLUDED.iso_code
+       RETURNING (xmax = 0) AS inserted`,
+      [id, code, entry.name, normalized, entry.isoCode],
     );
-    inserted += result.rowCount ?? 0;
+    if (result.rows[0]?.inserted) inserted += 1;
   }
+
   return inserted;
 }
 
 export async function listRegionsForCountry(countryCode: string): Promise<Region[]> {
   const db = await ensureDb();
   const result = await db.query(
-    `SELECT id, country_code, name
+    `SELECT id, country_code, name, iso_code
      FROM regions
      WHERE country_code = $1
      ORDER BY name ASC`,
@@ -194,7 +79,7 @@ export async function listRegionsForCountry(countryCode: string): Promise<Region
 export async function getRegionById(id: string): Promise<Region | undefined> {
   const db = await ensureDb();
   const result = await db.query(
-    `SELECT id, country_code, name FROM regions WHERE id = $1`,
+    `SELECT id, country_code, name, iso_code FROM regions WHERE id = $1`,
     [id],
   );
   const row = result.rows[0];
@@ -207,7 +92,7 @@ export async function findRegionByNormalizedName(
 ): Promise<Region | undefined> {
   const db = await ensureDb();
   const result = await db.query(
-    `SELECT id, country_code, name
+    `SELECT id, country_code, name, iso_code
      FROM regions
      WHERE country_code = $1 AND normalized_name = $2`,
     [countryCode.toLowerCase(), normalizedName],
@@ -244,20 +129,22 @@ export async function createRegionResolver(countryCode: string): Promise<RegionR
       return undefined;
     }
 
-    const canonical = resolveCanonicalRegionName(trimmed);
+    const canonical = resolveCanonicalRegionName(trimmed, code);
+    const isoCode = lookupIsoCode(code, canonical);
     const normalized = normalizeRegionName(canonical);
     const cached = byNormalized.get(normalized);
     if (cached) return cached;
 
-    const id = regionSlug(code, canonical);
+    const id = regionIdFor(code, canonical, isoCode);
     const db = await ensureDb();
     const result = await db.query(
-      `INSERT INTO regions (id, country_code, name, normalized_name)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO regions (id, country_code, name, normalized_name, iso_code)
+       VALUES ($1, $2, $3, $4, $5)
        ON CONFLICT (country_code, normalized_name) DO UPDATE
-         SET name = EXCLUDED.name
-       RETURNING id, country_code, name`,
-      [id, code, canonical, normalized],
+         SET name = EXCLUDED.name,
+             iso_code = COALESCE(EXCLUDED.iso_code, regions.iso_code)
+       RETURNING id, country_code, name, iso_code`,
+      [id, code, canonical, normalized, isoCode ?? null],
     );
     const row = result.rows[0];
     if (!row) {

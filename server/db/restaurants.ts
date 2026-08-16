@@ -664,9 +664,16 @@ async function migrate(db: Pool) {
       country_code TEXT NOT NULL REFERENCES countries(code) ON DELETE CASCADE,
       name TEXT NOT NULL,
       normalized_name TEXT NOT NULL,
+      iso_code TEXT,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
       UNIQUE (country_code, normalized_name)
     );
+
+    ALTER TABLE regions ADD COLUMN IF NOT EXISTS iso_code TEXT;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_regions_country_iso_code
+      ON regions (country_code, iso_code)
+      WHERE iso_code IS NOT NULL;
 
     CREATE INDEX IF NOT EXISTS idx_regions_country_code
       ON regions (country_code);
@@ -689,8 +696,10 @@ async function migrate(db: Pool) {
     const { seedDevCountries } = await import("./seedCountries.ts");
     await seedDevCountries(db);
 
-    const { seedChineseRegions } = await import("./regions.ts");
-    await seedChineseRegions(db);
+    const { seedCountryRegions } = await import("./regions.ts");
+    const { migrateRegionIdsToIso } = await import("./regions/migrateIds.ts");
+    await migrateRegionIdsToIso(db);
+    await seedCountryRegions("cn", db);
 
     const { seedChineseRegionRecipes } = await import("./seedChineseRegionRecipes.ts");
     await seedChineseRegionRecipes(db);
@@ -1395,6 +1404,7 @@ export async function resetAllTables(client?: PoolClient): Promise<void> {
       shop_submissions,
       sessions,
       recipes,
+      regions,
       countries,
       users,
       content_fill_progress

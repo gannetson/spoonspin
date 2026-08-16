@@ -1,7 +1,10 @@
 /** @vitest-environment node */
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { closeDb, ensureDb, resetAllTables } from "./restaurants";
-import { CHINESE_REGIONS, seedChineseRegions } from "./regions";
+import { seedCountryRegions } from "./regions";
 import {
   CHINESE_REGION_RECIPES,
   seedChineseRegionRecipes,
@@ -12,11 +15,23 @@ const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL?.trim() ||
   "postgresql://spoonspin:spoonspin@localhost:5435/spoonspin_test";
 
+const cnCatalog = JSON.parse(
+  readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "regions/data/cn.json"),
+    "utf8",
+  ),
+) as { subdivisions: Array<{ isoCode: string; name: string }> };
+
+/** Regions with seeded recipes (Taiwan has no recipe yet). */
+const REGIONS_WITH_RECIPES = cnCatalog.subdivisions.filter(
+  (entry) => entry.isoCode !== "CN-TW",
+);
+
 describe("seedChineseRegionRecipes", () => {
-  it("defines one recipe for every Chinese region", () => {
-    expect(CHINESE_REGION_RECIPES).toHaveLength(CHINESE_REGIONS.length);
+  it("defines one recipe for every seeded Chinese region", () => {
+    expect(CHINESE_REGION_RECIPES).toHaveLength(REGIONS_WITH_RECIPES.length);
     expect(new Set(CHINESE_REGION_RECIPES.map((entry) => entry.region)).size).toBe(
-      CHINESE_REGIONS.length,
+      REGIONS_WITH_RECIPES.length,
     );
   });
 
@@ -26,7 +41,7 @@ describe("seedChineseRegionRecipes", () => {
     await resetAllTables();
     const db = await ensureDb();
     await seedDevCountries(db);
-    await seedChineseRegions(db);
+    await seedCountryRegions("cn", db);
   });
 
   afterEach(async () => {

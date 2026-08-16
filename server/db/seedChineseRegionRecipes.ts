@@ -1,12 +1,12 @@
 import type { Pool } from "pg";
 import type { RecipeCategory } from "../../src/types/content.ts";
-import { CHINESE_REGIONS, regionSlug } from "./regions.ts";
+import { findSubdivisionByName, normalizeRegionName } from "./regions/catalog.ts";
 import { ensureDb } from "./restaurants.ts";
 
 type SeedIngredient = { name: string; quantity: number; unit: string; note?: string };
 
 type ChineseRegionRecipeSeed = {
-  region: (typeof CHINESE_REGIONS)[number];
+  region: string;
   id: string;
   name: string;
   localName: string;
@@ -17,7 +17,7 @@ type ChineseRegionRecipeSeed = {
 };
 
 function dish(
-  region: (typeof CHINESE_REGIONS)[number],
+  region: string,
   id: string,
   name: string,
   localName: string,
@@ -392,7 +392,7 @@ export const CHINESE_REGION_RECIPES: ChineseRegionRecipeSeed[] = [
     ],
   ),
   dish(
-    "Macau",
+    "Macao",
     "macau-minchi",
     "Macanese minchi",
     "澳门 minchi",
@@ -633,11 +633,15 @@ export async function seedChineseRegionRecipes(db?: Pool): Promise<number> {
   let sortOrder = 0;
 
   for (const entry of CHINESE_REGION_RECIPES) {
-    const regionId = regionSlug("cn", entry.region);
-    const regionExists = await pool.query(`SELECT id FROM regions WHERE id = $1`, [
-      regionId,
-    ]);
-    if (!regionExists.rows[0]) continue;
+    const subdivision = findSubdivisionByName("cn", entry.region);
+    if (!subdivision) continue;
+    const regionExists = await pool.query<{ id: string }>(
+      `SELECT id FROM regions
+       WHERE country_code = 'cn' AND normalized_name = $1`,
+      [normalizeRegionName(entry.region)],
+    );
+    const regionRow = regionExists.rows[0];
+    if (!regionRow) continue;
 
     const result = await pool.query(
       `INSERT INTO recipes (
@@ -659,7 +663,7 @@ export async function seedChineseRegionRecipes(db?: Pool): Promise<number> {
         entry.category,
         JSON.stringify(entry.ingredients),
         JSON.stringify(entry.steps),
-        regionId,
+        regionRow.id,
       ],
     );
     inserted += result.rowCount ?? 0;
