@@ -1,4 +1,8 @@
-import { z } from "zod";
+import {
+  communityRecipePreviewSystemPrompt,
+  sanitizeRecipeSourceUrl,
+  sourcingContextFromCountry,
+} from "./sourcing/index.ts";
 import type { Drink, Recipe, SpecialtyShop } from "../../src/types/content.ts";
 import type { RestaurantSubmissionPayload } from "../db/submissions.ts";
 import {
@@ -54,6 +58,7 @@ const recipeDraftSchema = z.object({
         .transform((v) => v ?? undefined),
       servingSuggestion: optionalString,
       drinkPairing: optionalString,
+      sourceUrl: optionalString,
     })
     .nullable(),
 });
@@ -175,12 +180,9 @@ export async function previewRecipeSuggestion(input: {
   countryName: string;
   query: string;
 }): Promise<RecipePreview> {
+  const sourcingContext = sourcingContextFromCountry(input.countryCode);
   const raw = await chatJson(
-    `You research authentic dishes for a food app. Reply with JSON only.
-If the query is not a real dish (or not tied to the given cuisine), set found=false and recipe=null.
-If found, return a practical home-cook recipe for Dutch kitchens.
-confirmationNotes: 1-2 short sentences confirming what you found and why it fits.
-Use metric units. Keep steps concrete. description at least 40 characters.`,
+    communityRecipePreviewSystemPrompt(sourcingContext),
     `Country: ${input.countryName} (${input.countryCode})
 User query (dish name or short description): ${input.query}
 
@@ -203,7 +205,8 @@ JSON shape:
     "steps": string[],
     "substitutions": string[]?,
     "servingSuggestion": string?,
-    "drinkPairing": string?
+    "drinkPairing": string?,
+    "sourceUrl": string?
   }
 }`,
   );
@@ -222,6 +225,7 @@ JSON shape:
     confirmationNotes: parsed.confirmationNotes,
     recipe: {
       ...parsed.recipe,
+      sourceUrl: sanitizeRecipeSourceUrl(parsed.recipe.sourceUrl, sourcingContext),
       description:
         parsed.recipe.description.length >= 40
           ? parsed.recipe.description
