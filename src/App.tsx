@@ -113,15 +113,22 @@ export default function App() {
   const invalidCountry = !countriesLoading && Boolean(countryCode) && !selectedCountry;
 
   const [countryRegions, setCountryRegions] = useState<Region[]>([]);
+  const [regionsLoaded, setRegionsLoaded] = useState(false);
 
   useEffect(() => {
     if (!selectedCountry) {
       setCountryRegions([]);
+      setRegionsLoaded(false);
       return;
     }
+    setCountryRegions([]);
+    setRegionsLoaded(false);
     let cancelled = false;
     void fetchRegions(selectedCountry.code).then((regions) => {
-      if (!cancelled) setCountryRegions(regions);
+      if (!cancelled) {
+        setCountryRegions(regions);
+        setRegionsLoaded(true);
+      }
     });
     return () => {
       cancelled = true;
@@ -132,8 +139,8 @@ export default function App() {
     () => countryRegions.find((region) => region.id === regionId),
     [countryRegions, regionId],
   );
-  const invalidRegion =
-    Boolean(regionId) && countryRegions.length > 0 && !selectedRegion;
+  const staleRegionParam =
+    regionsLoaded && Boolean(regionId) && !selectedRegion;
 
   const [communityRecipes, setCommunityRecipes] = useState<Recipe[]>([]);
   const [communityDrinks, setCommunityDrinks] = useState<Drink[]>([]);
@@ -189,7 +196,7 @@ export default function App() {
   }, [invalidCountry, countryCode, setSearchParams, t]);
 
   useEffect(() => {
-    if (!invalidRegion) return;
+    if (!staleRegionParam) return;
     setSearchParams(
       (prev) => {
         const params = new URLSearchParams(prev);
@@ -198,7 +205,7 @@ export default function App() {
       },
       { replace: true },
     );
-  }, [invalidRegion, setSearchParams]);
+  }, [staleRegionParam, setSearchParams]);
 
   useEffect(() => {
     return () => {
@@ -719,7 +726,7 @@ export default function App() {
                     id="result-country-select"
                     label={t("app.countrySelect.labelResult")}
                   />
-                  {countryRegions.length > 0 ? (
+                  {mode === "cook" && countryRegions.length > 0 ? (
                     <RegionSelect
                       regions={countryRegions}
                       value={selectedRegion?.id ?? ""}
@@ -734,7 +741,7 @@ export default function App() {
               {mode === "cook" && !selectedRecipe && !selectedShop ? (
                 <CookMenu
                   country={selectedCountry}
-                  regionId={selectedRegion?.id ?? null}
+                  regionId={selectedRegion?.id ?? (regionsLoaded ? null : regionId)}
                   communityRecipes={communityRecipes}
                   communityDrinks={communityDrinks}
                   communityShops={communityShops}
@@ -803,7 +810,6 @@ export default function App() {
               {mode === "dine" && !restaurantId ? (
                 <DineSearch
                   country={selectedCountry}
-                  regionId={selectedRegion?.id ?? null}
                   onOpenRestaurant={openRestaurant}
                   refreshKey={dineRefreshKey}
                   onCountryUpdated={handleCountryUpdated}

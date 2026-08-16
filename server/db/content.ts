@@ -15,7 +15,7 @@ import {
   getSpecialtyShops,
 } from "../../src/content/countries/menuAccessors.ts";
 import { countByCuisineCode, ensureDb } from "./restaurants.ts";
-import { findOrCreateRegion } from "./regions.ts";
+import { createRegionResolver, findOrCreateRegion } from "./regions.ts";
 
 const RECIPE_SELECT = `
   recipes.*,
@@ -266,9 +266,13 @@ export async function replaceCountryRecipes(
   const code = countryCode.toLowerCase();
   await db.query(`DELETE FROM recipes WHERE country_code = $1`, [code]);
 
+  const { resolve: resolveRegion } = await createRegionResolver(code);
   for (const entry of entries) {
     const { recipe, menuSlot, sortOrder } = entry;
-    const region = await findOrCreateRegion(code, recipe.region ?? recipe.regionName);
+    const region = await resolveRegion(
+      recipe.region ?? recipe.regionName,
+      recipe.regionId,
+    );
     const regionId = region?.id ?? recipe.regionId ?? null;
     await db.query(
       `INSERT INTO recipes (
@@ -434,6 +438,7 @@ export async function appendMoreRecipes(
   );
   let sortOrder = Number(maxSort.rows[0]?.n ?? -1) + 1;
   const inserted: Recipe[] = [];
+  const { resolve: resolveRegion } = await createRegionResolver(code);
 
   for (const recipe of recipes) {
     let id = recipe.id?.trim() || slugifyId(recipe.name) || `dish-${sortOrder}`;
@@ -441,7 +446,10 @@ export async function appendMoreRecipes(
       id = `${id}-${sortOrder}`;
     }
     existing.add(id);
-    const region = await findOrCreateRegion(code, recipe.region ?? recipe.regionName);
+    const region = await resolveRegion(
+      recipe.region ?? recipe.regionName,
+      recipe.regionId,
+    );
     const regionId = region?.id ?? recipe.regionId ?? null;
     const saved: Recipe = {
       ...recipe,

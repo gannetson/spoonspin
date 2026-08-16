@@ -216,6 +216,63 @@ export async function findRegionByNormalizedName(
   return row ? rowToRegion(row) : undefined;
 }
 
+export type RegionResolver = {
+  resolve(
+    rawName: string | undefined | null,
+    fallbackRegionId?: string | null,
+  ): Promise<Region | undefined>;
+};
+
+/** Batch-friendly region lookup — one list query, cached creates. */
+export async function createRegionResolver(countryCode: string): Promise<RegionResolver> {
+  const code = countryCode.toLowerCase();
+  const all = await listRegionsForCountry(code);
+  const byNormalized = new Map<string, Region>();
+  const byId = new Map<string, Region>();
+  for (const region of all) {
+    byNormalized.set(normalizeRegionName(region.name), region);
+    byId.set(region.id, region);
+  }
+
+  async function resolve(
+    rawName: string | undefined | null,
+    fallbackRegionId?: string | null,
+  ): Promise<Region | undefined> {
+    const trimmed = rawName?.trim();
+    if (!trimmed) {
+      if (fallbackRegionId) return byId.get(fallbackRegionId);
+      return undefined;
+    }
+
+    const canonical = resolveCanonicalRegionName(trimmed);
+    const normalized = normalizeRegionName(canonical);
+    const cached = byNormalized.get(normalized);
+    if (cached) return cached;
+
+    const id = regionSlug(code, canonical);
+    const db = await ensureDb();
+    const result = await db.query(
+      `INSERT INTO regions (id, country_code, name, normalized_name)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (country_code, normalized_name) DO UPDATE
+         SET name = EXCLUDED.name
+       RETURNING id, country_code, name`,
+      [id, code, canonical, normalized],
+    );
+    const row = result.rows[0];
+    if (!row) {
+      return findRegionByNormalizedName(code, normalized);
+    }
+    const region = rowToRegion(row);
+    byNormalized.set(normalized, region);
+    byId.set(region.id, region);
+    all.push(region);
+    return region;
+  }
+
+  return { resolve };
+}
+
 /**
  * Resolve a free-text region name to an existing row or create one.
  * Returns undefined when the input is empty.
@@ -224,32 +281,7 @@ export async function findOrCreateRegion(
   countryCode: string,
   rawName: string | undefined | null,
 ): Promise<Region | undefined> {
-  const trimmed = rawName?.trim();
-  if (!trimmed) return undefined;
-
-  const code = countryCode.toLowerCase();
-  const canonical = resolveCanonicalRegionName(trimmed);
-  const normalized = normalizeRegionName(canonical);
-
-  const existing = await findRegionByNormalizedName(code, normalized);
-  if (existing) return existing;
-
-  // Fuzzy: match against seeded regions for this country
-  const all = await listRegionsForCountry(code);
-  for (const region of all) {
-    if (normalizeRegionName(region.name) === normalized) {
-      return region;
-    }
-  }
-
-  const id = regionSlug(code, canonical);
-  const db = await ensureDb();
-  await db.query(
-    `INSERT INTO regions (id, country_code, name, normalized_name)
-     VALUES ($1, $2, $3, $4)
-     ON CONFLICT (country_code, normalized_name) DO UPDATE
-       SET name = EXCLUDED.name`,
-    [id, code, canonical, normalized],
-  );
-  return { id, countryCode: code, name: canonical };
+  if (!rawName?.trim()) return undefined;
+  const { resolve } = await createRegionResolver(countryCode);
+  return resolve(rawName);
 }
