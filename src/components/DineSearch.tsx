@@ -31,6 +31,7 @@ import { useT } from "@/i18n/LocaleContext";
 
 type DineSearchProps = {
   country: Country;
+  regionId?: string | null;
   onOpenRestaurant: (restaurant: Restaurant) => void;
   /** Bump to force a fresh search (e.g. after admin add). */
   refreshKey?: number;
@@ -68,6 +69,7 @@ const SORT_OPTION_KEYS: Record<RestaurantSortMode, string> = {
 
 export function DineSearch({
   country,
+  regionId = null,
   onOpenRestaurant,
   refreshKey = 0,
   onCountryUpdated,
@@ -99,6 +101,7 @@ export function DineSearch({
 
   const searchRef = useRef({
     country,
+    regionId,
     cityOrPostcode,
     visitorLocation,
     rememberCity,
@@ -106,6 +109,7 @@ export function DineSearch({
   });
   searchRef.current = {
     country,
+    regionId,
     cityOrPostcode,
     visitorLocation,
     rememberCity,
@@ -130,6 +134,7 @@ export function DineSearch({
       cuisineAliases: country.cuisineAliases,
       countryName: country.name,
       countryCode: country.code,
+      regionId: regionId ?? undefined,
       cityOrPostcode: city || undefined,
       visitorLocation: location,
     });
@@ -177,6 +182,7 @@ export function DineSearch({
   useEffect(() => {
     const {
       country: activeCountry,
+      regionId: activeRegionId,
       cityOrPostcode: city,
       visitorLocation: coords,
       rememberCity: remember,
@@ -195,6 +201,7 @@ export function DineSearch({
         cuisineAliases: activeCountry.cuisineAliases,
         countryName: activeCountry.name,
         countryCode: activeCountry.code,
+        regionId: activeRegionId ?? undefined,
         cityOrPostcode: city.trim(),
         visitorLocation: coords,
       });
@@ -241,7 +248,7 @@ export function DineSearch({
     return () => {
       cancelled = true;
     };
-  }, [country.code, refreshKey]);
+  }, [country.code, regionId, refreshKey]);
 
   function useMyLocation() {
     if (!navigator.geolocation) {

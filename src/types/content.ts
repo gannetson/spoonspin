@@ -53,6 +53,11 @@ export type Recipe = {
   sourceUrl?: string;
   /** Video page or search URL (e.g. YouTube). */
   videoUrl?: string;
+  /** Linked administrative region within the country. */
+  regionId?: string;
+  regionName?: string;
+  /** Raw region name when inserting (resolved to regionId in the DB). */
+  region?: string;
 };
 
 export type SpecialtyShop = {
@@ -196,4 +201,11 @@ export type CountryCatalogEntry = {
   flag: string;
   region: string;
   status: CountryStatus;
+};
+
+/** Administrative region within a country (e.g. Chinese province). */
+export type Region = {
+  id: string;
+  countryCode: string;
+  name: string;
 };

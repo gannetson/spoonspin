@@ -24,6 +24,13 @@ import {
 import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
 import { chatJson, isOpenAiConfigured } from "./suggest.ts";
 import {
+  recipeDiscoverSystemPrompt,
+  recipeDiscoverUserExtra,
+  recipeExpandSystemPrompt,
+  sanitizeRecipeSourceUrl,
+  sourcingContextFromCountry,
+} from "./sourcing/index.ts";
+import {
   isApifyConfigured,
   searchDeliveryOrderOptions,
   type GroundedOrderListing,
@@ -99,6 +106,7 @@ const recipeItemSchema = z.object({
   localName: optionalString,
   description: z.string().min(20),
   category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+  region: optionalString,
   servings: z.coerce.number().int().positive(),
   prepMinutes: z.coerce.number().int().nonnegative(),
   cookMinutes: z.coerce.number().int().nonnegative(),
@@ -122,6 +130,7 @@ const recipeItemSchema = z.object({
   substitutions: optionalStringArray,
   servingSuggestion: optionalString,
   drinkPairing: optionalString,
+  sourceUrl: optionalString,
 });
 
 const dishCandidateSchema = z.object({
@@ -129,6 +138,7 @@ const dishCandidateSchema = z.object({
   localName: optionalString,
   description: z.string().min(20),
   category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+  region: optionalString,
 });
 
 const recipesDiscoverSchema = z.object({
@@ -392,6 +402,7 @@ export type DishCandidate = {
   localName?: string;
   description: string;
   category: Recipe["category"];
+  region?: string;
 };
 
 export async function discoverCountryRecipes(input: {
@@ -409,16 +420,17 @@ export async function discoverCountryRecipes(input: {
     .filter(Boolean)
     .slice(0, 40);
 
+  const sourcingContext = sourcingContextFromCountry(input.countryCode);
+  const discoverUserExtra = recipeDiscoverUserExtra(sourcingContext);
+
   const raw = await chatJson(
-    `You are a cuisine editor for Spoon Spin. Reply with JSON only.
-Propose authentic dishes for the given country that Dutch home cooks can make.
-Avoid duplicates of existing dish names. Return dish candidates only (no full recipes).`,
+    recipeDiscoverSystemPrompt(sourcingContext),
     `Country: ${input.countryName} (${input.countryCode})
 Existing dishes (do not repeat): ${existing.join("; ") || "none"}
 ${focus}
 
 Return 20–24 distinct dishes when possible (quality still matters; prefer real classics over filler).
-
+${discoverUserExtra ? `${discoverUserExtra}\n` : ""}
 JSON shape:
 {
   "notes": string,
@@ -426,7 +438,8 @@ JSON shape:
     "name": string,
     "localName": string?,
     "description": string,
-    "category": "starter"|"main"|"side"|"dessert"|"snack"
+    "category": "starter"|"main"|"side"|"dessert"|"snack",
+    "region": string?
   }]
 }`,
   );
@@ -454,11 +467,11 @@ export async function expandDishCandidates(input: {
 
   const expanded: Recipe[] = [];
   const batchSize = 8;
+  const sourcingContext = sourcingContextFromCountry(input.countryCode);
   for (let i = 0; i < input.dishes.length; i += batchSize) {
     const batch = input.dishes.slice(i, i + batchSize);
     const raw = await chatJson(
-      `You write practical home-cook recipes for Spoon Spin. Reply with JSON only.
-Use metric units. Keep steps concrete. description at least 40 characters.`,
+      recipeExpandSystemPrompt(sourcingContext),
       `Country: ${input.countryName} (${input.countryCode})
 Expand each dish into a full recipe.
 
@@ -472,6 +485,7 @@ JSON shape:
     "localName": string?,
     "description": string,
     "category": "starter"|"main"|"side"|"dessert"|"snack",
+    "region": string?,
     "servings": number,
     "prepMinutes": number,
     "cookMinutes": number,
@@ -482,7 +496,8 @@ JSON shape:
     "steps": string[],
     "substitutions": string[]?,
     "servingSuggestion": string?,
-    "drinkPairing": string?
+    "drinkPairing": string?,
+    "sourceUrl": string?
   }]
 }`,
     );
@@ -503,6 +518,8 @@ JSON shape:
       expanded.push({
         ...recipe,
         id: match?.id || slugify(recipe.name) || `dish-${expanded.length + 1}`,
+        region: recipe.region ?? match?.region,
+        sourceUrl: sanitizeRecipeSourceUrl(recipe.sourceUrl, sourcingContext),
         description:
           recipe.description.length >= 40
             ? recipe.description

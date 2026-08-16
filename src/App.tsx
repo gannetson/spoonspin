@@ -7,15 +7,16 @@ import {
   getSpecialtyShops,
   setRuntimeCountries,
 } from "@/content/countries";
-import { fetchCountries } from "@/content/client";
+import { fetchCountries, fetchRegions } from "@/content/client";
 import {
   getRecentCountryCodes,
   pickRandomCountry,
   rememberCountryCode,
 } from "@/lib/picker";
-import type { Country, Drink, OrderOption, Recipe, SpecialtyShop } from "@/types/content";
+import type { Country, Drink, OrderOption, Recipe, Region, SpecialtyShop } from "@/types/content";
 import { CountryCard } from "@/components/CountryCard";
 import { CountrySelect } from "@/components/CountrySelect";
+import { RegionSelect } from "@/components/RegionSelect";
 import { CookMenu } from "@/components/CookMenu";
 import { DineSearch } from "@/components/DineSearch";
 import { OrderHome } from "@/components/OrderHome";
@@ -75,6 +76,7 @@ export default function App() {
   const [countriesLoading, setCountriesLoading] = useState(true);
   const [countriesError, setCountriesError] = useState<string | null>(null);
   const countryCode = searchParams.get("country")?.toLowerCase() ?? null;
+  const regionId = searchParams.get("region") ?? null;
   const mode = parseMode(searchParams.get("mode"));
   const recipeId = searchParams.get("recipe");
   const shopId = searchParams.get("shop");
@@ -109,6 +111,36 @@ export default function App() {
     [published, countryCode],
   );
   const invalidCountry = !countriesLoading && Boolean(countryCode) && !selectedCountry;
+
+  const [countryRegions, setCountryRegions] = useState<Region[]>([]);
+  const [regionsLoaded, setRegionsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (!selectedCountry) {
+      setCountryRegions([]);
+      setRegionsLoaded(false);
+      return;
+    }
+    setCountryRegions([]);
+    setRegionsLoaded(false);
+    let cancelled = false;
+    void fetchRegions(selectedCountry.code).then((regions) => {
+      if (!cancelled) {
+        setCountryRegions(regions);
+        setRegionsLoaded(true);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedCountry]);
+
+  const selectedRegion = useMemo(
+    () => countryRegions.find((region) => region.id === regionId),
+    [countryRegions, regionId],
+  );
+  const staleRegionParam =
+    regionsLoaded && Boolean(regionId) && !selectedRegion;
 
   const [communityRecipes, setCommunityRecipes] = useState<Recipe[]>([]);
   const [communityDrinks, setCommunityDrinks] = useState<Drink[]>([]);
@@ -164,6 +196,18 @@ export default function App() {
   }, [invalidCountry, countryCode, setSearchParams, t]);
 
   useEffect(() => {
+    if (!staleRegionParam) return;
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        params.delete("region");
+        return params;
+      },
+      { replace: true },
+    );
+  }, [staleRegionParam, setSearchParams]);
+
+  useEffect(() => {
     return () => {
       if (spinTimer.current) window.clearInterval(spinTimer.current);
     };
@@ -172,6 +216,7 @@ export default function App() {
   const updateParams = useCallback(
     (next: {
       country?: string;
+      region?: string | null;
       mode?: AppMode;
       recipe?: string | null;
       shop?: string | null;
@@ -182,6 +227,8 @@ export default function App() {
         (prev) => {
           const params = new URLSearchParams(prev);
           if (next.country) params.set("country", next.country);
+          if (next.region === null) params.delete("region");
+          else if (next.region) params.set("region", next.region);
           if (next.mode === "choose") params.delete("mode");
           else if (next.mode) params.set("mode", next.mode);
           if (next.recipe === null) params.delete("recipe");
@@ -291,6 +338,17 @@ export default function App() {
     },
     [published, setSearchParams, spinning, t],
   );
+
+  const selectRegion = useCallback(
+    (id: string) => {
+      updateParams({ region: id });
+    },
+    [updateParams],
+  );
+
+  const clearRegion = useCallback(() => {
+    updateParams({ region: null });
+  }, [updateParams]);
 
   const handleCountryUpdated = useCallback((country: Country) => {
     setPublished((prev) => {
@@ -660,18 +718,30 @@ export default function App() {
                     iconSrc="/modes/order.png"
                   />
                 </div>
-                <CountrySelect
-                  countries={published}
-                  value={selectedCountry.code}
-                  onSelect={selectCountry}
-                  id="result-country-select"
-                  label={t("app.countrySelect.labelResult")}
-                />
+                <div className="grid gap-4 md:grid-cols-2">
+                  <CountrySelect
+                    countries={published}
+                    value={selectedCountry.code}
+                    onSelect={selectCountry}
+                    id="result-country-select"
+                    label={t("app.countrySelect.labelResult")}
+                  />
+                  {mode === "cook" && countryRegions.length > 0 ? (
+                    <RegionSelect
+                      regions={countryRegions}
+                      value={selectedRegion?.id ?? ""}
+                      onSelect={selectRegion}
+                      onClear={clearRegion}
+                      id="result-region-select"
+                    />
+                  ) : null}
+                </div>
               </div>
 
               {mode === "cook" && !selectedRecipe && !selectedShop ? (
                 <CookMenu
                   country={selectedCountry}
+                  regionId={selectedRegion?.id ?? (regionsLoaded ? null : regionId)}
                   communityRecipes={communityRecipes}
                   communityDrinks={communityDrinks}
                   communityShops={communityShops}

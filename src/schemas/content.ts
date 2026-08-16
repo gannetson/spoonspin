@@ -40,6 +40,9 @@ export const recipeSchema = z.object({
   imageAttribution: z.string().min(2).optional(),
   sourceUrl: z.string().url().optional(),
   videoUrl: z.string().url().optional(),
+  regionId: z.string().min(1).optional(),
+  regionName: z.string().min(1).optional(),
+  region: z.string().min(1).optional(),
 });
 
 export const specialtyShopSchema = z.object({

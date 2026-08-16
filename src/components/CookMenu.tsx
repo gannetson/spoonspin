@@ -19,6 +19,7 @@ import {
   groupDrinksIntoSections,
   recipeMatchesCategory,
   recipeMatchesDiet,
+  recipeMatchesRegion,
 } from "@/content/countries/menuAccessors";
 import { cookBannerUrl } from "@/content/countries/cuisineImages";
 import { SuggestModal } from "@/components/SuggestModal";
@@ -48,6 +49,7 @@ import { drinkEntityId } from "@/tags/types";
 
 type CookMenuProps = {
   country: Country;
+  regionId?: string | null;
   communityRecipes: Recipe[];
   communityDrinks: Drink[];
   communityShops: SpecialtyShop[];
@@ -120,6 +122,7 @@ const COURSE_KEYS: Record<RecipeCategory | "extra", string> = {
 
 export function CookMenu({
   country,
+  regionId = null,
   communityRecipes,
   communityDrinks,
   communityShops,
@@ -199,9 +202,10 @@ export function CookMenu({
       recipes.filter(
         (recipe) =>
           recipeMatchesCategory(recipe, categoryFilter) &&
-          recipeMatchesDiet(recipe, dietFilter),
+          recipeMatchesDiet(recipe, dietFilter) &&
+          recipeMatchesRegion(recipe, regionId),
       ),
-    [recipes, categoryFilter, dietFilter],
+    [recipes, categoryFilter, dietFilter, regionId],
   );
 
   const filteredDrinks = useMemo(
@@ -374,7 +378,7 @@ export function CookMenu({
               <div className="mt-4 divide-y divide-ink/10">
                 {dinner.courses.map((course, index) => {
                   const recipe = recipesById.get(course.recipeId);
-                  if (!recipe) return null;
+                  if (!recipe || !recipeMatchesRegion(recipe, regionId)) return null;
                   const imageUrl = recipe.imageUrl?.trim() || null;
                   const imageLeft = index % 2 === 0;
                   return (
