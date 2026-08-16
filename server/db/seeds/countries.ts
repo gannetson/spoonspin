@@ -1,5 +1,5 @@
 import type { Pool } from "pg";
-import { ensureDb } from "./restaurants.ts";
+import { ensureDb } from "../restaurants.ts";
 
 /** Minimal published countries for local/dev databases. */
 export const SEED_COUNTRIES = [

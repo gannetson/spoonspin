@@ -1,7 +1,7 @@
 /** @vitest-environment node */
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { closeDb, ensureDb, resetAllTables } from "./restaurants";
-import { SEED_COUNTRIES, seedDevCountries } from "./seedCountries";
+import { closeDb, ensureDb, resetAllTables } from "../restaurants";
+import { SEED_COUNTRIES, seedDevCountries } from "./countries";
 
 const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL?.trim() ||

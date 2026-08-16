@@ -1,5 +1,6 @@
 /**
  * Dev-only seed data (sample countries, Chinese regions/recipes).
+ * Lives under server/db/seeds/ — not used in production.
  * Schema migrations always run; these inserts do not.
  */
 export function shouldRunDevSeeds(): boolean {

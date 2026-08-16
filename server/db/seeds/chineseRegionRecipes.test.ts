@@ -3,13 +3,13 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { closeDb, ensureDb, resetAllTables } from "./restaurants";
-import { seedCountryRegions } from "./regions";
+import { closeDb, ensureDb, resetAllTables } from "../restaurants";
+import { seedCountryRegions } from "../regions";
 import {
   CHINESE_REGION_RECIPES,
   seedChineseRegionRecipes,
-} from "./seedChineseRegionRecipes";
-import { seedDevCountries } from "./seedCountries";
+} from "./chineseRegionRecipes";
+import { seedDevCountries } from "./countries";
 
 const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL?.trim() ||
@@ -17,7 +17,7 @@ const TEST_DATABASE_URL =
 
 const cnCatalog = JSON.parse(
   readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), "regions/data/cn.json"),
+    join(dirname(fileURLToPath(import.meta.url)), "../regions/data/cn.json"),
     "utf8",
   ),
 ) as { subdivisions: Array<{ isoCode: string; name: string }> };

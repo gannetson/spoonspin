@@ -9,7 +9,7 @@ import {
   type RestaurantRatings,
 } from "../../src/restaurants/ratings.ts";
 import type { PriceLevel, RestaurantMenuItem } from "../../src/restaurants/types.ts";
-import { shouldRunDevSeeds } from "./devSeeds.ts";
+import { shouldRunDevSeeds } from "./seeds/devSeeds.ts";
 
 /** Default: Unix socket peer auth (no password). Override with DATABASE_URL. */
 export const DEFAULT_DATABASE_URL = "postgresql:///spoonspin?host=/var/run/postgresql";
@@ -693,7 +693,7 @@ async function migrate(db: Pool) {
   );
 
   if (shouldRunDevSeeds()) {
-    const { seedDevCountries } = await import("./seedCountries.ts");
+    const { seedDevCountries } = await import("./seeds/countries.ts");
     await seedDevCountries(db);
 
     const { seedCountryRegions } = await import("./regions.ts");
@@ -701,7 +701,7 @@ async function migrate(db: Pool) {
     await migrateRegionIdsToIso(db);
     await seedCountryRegions("cn", db);
 
-    const { seedChineseRegionRecipes } = await import("./seedChineseRegionRecipes.ts");
+    const { seedChineseRegionRecipes } = await import("./seeds/chineseRegionRecipes.ts");
     await seedChineseRegionRecipes(db);
   }
 }

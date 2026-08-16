@@ -1,7 +1,7 @@
 import type { Pool } from "pg";
-import type { RecipeCategory } from "../../src/types/content.ts";
-import { findSubdivisionByName, normalizeRegionName } from "./regions/catalog.ts";
-import { ensureDb } from "./restaurants.ts";
+import type { RecipeCategory } from "../../../src/types/content.ts";
+import { findSubdivisionByName, normalizeRegionName } from "../regions/catalog.ts";
+import { ensureDb } from "../restaurants.ts";
 
 type SeedIngredient = { name: string; quantity: number; unit: string; note?: string };
 
