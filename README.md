@@ -33,13 +33,26 @@ From your laptop: `npm run deploy:prod` (SSH â†’ discard dirty `src/content/` â†
 
 ## Local setup
 
-Requirements: Node.js 20+ (22 recommended).
+Requirements: Node.js 20+ (22 recommended). For Postgres, Docker is recommended locally (see below).
 
 ```bash
 cp .env.example .env
+docker compose up -d   # Postgres on localhost:5435
 npm install
 npm run dev
 ```
+
+### Local Postgres (Docker)
+
+```bash
+docker compose up -d    # start spoonspin-db on port 5435
+docker compose down     # stop
+docker compose down -v  # stop and wipe data
+```
+
+Default credentials match `.env.example`: user/database `spoonspin`, password `spoonspin`, host port **5435** (chosen to avoid common 5432/5434 mappings on this machine).
+
+After the first start, seed content if needed: `npm run db:import-content`.
 
 - Web app: http://localhost:5173
 - API: http://localhost:3007
