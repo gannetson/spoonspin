@@ -50,6 +50,7 @@ const searchBodySchema = z.object({
   cuisineAliases: z.array(z.string().min(1)).min(1),
   countryName: z.string().min(1),
   countryCode: z.string().length(2).optional(),
+  regionId: z.string().min(1).optional(),
   cityOrPostcode: z.string().optional(),
   visitorLocation: z
     .object({
@@ -167,6 +168,7 @@ app.post("/api/restaurants", async (req, res) => {
     ip: req.ip,
     meta: {
       countryCode: params.countryCode ?? null,
+      regionId: params.regionId ?? null,
       cityOrPostcode: params.cityOrPostcode?.trim() || null,
       cuisineAliases: params.cuisineAliases.slice(0, 8),
       hasVisitorLocation: Boolean(params.visitorLocation),
@@ -178,6 +180,7 @@ app.post("/api/restaurants", async (req, res) => {
     const local = (
       await searchLocalRestaurants({
         countryCode: params.countryCode,
+        regionId: params.regionId,
         cityOrPostcode: params.cityOrPostcode,
         visitorLocation: params.visitorLocation,
         reviewedOnly: true,
@@ -314,6 +317,7 @@ function toApiRestaurant(
     reviewed: row.reviewed,
     photoUrl: row.photoUrl ?? undefined,
     photoAttribution: row.photoAttribution ?? undefined,
+    regionId: row.regionId ?? undefined,
   };
 }
 

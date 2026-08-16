@@ -40,12 +40,14 @@ export type Restaurant = {
   authenticityRating?: number;
   authenticityNotes?: string;
   reviewed?: boolean;
+  regionId?: string;
 };
 
 export type RestaurantSearchParams = {
   cuisineAliases: string[];
   countryName: string;
   countryCode?: string;
+  regionId?: string;
   cityOrPostcode?: string;
   visitorLocation?: {
     lat: number;

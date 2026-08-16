@@ -4,6 +4,7 @@ import {
   getDinnerSuggestion,
   groupDrinksIntoSections,
   recipeMatchesDiet,
+  recipeMatchesRegion,
 } from "./menuAccessors";
 import type { Country, Drink, Recipe } from "@/types/content";
 
@@ -85,6 +86,25 @@ describe("recipeMatchesDiet", () => {
     expect(recipeMatchesDiet(meat, "vegetarian")).toBe(false);
     expect(recipeMatchesDiet(meat, "meat")).toBe(true);
     expect(recipeMatchesDiet(vegan, "meat")).toBe(false);
+  });
+});
+
+describe("recipeMatchesRegion", () => {
+  it("includes all recipes when no region is selected", () => {
+    expect(recipeMatchesRegion({ ...recipe([]), regionId: "cn:sichuan" }, null)).toBe(
+      true,
+    );
+    expect(recipeMatchesRegion(recipe([]), null)).toBe(true);
+  });
+
+  it("filters to matching region only when selected", () => {
+    expect(
+      recipeMatchesRegion({ ...recipe([]), regionId: "cn:sichuan" }, "cn:sichuan"),
+    ).toBe(true);
+    expect(
+      recipeMatchesRegion({ ...recipe([]), regionId: "cn:guangdong" }, "cn:sichuan"),
+    ).toBe(false);
+    expect(recipeMatchesRegion(recipe([]), "cn:sichuan")).toBe(false);
   });
 });
 

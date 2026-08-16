@@ -22,6 +22,7 @@ export async function fetchRestaurants(
         cuisineAliases: params.cuisineAliases,
         countryName: params.countryName,
         countryCode: params.countryCode,
+        regionId: params.regionId,
         cityOrPostcode: params.cityOrPostcode,
         visitorLocation: params.visitorLocation,
       }),

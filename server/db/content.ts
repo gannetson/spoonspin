@@ -15,6 +15,17 @@ import {
   getSpecialtyShops,
 } from "../../src/content/countries/menuAccessors.ts";
 import { countByCuisineCode, ensureDb } from "./restaurants.ts";
+import { findOrCreateRegion } from "./regions.ts";
+
+const RECIPE_SELECT = `
+  recipes.*,
+  regions.name AS region_name
+`;
+
+const RECIPE_FROM = `
+  FROM recipes
+  LEFT JOIN regions ON recipes.region_id = regions.id
+`;
 
 export type MenuSlot = "starter" | "main" | "side" | "dessert" | "more";
 
@@ -74,6 +85,8 @@ function rowToRecipe(row: QueryResultRow): Recipe {
       row.image_attribution == null ? undefined : String(row.image_attribution),
     sourceUrl: row.source_url == null ? undefined : String(row.source_url),
     videoUrl: row.video_url == null ? undefined : String(row.video_url),
+    regionId: row.region_id == null ? undefined : String(row.region_id),
+    regionName: row.region_name == null ? undefined : String(row.region_name),
   };
 }
 
@@ -157,7 +170,7 @@ export async function listCountriesFromDb(): Promise<Country[]> {
   const db = await ensureDb();
   const countries = await db.query(`SELECT * FROM countries ORDER BY name ASC`);
   const recipes = await db.query(
-    `SELECT * FROM recipes ORDER BY country_code, menu_slot, sort_order, id`,
+    `SELECT ${RECIPE_SELECT} ${RECIPE_FROM} ORDER BY country_code, menu_slot, sort_order, id`,
   );
   const byCode = new Map<string, QueryResultRow[]>();
   for (const row of recipes.rows) {
@@ -179,7 +192,7 @@ export async function getCountryFromDb(code: string): Promise<Country | undefine
   const row = country.rows[0];
   if (!row) return undefined;
   const recipes = await db.query(
-    `SELECT * FROM recipes
+    `SELECT ${RECIPE_SELECT} ${RECIPE_FROM}
      WHERE country_code = $1
      ORDER BY menu_slot, sort_order, id`,
     [code.toLowerCase()],
@@ -255,17 +268,19 @@ export async function replaceCountryRecipes(
 
   for (const entry of entries) {
     const { recipe, menuSlot, sortOrder } = entry;
+    const region = await findOrCreateRegion(code, recipe.region ?? recipe.regionName);
+    const regionId = region?.id ?? recipe.regionId ?? null;
     await db.query(
       `INSERT INTO recipes (
         country_code, id, menu_slot, sort_order, name, local_name, description,
         category, servings, prep_minutes, cook_minutes, wait_time, difficulty, dietary_labels,
         ingredients, steps, substitutions, serving_suggestion, drink_pairing,
-        image_url, image_attribution, source_url, video_url, updated_at
+        image_url, image_attribution, source_url, video_url, region_id, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7,
         $8, $9, $10, $11, $12, $13, $14::jsonb,
         $15::jsonb, $16::jsonb, $17::jsonb, $18, $19,
-        $20, $21, $22, $23, NOW()
+        $20, $21, $22, $23, $24, NOW()
       )`,
       [
         code,
@@ -291,6 +306,7 @@ export async function replaceCountryRecipes(
         recipe.imageAttribution ?? null,
         recipe.sourceUrl ?? null,
         recipe.videoUrl ?? null,
+        regionId,
       ],
     );
   }
@@ -425,18 +441,25 @@ export async function appendMoreRecipes(
       id = `${id}-${sortOrder}`;
     }
     existing.add(id);
-    const saved: Recipe = { ...recipe, id };
+    const region = await findOrCreateRegion(code, recipe.region ?? recipe.regionName);
+    const regionId = region?.id ?? recipe.regionId ?? null;
+    const saved: Recipe = {
+      ...recipe,
+      id,
+      regionId: regionId ?? undefined,
+      regionName: region?.name ?? recipe.regionName,
+    };
     await db.query(
       `INSERT INTO recipes (
         country_code, id, menu_slot, sort_order, name, local_name, description,
         category, servings, prep_minutes, cook_minutes, wait_time, difficulty, dietary_labels,
         ingredients, steps, substitutions, serving_suggestion, drink_pairing,
-        image_url, image_attribution, source_url, video_url, updated_at
+        image_url, image_attribution, source_url, video_url, region_id, updated_at
       ) VALUES (
         $1, $2, 'more', $3, $4, $5, $6,
         $7, $8, $9, $10, $11, $12, $13::jsonb,
         $14::jsonb, $15::jsonb, $16::jsonb, $17, $18,
-        $19, $20, $21, $22, NOW()
+        $19, $20, $21, $22, $23, NOW()
       )
       ON CONFLICT (country_code, id) DO UPDATE SET
         menu_slot = EXCLUDED.menu_slot,
@@ -460,6 +483,7 @@ export async function appendMoreRecipes(
         image_attribution = EXCLUDED.image_attribution,
         source_url = EXCLUDED.source_url,
         video_url = EXCLUDED.video_url,
+        region_id = EXCLUDED.region_id,
         updated_at = NOW()`,
       [
         code,
@@ -484,6 +508,7 @@ export async function appendMoreRecipes(
         saved.imageAttribution ?? null,
         saved.sourceUrl ?? null,
         saved.videoUrl ?? null,
+        regionId,
       ],
     );
     inserted.push(saved);
@@ -499,7 +524,8 @@ export async function getRecipeRow(
 ): Promise<{ recipe: Recipe; menuSlot: MenuSlot } | null> {
   const db = await ensureDb();
   const result = await db.query(
-    `SELECT * FROM recipes WHERE country_code = $1 AND id = $2`,
+    `SELECT ${RECIPE_SELECT} ${RECIPE_FROM}
+     WHERE country_code = $1 AND id = $2`,
     [countryCode.toLowerCase(), recipeId],
   );
   const row = result.rows[0];
@@ -530,6 +556,19 @@ export async function updateRecipeFields(
   const existing = await getRecipeRow(countryCode, recipeId);
   if (!existing) return null;
   const next: Recipe = { ...existing.recipe, ...patch, id: existing.recipe.id };
+  let regionId =
+    patch.regionId !== undefined
+      ? patch.regionId ?? null
+      : existing.recipe.regionId ?? null;
+  if (patch.region !== undefined || patch.regionName !== undefined) {
+    const region = await findOrCreateRegion(
+      countryCode,
+      patch.region ?? patch.regionName,
+    );
+    regionId = region?.id ?? null;
+    next.regionId = region?.id;
+    next.regionName = region?.name;
+  }
   const db = await ensureDb();
   await db.query(
     `UPDATE recipes SET
@@ -552,6 +591,7 @@ export async function updateRecipeFields(
       image_attribution = $19,
       source_url = $20,
       video_url = $21,
+      region_id = $22,
       updated_at = NOW()
      WHERE country_code = $1 AND id = $2`,
     [
@@ -576,6 +616,7 @@ export async function updateRecipeFields(
       next.imageAttribution ?? null,
       next.sourceUrl ?? null,
       next.videoUrl ?? null,
+      regionId,
     ],
   );
   if (!next.waitTime?.trim()) {

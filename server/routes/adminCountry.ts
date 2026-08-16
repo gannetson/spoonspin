@@ -302,6 +302,7 @@ const dishCandidateSchema = z.object({
   localName: z.string().nullish(),
   description: z.string().min(20),
   category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+  region: z.string().nullish(),
 });
 
 function isFullRecipe(
@@ -594,6 +595,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             localName?: string;
             description: string;
             category: Recipe["category"];
+            region?: string;
           };
         }> = [];
 
@@ -604,6 +606,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
               ...recipe,
               id,
               localName: recipe.localName ?? undefined,
+              region: recipe.region ?? undefined,
               substitutions: recipe.substitutions ?? undefined,
               servingSuggestion: recipe.servingSuggestion ?? undefined,
               drinkPairing: recipe.drinkPairing ?? undefined,
@@ -632,6 +635,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
               localName: recipe.localName ?? undefined,
               description: recipe.description,
               category: recipe.category,
+              region: recipe.region ?? undefined,
               servings: 4,
               prepMinutes: 20,
               cookMinutes: 30,
@@ -657,6 +661,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
                 localName: recipe.localName ?? undefined,
                 description: recipe.description,
                 category: recipe.category,
+                region: recipe.region ?? undefined,
               },
             });
           }

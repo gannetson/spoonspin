@@ -9,6 +9,7 @@ import {
   type RestaurantRatings,
 } from "../../src/restaurants/ratings.ts";
 import type { PriceLevel, RestaurantMenuItem } from "../../src/restaurants/types.ts";
+import { shouldRunDevSeeds } from "./devSeeds.ts";
 
 /** Default: Unix socket peer auth (no password). Override with DATABASE_URL. */
 export const DEFAULT_DATABASE_URL = "postgresql:///spoonspin?host=/var/run/postgresql";
@@ -41,6 +42,7 @@ export type StoredRestaurant = {
   menu: RestaurantMenuItem[] | null;
   photoUrl: string | null;
   photoAttribution: string | null;
+  regionId: string | null;
 };
 
 export type RestaurantUpsert = {
@@ -70,6 +72,7 @@ export type RestaurantUpsert = {
   menu?: RestaurantMenuItem[] | null;
   photoUrl?: string | null;
   photoAttribution?: string | null;
+  regionId?: string | null;
 };
 
 let pool: Pool | null = null;
@@ -652,6 +655,46 @@ async function migrate(db: Pool) {
     );
   `,
   );
+
+  await migrateSql(
+    db,
+    `
+    CREATE TABLE IF NOT EXISTS regions (
+      id TEXT PRIMARY KEY,
+      country_code TEXT NOT NULL REFERENCES countries(code) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      normalized_name TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (country_code, normalized_name)
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_regions_country_code
+      ON regions (country_code);
+
+    ALTER TABLE recipes ADD COLUMN IF NOT EXISTS region_id TEXT
+      REFERENCES regions(id) ON DELETE SET NULL;
+
+    CREATE INDEX IF NOT EXISTS idx_recipes_region_id
+      ON recipes (region_id);
+
+    ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS region_id TEXT
+      REFERENCES regions(id) ON DELETE SET NULL;
+
+    CREATE INDEX IF NOT EXISTS idx_restaurants_region_id
+      ON restaurants (region_id);
+  `,
+  );
+
+  if (shouldRunDevSeeds()) {
+    const { seedDevCountries } = await import("./seedCountries.ts");
+    await seedDevCountries(db);
+
+    const { seedChineseRegions } = await import("./regions.ts");
+    await seedChineseRegions(db);
+
+    const { seedChineseRegionRecipes } = await import("./seedChineseRegionRecipes.ts");
+    await seedChineseRegionRecipes(db);
+  }
 }
 
 function asStringArray(value: unknown): string[] {
@@ -782,6 +825,7 @@ export function rowToStored(row: QueryResultRow): StoredRestaurant {
     photoUrl: row.photo_url == null ? null : String(row.photo_url),
     photoAttribution:
       row.photo_attribution == null ? null : String(row.photo_attribution),
+    regionId: row.region_id == null ? null : String(row.region_id),
   };
 }
 
@@ -836,8 +880,9 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
         photo_url = $22,
         photo_attribution = $23,
         price_level = $24,
-        menu_json = $25::jsonb
-      WHERE osm_id = $26`,
+        menu_json = $25::jsonb,
+        region_id = $26
+      WHERE osm_id = $27`,
       [
         restaurant.name,
         restaurant.address || current.address,
@@ -870,6 +915,7 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
           : current.menu
             ? JSON.stringify(current.menu)
             : null,
+        restaurant.regionId ?? current.regionId,
         restaurant.osmId,
       ],
     );
@@ -885,13 +931,13 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
       cuisine_codes, cuisine_tags, website, phone, source, osm_id, maps_url, updated_at,
       reviewed, authenticity_rating, authenticity_notes, reviewed_at, review_source,
       user_rating, review_count, ratings_json, photo_url, photo_attribution,
-      price_level, menu_json
+      price_level, menu_json, region_id
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
       $8::jsonb, $9::jsonb, $10, $11, $12, $13, $14, $15::timestamptz,
       $16, $17, $18, $19::timestamptz, $20,
       $21, $22, $23::jsonb, $24, $25,
-      $26, $27::jsonb
+      $26, $27::jsonb, $28
     )`,
     [
       restaurant.id,
@@ -921,12 +967,14 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
       restaurant.photoAttribution ?? null,
       restaurant.priceLevel ?? null,
       restaurant.menu ? JSON.stringify(restaurant.menu) : null,
+      restaurant.regionId ?? null,
     ],
   );
 }
 
 export type LocalSearchOptions = {
   countryCode: string;
+  regionId?: string;
   cityOrPostcode?: string;
   visitorLocation?: { lat: number; lng: number };
   maxDistanceKm?: number;
@@ -1215,8 +1263,14 @@ export async function searchLocalRestaurants(
   const reviewedOnly = options.reviewedOnly ?? true;
   const anchor = resolveSearchAnchor(options.cityOrPostcode, options.visitorLocation);
 
+  const regionId = options.regionId?.trim() || undefined;
+
   const matched = rows
     .filter((restaurant) => restaurant.cuisineCodes.includes(code))
+    .filter((restaurant) => {
+      if (!regionId) return true;
+      return restaurant.regionId === regionId;
+    })
     .filter(
       (restaurant) =>
         // Trust curated cuisine codes for admin/user adds (tags may be aliases).

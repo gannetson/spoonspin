@@ -118,6 +118,8 @@ export const nl: Messages = {
   "country.select.placeholder": "Zoek een land…",
   "country.select.listAria": "Landen",
   "country.select.noMatch": "Geen landen gevonden",
+  "region.select.label": "Regio (optioneel)",
+  "region.select.all": "Alle regio's",
   "country.card.choosing": "Kiezen…",
   "country.card.spinningPlate": "Draaien voor je volgende gerecht…",
   "country.card.wikipediaLink": "{title} op Wikipedia",

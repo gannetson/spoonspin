@@ -119,6 +119,8 @@ export const en: Messages = {
   "country.select.placeholder": "Search for a country…",
   "country.select.listAria": "Countries",
   "country.select.noMatch": "No countries match",
+  "region.select.label": "Region (optional)",
+  "region.select.all": "All regions",
   "country.card.choosing": "Choosing…",
   "country.card.spinningPlate": "Spinning for your next plate…",
   "country.card.wikipediaLink": "{title} on Wikipedia",

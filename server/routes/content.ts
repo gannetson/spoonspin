@@ -3,6 +3,7 @@ import {
   getCountryFromDb,
   listCountriesFromDb,
 } from "../db/content.ts";
+import { listRegionsForCountry } from "../db/regions.ts";
 import { recordProductEvent } from "../db/analytics.ts";
 
 export function registerContentRoutes(app: import("express").Express): void {
@@ -43,6 +44,17 @@ export function registerContentRoutes(app: import("express").Express): void {
     } catch (error) {
       console.error("Get country failed", error);
       res.status(500).json({ message: "Could not load country." });
+    }
+  });
+
+  app.get("/api/countries/:code/regions", async (req, res) => {
+    try {
+      const code = String(req.params.code ?? "").toLowerCase();
+      const regions = await listRegionsForCountry(code);
+      res.json({ regions });
+    } catch (error) {
+      console.error("List regions failed", error);
+      res.status(500).json({ message: "Could not load regions.", regions: [] });
     }
   });
 

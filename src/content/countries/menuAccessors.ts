@@ -84,6 +84,12 @@ export function recipeMatchesCategory(
   return recipe.category === category;
 }
 
+/** When no region is selected, include all recipes; otherwise match linked region. */
+export function recipeMatchesRegion(recipe: Recipe, regionId: string | null): boolean {
+  if (!regionId) return true;
+  return recipe.regionId === regionId;
+}
+
 export type DrinkAlcoholFilter =
   "all" | "other-alcoholic" | "non-alcoholic" | "beer" | "wine";
 

@@ -99,6 +99,7 @@ const recipeItemSchema = z.object({
   localName: optionalString,
   description: z.string().min(20),
   category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+  region: optionalString,
   servings: z.coerce.number().int().positive(),
   prepMinutes: z.coerce.number().int().nonnegative(),
   cookMinutes: z.coerce.number().int().nonnegative(),
@@ -129,6 +130,7 @@ const dishCandidateSchema = z.object({
   localName: optionalString,
   description: z.string().min(20),
   category: z.enum(["starter", "main", "side", "dessert", "snack"]),
+  region: optionalString,
 });
 
 const recipesDiscoverSchema = z.object({
@@ -392,6 +394,7 @@ export type DishCandidate = {
   localName?: string;
   description: string;
   category: Recipe["category"];
+  region?: string;
 };
 
 export async function discoverCountryRecipes(input: {
@@ -412,7 +415,8 @@ export async function discoverCountryRecipes(input: {
   const raw = await chatJson(
     `You are a cuisine editor for Spoon Spin. Reply with JSON only.
 Propose authentic dishes for the given country that Dutch home cooks can make.
-Avoid duplicates of existing dish names. Return dish candidates only (no full recipes).`,
+Avoid duplicates of existing dish names. Return dish candidates only (no full recipes).
+When a dish is strongly tied to a specific region/province within the country, include its region in English.`,
     `Country: ${input.countryName} (${input.countryCode})
 Existing dishes (do not repeat): ${existing.join("; ") || "none"}
 ${focus}
@@ -426,7 +430,8 @@ JSON shape:
     "name": string,
     "localName": string?,
     "description": string,
-    "category": "starter"|"main"|"side"|"dessert"|"snack"
+    "category": "starter"|"main"|"side"|"dessert"|"snack",
+    "region": string?
   }]
 }`,
   );
@@ -458,7 +463,8 @@ export async function expandDishCandidates(input: {
     const batch = input.dishes.slice(i, i + batchSize);
     const raw = await chatJson(
       `You write practical home-cook recipes for Spoon Spin. Reply with JSON only.
-Use metric units. Keep steps concrete. description at least 40 characters.`,
+Use metric units. Keep steps concrete. description at least 40 characters.
+Include region in English when the dish belongs to a specific area of the country.`,
       `Country: ${input.countryName} (${input.countryCode})
 Expand each dish into a full recipe.
 
@@ -472,6 +478,7 @@ JSON shape:
     "localName": string?,
     "description": string,
     "category": "starter"|"main"|"side"|"dessert"|"snack",
+    "region": string?,
     "servings": number,
     "prepMinutes": number,
     "cookMinutes": number,
@@ -503,6 +510,7 @@ JSON shape:
       expanded.push({
         ...recipe,
         id: match?.id || slugify(recipe.name) || `dish-${expanded.length + 1}`,
+        region: recipe.region ?? match?.region,
         description:
           recipe.description.length >= 40
             ? recipe.description
