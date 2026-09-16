@@ -32,6 +32,8 @@ export type Restaurant = {
   mapsUrl: string;
   photoUrl?: string;
   photoAttribution?: string;
+  /** Present when reconciled to Google Places. */
+  googlePlaceId?: string;
   location?: {
     lat: number;
     lng: number;

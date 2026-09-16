@@ -1,0 +1,8 @@
+{
+  "source": "culinary regions",
+  "subdivisions": [
+    { "isoCode": "VN-C", "name": "Central", "type": "culinary region" },
+    { "isoCode": "VN-N", "name": "Northern", "type": "culinary region" },
+    { "isoCode": "VN-S", "name": "Southern", "type": "culinary region" }
+  ]
+}

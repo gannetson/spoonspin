@@ -1,0 +1,8 @@
+{
+  "source": "culinary regions",
+  "subdivisions": [
+    { "isoCode": "PE-COS", "name": "Costa", "type": "culinary region" },
+    { "isoCode": "PE-SEL", "name": "Selva", "type": "culinary region" },
+    { "isoCode": "PE-SIE", "name": "Sierra", "type": "culinary region" }
+  ]
+}

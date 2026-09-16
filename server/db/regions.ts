@@ -1,6 +1,7 @@
 import type { Pool, QueryResultRow } from "pg";
 import { ensureDb } from "./restaurants.ts";
 import {
+  listCountryCatalogCodes,
   loadCountryCatalog,
   lookupIsoCode,
   normalizeRegionName,
@@ -18,6 +19,7 @@ export type Region = {
 };
 
 export {
+  listCountryCatalogCodes,
   loadCountryCatalog,
   lookupIsoCode,
   normalizeRegionName,
@@ -36,13 +38,16 @@ function rowToRegion(row: QueryResultRow): Region {
   };
 }
 
-/** Seed ISO 3166-2 subdivisions for a country when catalog JSON exists. */
+/** Seed catalog subdivisions for a country when catalog JSON exists. */
 export async function seedCountryRegions(countryCode: string, db?: Pool): Promise<number> {
   const catalog = loadCountryCatalog(countryCode);
   if (!catalog) return 0;
 
   const code = countryCode.toLowerCase();
   const pool = db ?? (await ensureDb());
+  const country = await pool.query(`SELECT 1 FROM countries WHERE code = $1`, [code]);
+  if (!country.rows.length) return 0;
+
   let inserted = 0;
 
   for (const entry of catalog.subdivisions) {
@@ -61,6 +66,16 @@ export async function seedCountryRegions(countryCode: string, db?: Pool): Promis
     if (result.rows[0]?.inserted) inserted += 1;
   }
 
+  return inserted;
+}
+
+/** Seed every catalog whose country row already exists. Safe on every startup. */
+export async function seedCatalogRegionsForExistingCountries(db?: Pool): Promise<number> {
+  const pool = db ?? (await ensureDb());
+  let inserted = 0;
+  for (const code of listCountryCatalogCodes()) {
+    inserted += await seedCountryRegions(code, pool);
+  }
   return inserted;
 }
 

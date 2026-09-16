@@ -1,25 +1,12 @@
-import { readdirSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { Pool } from "pg";
 import {
+  listCountryCatalogCodes,
   loadCountryCatalog,
   normalizeRegionName,
   regionIdFromIso,
 } from "./catalog.ts";
 
-const dataDir = join(dirname(fileURLToPath(import.meta.url)), "data");
-
-export function listCountryCatalogCodes(): string[] {
-  try {
-    return readdirSync(dataDir)
-      .filter((name) => name.endsWith(".json"))
-      .map((name) => name.slice(0, -".json".length))
-      .sort();
-  } catch {
-    return [];
-  }
-}
+export { listCountryCatalogCodes };
 
 /**
  * Ensure ISO-based region ids exist and rewire legacy slug ids (e.g. cn:sichuan → cn:CN-SC).
@@ -36,6 +23,8 @@ async function migrateCountryRegionIdsToIso(db: Pool, countryCode: string): Prom
   if (!catalog) return;
 
   const code = countryCode.toLowerCase();
+  const country = await db.query(`SELECT 1 FROM countries WHERE code = $1`, [code]);
+  if (!country.rows.length) return;
 
   for (const entry of catalog.subdivisions) {
     const newId = regionIdFromIso(code, entry.isoCode);

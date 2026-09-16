@@ -37,4 +37,11 @@ describe("region normalization", () => {
   it("builds slug ids for ad-hoc regions", () => {
     expect(regionSlug("cn", "Lower Yangtze")).toBe("cn:lower-yangtze");
   });
+
+  it("resolves aliases for other regional catalogs", () => {
+    expect(resolveCanonicalRegionName("madras", "in")).toBe("Tamil Nadu");
+    expect(resolveCanonicalRegionName("apulia", "it")).toBe("Puglia");
+    expect(resolveCanonicalRegionName("andalucia", "es")).toBe("Andalusia");
+    expect(resolveCanonicalRegionName("lanna", "th")).toBe("Northern");
+  });
 });

@@ -10,7 +10,7 @@ import type {
 import { useAuth } from "@/auth/AuthContext";
 import { isEditorOrAdmin } from "@/auth/roles";
 import {
-  dinnerRecipeIdSet,
+  dinnerSuggestionForRecipes,
   drinkMatchesAlcohol,
   getCountryDrinks,
   getCountryRecipes,
@@ -50,6 +50,7 @@ import { drinkEntityId } from "@/tags/types";
 type CookMenuProps = {
   country: Country;
   regionId?: string | null;
+  regionName?: string | null;
   communityRecipes: Recipe[];
   communityDrinks: Drink[];
   communityShops: SpecialtyShop[];
@@ -123,6 +124,7 @@ const COURSE_KEYS: Record<RecipeCategory | "extra", string> = {
 export function CookMenu({
   country,
   regionId = null,
+  regionName = null,
   communityRecipes,
   communityDrinks,
   communityShops,
@@ -189,8 +191,29 @@ export function CookMenu({
     [communityShops],
   );
   const bannerUrl = cookBannerUrl(country);
-  const dinner = useMemo(() => getDinnerSuggestion(country), [country]);
-  const dinnerIds = useMemo(() => dinnerRecipeIdSet(country), [country]);
+  const nationalDinner = useMemo(() => getDinnerSuggestion(country), [country]);
+  const regionRecipes = useMemo(
+    () => recipes.filter((recipe) => recipeMatchesRegion(recipe, regionId)),
+    [recipes, regionId],
+  );
+  const placeName = regionName?.trim() || country.name;
+  const dinner = useMemo(() => {
+    if (!regionId) return nationalDinner;
+    const regional = dinnerSuggestionForRecipes(regionRecipes, nationalDinner);
+    if (!regional) return undefined;
+    return {
+      ...regional,
+      title: t("cook.dinner.regionTitle", { region: placeName }),
+      description: t("cook.dinner.regionDescription", {
+        region: placeName,
+        name: country.name,
+      }),
+    };
+  }, [country.name, nationalDinner, placeName, regionId, regionRecipes, t]);
+  const dinnerIds = useMemo(
+    () => new Set(dinner?.courses.map((course) => course.recipeId) ?? []),
+    [dinner],
+  );
   const recipesById = useMemo(() => {
     const map = new Map<string, Recipe>();
     for (const recipe of recipes) map.set(recipe.id, recipe);
@@ -315,9 +338,9 @@ export function CookMenu({
               </h2>
               <p className="mt-2 max-w-lg text-cream/85">
                 {t("cook.banner.summary", {
-                  recipeCount: recipes.length,
+                  recipeCount: regionId ? regionRecipes.length : recipes.length,
                   drinkCount: drinks.length,
-                  name: country.name,
+                  name: placeName,
                 })}
               </p>
             </div>
@@ -378,7 +401,7 @@ export function CookMenu({
               <div className="mt-4 divide-y divide-ink/10">
                 {dinner.courses.map((course, index) => {
                   const recipe = recipesById.get(course.recipeId);
-                  if (!recipe || !recipeMatchesRegion(recipe, regionId)) return null;
+                  if (!recipe) return null;
                   const imageUrl = recipe.imageUrl?.trim() || null;
                   const imageLeft = index % 2 === 0;
                   return (
@@ -568,8 +591,8 @@ export function CookMenu({
             </article>
           ) : (
             <div className="rounded-2xl border border-dashed border-stamp/40 bg-cream/60 p-6 text-ink-soft">
-              <p>{t("cook.dinner.empty", { name: country.name })}</p>
-              {recipes.length > 0 ? (
+              <p>{t("cook.dinner.empty", { name: placeName })}</p>
+              {regionRecipes.length > 0 ? (
                 <button
                   type="button"
                   onClick={() => setTab("recipes")}

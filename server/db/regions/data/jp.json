@@ -1,0 +1,14 @@
+{
+  "source": "culinary regions",
+  "subdivisions": [
+    { "isoCode": "JP-CHB", "name": "Chubu", "type": "culinary region" },
+    { "isoCode": "JP-CHG", "name": "Chugoku", "type": "culinary region" },
+    { "isoCode": "JP-HOK", "name": "Hokkaido", "type": "culinary region" },
+    { "isoCode": "JP-KAN", "name": "Kanto", "type": "culinary region" },
+    { "isoCode": "JP-KIN", "name": "Kansai", "type": "culinary region" },
+    { "isoCode": "JP-KYU", "name": "Kyushu", "type": "culinary region" },
+    { "isoCode": "JP-OKI", "name": "Okinawa", "type": "culinary region" },
+    { "isoCode": "JP-SHI", "name": "Shikoku", "type": "culinary region" },
+    { "isoCode": "JP-TOH", "name": "Tohoku", "type": "culinary region" }
+  ]
+}

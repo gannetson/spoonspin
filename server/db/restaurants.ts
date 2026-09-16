@@ -28,6 +28,8 @@ export type StoredRestaurant = {
   phone: string | null;
   source: string;
   osmId: string;
+  /** Durable Google Places identity; reconcile source of truth for venue identity. */
+  googlePlaceId: string | null;
   mapsUrl: string;
   updatedAt: string;
   reviewed: boolean;
@@ -43,6 +45,10 @@ export type StoredRestaurant = {
   photoUrl: string | null;
   photoAttribution: string | null;
   regionId: string | null;
+  businessStatus: string | null;
+  primaryType: string | null;
+  /** Last time Places *content* fields were refreshed (not the place ID itself). */
+  placesRefreshedAt: string | null;
 };
 
 export type RestaurantUpsert = {
@@ -59,6 +65,7 @@ export type RestaurantUpsert = {
   phone?: string | null;
   source: string;
   osmId: string;
+  googlePlaceId?: string | null;
   mapsUrl: string;
   reviewed?: boolean;
   authenticityRating?: number | null;
@@ -73,6 +80,9 @@ export type RestaurantUpsert = {
   photoUrl?: string | null;
   photoAttribution?: string | null;
   regionId?: string | null;
+  businessStatus?: string | null;
+  primaryType?: string | null;
+  placesRefreshedAt?: string | null;
 };
 
 let pool: Pool | null = null;
@@ -689,19 +699,33 @@ async function migrate(db: Pool) {
 
     CREATE INDEX IF NOT EXISTS idx_restaurants_region_id
       ON restaurants (region_id);
+
+    ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS google_place_id TEXT;
+    ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS business_status TEXT;
+    ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS primary_type TEXT;
+    ALTER TABLE restaurants ADD COLUMN IF NOT EXISTS places_refreshed_at TIMESTAMPTZ;
+
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_restaurants_google_place_id
+      ON restaurants (google_place_id)
+      WHERE google_place_id IS NOT NULL;
   `,
   );
+
+  const { migrateReservationTables } = await import("./reservations.ts");
+  await migrateReservationTables(db);
 
   if (shouldRunDevSeeds()) {
     const { seedDevCountries } = await import("./seeds/countries.ts");
     await seedDevCountries(db);
+  }
 
-    const { migrateRegionIdsToIso } = await import("./regions/migrateIds.ts");
-    await migrateRegionIdsToIso(db);
+  const { migrateRegionIdsToIso } = await import("./regions/migrateIds.ts");
+  await migrateRegionIdsToIso(db);
 
-    const { seedCountryRegions } = await import("./regions.ts");
-    await seedCountryRegions("cn", db);
+  const { seedCatalogRegionsForExistingCountries } = await import("./regions.ts");
+  await seedCatalogRegionsForExistingCountries(db);
 
+  if (shouldRunDevSeeds()) {
     const { seedChineseRegionRecipes } = await import("./seeds/chineseRegionRecipes.ts");
     await seedChineseRegionRecipes(db);
   }
@@ -836,6 +860,10 @@ export function rowToStored(row: QueryResultRow): StoredRestaurant {
     photoAttribution:
       row.photo_attribution == null ? null : String(row.photo_attribution),
     regionId: row.region_id == null ? null : String(row.region_id),
+    googlePlaceId: row.google_place_id == null ? null : String(row.google_place_id),
+    businessStatus: row.business_status == null ? null : String(row.business_status),
+    primaryType: row.primary_type == null ? null : String(row.primary_type),
+    placesRefreshedAt: toIsoOrNull(row.places_refreshed_at),
   };
 }
 
@@ -891,8 +919,12 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
         photo_attribution = $23,
         price_level = $24,
         menu_json = $25::jsonb,
-        region_id = $26
-      WHERE osm_id = $27`,
+        region_id = $26,
+        google_place_id = $27,
+        business_status = $28,
+        primary_type = $29,
+        places_refreshed_at = $30::timestamptz
+      WHERE osm_id = $31`,
       [
         restaurant.name,
         restaurant.address || current.address,
@@ -926,6 +958,10 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
             ? JSON.stringify(current.menu)
             : null,
         restaurant.regionId ?? current.regionId,
+        restaurant.googlePlaceId ?? current.googlePlaceId,
+        restaurant.businessStatus ?? current.businessStatus,
+        restaurant.primaryType ?? current.primaryType,
+        restaurant.placesRefreshedAt ?? current.placesRefreshedAt,
         restaurant.osmId,
       ],
     );
@@ -941,13 +977,15 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
       cuisine_codes, cuisine_tags, website, phone, source, osm_id, maps_url, updated_at,
       reviewed, authenticity_rating, authenticity_notes, reviewed_at, review_source,
       user_rating, review_count, ratings_json, photo_url, photo_attribution,
-      price_level, menu_json, region_id
+      price_level, menu_json, region_id,
+      google_place_id, business_status, primary_type, places_refreshed_at
     ) VALUES (
       $1, $2, $3, $4, $5, $6, $7,
       $8::jsonb, $9::jsonb, $10, $11, $12, $13, $14, $15::timestamptz,
       $16, $17, $18, $19::timestamptz, $20,
       $21, $22, $23::jsonb, $24, $25,
-      $26, $27::jsonb, $28
+      $26, $27::jsonb, $28,
+      $29, $30, $31, $32::timestamptz
     )`,
     [
       restaurant.id,
@@ -978,6 +1016,10 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
       restaurant.priceLevel ?? null,
       restaurant.menu ? JSON.stringify(restaurant.menu) : null,
       restaurant.regionId ?? null,
+      restaurant.googlePlaceId ?? null,
+      restaurant.businessStatus ?? null,
+      restaurant.primaryType ?? null,
+      restaurant.placesRefreshedAt ?? null,
     ],
   );
 }
@@ -1037,6 +1079,111 @@ export async function getRestaurantById(id: string): Promise<StoredRestaurant | 
   const result = await db.query(`SELECT * FROM restaurants WHERE id = $1`, [id]);
   const row = result.rows[0];
   return row ? rowToStored(row) : null;
+}
+
+export async function getRestaurantByGooglePlaceId(
+  googlePlaceId: string,
+): Promise<StoredRestaurant | null> {
+  const placeId = googlePlaceId.trim();
+  if (!placeId) return null;
+  const db = await ensureDb();
+  const result = await db.query(
+    `SELECT * FROM restaurants WHERE google_place_id = $1 LIMIT 1`,
+    [placeId],
+  );
+  const row = result.rows[0];
+  return row ? rowToStored(row) : null;
+}
+
+/**
+ * Attach or refresh Google Places identity fields on an existing restaurant.
+ * Enforces one SpoonSpin row per google_place_id (no duplicate venues).
+ */
+export async function applyGooglePlaceIdentity(
+  restaurantId: string,
+  place: {
+    googlePlaceId: string;
+    name?: string;
+    address?: string;
+    city?: string;
+    postcode?: string | null;
+    lat?: number | null;
+    lng?: number | null;
+    website?: string | null;
+    phone?: string | null;
+    mapsUrl?: string;
+    priceLevel?: PriceLevel | null;
+    userRating?: number | null;
+    reviewCount?: number | null;
+    businessStatus?: string | null;
+    primaryType?: string | null;
+    placesRefreshedAt?: string | null;
+  },
+): Promise<StoredRestaurant> {
+  const db = await ensureDb();
+  const placeId = place.googlePlaceId.trim();
+  if (!placeId) {
+    throw new Error("googlePlaceId is required");
+  }
+
+  const conflict = await getRestaurantByGooglePlaceId(placeId);
+  if (conflict && conflict.id !== restaurantId) {
+    throw new Error(
+      `Google Place ID ${placeId} is already linked to restaurant ${conflict.id}`,
+    );
+  }
+
+  const current = await getRestaurantById(restaurantId);
+  if (!current) {
+    throw new Error(`Restaurant ${restaurantId} not found`);
+  }
+
+  const now = new Date().toISOString();
+  await db.query(
+    `UPDATE restaurants SET
+      google_place_id = $1,
+      name = COALESCE($2, name),
+      address = COALESCE($3, address),
+      city = COALESCE($4, city),
+      postcode = COALESCE($5, postcode),
+      lat = COALESCE($6, lat),
+      lng = COALESCE($7, lng),
+      website = COALESCE($8, website),
+      phone = COALESCE($9, phone),
+      maps_url = COALESCE($10, maps_url),
+      price_level = COALESCE($11, price_level),
+      user_rating = COALESCE($12, user_rating),
+      review_count = COALESCE($13, review_count),
+      business_status = COALESCE($14, business_status),
+      primary_type = COALESCE($15, primary_type),
+      places_refreshed_at = COALESCE($16::timestamptz, places_refreshed_at),
+      updated_at = $17::timestamptz
+     WHERE id = $18`,
+    [
+      placeId,
+      place.name ?? null,
+      place.address ?? null,
+      place.city ?? null,
+      place.postcode ?? null,
+      place.lat ?? null,
+      place.lng ?? null,
+      place.website ?? null,
+      place.phone ?? null,
+      place.mapsUrl ?? null,
+      place.priceLevel ?? null,
+      place.userRating ?? null,
+      place.reviewCount ?? null,
+      place.businessStatus ?? null,
+      place.primaryType ?? null,
+      place.placesRefreshedAt ?? now,
+      now,
+      restaurantId,
+    ],
+  );
+
+  const updated = await getRestaurantById(restaurantId);
+  if (!updated) throw new Error(`Restaurant ${restaurantId} missing after update`);
+  return updated;
 }
 
 /** Match by normalized name + city (for cuisine reassignment / dedupe). */
@@ -1398,6 +1545,8 @@ export async function resetAllTables(client?: PoolClient): Promise<void> {
   const db = client ?? (await ensureDb());
   await db.query(`
     TRUNCATE TABLE
+      reservation_referrals,
+      restaurant_reservation_providers,
       restaurants,
       recipe_submissions,
       restaurant_submissions,

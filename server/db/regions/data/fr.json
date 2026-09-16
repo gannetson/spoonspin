@@ -1,0 +1,15 @@
+{
+  "source": "culinary regions",
+  "subdivisions": [
+    { "isoCode": "FR-ALS", "name": "Alsace", "type": "culinary region" },
+    { "isoCode": "FR-BRE", "name": "Brittany", "type": "culinary region" },
+    { "isoCode": "FR-BOU", "name": "Burgundy", "type": "culinary region" },
+    { "isoCode": "FR-COR", "name": "Corsica", "type": "culinary region" },
+    { "isoCode": "FR-LOI", "name": "Loire", "type": "culinary region" },
+    { "isoCode": "FR-LYO", "name": "Lyon", "type": "culinary region" },
+    { "isoCode": "FR-NOR", "name": "Normandy", "type": "culinary region" },
+    { "isoCode": "FR-PAR", "name": "Paris", "type": "culinary region" },
+    { "isoCode": "FR-PRO", "name": "Provence", "type": "culinary region" },
+    { "isoCode": "FR-SOU", "name": "Southwest", "type": "culinary region" }
+  ]
+}

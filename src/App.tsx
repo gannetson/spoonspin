@@ -660,6 +660,7 @@ export default function App() {
             >
               <CountryCard
                 country={selectedCountry}
+                regionName={selectedRegion?.name ?? null}
                 spinning={spinning}
                 spinningCountry={spinNames[0]}
                 onSpin={pickCountry}
@@ -742,6 +743,7 @@ export default function App() {
                 <CookMenu
                   country={selectedCountry}
                   regionId={selectedRegion?.id ?? (regionsLoaded ? null : regionId)}
+                  regionName={selectedRegion?.name ?? null}
                   communityRecipes={communityRecipes}
                   communityDrinks={communityDrinks}
                   communityShops={communityShops}

@@ -1,0 +1,22 @@
+{
+  "source": "ISO 3166-2:ES",
+  "subdivisions": [
+    { "isoCode": "ES-AN", "name": "Andalusia", "type": "autonomous community" },
+    { "isoCode": "ES-AR", "name": "Aragon", "type": "autonomous community" },
+    { "isoCode": "ES-AS", "name": "Asturias", "type": "autonomous community" },
+    { "isoCode": "ES-IB", "name": "Balearic Islands", "type": "autonomous community" },
+    { "isoCode": "ES-PV", "name": "Basque Country", "type": "autonomous community" },
+    { "isoCode": "ES-CN", "name": "Canary Islands", "type": "autonomous community" },
+    { "isoCode": "ES-CB", "name": "Cantabria", "type": "autonomous community" },
+    { "isoCode": "ES-CL", "name": "Castile and León", "type": "autonomous community" },
+    { "isoCode": "ES-CM", "name": "Castile-La Mancha", "type": "autonomous community" },
+    { "isoCode": "ES-CT", "name": "Catalonia", "type": "autonomous community" },
+    { "isoCode": "ES-EX", "name": "Extremadura", "type": "autonomous community" },
+    { "isoCode": "ES-GA", "name": "Galicia", "type": "autonomous community" },
+    { "isoCode": "ES-RI", "name": "La Rioja", "type": "autonomous community" },
+    { "isoCode": "ES-MD", "name": "Madrid", "type": "autonomous community" },
+    { "isoCode": "ES-MC", "name": "Murcia", "type": "autonomous community" },
+    { "isoCode": "ES-NC", "name": "Navarre", "type": "autonomous community" },
+    { "isoCode": "ES-VC", "name": "Valencia", "type": "autonomous community" }
+  ]
+}

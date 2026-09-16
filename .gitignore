@@ -4,6 +4,9 @@ dist-ssr
 *.local
 .env
 data/
+# Keep region ISO catalogs under server/db/regions/data/ (not fill-agent data/)
+!server/db/regions/data/
+!server/db/regions/data/**
 uploads/
 coverage
 playwright-report

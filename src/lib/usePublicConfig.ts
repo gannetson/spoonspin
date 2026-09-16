@@ -9,6 +9,12 @@ import {
 const EMPTY: PublicConfig = {
   awinPublisherId: null,
   awinThuisbezorgdMid: null,
+  reservationsEnabled: false,
+  reservationProviders: {
+    zenchef: false,
+    guestplan: false,
+    thefork: false,
+  },
 };
 
 /** Subscribe to runtime public config (Awin ids from `/api/public-config`). */

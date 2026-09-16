@@ -410,26 +410,37 @@ export async function discoverCountryRecipes(input: {
   countryName: string;
   query?: string;
   existingNames: string[];
+  regionId?: string;
+  regionName?: string;
 }): Promise<{ notes: string; recipes: DishCandidate[] }> {
+  const regionLabel = input.regionName?.trim();
   const focus = input.query?.trim()
     ? `Focus on: ${input.query.trim()}`
-    : "Focus on iconic national dishes and classic home-cook favourites.";
+    : regionLabel
+      ? `Focus on classic home-cook dishes from the ${regionLabel} region.`
+      : "Focus on iconic national dishes and classic home-cook favourites.";
 
   const existing = input.existingNames
     .map((name) => name.trim())
     .filter(Boolean)
     .slice(0, 40);
 
-  const sourcingContext = sourcingContextFromCountry(input.countryCode);
+  const sourcingContext = sourcingContextFromCountry(input.countryCode, {
+    regionId: input.regionId,
+    regionName: regionLabel,
+  });
   const discoverUserExtra = recipeDiscoverUserExtra(sourcingContext);
+  const targetCount = regionLabel ? "6–10" : "20–24";
 
   const raw = await chatJson(
     recipeDiscoverSystemPrompt(sourcingContext),
-    `Country: ${input.countryName} (${input.countryCode})
+    `Country: ${input.countryName} (${input.countryCode})${
+      regionLabel ? `\nRegion: ${regionLabel}` : ""
+    }
 Existing dishes (do not repeat): ${existing.join("; ") || "none"}
 ${focus}
 
-Return 20–24 distinct dishes when possible (quality still matters; prefer real classics over filler).
+Return ${targetCount} distinct dishes when possible (quality still matters; prefer real classics over filler).
 ${discoverUserExtra ? `${discoverUserExtra}\n` : ""}
 JSON shape:
 {
@@ -450,10 +461,15 @@ JSON shape:
     recipes: parsed.recipes.map((recipe) => ({
       ...recipe,
       id: slugify(recipe.name) || "dish",
+      region: regionLabel ?? recipe.region,
       description:
         recipe.description.length >= 40
           ? recipe.description
-          : `${recipe.description} A traditional dish from ${input.countryName} cuisine.`,
+          : `${recipe.description} A traditional dish from ${
+              regionLabel
+                ? `${regionLabel}, ${input.countryName}`
+                : `${input.countryName} cuisine`
+            }.`,
     })),
   };
 }
@@ -462,17 +478,25 @@ export async function expandDishCandidates(input: {
   countryCode: string;
   countryName: string;
   dishes: DishCandidate[];
+  regionId?: string;
+  regionName?: string;
 }): Promise<Recipe[]> {
   if (input.dishes.length === 0) return [];
 
+  const regionLabel = input.regionName?.trim();
   const expanded: Recipe[] = [];
   const batchSize = 8;
-  const sourcingContext = sourcingContextFromCountry(input.countryCode);
+  const sourcingContext = sourcingContextFromCountry(input.countryCode, {
+    regionId: input.regionId,
+    regionName: regionLabel,
+  });
   for (let i = 0; i < input.dishes.length; i += batchSize) {
     const batch = input.dishes.slice(i, i + batchSize);
     const raw = await chatJson(
       recipeExpandSystemPrompt(sourcingContext),
-      `Country: ${input.countryName} (${input.countryCode})
+      `Country: ${input.countryName} (${input.countryCode})${
+        regionLabel ? `\nRegion: ${regionLabel}` : ""
+      }
 Expand each dish into a full recipe.
 
 Dishes:
@@ -518,12 +542,18 @@ JSON shape:
       expanded.push({
         ...recipe,
         id: match?.id || slugify(recipe.name) || `dish-${expanded.length + 1}`,
-        region: recipe.region ?? match?.region,
+        region: regionLabel ?? recipe.region ?? match?.region,
+        regionId: input.regionId,
+        regionName: regionLabel,
         sourceUrl: sanitizeRecipeSourceUrl(recipe.sourceUrl, sourcingContext),
         description:
           recipe.description.length >= 40
             ? recipe.description
-            : `${recipe.description} A traditional dish from ${input.countryName} cuisine.`,
+            : `${recipe.description} A traditional dish from ${
+                regionLabel
+                  ? `${regionLabel}, ${input.countryName}`
+                  : `${input.countryName} cuisine`
+              }.`,
       });
     }
   }

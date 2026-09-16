@@ -6,6 +6,7 @@ export const PRODUCT_EVENT_TYPES = [
   "country_view",
   "restaurant_search",
   "restaurant_view",
+  "reservation_click",
   "suggestion_preview",
   "suggestion_create",
   "auth_login_success",

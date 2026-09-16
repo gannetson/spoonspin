@@ -1,7 +1,8 @@
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { LoaderCircle, Plus, Trash2, X } from "lucide-react";
-import type { Country, Ingredient, Recipe } from "@/types/content";
+import type { Country, Ingredient, Recipe, Region } from "@/types/content";
 import { patchRecipeFields } from "@/admin/countryTools";
+import { fetchRegions } from "@/content/client";
 import { useT } from "@/i18n/LocaleContext";
 import { zClass } from "@/lib/stacking";
 
@@ -50,6 +51,8 @@ export function EditRecipeModal({
   const [substitutions, setSubstitutions] = useState("");
   const [servingSuggestion, setServingSuggestion] = useState("");
   const [drinkPairing, setDrinkPairing] = useState("");
+  const [regionId, setRegionId] = useState("");
+  const [regions, setRegions] = useState<Region[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -76,9 +79,21 @@ export function EditRecipeModal({
     setSubstitutions((recipe.substitutions ?? []).join("\n"));
     setServingSuggestion(recipe.servingSuggestion ?? "");
     setDrinkPairing(recipe.drinkPairing ?? "");
+    setRegionId(recipe.regionId ?? "");
     setBusy(false);
     setError(null);
   }, [open, recipe]);
+
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    void fetchRegions(country.code).then((list) => {
+      if (!cancelled) setRegions(list);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [open, country.code]);
 
   useEffect(() => {
     if (!open) return;
@@ -140,6 +155,7 @@ export function EditRecipeModal({
         substitutions: linesToList(substitutions),
         servingSuggestion: servingSuggestion.trim() || null,
         drinkPairing: drinkPairing.trim() || null,
+        regionId: regionId.trim() || null,
       });
       if (!result.recipe) {
         throw new Error(t("admin.recipe.edit.error.save"));
@@ -236,6 +252,28 @@ export function EditRecipeModal({
                     className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
                   />
                 </label>
+                {regions.length > 0 ? (
+                  <label className="block">
+                    <span className="text-sm font-medium text-ink-soft">
+                      {t("admin.recipe.edit.region")}
+                    </span>
+                    <select
+                      value={regionId}
+                      onChange={(event) => setRegionId(event.target.value)}
+                      className="mt-1 w-full rounded-2xl border-2 border-ink/15 bg-white px-4 py-3 text-ink outline-none ring-tomato/30 focus:ring-2"
+                    >
+                      <option value="">{t("admin.recipe.edit.region.none")}</option>
+                      {regions.map((region) => (
+                        <option key={region.id} value={region.id}>
+                          {region.name}
+                        </option>
+                      ))}
+                    </select>
+                    <span className="mt-1 block text-xs text-ink-soft">
+                      {t("admin.recipe.edit.region.hint")}
+                    </span>
+                  </label>
+                ) : null}
                 <div className="grid gap-3 sm:grid-cols-2">
                   <label className="block">
                     <span className="text-sm font-medium text-ink-soft">

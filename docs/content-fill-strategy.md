@@ -38,7 +38,7 @@ After new order options are saved, and after gather promotes restaurants, OpenAI
 
 | Lane | What it does | Env |
 |------|----------------|-----|
-| **cook** | `agent:dishes` → `complete-menus` → `compose-dinners` → `recipes` → `cuisine-images` | `OPENAI_API_KEY`, `DATABASE_URL` |
+| **cook** | `agent:dishes` → `agent:complete-menus` → `compose-dinners` → `recipes` → `cuisine-images`. Complete-menus builds a national cook menu (20+ recipes), then iterates administrative regions (when a catalog exists, e.g. China) to append ~4 regional recipes each. Batch runs fill a few regions per country per pass; `--code` / `--force` fill all incomplete regions. | `OPENAI_API_KEY`, `DATABASE_URL` |
 | **restaurants** | `agent:gather --hubs randstad` for all published countries | `DATABASE_URL` (OSM; free but rate-limited) |
 | **orders** | Apify Thuisbezorgd + Uber Eats per **country × city**, then save options | `APIFY_TOKEN`, optional `OPENAI_API_KEY` for notes |
 | **daily** | cook + restaurants + orders, small `--batch` | all of the above |

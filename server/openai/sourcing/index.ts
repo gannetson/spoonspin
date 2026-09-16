@@ -113,6 +113,13 @@ function composeSystemPrompt(
   }
 
   let prompt = appendSection(base, extra);
+  if (normalized.regionName) {
+    prompt = appendSection(
+      prompt,
+      `Focus on dishes from the ${normalized.regionName} region of this country.
+Set every dish's region field to "${normalized.regionName}". Prefer regional specialties over national dishes.`,
+    );
+  }
   const forbidden = forbiddenSourceHints(normalized);
   if (strategy.id === defaultRecipeSourcing.id && forbidden.length > 0) {
     prompt = appendSection(prompt, forbidden.join("\n"));

@@ -1,0 +1,16 @@
+{
+  "kinki": "JP-KIN",
+  "osaka": "JP-KIN",
+  "kyoto": "JP-KIN",
+  "kobe": "JP-KIN",
+  "tokyo": "JP-KAN",
+  "edo": "JP-KAN",
+  "nagoya": "JP-CHB",
+  "hokkaido": "JP-HOK",
+  "okinawa ken": "JP-OKI",
+  "ryukyu": "JP-OKI",
+  "fukuoka": "JP-KYU",
+  "hakata": "JP-KYU",
+  "hiroshima": "JP-CHG",
+  "sendai": "JP-TOH"
+}

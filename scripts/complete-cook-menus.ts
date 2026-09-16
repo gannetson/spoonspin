@@ -3,6 +3,7 @@
  * Complete incomplete countries to cook-ready menus:
  * starter + main + side + dessert + menu drink, cook_ready = true,
  * plus enough moreRecipes to reach TARGET_RECIPES (20+) per country.
+ * When the country has administrative regions, also gather recipes per region.
  *
  *   npm run agent:complete-menus
  *   npm run agent:complete-menus -- --batch 5
@@ -16,12 +17,18 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { z } from "zod";
 import {
+  appendMoreRecipes,
   listCountriesFromDb,
   replaceCountryRecipes,
   upsertCountryRecord,
   type MenuSlot,
 } from "../server/db/content.ts";
 import { mergeFillProgress } from "../server/db/fillProgress.ts";
+import {
+  listRegionsForCountry,
+  seedCountryRegions,
+  type Region,
+} from "../server/db/regions.ts";
 import { closeDb, getDb } from "../server/db/restaurants.ts";
 import {
   discoverCountryDrinks,
@@ -50,6 +57,10 @@ const CORE_SLOTS: Array<"starter" | "main" | "side" | "dessert"> = [
 
 /** Aim for a rich Cook library per cuisine (core 4 + moreRecipes). */
 const TARGET_RECIPES = 20;
+/** Full recipes linked to each administrative region when a catalog exists. */
+const TARGET_RECIPES_PER_REGION = 4;
+/** Cap region passes per country in a batch run (all regions when --code / --force). */
+const MAX_REGIONS_PER_COUNTRY_RUN = 4;
 
 type WikiDish = {
   name: string;
@@ -244,7 +255,102 @@ function recipeToCandidate(recipe: Recipe): DishCandidate {
     localName: recipe.localName,
     description: recipe.description,
     category: recipe.category === "snack" ? "starter" : recipe.category,
+    region: recipe.regionName ?? recipe.region,
   };
+}
+
+function regionRecipeCount(recipes: Recipe[], regionId: string): number {
+  return recipes.filter(
+    (recipe) => isFullRecipe(recipe) && recipe.regionId === regionId,
+  ).length;
+}
+
+async function listIncompleteRegions(country: Country): Promise<Region[]> {
+  await seedCountryRegions(country.code);
+  const regions = await listRegionsForCountry(country.code);
+  if (regions.length === 0) return [];
+  const recipes = getCountryRecipes(country);
+  return regions.filter(
+    (region) => regionRecipeCount(recipes, region.id) < TARGET_RECIPES_PER_REGION,
+  );
+}
+
+async function completeRegionRecipes(
+  country: Country,
+  region: Region,
+): Promise<number> {
+  const existingRecipes = getCountryRecipes(country).filter(isFullRecipe);
+  const already = regionRecipeCount(existingRecipes, region.id);
+  const need = TARGET_RECIPES_PER_REGION - already;
+  if (need <= 0) return 0;
+
+  const existingNames = existingRecipes.map((recipe) => recipe.name);
+  const discovered = await withRetry(
+    `discover recipes ${country.code}/${region.name}`,
+    () =>
+      discoverCountryRecipes({
+        countryCode: country.code,
+        countryName: country.name,
+        existingNames,
+        regionId: region.id,
+        regionName: region.name,
+        query: `Regional classics and everyday home cooking from ${region.name}, ${country.name}`,
+      }),
+  );
+
+  const candidates: DishCandidate[] = [];
+  const seenNames = new Set(existingNames.map((name) => name.toLowerCase()));
+  for (const dish of discovered.recipes) {
+    const key = dish.name.toLowerCase();
+    if (seenNames.has(key)) continue;
+    seenNames.add(key);
+    const regionSlug = slugify(region.name) || region.id.split(":").pop() || "region";
+    candidates.push({
+      ...dish,
+      id: `${country.code}:${regionSlug}-${slugify(dish.name) || dish.id}`,
+      region: region.name,
+    });
+    if (candidates.length >= need + 2) break;
+  }
+
+  if (candidates.length === 0) {
+    throw new Error(`No new dish candidates for ${region.name}`);
+  }
+
+  const toExpand = candidates.slice(0, need);
+  const made: Recipe[] = [];
+  for (const dish of toExpand) {
+    try {
+      const [recipe] = await expandDishCandidates({
+        countryCode: country.code,
+        countryName: country.name,
+        dishes: [dish],
+        regionId: region.id,
+        regionName: region.name,
+      });
+      if (recipe && isFullRecipe(recipe)) {
+        made.push({
+          ...recipe,
+          id: dish.id,
+          category: dish.category,
+          name: recipe.name?.trim() ? recipe.name : dish.name,
+          region: region.name,
+          regionId: region.id,
+          regionName: region.name,
+        });
+      }
+    } catch (error) {
+      console.warn(`  expand failed for ${region.name}/${dish.name}`, error);
+    }
+    await sleep(200);
+  }
+
+  if (made.length === 0) {
+    throw new Error(`Could not expand recipes for ${region.name}`);
+  }
+
+  await appendMoreRecipes(country.code, made);
+  return made.length;
 }
 
 function ensureUniqueIds(recipes: Recipe[], countryCode: string): Recipe[] {
@@ -370,11 +476,20 @@ function ensureAliases(country: Country): string[] {
 async function completeCountry(
   country: Country,
   dishesByCountry: Record<string, WikiCountryDishes>,
-): Promise<{ recipeCount: number; drinkCount: number }> {
+  options?: { fillAllRegions?: boolean },
+): Promise<{ recipeCount: number; drinkCount: number; regionRecipes: number }> {
+  await seedCountryRegions(country.code);
   const existingRecipes = getCountryRecipes(country).filter(isFullRecipe);
   const existingDrinks = getCountryDrinks(country);
   const existingNames = existingRecipes.map((recipe) => recipe.name);
+  const needsNational =
+    !country.cookReady || fullRecipeCount(country) < TARGET_RECIPES;
 
+  let recipeCount = fullRecipeCount(country);
+  let drinkCount = existingDrinks.length;
+  let regionRecipes = 0;
+
+  if (needsNational) {
   // OpenAI discover first (reliable dish names + categories), then wiki extras.
   const discovered = await withRetry(`discover recipes ${country.code}`, () =>
     discoverCountryRecipes({
@@ -491,6 +606,9 @@ async function completeCountry(
         ...hit,
         id: dish.id,
         category: dish.category,
+        region: hit.region ?? dish.region,
+        regionId: hit.regionId,
+        regionName: hit.regionName,
       });
     } else {
       toExpand.push(dish);
@@ -512,6 +630,7 @@ async function completeCountry(
           id: dish.id,
           category: dish.category,
           name: made.name?.trim() ? made.name : dish.name,
+          region: made.region ?? dish.region,
         });
       }
     } catch (error) {
@@ -631,21 +750,58 @@ async function completeCountry(
   };
 
   await upsertCountryRecord(menuCountry);
-  await replaceCountryRecipes(country.code, [
-    { recipe: starter, menuSlot: "starter" as MenuSlot, sortOrder: 0 },
-    { recipe: main, menuSlot: "main", sortOrder: 0 },
-    { recipe: side, menuSlot: "side", sortOrder: 0 },
-    { recipe: dessert, menuSlot: "dessert", sortOrder: 0 },
-    ...moreRecipes.map((recipe, index) => ({
-      recipe,
-      menuSlot: "more" as MenuSlot,
-      sortOrder: index,
-    })),
-  ]);
+  const nationalize = (recipe: Recipe): Recipe => {
+    const next = { ...recipe };
+    delete next.region;
+    delete next.regionId;
+    delete next.regionName;
+    return next;
+  };
+  await replaceCountryRecipes(
+    country.code,
+    [
+      { recipe: nationalize(starter), menuSlot: "starter" as MenuSlot, sortOrder: 0 },
+      { recipe: nationalize(main), menuSlot: "main", sortOrder: 0 },
+      { recipe: nationalize(side), menuSlot: "side", sortOrder: 0 },
+      { recipe: nationalize(dessert), menuSlot: "dessert", sortOrder: 0 },
+      ...moreRecipes.map((recipe, index) => ({
+        recipe: nationalize(recipe),
+        menuSlot: "more" as MenuSlot,
+        sortOrder: index,
+      })),
+    ],
+    { preserveRegional: true },
+  );
+
+  recipeCount = 4 + moreRecipes.length;
+  drinkCount = 1 + moreDrinks.length;
+  }
+
+  let latest =
+    (await listCountriesFromDb()).find((item) => item.code === country.code) ?? country;
+  const incompleteRegions = await listIncompleteRegions(latest);
+  const regionLimit = options?.fillAllRegions
+    ? incompleteRegions.length
+    : Math.min(MAX_REGIONS_PER_COUNTRY_RUN, incompleteRegions.length);
+  for (const region of incompleteRegions.slice(0, regionLimit)) {
+    process.stdout.write(`\n  region ${region.name}… `);
+    try {
+      latest =
+        (await listCountriesFromDb()).find((item) => item.code === country.code) ??
+        latest;
+      const inserted = await completeRegionRecipes(latest, region);
+      regionRecipes += inserted;
+      console.log(`✓ +${inserted}`);
+    } catch (error) {
+      console.log("failed");
+      console.warn(error);
+    }
+  }
 
   return {
-    recipeCount: 4 + moreRecipes.length,
-    drinkCount: 1 + moreDrinks.length,
+    recipeCount,
+    drinkCount,
+    regionRecipes,
   };
 }
 
@@ -653,8 +809,12 @@ function fullRecipeCount(country: Country): number {
   return getCountryRecipes(country).filter(isFullRecipe).length;
 }
 
-function isIncomplete(country: Country): boolean {
-  return !country.cookReady || fullRecipeCount(country) < TARGET_RECIPES;
+async function isIncomplete(country: Country): Promise<boolean> {
+  if (!country.cookReady || fullRecipeCount(country) < TARGET_RECIPES) {
+    return true;
+  }
+  const incompleteRegions = await listIncompleteRegions(country);
+  return incompleteRegions.length > 0;
 }
 
 async function main() {
@@ -669,26 +829,33 @@ async function main() {
   const dishesByCountry = loadJson<Record<string, WikiCountryDishes>>(DISHES_PATH, {});
   const progress = loadProgress();
 
-  const pending = countries.filter((country) => {
-    if (args.code && country.code !== args.code) return false;
-    if (args.force) return true;
-    return isIncomplete(country);
-  });
+  const pending: Country[] = [];
+  for (const country of countries) {
+    if (args.code && country.code !== args.code) continue;
+    if (args.force || (await isIncomplete(country))) {
+      pending.push(country);
+    }
+  }
 
   if (args.status) {
     const ready = countries.filter((country) => country.cookReady).length;
     const thin = countries.filter(
       (country) => country.cookReady && fullRecipeCount(country) < TARGET_RECIPES,
     ).length;
+    let regionGaps = 0;
+    for (const country of countries) {
+      regionGaps += (await listIncompleteRegions(country)).length;
+    }
     console.log(
-      `Cook menus: ${ready} ready · ${thin} under ${TARGET_RECIPES} recipes · ${pending.length} pending · ${countries.length} countries`,
+      `Cook menus: ${ready} ready · ${thin} under ${TARGET_RECIPES} recipes · ${regionGaps} region gaps · ${pending.length} pending · ${countries.length} countries`,
     );
     console.log(`Dish research file: ${fs.existsSync(DISHES_PATH) ? "yes" : "MISSING"}`);
     console.log(`Lifetime completed: ${progress.lifetimeCompleted}`);
     console.log("Next:");
     for (const country of pending.slice(0, 15)) {
+      const regionGapsForCountry = (await listIncompleteRegions(country)).length;
       console.log(
-        `  - ${country.code} ${country.name} (recipes=${fullRecipeCount(country)}/${TARGET_RECIPES} drinks=${getCountryDrinks(country).length}${country.cookReady ? "" : " · not cook-ready"})`,
+        `  - ${country.code} ${country.name} (recipes=${fullRecipeCount(country)}/${TARGET_RECIPES} drinks=${getCountryDrinks(country).length}${country.cookReady ? "" : " · not cook-ready"}${regionGapsForCountry ? ` · ${regionGapsForCountry} regions to fill` : ""})`,
       );
     }
     await closeDb();
@@ -710,13 +877,26 @@ async function main() {
   for (const country of batch) {
     process.stdout.write(`${country.code} ${country.name}… `);
     try {
-      const result = await completeCountry(country, dishesByCountry);
-      if (!progress.completedCodes.includes(country.code)) {
-        progress.completedCodes.push(country.code);
+      const result = await completeCountry(country, dishesByCountry, {
+        fillAllRegions: Boolean(args.code || args.force),
+      });
+      const latest =
+        (await listCountriesFromDb()).find((item) => item.code === country.code) ??
+        country;
+      if (!(await isIncomplete(latest))) {
+        if (!progress.completedCodes.includes(country.code)) {
+          progress.completedCodes.push(country.code);
+        }
+        progress.failedCodes = progress.failedCodes.filter(
+          (code) => code !== country.code,
+        );
+        completed += 1;
       }
-      progress.failedCodes = progress.failedCodes.filter((code) => code !== country.code);
-      completed += 1;
-      console.log(`✓ ${result.recipeCount} recipes · ${result.drinkCount} drinks`);
+      const regionNote =
+        result.regionRecipes > 0 ? ` · +${result.regionRecipes} regional` : "";
+      console.log(
+        `✓ ${result.recipeCount} recipes · ${result.drinkCount} drinks${regionNote}`,
+      );
     } catch (error) {
       console.log("failed");
       console.warn(error);
