@@ -18,7 +18,13 @@ export type DiscoveredRestaurant = {
   lat?: number;
   lng?: number;
   cuisine?: string;
+  /** What the venue's own listing/pages say about its cuisine. */
   cuisineEvidence?: string;
+  /** Which source found it and how it ranked — diagnostic, not evidence. */
+  provenance?: string;
+  /** Grounded relevance score; higher means stronger listing evidence. */
+  relevanceScore?: number;
+  relevanceReasons?: string[];
   evidenceSourceUrl?: string;
   confidence?: "high" | "medium" | "low";
   authenticityNotes?: string;

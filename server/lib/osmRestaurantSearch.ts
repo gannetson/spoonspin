@@ -13,15 +13,28 @@ import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import type { GroundedPlace } from "./googlePlacesLookup.ts";
 import { officialWebsiteOrUndefined } from "./googlePlacesLookup.ts";
 
-const QUERY_TIMEOUT_SEC = 20;
-const FETCH_TIMEOUT_MS = 22_000;
+/**
+ * Overpass regularly needs 30s+ for a nationwide query and frequently answers
+ * "server too busy" instead of data. Discovery runs OSM concurrently with
+ * Google, so waiting costs nothing when the other sources answer first — but
+ * the client budget stays under the caller's source budget so a hung mirror
+ * aborts cleanly rather than being abandoned mid-flight.
+ */
+const QUERY_TIMEOUT_SEC = 25;
+const FETCH_TIMEOUT_MS = 27_000;
 
-function looksLikeStreetAddress(address: string): boolean {
+/**
+ * OSM entries carry a `cuisine=` tag a human editor wrote, which makes them the
+ * most precise source we have. Many lack full `addr:*` tags though, so only
+ * coordinate-only fallbacks are rejected — requiring a house number used to
+ * discard most of the matches this source exists to find.
+ */
+function usableAddress(address: string): boolean {
   const trimmed = address.trim();
   if (!trimmed || trimmed === "Netherlands") return false;
   // Reject lat,lng-only fallbacks from elementToRestaurant.
   if (/^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(trimmed)) return false;
-  return /[a-zA-Z]/.test(trimmed) && /\d/.test(trimmed);
+  return /[a-zA-Z]/.test(trimmed);
 }
 
 function isTimeoutError(error: unknown): boolean {
@@ -51,6 +64,8 @@ export async function searchOsmRestaurantsForCountry(input: {
     elements = await fetchOverpass(query, 1, 0, {
       timeoutMs: FETCH_TIMEOUT_MS,
       maxAttempts: 2,
+      // A busy mirror gets one quick retry on the next one; a hung mirror does
+      // not, because the whole search is waiting on a budget.
       retryOnAbort: false,
       retryWaitMs: () => 400,
     });
@@ -65,7 +80,7 @@ export async function searchOsmRestaurantsForCountry(input: {
   for (const element of elements) {
     const row = elementToRestaurant(element, input.countryCode);
     if (!row) continue;
-    if (!looksLikeStreetAddress(row.address)) continue;
+    if (!usableAddress(row.address)) continue;
 
     const key = row.osmId;
     if (byKey.has(key)) continue;
@@ -82,6 +97,11 @@ export async function searchOsmRestaurantsForCountry(input: {
       mapsUrl: row.mapsUrl,
       phone: row.phone ?? undefined,
       matchedQuery: `osm cuisine=${tags.join("|")}`,
+      // The tag itself is the evidence; it is what a mapper recorded on site.
+      sourceCuisineTags: (element.tags?.cuisine ?? "")
+        .split(";")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
       source: "osm",
     });
   }

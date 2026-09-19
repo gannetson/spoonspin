@@ -11,23 +11,27 @@ import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import {
   isGooglePlacesConfigured,
   officialWebsiteOrUndefined,
-  searchGoogleRestaurantsByCuisine,
+  searchGoogleRestaurantsRanked,
   type GroundedPlace,
+  type RankedQueryResult,
 } from "../lib/googlePlacesLookup.ts";
 import { searchOsmRestaurantsForCountry } from "../lib/osmRestaurantSearch.ts";
 import { searchTripadvisorRestaurants } from "../lib/apifyTripadvisorSearch.ts";
-import { searchYelpRestaurants } from "../lib/apifyYelpSearch.ts";
-import {
-  searchZenchefRestaurants,
-  isZenchefDiscoverConfigured,
-} from "../lib/zenchefRestaurantSearch.ts";
-import { searchTheForkRestaurants } from "../lib/theforkRestaurantSearch.ts";
 import { fetchPageEvidenceMany, formatPageEvidence } from "../lib/pageEvidence.ts";
 import {
   buildCuisineTermIndex,
   buildMentionHaystack,
   findCuisineMentions,
+  normalizeText,
+  type CuisineTermIndex,
 } from "../lib/cuisineMention.ts";
+import {
+  KEEP_THRESHOLD,
+  mergeRankedResults,
+  planDiscoveryQueries,
+  scoreCandidate,
+  type RelevanceScore,
+} from "../lib/restaurantRelevance.ts";
 import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
 import { chatJson, isOpenAiConfigured } from "./suggest.ts";
 import {
@@ -188,54 +192,38 @@ function looksWeakCandidate(name: string): boolean {
   return WEAK_NAME_RE.test(name);
 }
 
-function confidenceFromPlaces(place: GroundedPlace): "high" | "medium" {
-  const reviews = place.reviewCount ?? 0;
-  const rating = place.rating ?? 0;
-  if (reviews >= 40 && rating >= 4.2) return "high";
-  if (reviews >= 10 && rating >= 3.8) return "high";
-  return "medium";
-}
-
+/**
+ * Turn a scored candidate into an admin-facing row.
+ *
+ * `cuisineEvidence` holds only what the venue's own listing says. It used to
+ * hold the search query ("Google Places match for “Armenian restaurant in
+ * Amsterdam”"), which the mention gate downstream then read back as proof
+ * that the venue mentioned Armenia — so every hit passed. Provenance now
+ * lives in its own field and never reaches an evidence check.
+ */
 function groundedToDiscovered(
   place: GroundedPlace,
   cuisine: string,
+  relevance: RelevanceScore,
 ): DiscoveredRestaurant | null {
   if (looksWeakCandidate(place.name)) return null;
   if (!place.address?.trim() || place.address === "Netherlands") return null;
-  const confidence = confidenceFromPlaces(place);
-  const cuisineEvidence =
-    place.source === "google"
-      ? `Google Places match${place.matchedQuery ? ` for “${place.matchedQuery}”` : ""}${
-          place.rating != null
-            ? ` · ${place.rating.toFixed(1)}★ (${place.reviewCount ?? 0} reviews)`
-            : ""
-        }.`
-      : place.source === "tripadvisor"
-        ? `Tripadvisor match${place.matchedQuery ? ` for “${place.matchedQuery}”` : ""}${
-            place.rating != null
-              ? ` · ${place.rating.toFixed(1)}★ (${place.reviewCount ?? 0} reviews)`
-              : ""
-          }${place.tripadvisorUrl ? ` · ${place.tripadvisorUrl}` : ""}.`
-        : place.source === "zenchef"
-          ? `Zenchef partner catalog${place.matchedQuery ? ` · ${place.matchedQuery}` : ""}${
-              place.zenchefUrl ? ` · ${place.zenchefUrl}` : ""
-            }.`
-          : place.source === "thefork"
-            ? `TheFork${place.matchedQuery ? ` · ${place.matchedQuery}` : ""}${
-                place.theForkUrl ? ` · ${place.theForkUrl}` : ""
-              }.`
-            : place.source === "yelp"
-              ? `Yelp match${place.matchedQuery ? ` for “${place.matchedQuery}”` : ""}${
-                  place.rating != null
-                    ? ` · ${place.rating.toFixed(1)}★ (${place.reviewCount ?? 0} reviews)`
-                    : ""
-                }${place.yelpUrl ? ` · ${place.yelpUrl}` : ""}.`
-              : `OpenStreetMap cuisine tag match near ${place.city}.`;
+
+  const confidence = confidenceFromRelevance(relevance, place);
   const mapsUrl = stableMapsUrl(place.mapsUrl, {
     name: place.name,
     address: place.address,
     city: place.city,
   });
+  const sourceLabel =
+    place.source === "google"
+      ? "Google Places"
+      : place.source === "tripadvisor"
+        ? "Tripadvisor"
+        : place.source === "osm"
+          ? "OpenStreetMap"
+          : place.source;
+
   return {
     name: place.name,
     address: place.address,
@@ -246,7 +234,15 @@ function groundedToDiscovered(
     lat: place.lat,
     lng: place.lng,
     cuisine,
-    cuisineEvidence,
+    cuisineEvidence: relevance.listingEvidence.join(" · ") || undefined,
+    provenance:
+      `${sourceLabel}` +
+      (place.rating != null
+        ? ` · ${place.rating.toFixed(1)}★ (${place.reviewCount ?? 0} reviews)`
+        : "") +
+      ` · relevance ${relevance.score}`,
+    relevanceScore: relevance.score,
+    relevanceReasons: relevance.reasons,
     evidenceSourceUrl:
       place.source === "tripadvisor" && place.tripadvisorUrl
         ? place.tripadvisorUrl
@@ -254,20 +250,29 @@ function groundedToDiscovered(
           ? place.zenchefUrl
           : place.source === "thefork" && place.theForkUrl
             ? place.theForkUrl
-            : place.source === "yelp" && place.yelpUrl
-              ? place.yelpUrl
-              : (officialWebsiteOrUndefined(place.website) ?? mapsUrl),
+            : (officialWebsiteOrUndefined(place.website) ?? mapsUrl),
     confidence,
-    authenticityNotes: cuisineEvidence,
+    authenticityNotes: relevance.reasons.join("; "),
     authenticityRating: confidenceToRating(confidence),
     phone: place.phone,
-    verified:
-      place.source === "google" ||
-      place.source === "tripadvisor" ||
-      place.source === "zenchef" ||
-      place.source === "thefork" ||
-      place.source === "yelp",
+    verified: place.source !== "osm",
   };
+}
+
+/**
+ * Confidence now follows the grounded relevance score, with popularity only as
+ * a tie-break. A busy restaurant is not evidence that it cooks this cuisine.
+ */
+function confidenceFromRelevance(
+  relevance: RelevanceScore,
+  place: GroundedPlace,
+): "high" | "medium" | "low" {
+  if (relevance.score >= 5) return "high";
+  if (relevance.score >= 3) {
+    return (place.reviewCount ?? 0) >= 20 ? "high" : "medium";
+  }
+  if (relevance.score >= KEEP_THRESHOLD) return "medium";
+  return "low";
 }
 
 const shopItemSchema = z.object({
@@ -415,7 +420,13 @@ export type DiscoveredRestaurant = {
   lat?: number;
   lng?: number;
   cuisine?: string;
+  /** What the venue's OWN listing/pages say about its cuisine. Never our query. */
   cuisineEvidence?: string;
+  /** Where the hit came from and how it ranked. Diagnostic only — not evidence. */
+  provenance?: string;
+  /** Grounded relevance score; higher means stronger listing evidence. */
+  relevanceScore?: number;
+  relevanceReasons?: string[];
   evidenceSourceUrl?: string;
   confidence?: "high" | "medium" | "low";
   authenticityNotes?: string;
@@ -591,251 +602,292 @@ JSON shape:
   return expanded;
 }
 
+/** Sources run concurrently; a slow one must not hold up the whole search. */
+const SOURCE_BUDGET_MS = 30_000;
+
+async function withBudget<T>(
+  label: string,
+  fallback: T,
+  budgetMs: number,
+  work: () => Promise<T>,
+  log: (message: string) => void,
+): Promise<T> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<T>((resolve) => {
+    timer = setTimeout(() => {
+      log(`${label} exceeded ${Math.round(budgetMs / 1000)}s; continuing without it.`);
+      resolve(fallback);
+    }, budgetMs);
+  });
+  try {
+    return await Promise.race([work(), timeout]);
+  } catch (error) {
+    console.warn(`${label} failed`, error);
+    log(`${label} failed; continuing without it.`);
+    return fallback;
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
+/**
+ * Find restaurants in the Netherlands that genuinely cook a country's cuisine.
+ *
+ * The pipeline is: plan a handful of nationwide queries, collect ranked hits
+ * from every source at once, score each candidate on its own listing, then
+ * spend the expensive checks (page fetches, OpenAI) only on the shortlist.
+ *
+ * The ordering matters. Scoring before the LLM means the model sees a dozen
+ * plausible venues with real evidence rather than a hundred venues whose only
+ * connection to the cuisine is that we typed its name into a search box.
+ */
 export async function discoverCountryRestaurants(input: {
   countryCode: string;
   countryName: string;
   query?: string;
   cuisineAliases?: string[];
+  /** Signature dish names for this country, used to phrase better queries. */
+  dishNames?: string[];
   onProgress?: (message: string) => void;
 }): Promise<{ notes: string; restaurants: DiscoveredRestaurant[] }> {
   const hasPlaces = isGooglePlacesConfigured();
   const hasApify = isApifyConfigured();
   const log = input.onProgress ?? (() => undefined);
-  if (!hasPlaces && !hasApify && !isZenchefDiscoverConfigured()) {
+  if (!hasPlaces && !hasApify) {
     throw new Error(
-      "Restaurant discover needs GOOGLE_PLACES_API_KEY, APIFY_TOKEN (Tripadvisor), or Zenchef partner credentials.",
+      "Restaurant discover needs GOOGLE_PLACES_API_KEY or APIFY_TOKEN (Tripadvisor).",
     );
   }
 
   const cuisine = input.countryName;
-  const aliasSet = new Set<string>();
-  for (const alias of input.cuisineAliases ?? []) {
-    const trimmed = alias.trim();
-    if (trimmed) aliasSet.add(trimmed);
-  }
-  aliasSet.add(`${cuisine} restaurant`);
-  aliasSet.add(`${cuisine} restaurant Nederland`);
-  const aliases = [...aliasSet].slice(0, 8);
+  const searchCode = input.countryCode.toLowerCase();
   const focus = input.query?.trim() || undefined;
 
-  let placesHits: GroundedPlace[] = [];
-  if (hasPlaces) {
-    placesHits = await searchGoogleRestaurantsByCuisine({
-      aliases,
-      focus,
-      maxPerQuery: 8,
-      onProgress: log,
-    });
-    log(`Google Places: ${placesHits.length} hit(s)`);
-  } else {
-    log("Google Places skipped (no API key).");
-  }
+  const plan = planDiscoveryQueries({
+    countryName: input.countryName,
+    cuisineAliases: input.cuisineAliases,
+    dishNames: input.dishNames,
+    focus,
+  });
+  log(`Searching nationwide with ${plan.length} quer${plan.length === 1 ? "y" : "ies"}.`);
 
-  let osmHits: GroundedPlace[] = [];
-  try {
-    osmHits = await searchOsmRestaurantsForCountry({
-      countryCode: input.countryCode,
-      onProgress: log,
-    });
-    log(`OpenStreetMap: ${osmHits.length} specialty match(es)`);
-  } catch (error) {
-    console.warn("OSM restaurant supplement failed", error);
-    log("OpenStreetMap failed; continuing without it.");
-  }
+  const parts: string[] = [];
 
-  let tripadvisorHits: GroundedPlace[] = [];
-  let tripadvisorNotes = "";
-  if (hasApify) {
-    try {
-      const ta = await searchTripadvisorRestaurants({
-        countryName: input.countryName,
-        query: input.query,
-        cuisineAliases: input.cuisineAliases,
-        maxPerCity: 10,
-        onProgress: log,
-      });
-      tripadvisorHits = ta.places;
-      tripadvisorNotes = ta.notes;
-      log(`Tripadvisor: ${tripadvisorHits.length} hit(s)`);
-    } catch (error) {
-      console.warn("Tripadvisor restaurant search failed", error);
-      tripadvisorNotes =
-        error instanceof Error
-          ? `Tripadvisor failed: ${error.message}`
-          : "Tripadvisor search failed.";
-      log(tripadvisorNotes);
-    }
-  } else {
-    log("Tripadvisor skipped (no APIFY_TOKEN).");
-  }
+  // Every source runs at once. Google is fast and carries the ranking signal;
+  // the others are best-effort supplements that must never stall the search.
+  const [googleResults, osmHits, tripadvisor] = await Promise.all([
+    hasPlaces
+      ? withBudget(
+          "Google Places",
+          [] as RankedQueryResult[],
+          SOURCE_BUDGET_MS,
+          () =>
+            searchGoogleRestaurantsRanked({
+              queries: plan.map((query) => query.text),
+              maxPerQuery: 20,
+              onProgress: log,
+            }),
+          log,
+        )
+      : Promise.resolve<RankedQueryResult[]>([]),
+    withBudget(
+      "OpenStreetMap",
+      [] as GroundedPlace[],
+      SOURCE_BUDGET_MS,
+      () =>
+        searchOsmRestaurantsForCountry({
+          countryCode: input.countryCode,
+          onProgress: log,
+        }),
+      log,
+    ),
+    hasApify
+      ? withBudget(
+          "Tripadvisor",
+          { places: [] as GroundedPlace[], notes: "" },
+          SOURCE_BUDGET_MS,
+          () =>
+            searchTripadvisorRestaurants({
+              countryName: input.countryName,
+              query: input.query,
+              cuisineAliases: input.cuisineAliases,
+              maxPerCity: 10,
+              onProgress: log,
+            }),
+          log,
+        )
+      : Promise.resolve({ places: [] as GroundedPlace[], notes: "" }),
+  ]);
 
-  let yelpHits: GroundedPlace[] = [];
-  let yelpNotes = "";
-  if (hasApify) {
-    try {
-      const yelp = await searchYelpRestaurants({
-        countryName: input.countryName,
-        query: input.query,
-        cuisineAliases: input.cuisineAliases,
-        maxPerCity: 10,
-        onProgress: log,
-      });
-      yelpHits = yelp.places;
-      yelpNotes = yelp.notes;
-      log(`Yelp: ${yelpHits.length} hit(s)`);
-    } catch (error) {
-      console.warn("Yelp restaurant search failed", error);
-      yelpNotes =
-        error instanceof Error ? `Yelp failed: ${error.message}` : "Yelp search failed.";
-      log(yelpNotes);
-    }
-  } else {
-    log("Yelp skipped (no APIFY_TOKEN).");
-  }
+  if (!hasPlaces) log("Google Places skipped (no API key).");
+  if (!hasApify) log("Tripadvisor skipped (no APIFY_TOKEN).");
+  if (osmHits.length > 0) log(`OpenStreetMap: ${osmHits.length} specialty match(es)`);
+  if (tripadvisor.notes) parts.push(tripadvisor.notes);
 
-  let zenchefHits: GroundedPlace[] = [];
-  let zenchefNotes = "";
-  try {
-    const zc = await searchZenchefRestaurants({
-      countryName: input.countryName,
-      query: input.query,
-      cuisineAliases: input.cuisineAliases,
-      onProgress: log,
-    });
-    zenchefHits = zc.places;
-    zenchefNotes = zc.notes;
-    log(`Zenchef: ${zenchefHits.length} hit(s)`);
-  } catch (error) {
-    console.warn("Zenchef restaurant search failed", error);
-    zenchefNotes =
-      error instanceof Error
-        ? `Zenchef failed: ${error.message}`
-        : "Zenchef search failed.";
-    log(zenchefNotes);
-  }
+  const kindByQuery = new Map(plan.map((query) => [query.text, query.kind]));
+  const candidates = mergeRankedResults([
+    ...googleResults.map((result) => ({
+      query: result.query,
+      kind: kindByQuery.get(result.query) ?? ("demonym" as const),
+      places: result.places,
+    })),
+    // OSM and Tripadvisor carry no ranking of their own; they join as a single
+    // cuisine-filtered list whose value is the cuisine tags they bring with them.
+    { query: "openstreetmap cuisine tag", kind: "demonym" as const, places: osmHits },
+    {
+      query: "tripadvisor cuisine search",
+      kind: "demonym" as const,
+      places: tripadvisor.places,
+    },
+  ]);
 
-  let theForkNotes = "";
-  try {
-    const tf = await searchTheForkRestaurants({
-      countryName: input.countryName,
-      onProgress: log,
-    });
-    theForkNotes = tf.notes;
-    log(
-      tf.places.length > 0
-        ? `TheFork: ${tf.places.length} hit(s)`
-        : "TheFork: 0 (no directory search in B2B API)",
-    );
-  } catch (error) {
-    console.warn("TheFork restaurant search failed", error);
-    theForkNotes =
-      error instanceof Error
-        ? `TheFork failed: ${error.message}`
-        : "TheFork search failed.";
-    log(theForkNotes);
-  }
+  const googleHitCount = googleResults.reduce(
+    (total, result) => total + result.places.length,
+    0,
+  );
+  log(
+    `Merged ${candidates.length} unique venue(s) from ${googleHitCount} Google, ` +
+      `${tripadvisor.places.length} Tripadvisor and ${osmHits.length} OSM hit(s).`,
+  );
 
-  const byKey = new Map<string, GroundedPlace>();
-  const nameCityKey = (place: GroundedPlace) =>
-    `${place.name.trim().toLowerCase()}|${place.city.trim().toLowerCase()}`;
-
-  for (const place of placesHits) {
-    byKey.set(place.placeId, place);
-  }
-  for (const place of tripadvisorHits) {
-    const already = [...byKey.values()].some(
-      (existing) => nameCityKey(existing) === nameCityKey(place),
-    );
-    if (!already) byKey.set(place.placeId, place);
-  }
-  for (const place of yelpHits) {
-    const already = [...byKey.values()].some(
-      (existing) => nameCityKey(existing) === nameCityKey(place),
-    );
-    if (!already) byKey.set(place.placeId, place);
-  }
-  for (const place of zenchefHits) {
-    const already = [...byKey.values()].some(
-      (existing) => nameCityKey(existing) === nameCityKey(place),
-    );
-    if (!already) byKey.set(place.placeId, place);
-  }
-  for (const place of osmHits) {
-    // Prefer Google / Tripadvisor / Zenchef when both sources find the same name+city.
-    const already = [...byKey.values()].some(
-      (existing) => nameCityKey(existing) === nameCityKey(place),
-    );
-    if (!already) byKey.set(place.placeId, place);
-  }
-
-  const grounded = [...byKey.values()]
-    .map((place) => groundedToDiscovered(place, cuisine))
-    .filter((place): place is DiscoveredRestaurant => Boolean(place));
-
-  log(`Merged ${grounded.length} unique venue(s).`);
-
-  const parts = [
-    `Found ${placesHits.length} Google Places hit(s)` +
-      (tripadvisorHits.length > 0
-        ? `, ${tripadvisorHits.length} Tripadvisor hit(s)`
-        : "") +
-      (yelpHits.length > 0 ? `, ${yelpHits.length} Yelp hit(s)` : "") +
-      (zenchefHits.length > 0 ? `, ${zenchefHits.length} Zenchef hit(s)` : "") +
-      (osmHits.length > 0 ? `, and ${osmHits.length} OSM specialty match(es)` : "") +
-      ` for ${cuisine}.`,
-  ];
-  if (tripadvisorNotes) parts.push(tripadvisorNotes);
-  if (yelpNotes) parts.push(yelpNotes);
-  if (zenchefNotes) parts.push(zenchefNotes);
-  if (theForkNotes) parts.push(theForkNotes);
-  if (focus) parts.push(`Focus: ${focus}.`);
-
-  if (grounded.length === 0) {
-    log("No suitable specialists remained after filtering.");
+  if (candidates.length === 0) {
     return {
-      notes: `${parts.join(" ")} No suitable specialists remained after filtering. Try a city name in the focus field.`,
+      notes: `No venues found for ${cuisine}. Try a different focus term.`,
       restaurants: [],
     };
   }
 
-  // Hard evidence gate — the searched cuisine must actually be named somewhere.
-  let mentionChecked = grounded;
-  const mentionReassigned: DiscoveredRestaurant[] = [];
-  try {
-    const gate = await gateByCuisineMention({
-      countryCode: input.countryCode,
-      countryName: input.countryName,
-      cuisineAliases: input.cuisineAliases,
-      restaurants: grounded.slice(0, 40),
-      onProgress: log,
-    });
-    mentionChecked = gate.kept;
-    mentionReassigned.push(...gate.reassigned);
-    if (gate.notes) parts.push(gate.notes);
-  } catch (error) {
-    console.warn("Cuisine mention gate failed; keeping unfiltered hits", error);
-    log("Mention check failed; continuing without it.");
-  }
+  // Score every candidate on its own listing — never on the query that found it.
+  const index = await buildDiscoveryTermIndex({
+    searchCode,
+    countryName: input.countryName,
+    cuisineAliases: input.cuisineAliases,
+  });
+  const extraTerms = [...(input.dishNames ?? []), ...(input.cuisineAliases ?? [])];
 
-  if (mentionReassigned.length > 0) {
-    const moved = await persistReassignedRestaurants(mentionReassigned);
+  const scored = candidates
+    .map((candidate) => ({
+      candidate,
+      relevance: scoreCandidate({ candidate, searchCode, index, extraTerms }),
+    }))
+    .sort((a, b) => b.relevance.score - a.relevance.score);
+
+  const confident = scored.filter((entry) => entry.relevance.score >= KEEP_THRESHOLD);
+  const rejected = scored.filter((entry) => entry.relevance.score < KEEP_THRESHOLD);
+
+  /**
+   * Venues that a cuisine query ranked but that carry no listing evidence
+   * either way — no Google cuisine category, nothing in the name. Plenty are
+   * genuine (a small Ethiopian place called "Adulis" says nothing Google can
+   * parse), so rather than dropping them here they go forward on probation and
+   * have to earn their place on their own website text at the evidence gate.
+   */
+  const probation = rejected.filter(
+    (entry) =>
+      entry.relevance.score > 0 &&
+      entry.relevance.mismatchCodes.length === 0 &&
+      (entry.relevance.typeVerdict === "neutral" ||
+        entry.relevance.typeVerdict === "region"),
+  );
+
+  const shortlisted = [...confident, ...probation].slice(0, 24);
+
+  log(
+    `Relevance: ${confident.length} of ${scored.length} venue(s) cleared the bar on listing ` +
+      `evidence (Google category, venue name, cuisine tags)` +
+      (probation.length > 0
+        ? `; ${Math.max(0, shortlisted.length - confident.length)} more go forward on probation.`
+        : "."),
+  );
+  parts.push(
+    `Scored ${scored.length} venue(s) on their own listings; ${confident.length} scored above the relevance bar.`,
+  );
+
+  // Venues whose Google category names a different cuisine are filed there
+  // instead of being silently dropped — that is where the Turkish places
+  // belong. Only Google's own categorisation is trusted for this: a country
+  // word appearing in a venue's name is far too weak to rewrite the database on.
+  const wrongCuisine = rejected
+    .filter((entry) => entry.relevance.typeMismatchCodes.length > 0)
+    .slice(0, 20)
+    .map((entry): DiscoveredRestaurant | null => {
+      const row = groundedToDiscovered(entry.candidate.place, cuisine, entry.relevance);
+      if (!row) return null;
+      return {
+        ...row,
+        cuisine: countryNameForCode(entry.relevance.typeMismatchCodes[0]!),
+        cuisineCodes: entry.relevance.typeMismatchCodes,
+        confidence: "low" as const,
+        verified: false,
+      };
+    })
+    .filter((row): row is DiscoveredRestaurant => row != null);
+
+  if (wrongCuisine.length > 0) {
+    log(
+      `Filing ${wrongCuisine.length} wrong-cuisine hit(s) under the country they name…`,
+    );
+    const moved = await persistReassignedRestaurants(wrongCuisine);
     if (moved.created > 0 || moved.updated > 0) {
       parts.push(
-        `Suggested ${moved.created + moved.updated} hit(s) for the country their evidence names` +
+        `Filed ${moved.created + moved.updated} venue(s) under the cuisine their listing names` +
           (moved.labels.length > 0 ? ` (${moved.labels.join(", ")})` : "") +
-          (moved.skipped > 0 ? `; ${moved.skipped} already stored` : "") +
           ".",
       );
     }
   }
 
-  if (mentionChecked.length === 0) {
-    log("No hit explicitly mentioned the searched cuisine.");
+  const grounded = shortlisted
+    .map((entry) => groundedToDiscovered(entry.candidate.place, cuisine, entry.relevance))
+    .filter((place): place is DiscoveredRestaurant => Boolean(place));
+
+  if (grounded.length === 0) {
+    log("Nothing cleared the relevance bar.");
     return {
-      notes: `${parts.join(" ")} No hit explicitly mentioned ${input.countryName}. Try a city name in the focus field.`,
+      notes:
+        `${parts.join(" ")} No venue's own listing pointed at ${cuisine}. ` +
+        `Google may simply have no ${cuisine} restaurants in the Netherlands.`,
       restaurants: [],
     };
   }
+
+  // Evidence gate — now reading the listing and the venue's pages, never the query.
+  let mentionChecked = grounded;
+  try {
+    const gate = await gateByCuisineMention({
+      countryCode: input.countryCode,
+      countryName: input.countryName,
+      cuisineAliases: input.cuisineAliases,
+      dishNames: input.dishNames,
+      restaurants: grounded,
+      onProgress: log,
+    });
+    mentionChecked = gate.kept;
+    if (gate.notes) parts.push(gate.notes);
+    if (gate.reassigned.length > 0) {
+      const moved = await persistReassignedRestaurants(gate.reassigned);
+      if (moved.created > 0 || moved.updated > 0) {
+        parts.push(
+          `Suggested ${moved.created + moved.updated} more hit(s) for the country their pages name` +
+            (moved.labels.length > 0 ? ` (${moved.labels.join(", ")})` : "") +
+            ".",
+        );
+      }
+    }
+  } catch (error) {
+    console.warn("Cuisine mention gate failed; keeping the scored list", error);
+    log("Evidence check failed; continuing with the scored list.");
+  }
+
+  if (mentionChecked.length === 0) {
+    log("No shortlisted venue named the cuisine on its own pages.");
+    return {
+      notes: `${parts.join(" ")} No shortlisted venue named ${cuisine} on its own pages.`,
+      restaurants: [],
+    };
+  }
+
+  if (focus) parts.push(`Focus: ${focus}.`);
 
   // Soft OpenAI authenticity filter when configured — cannot invent new names.
   if (isOpenAiConfigured()) {
@@ -843,7 +895,7 @@ export async function discoverCountryRestaurants(input: {
       const verification = await verifyRestaurantAuthenticity({
         countryCode: input.countryCode,
         countryName: input.countryName,
-        restaurants: mentionChecked.slice(0, 20),
+        restaurants: mentionChecked.slice(0, 12),
         onProgress: log,
       });
       if (verification.notes) parts.push(verification.notes);
@@ -861,33 +913,12 @@ export async function discoverCountryRestaurants(input: {
             (reassigned.skipped > 0 ? `; ${reassigned.skipped} already stored` : "") +
             ".",
         );
-      } else if (verification.reassigned.length > 0) {
-        parts.push(
-          `${verification.reassigned.length} wrong-cuisine hit(s) already stored under their actual countries.`,
-        );
       }
 
-      const rejected =
-        grounded.length -
-        verification.restaurants.length -
-        verification.reassigned.length;
-      if (rejected > 0) {
-        parts.push(
-          `Dropped ${rejected} candidate(s) that failed the authenticity check.`,
-        );
-      }
       if (verification.restaurants.length === 0) {
         log("No authentic specialists remained after verification.");
-        parts.push(
-          reassigned.created + reassigned.updated > 0 ||
-            verification.reassigned.length > 0
-            ? "No matches remained for this cuisine after verification (mismatches were filed under the correct countries)."
-            : "No authentic specialists remained after verification.",
-        );
-        return {
-          notes: parts.join(" "),
-          restaurants: [],
-        };
+        parts.push("No authentic specialists remained after verification.");
+        return { notes: parts.join(" "), restaurants: [] };
       }
       log(
         `Authenticity check kept ${verification.restaurants.length}` +
@@ -901,10 +932,7 @@ export async function discoverCountryRestaurants(input: {
         restaurants: verification.restaurants.slice(0, 16),
       };
     } catch (error) {
-      console.warn(
-        "Authenticity verify failed; returning Places/Tripadvisor/OSM list",
-        error,
-      );
+      console.warn("Authenticity verify failed; returning the scored list", error);
       log("Authenticity check skipped due to an error.");
       parts.push("Authenticity check skipped due to an error.");
     }
@@ -912,11 +940,51 @@ export async function discoverCountryRestaurants(input: {
     log("OpenAI authenticity check skipped (no API key).");
   }
 
-  // Falls back to the mention-gated list, never the raw merge.
+  // Falls back to the scored, evidence-gated list — never the raw merge.
   return {
     notes: parts.join(" "),
     restaurants: mentionChecked.slice(0, 16),
   };
+}
+
+/**
+ * Country -> cuisine-term index used for both scoring and the evidence gate.
+ * Falls back to the static catalog when the DB is unavailable.
+ */
+async function buildDiscoveryTermIndex(input: {
+  searchCode: string;
+  countryName: string;
+  cuisineAliases?: string[];
+}): Promise<CuisineTermIndex> {
+  let catalogRows: { code: string; name: string; cuisineAliases?: string[] }[];
+  try {
+    const dbCountries = await listCountriesFromDb();
+    catalogRows = dbCountries.map((country) => ({
+      code: country.code,
+      name: country.name,
+      cuisineAliases: country.cuisineAliases,
+    }));
+  } catch (error) {
+    console.warn("Cuisine term index fell back to catalog", error);
+    catalogRows = countryCatalog.map((entry) => ({
+      code: entry.code,
+      name: entry.name,
+    }));
+  }
+
+  // The caller's aliases are the freshest signal for the searched country.
+  return buildCuisineTermIndex([
+    ...catalogRows,
+    {
+      code: input.searchCode,
+      name: input.countryName,
+      cuisineAliases: [
+        ...(input.cuisineAliases ?? []),
+        ...(catalogRows.find((row) => row.code === input.searchCode)?.cuisineAliases ??
+          []),
+      ],
+    },
+  ]);
 }
 
 async function persistReassignedRestaurants(places: DiscoveredRestaurant[]): Promise<{
@@ -1021,9 +1089,16 @@ async function ensureRestaurantUnderCuisines(
 }
 
 /**
- * Hard evidence gate: the searched country/cuisine must be named somewhere in
- * the listing or on a connected page. Hits that name a *different* country are
- * handed back as reassignment suggestions rather than dropped.
+ * Evidence gate: the searched cuisine must be named by the venue itself —
+ * in its name, its Google category, its cuisine tags, or on its own pages.
+ * Hits that name a *different* country come back as reassignment suggestions
+ * rather than being dropped.
+ *
+ * The haystack deliberately excludes `provenance` and `authenticityNotes`.
+ * Those carry our search terms, and feeding them back in is what made this gate
+ * pass 40 of 40 candidates: it was finding the word "Armenia" in the sentence
+ * "Google Places match for “Armenian restaurant in Amsterdam”" that we had just
+ * written ourselves.
  *
  * Runs for every hit regardless of whether OpenAI is configured.
  */
@@ -1031,6 +1106,7 @@ async function gateByCuisineMention(input: {
   countryCode: string;
   countryName: string;
   cuisineAliases?: string[];
+  dishNames?: string[];
   restaurants: DiscoveredRestaurant[];
   onProgress?: (message: string) => void;
 }): Promise<{
@@ -1043,38 +1119,17 @@ async function gateByCuisineMention(input: {
   }
 
   const searchCode = input.countryCode.toLowerCase();
-
-  let catalogRows: { code: string; name: string; cuisineAliases?: string[] }[];
-  try {
-    const dbCountries = await listCountriesFromDb();
-    catalogRows = dbCountries.map((country) => ({
-      code: country.code,
-      name: country.name,
-      cuisineAliases: country.cuisineAliases,
-    }));
-  } catch (error) {
-    console.warn("Cuisine mention index fell back to catalog", error);
-    catalogRows = countryCatalog.map((entry) => ({
-      code: entry.code,
-      name: entry.name,
-    }));
-  }
-
-  // The caller's aliases are the freshest signal for the searched country.
-  const index = buildCuisineTermIndex([
-    ...catalogRows,
-    {
-      code: searchCode,
-      name: input.countryName,
-      cuisineAliases: [
-        ...(input.cuisineAliases ?? []),
-        ...(catalogRows.find((row) => row.code === searchCode)?.cuisineAliases ?? []),
-      ],
-    },
-  ]);
+  const index = await buildDiscoveryTermIndex({
+    searchCode,
+    countryName: input.countryName,
+    cuisineAliases: input.cuisineAliases,
+  });
+  const dishTerms = (input.dishNames ?? [])
+    .map((dish) => normalizeText(dish))
+    .filter((dish) => dish.length >= 4);
 
   input.onProgress?.(
-    `Checking ${input.restaurants.length} hit(s) for an explicit ${input.countryName} mention\u2026`,
+    `Reading pages for ${input.restaurants.length} shortlisted venue(s)…`,
   );
 
   const evidenceByIndex = await Promise.all(
@@ -1092,24 +1147,25 @@ async function gateByCuisineMention(input: {
 
   input.restaurants.forEach((place, i) => {
     const pages = evidenceByIndex[i] ?? [];
+    // Only the venue's own words: its name, what its listing says about it,
+    // and what its website/profile pages say. Never our query.
     const haystack = buildMentionHaystack([
       place.name,
       place.cuisineEvidence,
-      place.authenticityNotes,
       ...pages.flatMap((page) => [page.title, page.description, page.snippet]),
     ]);
 
     const mention = findCuisineMentions({ text: haystack, searchCode, index });
+    const normalized = normalizeText(haystack);
+    const dishHit = dishTerms.find((dish) => normalized.includes(dish));
 
-    if (mention.mentioned) {
+    if (mention.mentioned || dishHit) {
+      const proof = mention.mentioned ? mention.matchedTerms.join("”, “") : dishHit!;
       kept.push({
         ...place,
-        cuisineEvidence: [
-          place.cuisineEvidence,
-          `Mentions ${input.countryName} cuisine (\u201c${mention.matchedTerms.join("\u201d, \u201c")}\u201d).`,
-        ]
+        cuisineEvidence: [place.cuisineEvidence, `Own pages mention “${proof}”.`]
           .filter(Boolean)
-          .join(" "),
+          .join(" · "),
       });
       return;
     }
@@ -1133,12 +1189,12 @@ async function gateByCuisineMention(input: {
   });
 
   const notes = [
-    `Mention check: ${kept.length} of ${input.restaurants.length} hit(s) explicitly name ${input.countryName}.`,
+    `Evidence check: ${kept.length} of ${input.restaurants.length} shortlisted venue(s) name ${input.countryName} themselves.`,
     reassigned.length > 0
       ? `${reassigned.length} named another country and were suggested there instead.`
       : null,
     droppedNoMention > 0
-      ? `${droppedNoMention} had no country/cuisine mention at all and were dropped.`
+      ? `${droppedNoMention} gave no cuisine evidence of their own and were dropped.`
       : null,
   ]
     .filter(Boolean)
@@ -1175,14 +1231,17 @@ async function verifyRestaurantAuthenticity(input: {
   );
 
   input.onProgress?.("OpenAI authenticity check…");
+  // Only listing/page evidence goes to the model. `provenance` (which query
+  // found the venue, at what rank) is deliberately withheld: it describes our
+  // search, not the restaurant, and offering it as context invites the model to
+  // confirm whatever we searched for.
   const listing = input.restaurants
     .map((place, index) => {
       const parts = [
         `${index + 1}. ${place.name} — ${place.address}, ${place.city}`,
         place.website ? `website: ${place.website}` : "website: (none)",
-        place.cuisineEvidence ? `claimed evidence: ${place.cuisineEvidence}` : null,
+        place.cuisineEvidence ? `listing evidence: ${place.cuisineEvidence}` : null,
         place.evidenceSourceUrl ? `evidence source: ${place.evidenceSourceUrl}` : null,
-        place.confidence ? `claimed confidence: ${place.confidence}` : null,
         `page text:\n${formatPageEvidence(evidenceByIndex[index] ?? [])}`,
       ];
       return parts.filter(Boolean).join("\n");
@@ -1193,12 +1252,14 @@ async function verifyRestaurantAuthenticity(input: {
     `You verify whether restaurants in the Netherlands are genuine specialists for a given national cuisine.
 Reply with JSON only.
 
-Use the fetched page text (website / Tripadvisor / delivery pages) as primary evidence when present. Trust clear cuisine wording in titles and descriptions (e.g. “Yemeni Restaurant”, “Albanese keuken”) over the search query that surfaced the place.
+The candidates were found by searching for the cuisine, so the search itself proves NOTHING. Judge each place only on its own evidence: its name, its Google category, and the fetched page text (website / Tripadvisor / delivery pages). Trust clear cuisine wording in titles and descriptions (e.g. “Yemeni Restaurant”, “Albanese keuken”, a menu of national dishes).
 
-Accept (accept=true) only when the place mainly serves the SEARCH cuisine (or a closely related regional cuisine diners would expect under that flag), is currently operating, and has a real NL address.
+Neighbouring cuisines are the common failure here — Turkish places surfacing under Armenian or Algerian searches, Georgian under Armenian, Moroccan under Algerian. They share a region and often share dishes, but they are NOT interchangeable. When the evidence fits a neighbour better than the search cuisine, say so and reassign.
+
+Accept (accept=true) only when the evidence positively shows the place mainly serves the SEARCH cuisine, it is currently operating, and it has a real NL address.
 When the place clearly serves a DIFFERENT national cuisine: set accept=false and set actualCuisineCodes to the ISO country code(s) it actually matches (1–3). Do not invent weak matches.
 When cuisine is unclear, closed, directory-only, fusion-first, hotel, supermarket, or not a restaurant: accept=false and omit actualCuisineCodes (or leave empty).
-Prefer fewer accepts over uncertain ones.
+Absence of evidence is a reject, not an accept. Prefer fewer accepts over uncertain ones.
 confidence: "high" | "medium" | "low" — only accept high or medium for accept=true.
 authenticityRating 1–5 (only accept if rating >= 4).
 cuisineEvidence: short note citing menu/About/description proof from the page text when available.

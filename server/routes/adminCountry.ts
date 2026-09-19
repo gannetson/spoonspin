@@ -80,6 +80,7 @@ import { scheduleRestaurantEnrichments } from "../lib/restaurantEnrichmentQueue.
 import { scheduleRecipeEnrichments } from "../lib/recipeEnrichmentQueue.ts";
 import { scheduleOrderOptionEnrichments } from "../lib/orderOptionEnrichmentQueue.ts";
 import type {
+  Country,
   Drink,
   OrderOption,
   Recipe,
@@ -332,6 +333,27 @@ function isFullRecipe(
     Array.isArray(value.steps) &&
     value.steps.length >= 3
   );
+}
+
+/**
+ * Dish names to phrase restaurant queries with. A kitchen that cooks khorovats
+ * or bacalhau is far more likely to be the real thing than one that merely
+ * ranks for the demonym, and local dish words also reach venues that never use
+ * the English cuisine label.
+ */
+function signatureDishNames(country: Country): string[] {
+  const names: string[] = [];
+  const seen = new Set<string>();
+  for (const recipe of getCountryRecipes(country)) {
+    // Local names first — "khorovats" beats "grilled meat skewers" as a query.
+    const name = (recipe.localName?.trim() || recipe.name.trim()).trim();
+    if (name.length < 4) continue;
+    const key = name.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    names.push(name);
+  }
+  return names.slice(0, 6);
 }
 
 function publicErrorMessage(error: unknown, fallback: string): string {
@@ -758,6 +780,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             countryName: country.name,
             query: parsed.data.query,
             cuisineAliases: country.cuisineAliases,
+            dishNames: signatureDishNames(country),
             onProgress: stream.log,
           });
           stream.send({

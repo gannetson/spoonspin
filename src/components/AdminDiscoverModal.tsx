@@ -530,6 +530,14 @@ export function AdminDiscoverModal({
                                     entry.item.authenticityNotes}
                                 </span>
                               ) : null}
+                              {entry.item.provenance ? (
+                                <span className="mt-1 block text-xs text-ink-soft/80">
+                                  {entry.item.provenance}
+                                  {entry.item.relevanceReasons?.length
+                                    ? ` · ${entry.item.relevanceReasons.join(" · ")}`
+                                    : null}
+                                </span>
+                              ) : null}
                               {entry.item.website || entry.item.evidenceSourceUrl ? (
                                 <span className="mt-1 block text-sm text-ink-soft">
                                   {entry.item.website ? (

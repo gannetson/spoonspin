@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  bareCuisineTerm,
   buildCuisineTermIndex,
   buildMentionHaystack,
   findCuisineMentions,
@@ -88,5 +89,38 @@ describe("findCuisineMentions", () => {
     const result = findCuisineMentions({ text: "   ", searchCode: "th", index });
     expect(result.mentioned).toBe(false);
     expect(result.otherCountryCodes).toEqual([]);
+  });
+});
+
+describe("bare demonyms from curated aliases", () => {
+  const aliasIndex = buildCuisineTermIndex([
+    { code: "ma", name: "Morocco", cuisineAliases: ["Marokkaans restaurant"] },
+    { code: "ge", name: "Georgia", cuisineAliases: ["restaurant uit Georgië"] },
+    { code: "dz", name: "Algeria", cuisineAliases: ["Algerijns restaurant"] },
+  ]);
+
+  it("matches a demonym written the way venues actually write it", () => {
+    // The curated alias is the phrase "Marokkaans restaurant"; venue text says
+    // "Traditioneel Marokkaans eten".
+    const result = findCuisineMentions({
+      text: "Hello Couscous | Traditioneel Marokkaans eten",
+      searchCode: "ma",
+      index: aliasIndex,
+    });
+    expect(result.mentioned).toBe(true);
+  });
+
+  it("reports that Moroccan naming when the search was Algerian", () => {
+    const result = findCuisineMentions({
+      text: "Hello Couscous | Traditioneel Marokkaans eten",
+      searchCode: "dz",
+      index: aliasIndex,
+    });
+    expect(result.mentioned).toBe(false);
+    expect(result.otherCountryCodes).toContain("ma");
+  });
+
+  it("drops connective words rather than indexing them as terms", () => {
+    expect(bareCuisineTerm("restaurant uit Georgië")).toBe("georgie");
   });
 });

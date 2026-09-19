@@ -9,7 +9,10 @@
  * present, the caller can suggest filing the venue under that country instead.
  */
 
-import { OSM_CUISINE_BY_COUNTRY, WEAK_OSM_CUISINE_TAGS } from "../../src/restaurants/osmCuisineMap.ts";
+import {
+  OSM_CUISINE_BY_COUNTRY,
+  WEAK_OSM_CUISINE_TAGS,
+} from "../../src/restaurants/osmCuisineMap.ts";
 
 /** Terms shorter than this produce too many incidental hits to trust. */
 const MIN_TERM_LENGTH = 4;
@@ -53,6 +56,22 @@ export function normalizeText(value: string): string {
     .trim();
 }
 
+/**
+ * Curated aliases are phrases ("Marokkaans restaurant", "restaurant uit
+ * Georgië"), and matching only the whole phrase misses the demonym as venues
+ * and menus actually write it — "Traditioneel Marokkaans eten", "Albanese
+ * keuken". So each alias is also indexed with that boilerplate stripped off.
+ */
+const ALIAS_BOILERPLATE_RE =
+  /\b(restaurant|restaurants|cuisine|keuken|eten|food|eethuis|uit|van|de|het|the)\b/g;
+
+export function bareCuisineTerm(alias: string): string {
+  return normalizeText(alias)
+    .replace(ALIAS_BOILERPLATE_RE, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function usableTerm(term: string): boolean {
   const normalized = normalizeText(term);
   if (normalized.length < MIN_TERM_LENGTH) return false;
@@ -84,6 +103,7 @@ export function buildCuisineTermIndex(
     add(country.code, country.name);
     for (const alias of country.cuisineAliases ?? []) {
       add(country.code, alias);
+      add(country.code, bareCuisineTerm(alias));
     }
   }
 

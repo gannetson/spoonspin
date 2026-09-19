@@ -104,17 +104,26 @@ export type GooglePlaceMatch = {
   phone?: string;
   rating?: number;
   reviewCount?: number;
+  /** Google's own cuisine/category vocabulary, e.g. ["turkish_restaurant", "restaurant"]. */
+  placeTypes?: string[];
+  primaryType?: string;
+  /** Localized label for `primaryType`, e.g. "Turkish restaurant". */
+  primaryTypeLabel?: string;
+  /** Google's editorial one-liner about the venue, when it has one. */
+  editorialSummary?: string;
 };
 
 /** Places-grounded venue used by admin discover and suggestions. */
 export type GroundedPlace = GooglePlaceMatch & {
   /** Alias or query that found this place. */
   matchedQuery?: string;
-  source: "google" | "osm" | "tripadvisor" | "zenchef" | "thefork" | "yelp";
+  /** 0-based position in the result list of `matchedQuery`. */
+  rank?: number;
+  /** Cuisine labels the source itself assigned (Tripadvisor cuisines, OSM cuisine=*). */
+  sourceCuisineTags?: string[];
+  source: "google" | "osm" | "tripadvisor" | "zenchef" | "thefork";
   /** Tripadvisor Restaurant_Review profile when found via Apify. */
   tripadvisorUrl?: string;
-  /** Canonical yelp.com/biz profile when found via Apify. */
-  yelpUrl?: string;
   /** Zenchef booking widget when found via the partner restaurant list. */
   zenchefUrl?: string;
   /** Canonical thefork.nl restaurant URL when a profile id is known. */
@@ -142,12 +151,23 @@ type PlacesSearchHit = {
   nationalPhoneNumber?: string;
   rating?: number;
   userRatingCount?: number;
+  types?: string[];
+  primaryType?: string;
+  primaryTypeDisplayName?: { text?: string };
+  editorialSummary?: { text?: string };
 };
 
 async function searchGooglePlaces(
   apiKey: string,
   textQuery: string,
-  options?: { maxResultCount?: number; includedType?: string },
+  options?: {
+    maxResultCount?: number;
+    includedType?: string;
+    locationBias?: {
+      low: { latitude: number; longitude: number };
+      high: { latitude: number; longitude: number };
+    };
+  },
 ): Promise<PlacesSearchHit[]> {
   const body: Record<string, unknown> = {
     textQuery,
@@ -157,6 +177,9 @@ async function searchGooglePlaces(
   };
   if (options?.includedType) {
     body.includedType = options.includedType;
+  }
+  if (options?.locationBias) {
+    body.locationBias = { rectangle: options.locationBias };
   }
 
   const response = await fetch("https://places.googleapis.com/v1/places:searchText", {
@@ -174,6 +197,10 @@ async function searchGooglePlaces(
         "places.nationalPhoneNumber",
         "places.rating",
         "places.userRatingCount",
+        "places.types",
+        "places.primaryType",
+        "places.primaryTypeDisplayName",
+        "places.editorialSummary",
       ].join(","),
     },
     body: JSON.stringify(body),
@@ -225,10 +252,18 @@ function toMatch(match: PlacesSearchHit, fallbackCity: string): GooglePlaceMatch
     phone: match.nationalPhoneNumber,
     rating: match.rating,
     reviewCount: match.userRatingCount,
+    placeTypes: match.types?.filter(Boolean),
+    primaryType: match.primaryType,
+    primaryTypeLabel: match.primaryTypeDisplayName?.text,
+    editorialSummary: match.editorialSummary?.text,
   };
 }
 
-function hitToGrounded(hit: PlacesSearchHit, matchedQuery: string): GroundedPlace | null {
+function hitToGrounded(
+  hit: PlacesSearchHit,
+  matchedQuery: string,
+  rank?: number,
+): GroundedPlace | null {
   if (
     !hit.id ||
     !hit.displayName?.text ||
@@ -241,6 +276,7 @@ function hitToGrounded(hit: PlacesSearchHit, matchedQuery: string): GroundedPlac
   return {
     ...base,
     matchedQuery,
+    rank,
     source: "google",
   };
 }
@@ -393,4 +429,70 @@ export async function searchGoogleRestaurantsByCuisine(input: {
   }
 
   return [...byId.values()].sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
+}
+
+/** Netherlands mainland + islands, used to bias Text Search away from BE/DE. */
+const NL_RECTANGLE = {
+  low: { latitude: 50.75, longitude: 3.2 },
+  high: { latitude: 53.6, longitude: 7.23 },
+};
+
+export type RankedQueryResult = {
+  query: string;
+  places: GroundedPlace[];
+  /** Hits Google returned before the Netherlands filter, for diagnostics. */
+  rawCount: number;
+};
+
+/**
+ * Run one nationwide Text Search per query and keep each hit's rank.
+ *
+ * Nationwide beats the old per-city fan-out for two reasons. Google ranks a
+ * country-wide query by how well the venue actually matches the cuisine, while
+ * "<cuisine> in <city>" always backfills with that city's popular restaurants
+ * whether or not any of them serve the cuisine — which is how the same venues
+ * ended up under every country. And rank is itself evidence: the venues a
+ * cuisine's queries agree on, near the top, are the real specialists.
+ */
+export async function searchGoogleRestaurantsRanked(input: {
+  queries: string[];
+  maxPerQuery?: number;
+  onProgress?: (message: string) => void;
+}): Promise<RankedQueryResult[]> {
+  const apiKey = getGooglePlacesApiKey();
+  if (!apiKey) return [];
+
+  const queries = input.queries.map((query) => query.trim()).filter(Boolean);
+  if (queries.length === 0) return [];
+  const maxPerQuery = input.maxPerQuery ?? 20;
+
+  const settled = await Promise.all(
+    queries.map(async (query): Promise<RankedQueryResult> => {
+      try {
+        const hits = await searchGooglePlaces(apiKey, query, {
+          maxResultCount: maxPerQuery,
+          includedType: "restaurant",
+          locationBias: NL_RECTANGLE,
+        });
+        const places = hits
+          .map((hit, index) => hitToGrounded(hit, query, index))
+          .filter((place): place is GroundedPlace => Boolean(place));
+        return { query, places, rawCount: hits.length };
+      } catch (error) {
+        console.warn(`Places nationwide search failed for "${query}"`, error);
+        return { query, places: [], rawCount: 0 };
+      }
+    }),
+  );
+
+  for (const result of settled) {
+    input.onProgress?.(
+      `Google \u00b7 \u201c${result.query}\u201d: ${result.places.length} NL hit(s)` +
+        (result.rawCount > result.places.length
+          ? ` (${result.rawCount - result.places.length} outside NL)`
+          : ""),
+    );
+  }
+
+  return settled;
 }

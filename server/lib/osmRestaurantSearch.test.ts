@@ -45,3 +45,49 @@ describe("fetchOverpass", () => {
     ).rejects.toMatchObject({ name: "AbortError" });
   });
 });
+
+describe("fetchOverpass on an overloaded mirror", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  const busyPage = `<?xml version="1.0" encoding="UTF-8"?>
+<html><body>
+<p><strong style="color:#FF0000">Error</strong>: runtime error: open64: 0 Success /osm3s_osm_base Dispatcher_Client::request_read_and_idx::timeout. The server is probably too busy to handle your request. </p>
+</body></html>`;
+
+  it("retries on the next mirror when a 200 carries an OSM3S error page", async () => {
+    // Overpass answers 200 with HTML when it is loaded; JSON.parse would
+    // otherwise report an unrelated syntax error.
+    const seen: string[] = [];
+    vi.stubGlobal("fetch", (url: string) => {
+      seen.push(url);
+      return Promise.resolve(
+        seen.length === 1
+          ? new Response(busyPage, { status: 200 })
+          : new Response(JSON.stringify({ elements: [{ type: "node", id: 1 }] }), {
+              status: 200,
+            }),
+      );
+    });
+
+    const elements = await fetchOverpass("[out:json];", 1, 0, {
+      maxAttempts: 2,
+      retryWaitMs: () => 0,
+    });
+
+    expect(seen).toHaveLength(2);
+    expect(seen[0]).not.toBe(seen[1]);
+    expect(elements).toHaveLength(1);
+  });
+
+  it("reports the overload plainly once the mirrors are exhausted", async () => {
+    vi.stubGlobal("fetch", () =>
+      Promise.resolve(new Response(busyPage, { status: 200 })),
+    );
+
+    await expect(
+      fetchOverpass("[out:json];", 1, 0, { maxAttempts: 1, retryWaitMs: () => 0 }),
+    ).rejects.toThrow(/busy/i);
+  });
+});

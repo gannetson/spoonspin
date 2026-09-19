@@ -290,6 +290,9 @@ export function mapTripadvisorRestaurantItem(
     .join(", ");
 
   return {
+    // Tripadvisor's own cuisine labels are listing evidence, so they travel
+    // separately from `matchedQuery` — which is only ever our search text.
+    sourceCuisineTags: cuisines?.slice(0, 6),
     placeId,
     name,
     address,
@@ -356,9 +359,7 @@ export async function searchTripadvisorRestaurants(input: {
 
   // Cap cities to control Apify cost/latency.
   const searchCities = cities.slice(0, 2);
-  input.onProgress?.(
-    `Tripadvisor · ${searchCities.join(", ")} (Apify, often a minute+)`,
-  );
+  input.onProgress?.(`Tripadvisor · ${searchCities.join(", ")} (Apify, often a minute+)`);
 
   const settled = await Promise.allSettled(
     searchCities.map(async (city) => {

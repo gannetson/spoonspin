@@ -156,7 +156,26 @@ export async function fetchOverpass(
     throw new Error(`Overpass ${response.status}: ${text.slice(0, 240)}`);
   }
 
-  const data = (await response.json()) as { elements?: OverpassElement[] };
+  // A loaded Overpass instance answers 200 with an OSM3S *HTML error page*
+  // ("The server is probably too busy to handle your request"), not JSON. Left
+  // to JSON.parse that surfaces as an unrelated syntax error, so it is detected
+  // here and retried on the next mirror like any other overload response.
+  const body = await response.text();
+  if (!body.trimStart().startsWith("{")) {
+    const reason =
+      /runtime error:([^<]*)/i.exec(body)?.[1]?.trim() || "non-JSON response";
+    if (attempt < maxAttempts) {
+      const waitMs = retryWaitMs(attempt);
+      console.log(
+        `overpass busy on ${endpoint} (${reason.slice(0, 80)}), retry #${attempt} in ${waitMs}ms…`,
+      );
+      await sleep(waitMs);
+      return fetchOverpass(query, attempt + 1, endpointIndex + 1, options);
+    }
+    throw new Error(`Overpass busy: ${reason.slice(0, 200)}`);
+  }
+
+  const data = JSON.parse(body) as { elements?: OverpassElement[] };
   return data.elements ?? [];
 }
 
