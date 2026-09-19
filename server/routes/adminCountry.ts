@@ -67,6 +67,7 @@ import {
   rewriteShopText,
 } from "../openai/adminDiscover.ts";
 import { sanitizeAdminErrorMessage } from "../openai/httpError.ts";
+import { getRegionById } from "../db/regions.ts";
 import { isZenchefDiscoverConfigured } from "../lib/zenchefRestaurantSearch.ts";
 import { startNdjson } from "../lib/ndjson.ts";
 import { findCuisineImageFromQueries, sameImageUrl } from "../lib/wikimedia.ts";
@@ -242,6 +243,8 @@ const restaurantSchema = z.object({
     .nullish(),
   /** Google Place ID when known from discover / Places grounding. */
   placeId: z.string().min(3).max(256).nullish(),
+  /** Regional cuisine the venue cooks, e.g. "cn:CN-SC". */
+  regionId: z.string().min(2).max(64).nullish(),
 });
 
 const shopSchema = z.object({
@@ -333,6 +336,26 @@ function isFullRecipe(
     Array.isArray(value.steps) &&
     value.steps.length >= 3
   );
+}
+
+/**
+ * Keep a proposed region id only when that region exists for the country.
+ * `restaurants.region_id` is a foreign key, so an unknown id would abort the
+ * whole save rather than simply going untagged.
+ */
+async function resolveStorableRegionId(
+  countryCode: string,
+  regionId: string | null | undefined,
+): Promise<string | null> {
+  const wanted = regionId?.trim();
+  if (!wanted) return null;
+  try {
+    const region = await getRegionById(wanted);
+    return region && region.countryCode === countryCode.toLowerCase() ? region.id : null;
+  } catch (error) {
+    console.warn(`Region lookup failed for ${wanted}`, error);
+    return null;
+  }
 }
 
 /**
@@ -919,6 +942,10 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             website = null;
           }
 
+          // Only store a region that exists for this country: `region_id` is a
+          // foreign key, and a stale id from an older payload would fail the write.
+          const regionId = await resolveStorableRegionId(primaryCode, place.regionId);
+
           const restaurantId = `admin-${key}`;
           const authenticityRating =
             place.authenticityRating != null && place.authenticityRating >= 3
@@ -930,7 +957,11 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             place.authenticityNotes?.trim() ||
             place.cuisineEvidence?.trim() ||
             `Admin-added specialist for ${country.name} cuisine.`;
-          await upsertRestaurant({
+          // The venue may already exist under another identity (re-filed under a
+          // second cuisine, or re-imported with a different address), in which
+          // case upsert merges into that row and returns its id — so enrichment
+          // must follow the id that was actually written, not the one proposed.
+          const storedId = await upsertRestaurant({
             id: restaurantId,
             osmId: `admin:${key}`,
             name: place.name,
@@ -945,6 +976,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             phone,
             source: "admin-discover",
             mapsUrl,
+            regionId,
             googlePlaceId,
             placesRefreshedAt: googlePlaceId ? new Date().toISOString() : null,
             reviewed: true,
@@ -955,7 +987,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           });
           if (shouldReview) {
             enrichmentJobs.push({
-              restaurantId,
+              restaurantId: storedId,
               countryCode: primaryCode,
               countryName:
                 countryCatalog.find((entry) => entry.code === primaryCode)?.name ??

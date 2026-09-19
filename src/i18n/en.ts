@@ -836,6 +836,8 @@ export const en: Messages = {
     "No Places/Tripadvisor/OSM restaurants returned. Try a city name in the focus field.",
   "admin.discover.restaurants.verified": "Verified",
   "admin.discover.restaurants.confidence": "{level} confidence",
+  "admin.discover.restaurants.regional": "Regional: {region}",
+  "admin.discover.restaurants.region": "Regional cuisine: {region}",
   "admin.discover.restaurants.authenticity": "Authenticity {rating}/5",
   "admin.discover.restaurants.website": "Website",
   "admin.discover.restaurants.evidence": "Evidence",

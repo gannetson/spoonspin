@@ -856,6 +856,8 @@ export const nl: Messages = {
     "Geen Places/Tripadvisor/OSM-restaurants. Probeer een stadsnaam in het focusveld.",
   "admin.discover.restaurants.verified": "Geverifieerd",
   "admin.discover.restaurants.confidence": "{level} vertrouwen",
+  "admin.discover.restaurants.regional": "Regionaal: {region}",
+  "admin.discover.restaurants.region": "Streekkeuken: {region}",
   "admin.discover.restaurants.authenticity": "Authenticiteit {rating}/5",
   "admin.discover.restaurants.website": "Website",
   "admin.discover.restaurants.evidence": "Bewijs",

@@ -29,7 +29,9 @@ import {
   KEEP_THRESHOLD,
   mergeRankedResults,
   planDiscoveryQueries,
+  planUmbrellaQueries,
   scoreCandidate,
+  type MergedCandidate,
   type RelevanceScore,
 } from "../lib/restaurantRelevance.ts";
 import { findCuisineImageFromQueries } from "../lib/wikimedia.ts";
@@ -51,6 +53,12 @@ import {
   getCountryFromDb,
   listCountriesFromDb,
 } from "../db/content.ts";
+import {
+  buildRegionTermIndex,
+  detectRegion,
+  type RegionTermIndex,
+} from "../lib/regionCuisine.ts";
+import { listRegionsForCountry } from "../db/regions.ts";
 import {
   findRestaurantByNameAndCity,
   updateRestaurantFields,
@@ -226,6 +234,7 @@ function groundedToDiscovered(
 
   return {
     name: place.name,
+    placeId: place.source === "google" ? place.placeId : undefined,
     address: place.address,
     city: place.city,
     postcode: place.postcode,
@@ -412,6 +421,12 @@ function stableMapsUrl(
 
 export type DiscoveredRestaurant = {
   name: string;
+  /**
+   * Google Place ID when the hit came from Places. Carried all the way to the
+   * database so a venue keeps one identity across cuisines and re-runs, which
+   * is what lets the upsert merge duplicates instead of colliding on them.
+   */
+  placeId?: string;
   address: string;
   city: string;
   postcode?: string;
@@ -427,6 +442,15 @@ export type DiscoveredRestaurant = {
   /** Grounded relevance score; higher means stronger listing evidence. */
   relevanceScore?: number;
   relevanceReasons?: string[];
+  /**
+   * Set when this is a regional suggestion rather than a national specialist,
+   * e.g. "Caribbean" for a country with no restaurant of its own in NL.
+   */
+  regionalMatch?: string;
+  /** Regional cuisine the venue cooks, e.g. "cn:CN-SC" for a Sichuanese place. */
+  regionId?: string;
+  /** The word that identified `regionId`, shown to the admin as justification. */
+  regionEvidence?: string;
   evidenceSourceUrl?: string;
   confidence?: "high" | "medium" | "low";
   authenticityNotes?: string;
@@ -605,6 +629,14 @@ JSON shape:
 /** Sources run concurrently; a slow one must not hold up the whole search. */
 const SOURCE_BUDGET_MS = 30_000;
 
+/**
+ * Below this many confident specialists, discovery falls back to the country's
+ * regional umbrella. Small countries — Barbados, Saint Kitts, Djibouti, Laos —
+ * routinely have no specialist in the Netherlands at all, and a short honest
+ * regional list beats an empty result.
+ */
+const REGIONAL_FALLBACK_MIN = 4;
+
 async function withBudget<T>(
   label: string,
   fallback: T,
@@ -724,13 +756,15 @@ export async function discoverCountryRestaurants(input: {
   if (osmHits.length > 0) log(`OpenStreetMap: ${osmHits.length} specialty match(es)`);
   if (tripadvisor.notes) parts.push(tripadvisor.notes);
 
-  const kindByQuery = new Map(plan.map((query) => [query.text, query.kind]));
+  const planned = new Map(plan.map((query) => [query.text, query]));
+  const rankedRows = googleResults.map((result) => ({
+    query: result.query,
+    kind: planned.get(result.query)?.kind ?? ("demonym" as const),
+    umbrella: planned.get(result.query)?.umbrella,
+    places: result.places,
+  }));
   const candidates = mergeRankedResults([
-    ...googleResults.map((result) => ({
-      query: result.query,
-      kind: kindByQuery.get(result.query) ?? ("demonym" as const),
-      places: result.places,
-    })),
+    ...rankedRows,
     // OSM and Tripadvisor carry no ranking of their own; they join as a single
     // cuisine-filtered list whose value is the cuisine tags they bring with them.
     { query: "openstreetmap cuisine tag", kind: "demonym" as const, places: osmHits },
@@ -757,6 +791,18 @@ export async function discoverCountryRestaurants(input: {
     };
   }
 
+  // Regional cuisines this country is catalogued into (Sichuan, Cantonese, …),
+  // used to fill `restaurants.region_id` from the venue's own pages.
+  let regionIndex: RegionTermIndex | undefined;
+  try {
+    const regions = await listRegionsForCountry(searchCode);
+    if (regions.length > 0) {
+      regionIndex = buildRegionTermIndex(searchCode, regions);
+    }
+  } catch (error) {
+    console.warn("Region index unavailable; continuing without region tagging", error);
+  }
+
   // Score every candidate on its own listing — never on the query that found it.
   const index = await buildDiscoveryTermIndex({
     searchCode,
@@ -765,15 +811,81 @@ export async function discoverCountryRestaurants(input: {
   });
   const extraTerms = [...(input.dishNames ?? []), ...(input.cuisineAliases ?? [])];
 
-  const scored = candidates
-    .map((candidate) => ({
-      candidate,
-      relevance: scoreCandidate({ candidate, searchCode, index, extraTerms }),
-    }))
-    .sort((a, b) => b.relevance.score - a.relevance.score);
+  const rescore = (rows: MergedCandidate[]) =>
+    rows
+      .map((candidate) => ({
+        candidate,
+        relevance: scoreCandidate({ candidate, searchCode, index, extraTerms }),
+      }))
+      .sort((a, b) => b.relevance.score - a.relevance.score);
 
-  const confident = scored.filter((entry) => entry.relevance.score >= KEEP_THRESHOLD);
-  const rejected = scored.filter((entry) => entry.relevance.score < KEEP_THRESHOLD);
+  let scored = rescore(candidates);
+
+  /**
+   * Regional fallback. Plenty of countries have no specialist in the
+   * Netherlands at all — there is no Barbadian restaurant here, and searching
+   * for one returns restaurants *in* Barbados plus name-noise. When the
+   * country's own name comes up short, ask the regional question instead
+   * ("Caribbean restaurant") and label whatever it finds as regional.
+   */
+  let umbrellaLabels: string[] = [];
+  if (
+    hasPlaces &&
+    scored.filter((entry) => entry.relevance.score >= KEEP_THRESHOLD).length <
+      REGIONAL_FALLBACK_MIN
+  ) {
+    const umbrellaPlan = planUmbrellaQueries({
+      countryCode: input.countryCode,
+      focus,
+    });
+    if (umbrellaPlan.length > 0) {
+      umbrellaLabels = [
+        ...new Set(umbrellaPlan.map((query) => query.umbrella).filter(Boolean)),
+      ] as string[];
+      log(
+        `Few ${cuisine} specialists found; trying the regional fallback ` +
+          `(${umbrellaLabels.join(", ")}).`,
+      );
+      const umbrellaResults = await withBudget(
+        "Regional fallback",
+        [] as RankedQueryResult[],
+        SOURCE_BUDGET_MS,
+        () =>
+          searchGoogleRestaurantsRanked({
+            queries: umbrellaPlan.map((query) => query.text),
+            maxPerQuery: 20,
+            onProgress: log,
+          }),
+        log,
+      );
+      const umbrellaByQuery = new Map(umbrellaPlan.map((query) => [query.text, query]));
+      scored = rescore(
+        mergeRankedResults([
+          ...rankedRows,
+          {
+            query: "openstreetmap cuisine tag",
+            kind: "demonym" as const,
+            places: osmHits,
+          },
+          {
+            query: "tripadvisor cuisine search",
+            kind: "demonym" as const,
+            places: tripadvisor.places,
+          },
+          ...umbrellaResults.map((result) => ({
+            query: result.query,
+            kind: "umbrella" as const,
+            umbrella: umbrellaByQuery.get(result.query)?.umbrella,
+            places: result.places,
+          })),
+        ]),
+      );
+    }
+  }
+
+  const specific = scored.filter((entry) => !entry.relevance.regionalOnly);
+  const confident = specific.filter((entry) => entry.relevance.score >= KEEP_THRESHOLD);
+  const rejected = specific.filter((entry) => entry.relevance.score < KEEP_THRESHOLD);
 
   /**
    * Venues that a cuisine query ranked but that carry no listing evidence
@@ -790,7 +902,23 @@ export async function discoverCountryRestaurants(input: {
         entry.relevance.typeVerdict === "region"),
   );
 
+  /**
+   * Regional fallbacks: real venues from the right part of the world, with
+   * nothing tying them to this country in particular. They are only worth
+   * showing when the country's own name found little, and only ever as what
+   * they are — a Caribbean restaurant, not a Barbadian one.
+   */
+  const regional = scored.filter(
+    (entry) =>
+      entry.relevance.regionalOnly &&
+      entry.relevance.score > 0 &&
+      entry.relevance.mismatchCodes.length === 0 &&
+      entry.relevance.typeVerdict !== "region-mismatch",
+  );
+
   const shortlisted = [...confident, ...probation].slice(0, 24);
+  const regionalShortlist =
+    confident.length < REGIONAL_FALLBACK_MIN ? regional.slice(0, 8) : [];
 
   log(
     `Relevance: ${confident.length} of ${scored.length} venue(s) cleared the bar on listing ` +
@@ -802,6 +930,17 @@ export async function discoverCountryRestaurants(input: {
   parts.push(
     `Scored ${scored.length} venue(s) on their own listings; ${confident.length} scored above the relevance bar.`,
   );
+  if (regionalShortlist.length > 0) {
+    const label = umbrellaLabels.join(" / ") || "regional";
+    log(
+      `Adding ${regionalShortlist.length} ${label} venue(s) as regional fallbacks — ` +
+        `no ${cuisine} specialist found.`,
+    );
+    parts.push(
+      `No ${cuisine} specialist was found, so ${regionalShortlist.length} ${label} venue(s) are suggested instead; ` +
+        `they are flagged as regional, not as ${cuisine} specialists.`,
+    );
+  }
 
   // Venues whose Google category names a different cuisine are filed there
   // instead of being silently dropped — that is where the Turkish places
@@ -841,7 +980,35 @@ export async function discoverCountryRestaurants(input: {
     .map((entry) => groundedToDiscovered(entry.candidate.place, cuisine, entry.relevance))
     .filter((place): place is DiscoveredRestaurant => Boolean(place));
 
-  if (grounded.length === 0) {
+  // Regional fallbacks skip the country-mention gate by design: a pan-Caribbean
+  // venue will never name Barbados, and demanding that it does would throw away
+  // the only suggestions such a country has. They carry their own label instead.
+  const regionalRows = regionalShortlist
+    .map((entry): DiscoveredRestaurant | null => {
+      const row = groundedToDiscovered(entry.candidate.place, cuisine, entry.relevance);
+      if (!row) return null;
+      const label = entry.relevance.umbrellaLabel ?? "Regional";
+      return {
+        ...row,
+        regionalMatch: label,
+        confidence: "low" as const,
+        // Never carries the "verified" badge: nothing has verified this venue
+        // cooks the searched country's food, only that it cooks the region's.
+        verified: false,
+        cuisineEvidence: [
+          row.cuisineEvidence,
+          `${label} venue; no explicit ${cuisine} mention.`,
+        ]
+          .filter(Boolean)
+          .join(" \u00b7 "),
+        authenticityNotes:
+          `No ${cuisine} specialist found in the Netherlands. Suggested as a ${label} ` +
+          `venue that may serve ${cuisine} dishes — confirm before publishing.`,
+      };
+    })
+    .filter((row): row is DiscoveredRestaurant => row != null);
+
+  if (grounded.length === 0 && regionalRows.length === 0) {
     log("Nothing cleared the relevance bar.");
     return {
       notes:
@@ -859,6 +1026,7 @@ export async function discoverCountryRestaurants(input: {
       countryName: input.countryName,
       cuisineAliases: input.cuisineAliases,
       dishNames: input.dishNames,
+      regionIndex,
       restaurants: grounded,
       onProgress: log,
     });
@@ -879,7 +1047,7 @@ export async function discoverCountryRestaurants(input: {
     log("Evidence check failed; continuing with the scored list.");
   }
 
-  if (mentionChecked.length === 0) {
+  if (mentionChecked.length === 0 && regionalRows.length === 0) {
     log("No shortlisted venue named the cuisine on its own pages.");
     return {
       notes: `${parts.join(" ")} No shortlisted venue named ${cuisine} on its own pages.`,
@@ -918,7 +1086,7 @@ export async function discoverCountryRestaurants(input: {
       if (verification.restaurants.length === 0) {
         log("No authentic specialists remained after verification.");
         parts.push("No authentic specialists remained after verification.");
-        return { notes: parts.join(" "), restaurants: [] };
+        return { notes: parts.join(" "), restaurants: regionalRows };
       }
       log(
         `Authenticity check kept ${verification.restaurants.length}` +
@@ -929,7 +1097,7 @@ export async function discoverCountryRestaurants(input: {
       );
       return {
         notes: parts.join(" "),
-        restaurants: verification.restaurants.slice(0, 16),
+        restaurants: [...verification.restaurants.slice(0, 16), ...regionalRows],
       };
     } catch (error) {
       console.warn("Authenticity verify failed; returning the scored list", error);
@@ -943,7 +1111,7 @@ export async function discoverCountryRestaurants(input: {
   // Falls back to the scored, evidence-gated list — never the raw merge.
   return {
     notes: parts.join(" "),
-    restaurants: mentionChecked.slice(0, 16),
+    restaurants: [...mentionChecked.slice(0, 16), ...regionalRows],
   };
 }
 
@@ -1067,6 +1235,9 @@ async function ensureRestaurantUnderCuisines(
   await upsertRestaurant({
     id: `admin-${key}`,
     osmId: `admin-reassign:${key}`,
+    // Carries the venue's Google identity so a later admin save of the same
+    // place merges into this row rather than colliding with it.
+    googlePlaceId: place.placeId ?? null,
     name: place.name,
     address: place.address,
     city: place.city,
@@ -1107,6 +1278,7 @@ async function gateByCuisineMention(input: {
   countryName: string;
   cuisineAliases?: string[];
   dishNames?: string[];
+  regionIndex?: RegionTermIndex;
   restaurants: DiscoveredRestaurant[];
   onProgress?: (message: string) => void;
 }): Promise<{
@@ -1161,8 +1333,16 @@ async function gateByCuisineMention(input: {
 
     if (mention.mentioned || dishHit) {
       const proof = mention.mentioned ? mention.matchedTerms.join("”, “") : dishHit!;
+      // The same pages say which *regional* cuisine this is. `region_id` has
+      // been filtered on since the regions feature landed but never written, so
+      // choosing a region could only ever return nothing.
+      const region = input.regionIndex
+        ? detectRegion({ text: haystack, index: input.regionIndex })
+        : undefined;
       kept.push({
         ...place,
+        regionId: region?.regionId ?? place.regionId,
+        regionEvidence: region?.matchedTerm ?? place.regionEvidence,
         cuisineEvidence: [place.cuisineEvidence, `Own pages mention “${proof}”.`]
           .filter(Boolean)
           .join(" · "),

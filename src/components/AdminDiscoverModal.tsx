@@ -513,6 +513,13 @@ export function AdminDiscoverModal({
                                     })}
                                   </span>
                                 ) : null}
+                                {entry.item.regionalMatch ? (
+                                  <span className="ml-2 rounded-full bg-ink/10 px-2 py-0.5 text-xs font-medium text-ink-soft">
+                                    {t("admin.discover.restaurants.regional", {
+                                      region: entry.item.regionalMatch,
+                                    })}
+                                  </span>
+                                ) : null}
                               </span>
                               <span className="mt-1 block text-sm text-ink-soft">
                                 {entry.item.address}, {entry.item.city}
@@ -528,6 +535,13 @@ export function AdminDiscoverModal({
                                 <span className="mt-1 block text-sm text-ink-soft">
                                   {entry.item.cuisineEvidence ||
                                     entry.item.authenticityNotes}
+                                </span>
+                              ) : null}
+                              {entry.item.regionEvidence ? (
+                                <span className="mt-1 block text-xs text-ink-soft">
+                                  {t("admin.discover.restaurants.region", {
+                                    region: entry.item.regionEvidence,
+                                  })}
                                 </span>
                               ) : null}
                               {entry.item.provenance ? (

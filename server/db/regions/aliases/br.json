@@ -1,9 +1,16 @@
 {
-  "distrito federal": "BR-DF",
+  "amazonia": "BR-AM",
+  "amazonian": "BR-AM",
+  "bahian": "BR-BA",
+  "baiano": "BR-BA",
   "brasilia": "BR-DF",
-  "minas": "BR-MG",
-  "rio": "BR-RJ",
-  "gaucho": "BR-RS",
+  "carioca": "BR-RJ",
+  "distrito federal": "BR-DF",
   "gaucha": "BR-RS",
-  "amazonia": "BR-AM"
+  "gaucho": "BR-RS",
+  "minas": "BR-MG",
+  "mineiro": "BR-MG",
+  "paulista": "BR-SP",
+  "pernambucano": "BR-PE",
+  "rio": "BR-RJ"
 }

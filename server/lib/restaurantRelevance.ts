@@ -27,6 +27,7 @@ import {
   type PlaceTypeVerdict,
 } from "../../src/restaurants/placeTypeCuisine.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
+import { umbrellasForCountry } from "../../src/restaurants/cuisineUmbrellas.ts";
 import type { GroundedPlace } from "./googlePlacesLookup.ts";
 import {
   buildMentionHaystack,
@@ -36,11 +37,13 @@ import {
 } from "./cuisineMention.ts";
 
 /** How a query was derived, which sets how much its ranking is worth. */
-export type QueryKind = "demonym" | "native" | "dish" | "focus";
+export type QueryKind = "demonym" | "native" | "dish" | "focus" | "umbrella";
 
 export type PlannedQuery = {
   text: string;
   kind: QueryKind;
+  /** Set on umbrella queries: the regional label they searched under. */
+  umbrella?: string;
 };
 
 const QUERY_WEIGHT: Record<QueryKind, number> = {
@@ -52,6 +55,9 @@ const QUERY_WEIGHT: Record<QueryKind, number> = {
   dish: 0.6,
   // The admin's own focus text — helpful, but it narrows rather than qualifies.
   focus: 0.7,
+  // A regional fallback says "somewhere in this region", never "this country",
+  // so it must not outrank anything the country's own name found.
+  umbrella: 0.4,
 };
 
 /** Rank 0 is worth full weight; the tail is worth little. */
@@ -137,10 +143,51 @@ export function planDiscoveryQueries(input: {
   return dedupeQueries(queries).slice(0, input.maxQueries ?? 8);
 }
 
+/**
+ * Regional fallback queries for a country with no specialist of its own.
+ *
+ * Run only when the country's own name finds too little: these queries answer
+ * "where would someone from here actually be pointed?" rather than "who cooks
+ * this country's food?", and everything they surface is marked as regional so
+ * it is never presented as a national specialist.
+ */
+export function planUmbrellaQueries(input: {
+  countryCode: string;
+  focus?: string;
+  maxQueries?: number;
+}): PlannedQuery[] {
+  const focus = input.focus?.trim();
+  const queries: PlannedQuery[] = [];
+
+  for (const umbrella of umbrellasForCountry(input.countryCode)) {
+    for (const term of umbrella.queryTerms) {
+      queries.push({
+        text: `${term} restaurant Nederland`,
+        kind: "umbrella",
+        umbrella: umbrella.label,
+      });
+      if (focus) {
+        queries.push({
+          text: `${term} restaurant ${focus} Nederland`,
+          kind: "umbrella",
+          umbrella: umbrella.label,
+        });
+      }
+    }
+  }
+
+  return dedupeQueries(queries).slice(0, input.maxQueries ?? 4);
+}
+
 /** One place plus every query that surfaced it. */
 export type MergedCandidate = {
   place: GroundedPlace;
-  hits: { query: string; kind: QueryKind; rank: number | undefined }[];
+  hits: {
+    query: string;
+    kind: QueryKind;
+    rank: number | undefined;
+    umbrella?: string;
+  }[];
 };
 
 /**
@@ -149,7 +196,12 @@ export type MergedCandidate = {
  * query rather than the last one seen.
  */
 export function mergeRankedResults(
-  results: { query: string; kind: QueryKind; places: GroundedPlace[] }[],
+  results: {
+    query: string;
+    kind: QueryKind;
+    umbrella?: string;
+    places: GroundedPlace[];
+  }[],
 ): MergedCandidate[] {
   const byKey = new Map<string, MergedCandidate>();
 
@@ -160,7 +212,14 @@ export function mergeRankedResults(
       if (!existing) {
         byKey.set(key, {
           place,
-          hits: [{ query: result.query, kind: result.kind, rank: place.rank }],
+          hits: [
+            {
+              query: result.query,
+              kind: result.kind,
+              rank: place.rank,
+              umbrella: result.umbrella,
+            },
+          ],
         });
         continue;
       }
@@ -168,7 +227,12 @@ export function mergeRankedResults(
       if (sameQuery) {
         if ((place.rank ?? 99) < (sameQuery.rank ?? 99)) sameQuery.rank = place.rank;
       } else {
-        existing.hits.push({ query: result.query, kind: result.kind, rank: place.rank });
+        existing.hits.push({
+          query: result.query,
+          kind: result.kind,
+          rank: place.rank,
+          umbrella: result.umbrella,
+        });
       }
       // Keep whichever copy carries the richer listing.
       if (!existing.place.editorialSummary && place.editorialSummary) {
@@ -198,6 +262,15 @@ export type RelevanceScore = {
   typeVerdict: PlaceTypeVerdict["kind"];
   /** Evidence drawn from the listing itself — never from the search query. */
   listingEvidence: string[];
+  /**
+   * True when only a regional fallback query found this venue and nothing ties
+   * it to the searched country specifically. Such a venue is a real suggestion
+   * — often the only one for a small country — but it is a Caribbean
+   * restaurant, not a Barbadian one, and must be labelled that way.
+   */
+  regionalOnly: boolean;
+  /** The regional label that found it, e.g. "Caribbean". */
+  umbrellaLabel?: string;
 };
 
 const SCORE = {
@@ -233,6 +306,8 @@ export function scoreCandidate(input: {
   const listingEvidence: string[] = [];
   const mismatch = new Set<string>();
   const typeMismatch = new Set<string>();
+  /** Anything that ties this venue to the searched country in particular. */
+  let countrySpecific = false;
 
   // 1. Consensus across independent queries, weighted by rank.
   let consensus = 0;
@@ -258,6 +333,7 @@ export function scoreCandidate(input: {
   });
   if (verdict.kind === "match") {
     score += SCORE.typeMatch;
+    countrySpecific = true;
     reasons.push(`Google lists it as a ${placeTypeLabel(verdict.type).toLowerCase()}`);
     listingEvidence.push(`Google category: ${placeTypeLabel(verdict.type)}`);
   } else if (verdict.kind === "mismatch") {
@@ -290,6 +366,7 @@ export function scoreCandidate(input: {
   const nameMatch = searchTerms.filter((term) => nameHaystack.includes(term));
   if (nameMatch.length > 0) {
     score += SCORE.nameMentionsCountry;
+    countrySpecific = true;
     reasons.push(`Name says “${nameMatch[0]}”`);
     listingEvidence.push(`Venue name: ${place.name}`);
   }
@@ -325,6 +402,7 @@ export function scoreCandidate(input: {
       score += place.sourceCuisineTags?.length
         ? SCORE.sourceTagMatch
         : SCORE.summaryMentionsCountry;
+      countrySpecific = true;
       reasons.push("Listing description names this cuisine");
     } else {
       const otherInBlurb = findCuisineMentions({
@@ -341,9 +419,22 @@ export function scoreCandidate(input: {
     const tags = osmTagsForCountry(searchCode);
     if (tags.length > 0) {
       score += SCORE.typeMatch;
+      countrySpecific = true;
       reasons.push(`OpenStreetMap tags it cuisine=${tags[0]}`);
       listingEvidence.push(`OpenStreetMap: cuisine=${tags.join(";")}`);
     }
+  }
+
+  // 5. Regional fallback bookkeeping. A venue found only by "Caribbean
+  // restaurant", with nothing naming Barbados, is a regional suggestion — worth
+  // showing when nothing better exists, but never as a Barbadian specialist.
+  const umbrellaHit = candidate.hits.find((hit) => hit.kind === "umbrella");
+  const regionalOnly =
+    Boolean(umbrellaHit) &&
+    !countrySpecific &&
+    candidate.hits.every((hit) => hit.kind === "umbrella");
+  if (regionalOnly) {
+    reasons.push(`Regional match only (${umbrellaHit?.umbrella ?? "regional"})`);
   }
 
   mismatch.delete(searchCode.toLowerCase());
@@ -352,6 +443,8 @@ export function scoreCandidate(input: {
   return {
     score: Math.round(score * 100) / 100,
     reasons,
+    regionalOnly,
+    umbrellaLabel: umbrellaHit?.umbrella,
     mismatchCodes: [...mismatch].slice(0, 3),
     typeMismatchCodes: [...typeMismatch].slice(0, 3),
     typeVerdict: verdict.kind,

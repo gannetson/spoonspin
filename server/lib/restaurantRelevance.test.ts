@@ -3,6 +3,7 @@ import {
   KEEP_THRESHOLD,
   mergeRankedResults,
   planDiscoveryQueries,
+  planUmbrellaQueries,
   rankDecay,
   scoreCandidate,
   type MergedCandidate,
@@ -278,5 +279,94 @@ describe("scoreCandidate", () => {
     });
     expect(result.score).toBeLessThan(KEEP_THRESHOLD);
     expect(result.listingEvidence.join(" ")).not.toContain("Armenian restaurant");
+  });
+});
+
+describe("planUmbrellaQueries", () => {
+  it("asks the regional question for a country with no specialist", () => {
+    const queries = planUmbrellaQueries({ countryCode: "bb" });
+    expect(queries.length).toBeGreaterThan(0);
+    expect(queries[0]!.kind).toBe("umbrella");
+    expect(queries[0]!.text).toMatch(/Caribbean/i);
+    expect(queries[0]!.umbrella).toBe("Caribbean");
+  });
+
+  it("offers nothing for a cuisine that has its own restaurants", () => {
+    expect(planUmbrellaQueries({ countryCode: "jp" })).toHaveLength(0);
+  });
+
+  it("carries the admin's focus into the regional query", () => {
+    const queries = planUmbrellaQueries({ countryCode: "kn", focus: "Rotterdam" });
+    expect(queries.some((query) => /Rotterdam/.test(query.text))).toBe(true);
+  });
+});
+
+describe("regional fallback scoring", () => {
+  const caribbean: MergedCandidate["hits"] = [
+    {
+      query: "Caribbean restaurant Nederland",
+      kind: "umbrella",
+      rank: 0,
+      umbrella: "Caribbean",
+    },
+  ];
+
+  it("flags a pan-Caribbean venue as regional, not Barbadian", () => {
+    const result = scoreCandidate({
+      candidate: candidate(
+        { name: "Jerk Bay", primaryType: "caribbean_restaurant" },
+        caribbean,
+      ),
+      searchCode: "bb",
+      index,
+    });
+    expect(result.regionalOnly).toBe(true);
+    expect(result.umbrellaLabel).toBe("Caribbean");
+  });
+
+  it("stops flagging once the venue names the country itself", () => {
+    const result = scoreCandidate({
+      candidate: candidate(
+        { name: "Bajan Kitchen Barbados", primaryType: "caribbean_restaurant" },
+        caribbean,
+      ),
+      searchCode: "bb",
+      index: buildCuisineTermIndex([
+        { code: "bb", name: "Barbados", cuisineAliases: ["Bajan restaurant"] },
+      ]),
+      extraTerms: ["Bajan", "Cou-cou"],
+    });
+    expect(result.regionalOnly).toBe(false);
+  });
+
+  it("never lets a regional hit outrank a venue the country's own name found", () => {
+    const regional = scoreCandidate({
+      candidate: candidate(
+        { name: "Island Vibes", primaryType: "caribbean_restaurant" },
+        caribbean,
+      ),
+      searchCode: "jm",
+      index,
+    });
+    const specific = scoreCandidate({
+      candidate: candidate({ name: "Island Vibes", primaryType: "jamaican_restaurant" }, [
+        { query: "Jamaican restaurant Nederland", kind: "demonym", rank: 0 },
+      ]),
+      searchCode: "jm",
+      index,
+    });
+    expect(specific.score).toBeGreaterThan(regional.score);
+  });
+
+  it("is not regional when the country's own queries also found it", () => {
+    const result = scoreCandidate({
+      candidate: candidate({ name: "Jerk Bay" }, [
+        ...caribbean,
+        { query: "Jamaica restaurant Netherlands", kind: "demonym", rank: 2 },
+      ]),
+      searchCode: "jm",
+      index,
+    });
+    expect(result.regionalOnly).toBe(false);
   });
 });

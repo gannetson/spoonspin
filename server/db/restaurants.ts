@@ -867,12 +867,98 @@ export function rowToStored(row: QueryResultRow): StoredRestaurant {
   };
 }
 
-export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<void> {
+function isUniqueViolation(error: unknown): boolean {
+  return Boolean(
+    error &&
+    typeof error === "object" &&
+    "code" in error &&
+    (error as { code: unknown }).code === "23505",
+  );
+}
+
+/**
+ * Find the row that already represents this venue, under any of its identities.
+ *
+ * One physical restaurant reaches us under several keys: an OSM id, a Google
+ * place id, and a synthetic `admin-<hash>` id built from its name, city and
+ * cuisine. Those keys drift independently — re-filing a venue under a second
+ * cuisine changes the hash, and Google returning a slightly different address
+ * changes it again — so looking up by `osm_id` alone would miss the existing
+ * row and try to insert a second one, which the unique indexes on `osm_id`,
+ * `google_place_id` and the primary key then reject.
+ *
+ * Matching on all three instead turns those collisions into merges.
+ * `google_place_id` is the strongest signal (it identifies the venue itself,
+ * not our bookkeeping), but `osm_id` wins when present so that an ordinary
+ * re-import keeps updating the row it always updated.
+ */
+async function findExistingRestaurantRow(
+  db: Pool,
+  restaurant: RestaurantUpsert,
+): Promise<QueryResultRow | undefined> {
+  const googlePlaceId = restaurant.googlePlaceId?.trim() || null;
+  const result = await db.query(
+    `SELECT * FROM restaurants
+      WHERE osm_id = $1
+         OR id = $2
+         OR ($3::text IS NOT NULL AND google_place_id = $3)
+      ORDER BY
+        (osm_id = $1) DESC,
+        ($3::text IS NOT NULL AND google_place_id = $3) DESC,
+        (id = $2) DESC
+      LIMIT 1`,
+    [restaurant.osmId, restaurant.id, googlePlaceId],
+  );
+  return result.rows[0] as QueryResultRow | undefined;
+}
+
+/**
+ * Keep a Google place id only if no *other* row already holds it. Two venues
+ * occasionally resolve to the same Places entry (a restaurant inside a hotel,
+ * a rebrand); the second one keeps whatever it had rather than failing the
+ * whole write over a field that is only used for enrichment.
+ */
+async function resolveGooglePlaceId(
+  db: Pool,
+  desired: string | null | undefined,
+  current: string | null,
+  ownerId: string,
+): Promise<string | null> {
+  const wanted = desired?.trim() || null;
+  if (!wanted || wanted === current) return current;
+  const taken = await db.query(
+    `SELECT 1 FROM restaurants WHERE google_place_id = $1 AND id <> $2 LIMIT 1`,
+    [wanted, ownerId],
+  );
+  return (taken.rowCount ?? 0) > 0 ? current : wanted;
+}
+
+/**
+ * Insert or merge a restaurant, returning the id of the row actually written.
+ *
+ * That id is not always `restaurant.id`: when the venue already exists under
+ * another identity the incoming row is merged into it, and callers that go on
+ * to reference the restaurant (enrichment jobs, tags) must use the returned id
+ * rather than the one they proposed.
+ */
+export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<string> {
+  try {
+    return await upsertRestaurantOnce(restaurant);
+  } catch (error) {
+    if (!isUniqueViolation(error)) throw error;
+    // A concurrent writer claimed one of this venue's identities between our
+    // lookup and our insert. Re-resolving now finds their row, so the retry
+    // merges into it instead of inserting a duplicate.
+    console.warn(
+      `Restaurant upsert hit a unique conflict for ${restaurant.name}; merging instead.`,
+    );
+    return await upsertRestaurantOnce(restaurant);
+  }
+}
+
+async function upsertRestaurantOnce(restaurant: RestaurantUpsert): Promise<string> {
   const db = await ensureDb();
-  const existingResult = await db.query(`SELECT * FROM restaurants WHERE osm_id = $1`, [
-    restaurant.osmId,
-  ]);
-  const existing = existingResult.rows[0] as QueryResultRow | undefined;
+  const existing = await findExistingRestaurantRow(db, restaurant);
   const now = new Date().toISOString();
 
   if (existing) {
@@ -891,6 +977,12 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
     const userRating = restaurant.userRating ?? aggregated.rating ?? current.userRating;
     const reviewCount =
       restaurant.reviewCount ?? aggregated.reviewCount ?? current.reviewCount;
+    const googlePlaceId = await resolveGooglePlaceId(
+      db,
+      restaurant.googlePlaceId,
+      current.googlePlaceId,
+      current.id,
+    );
 
     await db.query(
       `UPDATE restaurants SET
@@ -924,7 +1016,7 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
         business_status = $28,
         primary_type = $29,
         places_refreshed_at = $30::timestamptz
-      WHERE osm_id = $31`,
+      WHERE id = $31`,
       [
         restaurant.name,
         restaurant.address || current.address,
@@ -958,14 +1050,14 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
             ? JSON.stringify(current.menu)
             : null,
         restaurant.regionId ?? current.regionId,
-        restaurant.googlePlaceId ?? current.googlePlaceId,
+        googlePlaceId,
         restaurant.businessStatus ?? current.businessStatus,
         restaurant.primaryType ?? current.primaryType,
         restaurant.placesRefreshedAt ?? current.placesRefreshedAt,
-        restaurant.osmId,
+        current.id,
       ],
     );
-    return;
+    return current.id;
   }
 
   const ratings = restaurant.ratings ?? null;
@@ -1022,6 +1114,7 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<vo
       restaurant.placesRefreshedAt ?? null,
     ],
   );
+  return restaurant.id;
 }
 
 export type LocalSearchOptions = {
@@ -1226,9 +1319,7 @@ export async function updateRestaurantFields(
 
   const name = patch.name?.trim() || current.name;
   const website =
-    patch.website === undefined
-      ? current.website
-      : patch.website?.trim() || null;
+    patch.website === undefined ? current.website : patch.website?.trim() || null;
   const authenticityNotes =
     patch.authenticityNotes === undefined
       ? current.authenticityNotes
@@ -1408,9 +1499,8 @@ export async function updateRestaurantScoresAndAuthenticity(
   const updated = await getRestaurantById(id);
   if (updated) {
     try {
-      const { upsertTheForkLinkFromRatings } = await import(
-        "../reservations/theForkFromRatings.ts"
-      );
+      const { upsertTheForkLinkFromRatings } =
+        await import("../reservations/theForkFromRatings.ts");
       await upsertTheForkLinkFromRatings(updated);
     } catch (error) {
       console.warn(`[reservations] TheFork attach skipped for ${id}`, error);

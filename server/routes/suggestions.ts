@@ -390,8 +390,12 @@ export function registerSuggestionRoutes(app: import("express").Express): void {
       const rowId = slugifyId("user", place.name);
       const code = parsed.data.countryCode.toLowerCase();
       const cuisineTags = osmTagsForCountry(code);
-      await upsertRestaurant({
+      // Community suggestions frequently name a venue we already hold under a
+      // different id, so the upsert may merge; the submission has to point at
+      // whichever row was actually written.
+      const storedRowId = await upsertRestaurant({
         id: rowId,
+        googlePlaceId: verified.placeId,
         name: place.name,
         address: place.address,
         city: place.city,
@@ -421,7 +425,7 @@ export function registerSuggestionRoutes(app: import("express").Express): void {
         countryName: parsed.data.countryName,
         query: parsed.data.query,
         restaurant: place,
-        restaurantRowId: rowId,
+        restaurantRowId: storedRowId,
         confirmationNotes: parsed.data.confirmationNotes,
       });
       trackCreate("restaurant", parsed.data.countryCode);

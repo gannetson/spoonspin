@@ -10,6 +10,8 @@ import { readDiscoverRestaurantStream } from "@/admin/discoverStream";
 
 export type DiscoveredRestaurant = {
   name: string;
+  /** Google Place ID, sent back on save so the row keeps one stable identity. */
+  placeId?: string;
   address: string;
   city: string;
   postcode?: string;
@@ -25,6 +27,11 @@ export type DiscoveredRestaurant = {
   /** Grounded relevance score; higher means stronger listing evidence. */
   relevanceScore?: number;
   relevanceReasons?: string[];
+  /** Set when this is a regional suggestion, e.g. "Caribbean", not a specialist. */
+  regionalMatch?: string;
+  /** Regional cuisine the venue cooks, e.g. "cn:CN-SC". */
+  regionId?: string;
+  regionEvidence?: string;
   evidenceSourceUrl?: string;
   confidence?: "high" | "medium" | "low";
   authenticityNotes?: string;

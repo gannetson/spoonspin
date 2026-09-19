@@ -1,12 +1,20 @@
 {
-  "coast": "PE-COS",
-  "lima": "PE-COS",
-  "andes": "PE-SIE",
-  "cusco": "PE-SIE",
-  "cuzco": "PE-SIE",
-  "arequipa": "PE-SIE",
   "amazon": "PE-SEL",
-  "jungle": "PE-SEL",
   "amazonia": "PE-SEL",
-  "iquitos": "PE-SEL"
+  "amazonian": "PE-SEL",
+  "andean": "PE-SIE",
+  "andes": "PE-SIE",
+  "arequipa": "PE-SIE",
+  "arequipena": "PE-SIE",
+  "chifa": "PE-COS",
+  "coast": "PE-COS",
+  "criollo": "PE-COS",
+  "cusco": "PE-SIE",
+  "cusquena": "PE-SIE",
+  "cuzco": "PE-SIE",
+  "iquitos": "PE-SEL",
+  "jungle": "PE-SEL",
+  "lima": "PE-COS",
+  "limeno": "PE-COS",
+  "nikkei": "PE-COS"
 }

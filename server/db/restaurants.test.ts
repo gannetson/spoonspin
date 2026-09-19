@@ -233,3 +233,162 @@ describe("local restaurant repository", () => {
     expect(results.map((row) => row.name)).toEqual(["Good Trattoria"]);
   });
 });
+
+async function countRows(): Promise<number> {
+  const db = await ensureDb();
+  const result = await db.query(`SELECT COUNT(*)::int AS n FROM restaurants`);
+  return Number(result.rows[0]?.n ?? 0);
+}
+
+async function row(id: string) {
+  const db = await ensureDb();
+  const result = await db.query(`SELECT * FROM restaurants WHERE id = $1`, [id]);
+  return result.rows[0];
+}
+
+/** A venue as discovery first files it, under one cuisine. */
+function baseVenue() {
+  return {
+    id: "admin-aaaa1111",
+    osmId: "admin-reassign:aaaa1111",
+    name: "Orontes West",
+    address: "Bos en Lommerplein 8",
+    city: "Amsterdam",
+    cuisineCodes: ["tr"],
+    cuisineTags: ["turkish"],
+    source: "admin-discover-reassign",
+    mapsUrl: "https://maps.example/orontes",
+    googlePlaceId: "ChIJorontes",
+    reviewed: true,
+    authenticityRating: 4,
+  };
+}
+
+describe("restaurant upsert deduplication", () => {
+  beforeEach(async () => {
+    process.env.DATABASE_URL = TEST_DATABASE_URL;
+    await closeDb();
+    await ensureDb();
+    await resetAllTables();
+  });
+
+  afterEach(async () => {
+    await closeDb();
+    delete process.env.DATABASE_URL;
+  });
+
+  it("merges a venue arriving under a new osm id but the same Google place", async () => {
+    // Re-filing a venue under a second cuisine changes the synthetic hash, so
+    // it arrives with different `id` and `osm_id` — but the same real venue.
+    const first = await upsertRestaurant(baseVenue());
+    const second = await upsertRestaurant({
+      ...baseVenue(),
+      id: "admin-bbbb2222",
+      osmId: "admin:bbbb2222",
+      cuisineCodes: ["am"],
+      cuisineTags: ["armenian"],
+      source: "admin-discover",
+    });
+
+    expect(second).toBe(first);
+    expect(await countRows()).toBe(1);
+  });
+
+  it("unions the cuisines of the rows it merges", async () => {
+    await upsertRestaurant(baseVenue());
+    const id = await upsertRestaurant({
+      ...baseVenue(),
+      id: "admin-bbbb2222",
+      osmId: "admin:bbbb2222",
+      cuisineCodes: ["am"],
+      cuisineTags: ["armenian"],
+    });
+
+    const stored = await row(id);
+    expect(stored?.cuisine_codes).toEqual(expect.arrayContaining(["tr", "am"]));
+    expect(stored?.cuisine_tags).toEqual(expect.arrayContaining(["turkish", "armenian"]));
+  });
+
+  it("merges on the primary key when the osm id drifts", async () => {
+    // The admin save path and the reassign path build the same `admin-<hash>`
+    // id but different osm ids, which used to be a primary key violation.
+    await upsertRestaurant({ ...baseVenue(), googlePlaceId: null });
+    const id = await upsertRestaurant({
+      ...baseVenue(),
+      osmId: "admin:aaaa1111",
+      googlePlaceId: null,
+    });
+
+    expect(id).toBe("admin-aaaa1111");
+    expect(await countRows()).toBe(1);
+  });
+
+  it("still keeps genuinely different venues apart", async () => {
+    await upsertRestaurant(baseVenue());
+    await upsertRestaurant({
+      ...baseVenue(),
+      id: "admin-cccc3333",
+      osmId: "admin:cccc3333",
+      name: "Somewhere Else",
+      googlePlaceId: "ChIJsomewhereelse",
+    });
+
+    expect(await countRows()).toBe(2);
+  });
+
+  it("adopts a Google place id the stored row was missing", async () => {
+    await upsertRestaurant({ ...baseVenue(), googlePlaceId: null });
+    const id = await upsertRestaurant({ ...baseVenue(), googlePlaceId: "ChIJorontes" });
+
+    expect(await row(id)).toMatchObject({ google_place_id: "ChIJorontes" });
+    expect(await countRows()).toBe(1);
+  });
+
+  it("does not fail when two venues resolve to one Google place", async () => {
+    // A restaurant inside a hotel can share a Places entry with it. The second
+    // row keeps its own identity and simply goes without the place id.
+    await upsertRestaurant(baseVenue());
+    const id = await upsertRestaurant({
+      ...baseVenue(),
+      id: "admin-dddd4444",
+      osmId: "admin:dddd4444",
+      name: "Hotel Restaurant",
+      googlePlaceId: "ChIJorontes",
+    });
+
+    // Merged into the existing row rather than duplicated.
+    expect(id).toBe("admin-aaaa1111");
+    expect(await countRows()).toBe(1);
+  });
+
+  it("keeps updating the same row on an ordinary OSM re-import", async () => {
+    const first = await upsertRestaurant({
+      id: "osm:node/99",
+      osmId: "node/99",
+      name: "Sofra",
+      address: "Kerkstraat 1",
+      city: "Utrecht",
+      cuisineCodes: ["tr"],
+      cuisineTags: ["turkish"],
+      source: "overpass",
+      mapsUrl: "https://maps.example/sofra",
+      reviewed: false,
+    });
+    const second = await upsertRestaurant({
+      id: "osm:node/99",
+      osmId: "node/99",
+      name: "Sofra Pide",
+      address: "Kerkstraat 1",
+      city: "Utrecht",
+      cuisineCodes: ["tr"],
+      cuisineTags: ["turkish"],
+      source: "overpass",
+      mapsUrl: "https://maps.example/sofra",
+      reviewed: false,
+    });
+
+    expect(second).toBe(first);
+    expect(await countRows()).toBe(1);
+    expect(await row(second)).toMatchObject({ name: "Sofra Pide" });
+  });
+});
