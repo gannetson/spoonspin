@@ -1,12 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  dinnerSuggestionForRecipes,
   drinkMatchesAlcohol,
   getDinnerSuggestion,
   groupDrinksIntoSections,
   recipeMatchesDiet,
   recipeMatchesRegion,
 } from "./menuAccessors";
-import type { Country, Drink, Recipe } from "@/types/content";
+import type { Country, DinnerSuggestion, Drink, Recipe } from "@/types/content";
 
 const sample = (name: string, type: Drink["type"], alcoholic: boolean): Drink => ({
   name,
@@ -161,5 +162,47 @@ describe("getDinnerSuggestion", () => {
     expect(dinner?.title).toBe("Stored");
     expect(dinner?.courses).toHaveLength(1);
     expect(dinner?.drinks.map((item) => item.drinkName)).toEqual(["Heineken"]);
+  });
+});
+
+describe("dinnerSuggestionForRecipes", () => {
+  const dish = (
+    id: string,
+    category: Recipe["category"],
+    regionId?: string,
+  ): Recipe => ({
+    ...recipe([]),
+    id,
+    category,
+    regionId,
+  });
+
+  const fallback: DinnerSuggestion = {
+    title: "A taste of China",
+    description: "Intro",
+    courses: [{ recipeId: "national-main", role: "main" }],
+    drinks: [{ drinkName: "Jenever" }],
+  };
+
+  it("builds a regional dinner from matching dishes and keeps fallback drinks", () => {
+    const dinner = dinnerSuggestionForRecipes(
+      [
+        dish("mapo-tofu", "main", "cn:CN-SC"),
+        dish("dan-dan", "starter", "cn:CN-SC"),
+        dish("twice-cooked", "main", "cn:CN-SC"),
+      ],
+      fallback,
+    );
+
+    expect(dinner?.courses.map((course) => course.recipeId)).toEqual([
+      "dan-dan",
+      "mapo-tofu",
+      "twice-cooked",
+    ]);
+    expect(dinner?.drinks.map((item) => item.drinkName)).toEqual(["Jenever"]);
+  });
+
+  it("returns undefined when the region has no recipes", () => {
+    expect(dinnerSuggestionForRecipes([], fallback)).toBe(undefined);
   });
 });

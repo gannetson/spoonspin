@@ -31,6 +31,17 @@ describe("recipe sourcing registry", () => {
     expect(recipeDiscoverSystemPrompt("jp")).toContain("Do not use xiaohongshu.com");
   });
 
+  it("includes region focus when a region name is provided", () => {
+    const prompt = recipeDiscoverSystemPrompt(
+      sourcingContextFromCountry("cn", {
+        regionId: "cn:CN-SC",
+        regionName: "Sichuan",
+      }),
+    );
+    expect(prompt).toContain("Sichuan");
+    expect(prompt).toContain('region field to "Sichuan"');
+  });
+
   it("registers china before default", () => {
     expect(chinaRecipeSourcing.priority).toBeGreaterThan(0);
   });

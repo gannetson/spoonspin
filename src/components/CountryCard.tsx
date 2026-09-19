@@ -9,6 +9,7 @@ import { useT } from "@/i18n/LocaleContext";
 
 type CountryCardProps = {
   country: Country;
+  regionName?: string | null;
   spinning?: boolean;
   spinningCountry?: { flag: string; name: string };
   onSpin: () => void;
@@ -17,6 +18,7 @@ type CountryCardProps = {
 
 export function CountryCard({
   country,
+  regionName = null,
   spinning = false,
   spinningCountry,
   onSpin,
@@ -57,7 +59,9 @@ export function CountryCard({
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-4 p-5 sm:p-7">
           <div>
             <p className="text-sm uppercase tracking-[0.18em] text-cream/75">
-              {spinning ? t("country.card.choosing") : country.region}
+              {spinning
+                ? t("country.card.choosing")
+                : (regionName?.trim() || country.region)}
             </p>
             <h2 className="mt-1 font-display text-4xl text-ochre sm:text-5xl">{name}</h2>
           </div>

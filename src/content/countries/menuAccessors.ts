@@ -1,5 +1,7 @@
 import type {
   Country,
+  DinnerCourse,
+  DinnerCourseRole,
   DinnerSuggestion,
   Drink,
   OrderOption,
@@ -179,4 +181,58 @@ export function getDinnerSuggestion(country: Country): DinnerSuggestion | undefi
 export function dinnerRecipeIdSet(country: Country): Set<string> {
   const dinner = getDinnerSuggestion(country);
   return new Set(dinner?.courses.map((course) => course.recipeId) ?? []);
+}
+
+const DINNER_ROLE_ORDER: RecipeCategory[] = [
+  "starter",
+  "main",
+  "side",
+  "dessert",
+  "snack",
+];
+const MAX_REGIONAL_DINNER_COURSES = 5;
+
+function courseRoleForRecipe(recipe: Recipe): DinnerCourseRole {
+  return DINNER_ROLE_ORDER.includes(recipe.category) ? recipe.category : "extra";
+}
+
+/** Build dinner courses from a recipe list, preferring one of each course. */
+export function coursesFromRecipes(recipes: Recipe[]): DinnerCourse[] {
+  const remaining = [...recipes];
+  const courses: DinnerCourse[] = [];
+
+  for (const role of DINNER_ROLE_ORDER) {
+    const index = remaining.findIndex((recipe) => recipe.category === role);
+    if (index === -1) continue;
+    const [recipe] = remaining.splice(index, 1);
+    if (!recipe) continue;
+    courses.push({ recipeId: recipe.id, role });
+    if (courses.length >= MAX_REGIONAL_DINNER_COURSES) return courses;
+  }
+
+  for (const recipe of remaining) {
+    if (courses.length >= MAX_REGIONAL_DINNER_COURSES) break;
+    courses.push({ recipeId: recipe.id, role: courseRoleForRecipe(recipe) });
+  }
+
+  return courses;
+}
+
+/**
+ * Dinner for a filtered recipe set (e.g. a selected region). Keeps national
+ * drinks when provided; returns undefined when there are no matching dishes.
+ */
+export function dinnerSuggestionForRecipes(
+  recipes: Recipe[],
+  fallback?: DinnerSuggestion,
+): DinnerSuggestion | undefined {
+  const courses = coursesFromRecipes(recipes);
+  if (courses.length === 0) return undefined;
+  return {
+    title: fallback?.title ?? "",
+    description: fallback?.description ?? "",
+    courses,
+    drinks: fallback?.drinks ?? [],
+    composedAt: fallback?.composedAt,
+  };
 }

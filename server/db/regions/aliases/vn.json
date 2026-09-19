@@ -1,0 +1,19 @@
+{
+  "hanoi": "VN-N",
+  "ha noi": "VN-N",
+  "north": "VN-N",
+  "bac": "VN-N",
+  "tonkin": "VN-N",
+  "hue": "VN-C",
+  "da nang": "VN-C",
+  "danang": "VN-C",
+  "central vietnam": "VN-C",
+  "annam": "VN-C",
+  "saigon": "VN-S",
+  "ho chi minh": "VN-S",
+  "ho chi minh city": "VN-S",
+  "hcmc": "VN-S",
+  "south": "VN-S",
+  "nam": "VN-S",
+  "cochinchina": "VN-S"
+}

@@ -258,6 +258,8 @@ export type RecipeCopyPatch = {
   substitutions?: string[] | null;
   servingSuggestion?: string | null;
   drinkPairing?: string | null;
+  regionId?: string | null;
+  region?: string | null;
 };
 
 export async function patchRecipeFields(

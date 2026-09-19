@@ -1,12 +1,20 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { AWIN_THUISBEZORGD_MID, wrapThuisbezorgdAffiliateUrl } from "./affiliateLinks";
-import { getPublicConfig } from "../lib/publicConfig";
+import { getPublicConfig, type PublicConfig } from "../lib/publicConfig";
+
+const emptyConfig: PublicConfig = {
+  awinPublisherId: null,
+  awinThuisbezorgdMid: null,
+  reservationsEnabled: false,
+  reservationProviders: {
+    zenchef: false,
+    guestplan: false,
+    thefork: false,
+  },
+};
 
 vi.mock("../lib/publicConfig", () => ({
-  getPublicConfig: vi.fn(() => ({
-    awinPublisherId: null,
-    awinThuisbezorgdMid: null,
-  })),
+  getPublicConfig: vi.fn(() => emptyConfig),
 }));
 
 const TB_URL = "https://www.thuisbezorgd.nl/bestel/amsterdam/italiaans";
@@ -14,10 +22,7 @@ const TB_URL = "https://www.thuisbezorgd.nl/bestel/amsterdam/italiaans";
 describe("wrapThuisbezorgdAffiliateUrl", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
-    vi.mocked(getPublicConfig).mockReturnValue({
-      awinPublisherId: null,
-      awinThuisbezorgdMid: null,
-    });
+    vi.mocked(getPublicConfig).mockReturnValue({ ...emptyConfig });
   });
 
   it("returns the destination when marketing is not allowed", () => {
@@ -48,8 +53,8 @@ describe("wrapThuisbezorgdAffiliateUrl", () => {
   it("prefers runtime public config over Vite env", () => {
     vi.stubEnv("VITE_AWIN_PUBLISHER_ID", "111");
     vi.mocked(getPublicConfig).mockReturnValue({
+      ...emptyConfig,
       awinPublisherId: "222",
-      awinThuisbezorgdMid: null,
     });
     const wrapped = wrapThuisbezorgdAffiliateUrl(TB_URL, {
       marketingAllowed: true,

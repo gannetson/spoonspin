@@ -19,6 +19,7 @@ import {
   upsertCountryRecord,
   type MenuSlot,
 } from "../server/db/content.ts";
+import { seedCountryRegions } from "../server/db/regions.ts";
 import { closeDb, getDb, upsertRestaurant } from "../server/db/restaurants.ts";
 import type { Country, Recipe } from "../src/types/content.ts";
 
@@ -80,6 +81,7 @@ async function main() {
   for (const item of raw.countries) {
     const country = item as Country;
     await upsertCountryRecord(country);
+    await seedCountryRegions(country.code);
     const entries = recipeEntries(country);
     if (entries.length > 0) {
       await replaceCountryRecipes(country.code, entries);

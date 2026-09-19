@@ -145,6 +145,9 @@ export const nl: Messages = {
   "cook.dinner.browseRecipes": "Bekijk recepten",
   "cook.dinner.empty":
     "Nog geen dinersuggestie voor {name}. Voeg recepten en dranken toe, en stel er een samen via Beheer.",
+  "cook.dinner.regionTitle": "Een smaak van {region}",
+  "cook.dinner.regionDescription":
+    "Een {region}-tafel uit {name} — streekgerechten om vanavond te koken.",
   "cook.course.extra": "Gang",
   "cook.suggestRecipe": "Stel een recept voor",
   "cook.suggestDrink": "Stel een drank voor",
@@ -343,6 +346,12 @@ export const nl: Messages = {
   "restaurant.category.dessert": "Nagerecht",
   "restaurant.category.snack": "Snack",
   "restaurant.category.drink": "Drank",
+
+  "restaurant.booking.reserve": "Reserveer een tafel",
+  "restaurant.booking.bookExternally": "Reserveer extern",
+  "restaurant.booking.visitWebsite": "Website",
+  "restaurant.booking.viewOnMap": "Google Maps",
+  "restaurant.booking.adminProviders": "Reserveringsproviders",
 
   "share.button": "Delen",
   "share.ariaLabel": "Deel dit land",
@@ -764,6 +773,10 @@ export const nl: Messages = {
   "admin.recipe.edit.section.steps": "Stappen",
   "admin.recipe.edit.section.extras": "Extra",
   "admin.recipe.edit.localName": "Lokale naam",
+  "admin.recipe.edit.region": "Regio (optioneel)",
+  "admin.recipe.edit.region.none": "Geen regio (nationaal)",
+  "admin.recipe.edit.region.hint":
+    "Koppel dit gerecht aan een provincie of streek wanneer het regionaal is.",
   "admin.recipe.edit.servings": "Porties",
   "admin.recipe.edit.prepMinutes": "Voorbereiding (minuten)",
   "admin.recipe.edit.cookMinutes": "Bereiding (minuten)",

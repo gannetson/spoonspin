@@ -1,0 +1,12 @@
+{
+  "source": "culinary regions",
+  "subdivisions": [
+    { "isoCode": "TR-EGE", "name": "Aegean", "type": "culinary region" },
+    { "isoCode": "TR-KAR", "name": "Black Sea", "type": "culinary region" },
+    { "isoCode": "TR-IAN", "name": "Central Anatolia", "type": "culinary region" },
+    { "isoCode": "TR-DOA", "name": "Eastern Anatolia", "type": "culinary region" },
+    { "isoCode": "TR-MAR", "name": "Marmara", "type": "culinary region" },
+    { "isoCode": "TR-AKD", "name": "Mediterranean", "type": "culinary region" },
+    { "isoCode": "TR-GDA", "name": "Southeastern Anatolia", "type": "culinary region" }
+  ]
+}

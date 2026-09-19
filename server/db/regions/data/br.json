@@ -1,0 +1,32 @@
+{
+  "source": "ISO 3166-2:BR",
+  "subdivisions": [
+    { "isoCode": "BR-AC", "name": "Acre", "type": "state" },
+    { "isoCode": "BR-AL", "name": "Alagoas", "type": "state" },
+    { "isoCode": "BR-AP", "name": "Amapá", "type": "state" },
+    { "isoCode": "BR-AM", "name": "Amazonas", "type": "state" },
+    { "isoCode": "BR-BA", "name": "Bahia", "type": "state" },
+    { "isoCode": "BR-CE", "name": "Ceará", "type": "state" },
+    { "isoCode": "BR-DF", "name": "Federal District", "type": "federal district" },
+    { "isoCode": "BR-ES", "name": "Espírito Santo", "type": "state" },
+    { "isoCode": "BR-GO", "name": "Goiás", "type": "state" },
+    { "isoCode": "BR-MA", "name": "Maranhão", "type": "state" },
+    { "isoCode": "BR-MT", "name": "Mato Grosso", "type": "state" },
+    { "isoCode": "BR-MS", "name": "Mato Grosso do Sul", "type": "state" },
+    { "isoCode": "BR-MG", "name": "Minas Gerais", "type": "state" },
+    { "isoCode": "BR-PA", "name": "Pará", "type": "state" },
+    { "isoCode": "BR-PB", "name": "Paraíba", "type": "state" },
+    { "isoCode": "BR-PR", "name": "Paraná", "type": "state" },
+    { "isoCode": "BR-PE", "name": "Pernambuco", "type": "state" },
+    { "isoCode": "BR-PI", "name": "Piauí", "type": "state" },
+    { "isoCode": "BR-RJ", "name": "Rio de Janeiro", "type": "state" },
+    { "isoCode": "BR-RN", "name": "Rio Grande do Norte", "type": "state" },
+    { "isoCode": "BR-RS", "name": "Rio Grande do Sul", "type": "state" },
+    { "isoCode": "BR-RO", "name": "Rondônia", "type": "state" },
+    { "isoCode": "BR-RR", "name": "Roraima", "type": "state" },
+    { "isoCode": "BR-SC", "name": "Santa Catarina", "type": "state" },
+    { "isoCode": "BR-SP", "name": "São Paulo", "type": "state" },
+    { "isoCode": "BR-SE", "name": "Sergipe", "type": "state" },
+    { "isoCode": "BR-TO", "name": "Tocantins", "type": "state" }
+  ]
+}

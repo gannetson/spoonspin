@@ -33,6 +33,14 @@ import { getUploadsRoot, registerMeRoutes } from "./routes/me.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
 import { isApifyConfigured } from "./lib/apifyOrderSearch.ts";
 import { warnIfOAuthMisconfigured } from "./auth/oauth.ts";
+import { reservationService } from "./reservations/service.ts";
+import { createReservationReferral } from "./db/reservations.ts";
+import {
+  isGuestplanEnabled,
+  isReservationsEnabled,
+  isTheForkEnabled,
+  isZenchefEnabled,
+} from "./reservations/config.ts";
 
 // Load .env from the project root even when cwd differs (e.g. supervisor).
 loadEnv({
@@ -109,6 +117,12 @@ app.get("/api/public-config", (_req, res) => {
   res.json({
     awinPublisherId: publisher || null,
     awinThuisbezorgdMid: mid || null,
+    reservationsEnabled: isReservationsEnabled(),
+    reservationProviders: {
+      zenchef: isZenchefEnabled(),
+      guestplan: isGuestplanEnabled(),
+      thefork: isTheForkEnabled(),
+    },
   });
 });
 
@@ -146,6 +160,124 @@ app.get("/api/restaurants/:id", async (req, res) => {
   } catch (error) {
     console.error("Get restaurant failed", error);
     res.status(500).json({ message: "Could not load restaurant." });
+  }
+});
+
+const reservationOptionsSchema = z.object({
+  date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  time: z
+    .string()
+    .regex(/^\d{1,2}:\d{2}$/)
+    .optional(),
+  party_size: z.coerce.number().int().min(1).max(20).optional(),
+});
+
+/** Provider-neutral booking options — never exposes partner secrets. */
+app.get("/api/restaurants/:id/reservation-options", async (req, res) => {
+  try {
+    const id = String(req.params.id ?? "");
+    if (!id) {
+      res.status(400).json({ message: "Restaurant id required." });
+      return;
+    }
+    const parsed = reservationOptionsSchema.safeParse(req.query);
+    if (!parsed.success) {
+      res.status(400).json({ message: "Invalid reservation options query." });
+      return;
+    }
+    const row = await getRestaurantById(id);
+    if (!row) {
+      res.status(404).json({ message: "Restaurant not found." });
+      return;
+    }
+
+    const options = await reservationService.getReservationOptions(row, {
+      date: parsed.data.date,
+      time: parsed.data.time,
+      partySize: parsed.data.party_size,
+    });
+
+    res.json({
+      restaurant_id: options.restaurantId,
+      requested: {
+        date: options.requested.date,
+        time: options.requested.time,
+        party_size: options.requested.partySize,
+      },
+      best_option: options.bestOption,
+      alternatives: options.alternatives,
+      fallback: options.fallback,
+      providers: options.providers.map((provider) => ({
+        key: provider.key,
+        enabled: provider.enabled,
+        configured: provider.configured,
+        match_status: provider.link?.matchStatus ?? "unmatched",
+        external_restaurant_id: provider.link?.externalRestaurantId ?? null,
+        verified: provider.link?.matchStatus === "verified",
+        last_checked_at: provider.link?.lastCheckedAt ?? null,
+        active: provider.link?.active ?? false,
+      })),
+    });
+  } catch (error) {
+    console.error("Reservation options failed", error);
+    res.status(500).json({ message: "Could not load reservation options." });
+  }
+});
+
+const reservationClickSchema = z.object({
+  provider: z.enum(["zenchef", "guestplan", "thefork"]),
+  party_size: z.number().int().min(1).max(20).optional(),
+  requested_date: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/)
+    .optional(),
+  requested_time: z
+    .string()
+    .regex(/^\d{1,2}:\d{2}$/)
+    .optional(),
+});
+
+/** Opaque outbound reservation click — no booking PII stored. */
+app.post("/api/restaurants/:id/reservation-clicks", async (req, res) => {
+  try {
+    const id = String(req.params.id ?? "");
+    if (!id) {
+      res.status(400).json({ message: "Restaurant id required." });
+      return;
+    }
+    const parsed = reservationClickSchema.safeParse(req.body ?? {});
+    if (!parsed.success) {
+      res.status(400).json({ message: "Invalid reservation click payload." });
+      return;
+    }
+    const row = await getRestaurantById(id);
+    if (!row) {
+      res.status(404).json({ message: "Restaurant not found." });
+      return;
+    }
+    const referralId = await createReservationReferral({
+      restaurantId: id,
+      providerKey: parsed.data.provider,
+      partySize: parsed.data.party_size ?? null,
+      requestedDate: parsed.data.requested_date ?? null,
+      requestedTime: parsed.data.requested_time ?? null,
+    });
+    recordProductEvent({
+      eventType: "reservation_click",
+      ip: req.ip,
+      meta: {
+        restaurantId: id,
+        provider: parsed.data.provider,
+        referralId,
+      },
+    });
+    res.json({ referral_id: referralId });
+  } catch (error) {
+    console.error("Reservation click failed", error);
+    res.status(500).json({ message: "Could not record reservation click." });
   }
 });
 
@@ -318,6 +450,7 @@ function toApiRestaurant(
     photoUrl: row.photoUrl ?? undefined,
     photoAttribution: row.photoAttribution ?? undefined,
     regionId: row.regionId ?? undefined,
+    googlePlaceId: row.googlePlaceId ?? undefined,
   };
 }
 

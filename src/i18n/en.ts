@@ -146,6 +146,9 @@ export const en: Messages = {
   "cook.dinner.browseRecipes": "Browse recipes",
   "cook.dinner.empty":
     "No dinner suggestion yet for {name}. Add a few recipes and drinks, then compose one from Admin.",
+  "cook.dinner.regionTitle": "A taste of {region}",
+  "cook.dinner.regionDescription":
+    "A {region} table from {name} — regional classics to cook tonight.",
   "cook.course.extra": "Course",
   "cook.suggestRecipe": "Suggest a recipe",
   "cook.suggestDrink": "Suggest a drink",
@@ -337,6 +340,12 @@ export const en: Messages = {
   "restaurant.category.dessert": "Dessert",
   "restaurant.category.snack": "Snack",
   "restaurant.category.drink": "Drink",
+
+  "restaurant.booking.reserve": "Reserve a table",
+  "restaurant.booking.bookExternally": "Book a table",
+  "restaurant.booking.visitWebsite": "Website",
+  "restaurant.booking.viewOnMap": "Google Maps",
+  "restaurant.booking.adminProviders": "Reservation providers",
 
   "share.button": "Share",
   "share.ariaLabel": "Share this country",
@@ -750,6 +759,9 @@ export const en: Messages = {
   "admin.recipe.edit.section.steps": "Steps",
   "admin.recipe.edit.section.extras": "Extras",
   "admin.recipe.edit.localName": "Local name",
+  "admin.recipe.edit.region": "Region (optional)",
+  "admin.recipe.edit.region.none": "No region (national)",
+  "admin.recipe.edit.region.hint": "Link this dish to a province or area when it is regional.",
   "admin.recipe.edit.servings": "Servings",
   "admin.recipe.edit.prepMinutes": "Prep (minutes)",
   "admin.recipe.edit.cookMinutes": "Cook (minutes)",

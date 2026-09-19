@@ -18,6 +18,7 @@ import type {
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
+import { RestaurantBookingActions } from "@/components/RestaurantBookingActions";
 import { handleRestaurantAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useEditRestaurant } from "@/admin/EditRestaurantContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
@@ -310,31 +311,13 @@ export function RestaurantView({
           <p className="text-xs text-ink-soft/80">{restaurant.photoAttribution}</p>
         ) : null}
 
+        <RestaurantBookingActions
+          restaurantId={restaurant.id}
+          website={restaurant.website}
+          mapsUrl={restaurant.mapsUrl}
+          isAdmin={isAdmin}
+        />
         <div className="flex flex-wrap gap-3">
-          {restaurant.website ? (
-            <a
-              href={restaurant.website}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
-            >
-              {t("dine.website")}
-              <ExternalLink aria-hidden="true" className="size-4" />
-            </a>
-          ) : null}
-          <a
-            href={restaurant.mapsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className={
-              restaurant.website
-                ? "inline-flex min-h-11 items-center gap-2 rounded-full border border-ink/15 px-4 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
-                : "inline-flex min-h-11 items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
-            }
-          >
-            {t("dine.openInGoogleMaps")}
-            <ExternalLink aria-hidden="true" className="size-4" />
-          </a>
           {listReviewLinks(restaurant).map((link) => (
             <a
               key={link.source}

@@ -15,7 +15,7 @@ import {
   getSpecialtyShops,
 } from "../../src/content/countries/menuAccessors.ts";
 import { countByCuisineCode, ensureDb } from "./restaurants.ts";
-import { createRegionResolver, findOrCreateRegion } from "./regions.ts";
+import { createRegionResolver, findOrCreateRegion, getRegionById } from "./regions.ts";
 
 const RECIPE_SELECT = `
   recipes.*,
@@ -170,7 +170,8 @@ export async function listCountriesFromDb(): Promise<Country[]> {
   const db = await ensureDb();
   const countries = await db.query(`SELECT * FROM countries ORDER BY name ASC`);
   const recipes = await db.query(
-    `SELECT ${RECIPE_SELECT} ${RECIPE_FROM} ORDER BY country_code, menu_slot, sort_order, id`,
+    `SELECT ${RECIPE_SELECT} ${RECIPE_FROM}
+     ORDER BY recipes.country_code, recipes.menu_slot, recipes.sort_order, recipes.id`,
   );
   const byCode = new Map<string, QueryResultRow[]>();
   for (const row of recipes.rows) {
@@ -193,8 +194,8 @@ export async function getCountryFromDb(code: string): Promise<Country | undefine
   if (!row) return undefined;
   const recipes = await db.query(
     `SELECT ${RECIPE_SELECT} ${RECIPE_FROM}
-     WHERE country_code = $1
-     ORDER BY menu_slot, sort_order, id`,
+     WHERE recipes.country_code = $1
+     ORDER BY recipes.menu_slot, recipes.sort_order, recipes.id`,
     [code.toLowerCase()],
   );
   return assembleCountry(row, recipes.rows);
@@ -261,10 +262,19 @@ export async function upsertCountryRecord(country: Country): Promise<void> {
 export async function replaceCountryRecipes(
   countryCode: string,
   entries: Array<{ recipe: Recipe; menuSlot: MenuSlot; sortOrder: number }>,
+  options?: { preserveRegional?: boolean },
 ): Promise<void> {
   const db = await ensureDb();
   const code = countryCode.toLowerCase();
-  await db.query(`DELETE FROM recipes WHERE country_code = $1`, [code]);
+  if (options?.preserveRegional) {
+    // Keep region-linked recipes when refreshing the national cook menu.
+    await db.query(
+      `DELETE FROM recipes WHERE country_code = $1 AND region_id IS NULL`,
+      [code],
+    );
+  } else {
+    await db.query(`DELETE FROM recipes WHERE country_code = $1`, [code]);
+  }
 
   const { resolve: resolveRegion } = await createRegionResolver(code);
   for (const entry of entries) {
@@ -533,7 +543,7 @@ export async function getRecipeRow(
   const db = await ensureDb();
   const result = await db.query(
     `SELECT ${RECIPE_SELECT} ${RECIPE_FROM}
-     WHERE country_code = $1 AND id = $2`,
+     WHERE recipes.country_code = $1 AND recipes.id = $2`,
     [countryCode.toLowerCase(), recipeId],
   );
   const row = result.rows[0];
@@ -576,6 +586,15 @@ export async function updateRecipeFields(
     regionId = region?.id ?? null;
     next.regionId = region?.id;
     next.regionName = region?.name;
+  } else if (patch.regionId !== undefined) {
+    if (regionId) {
+      const region = await getRegionById(regionId);
+      next.regionId = regionId;
+      next.regionName = region?.name;
+    } else {
+      delete next.regionId;
+      delete next.regionName;
+    }
   }
   const db = await ensureDb();
   await db.query(

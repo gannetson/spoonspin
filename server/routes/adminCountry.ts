@@ -130,6 +130,9 @@ const recipeSchema = z.object({
   imageAttribution: z.string().nullish(),
   sourceUrl: z.string().nullish(),
   videoUrl: z.string().nullish(),
+  regionId: z.string().min(1).nullish(),
+  regionName: z.string().min(1).nullish(),
+  region: z.string().min(1).nullish(),
 });
 
 /** Manual copy edits — partial; omit unchanged fields. */
@@ -168,6 +171,8 @@ const recipeCopyPatchSchema = z
     substitutions: z.array(z.string().min(1).max(500)).max(40).nullish(),
     servingSuggestion: z.string().max(2000).nullish(),
     drinkPairing: z.string().max(2000).nullish(),
+    regionId: z.string().min(1).nullish(),
+    region: z.string().min(1).max(120).nullish(),
   })
   .refine(
     (value) =>
@@ -183,7 +188,9 @@ const recipeCopyPatchSchema = z
       value.steps !== undefined ||
       value.substitutions !== undefined ||
       value.servingSuggestion !== undefined ||
-      value.drinkPairing !== undefined,
+      value.drinkPairing !== undefined ||
+      value.regionId !== undefined ||
+      value.region !== undefined,
     { message: "Provide at least one recipe field to update." },
   );
 
@@ -228,6 +235,8 @@ const restaurantSchema = z.object({
   phone: z.string().nullish(),
   verified: z.boolean().nullish(),
   cuisineCodes: z.array(z.string().regex(/^[a-z]{2}$/i)).max(12).nullish(),
+  /** Google Place ID when known from discover / Places grounding. */
+  placeId: z.string().min(3).max(256).nullish(),
 });
 
 const shopSchema = z.object({
@@ -607,6 +616,8 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
               id,
               localName: recipe.localName ?? undefined,
               region: recipe.region ?? undefined,
+              regionId: recipe.regionId ?? undefined,
+              regionName: recipe.regionName ?? undefined,
               substitutions: recipe.substitutions ?? undefined,
               servingSuggestion: recipe.servingSuggestion ?? undefined,
               drinkPairing: recipe.drinkPairing ?? undefined,
@@ -810,8 +821,12 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             city,
           });
           let verified = Boolean(place.verified);
+          let googlePlaceId = place.placeId?.trim() || null;
 
-          if ((lat == null || lng == null) && isGooglePlacesConfigured()) {
+          const needsPlacesEnrichment =
+            isGooglePlacesConfigured() &&
+            (lat == null || lng == null || !googlePlaceId);
+          if (needsPlacesEnrichment) {
             try {
               const match = await lookupGoogleRestaurant({
                 name: place.name,
@@ -820,6 +835,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
               });
               if (match) {
                 verified = true;
+                googlePlaceId = match.placeId || googlePlaceId;
                 lat = match.lat ?? lat;
                 lng = match.lng ?? lng;
                 address = match.address || address;
@@ -875,6 +891,8 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             phone,
             source: "admin-discover",
             mapsUrl,
+            googlePlaceId,
+            placesRefreshedAt: googlePlaceId ? new Date().toISOString() : null,
             reviewed: true,
             authenticityRating,
             authenticityNotes,
@@ -2083,6 +2101,12 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         if (body.drinkPairing !== undefined) {
           patch.drinkPairing = body.drinkPairing?.trim() || undefined;
         }
+        if (body.regionId !== undefined) {
+          patch.regionId = body.regionId?.trim() || undefined;
+        }
+        if (body.region !== undefined) {
+          patch.region = body.region?.trim() || undefined;
+        }
 
         let updatedRecipe: Recipe | null = null;
         if (authored) {
@@ -2194,6 +2218,87 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         res.status(500).json({
           message:
             error instanceof Error ? error.message : "Could not delete restaurant.",
+        });
+      }
+    },
+  );
+
+  app.get(
+    "/api/admin/restaurants/:id/reservations",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const id = String(req.params.id ?? "");
+        const existing = await getRestaurantById(id);
+        if (!existing) {
+          res.status(404).json({ message: "Restaurant not found." });
+          return;
+        }
+        const { listRestaurantReservationLinks } = await import("../db/reservations.ts");
+        const { reservationService } = await import("../reservations/service.ts");
+        const links = await listRestaurantReservationLinks(id);
+        const options = await reservationService.getReservationOptions(existing);
+        res.json({
+          restaurant: {
+            id: existing.id,
+            name: existing.name,
+            googlePlaceId: existing.googlePlaceId,
+            website: existing.website,
+            mapsUrl: existing.mapsUrl,
+            placesRefreshedAt: existing.placesRefreshedAt,
+            businessStatus: existing.businessStatus,
+            primaryType: existing.primaryType,
+          },
+          links,
+          options: {
+            bestOption: options.bestOption,
+            fallback: options.fallback,
+            providers: options.providers,
+          },
+        });
+      } catch (error) {
+        console.error("Admin restaurant reservations failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error
+              ? error.message
+              : "Could not load reservation associations.",
+        });
+      }
+    },
+  );
+
+  app.post(
+    "/api/admin/restaurants/:id/reconcile-places",
+    requireAdmin,
+    async (req: AuthedRequest, res) => {
+      try {
+        const id = String(req.params.id ?? "");
+        const existing = await getRestaurantById(id);
+        if (!existing) {
+          res.status(404).json({ message: "Restaurant not found." });
+          return;
+        }
+        const { reconcileRestaurantWithGooglePlaces } = await import(
+          "../lib/reconcileRestaurantPlaces.ts"
+        );
+        const result = await reconcileRestaurantWithGooglePlaces(existing);
+        if (!result.ok) {
+          res.status(result.status === "not_configured" ? 503 : 404).json({
+            message: result.message,
+          });
+          return;
+        }
+        res.json({
+          restaurant: toPublicRestaurant(result.restaurant),
+          placeId: result.restaurant.googlePlaceId,
+          refreshed: true,
+        });
+      } catch (error) {
+        console.error("Reconcile Places failed", error);
+        res.status(500).json({
+          message:
+            error instanceof Error ? error.message : "Could not reconcile Places.",
         });
       }
     },
@@ -2557,5 +2662,6 @@ function toPublicRestaurant(
     authenticityRating: row.authenticityRating ?? undefined,
     authenticityNotes: row.authenticityNotes ?? undefined,
     reviewed: row.reviewed,
+    googlePlaceId: row.googlePlaceId ?? undefined,
   };
 }

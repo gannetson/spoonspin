@@ -1,0 +1,25 @@
+{
+  "source": "ISO 3166-2:IT",
+  "subdivisions": [
+    { "isoCode": "IT-65", "name": "Abruzzo", "type": "region" },
+    { "isoCode": "IT-23", "name": "Aosta Valley", "type": "autonomous region" },
+    { "isoCode": "IT-77", "name": "Basilicata", "type": "region" },
+    { "isoCode": "IT-78", "name": "Calabria", "type": "region" },
+    { "isoCode": "IT-72", "name": "Campania", "type": "region" },
+    { "isoCode": "IT-45", "name": "Emilia-Romagna", "type": "region" },
+    { "isoCode": "IT-36", "name": "Friuli Venezia Giulia", "type": "autonomous region" },
+    { "isoCode": "IT-62", "name": "Lazio", "type": "region" },
+    { "isoCode": "IT-42", "name": "Liguria", "type": "region" },
+    { "isoCode": "IT-25", "name": "Lombardy", "type": "region" },
+    { "isoCode": "IT-57", "name": "Marche", "type": "region" },
+    { "isoCode": "IT-67", "name": "Molise", "type": "region" },
+    { "isoCode": "IT-21", "name": "Piedmont", "type": "region" },
+    { "isoCode": "IT-75", "name": "Puglia", "type": "region" },
+    { "isoCode": "IT-88", "name": "Sardinia", "type": "autonomous region" },
+    { "isoCode": "IT-82", "name": "Sicily", "type": "autonomous region" },
+    { "isoCode": "IT-32", "name": "Trentino-South Tyrol", "type": "autonomous region" },
+    { "isoCode": "IT-52", "name": "Tuscany", "type": "region" },
+    { "isoCode": "IT-55", "name": "Umbria", "type": "region" },
+    { "isoCode": "IT-34", "name": "Veneto", "type": "region" }
+  ]
+}

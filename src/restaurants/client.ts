@@ -1,4 +1,9 @@
 import type { Restaurant, RestaurantSearchParams, RestaurantSearchResult } from "./types";
+import type {
+  ReservationOptionsDto,
+  ReservationOptionsQuery,
+  ReservationProviderKey,
+} from "./reservationOptions";
 import { buildMapsSearchUrl, withDistances } from "./shared";
 
 export async function fetchRestaurantById(id: string): Promise<Restaurant | null> {
@@ -9,6 +14,58 @@ export async function fetchRestaurantById(id: string): Promise<Restaurant | null
   }
   const data = (await response.json()) as { restaurant: Restaurant };
   return data.restaurant;
+}
+
+export async function fetchReservationOptions(
+  restaurantId: string,
+  query: ReservationOptionsQuery = {},
+): Promise<ReservationOptionsDto> {
+  const params = new URLSearchParams();
+  if (query.date) params.set("date", query.date);
+  if (query.time) params.set("time", query.time);
+  if (query.partySize != null) params.set("party_size", String(query.partySize));
+  const qs = params.toString();
+  const response = await fetch(
+    `/api/restaurants/${encodeURIComponent(restaurantId)}/reservation-options${
+      qs ? `?${qs}` : ""
+    }`,
+    { credentials: "same-origin" },
+  );
+  if (!response.ok) {
+    throw new Error("Could not load reservation options.");
+  }
+  return (await response.json()) as ReservationOptionsDto;
+}
+
+/** Fire-and-forget outbound click tracking. Returns opaque referral id when available. */
+export async function recordReservationClick(input: {
+  restaurantId: string;
+  provider: ReservationProviderKey;
+  partySize?: number;
+  requestedDate?: string;
+  requestedTime?: string;
+}): Promise<string | null> {
+  try {
+    const response = await fetch(
+      `/api/restaurants/${encodeURIComponent(input.restaurantId)}/reservation-clicks`,
+      {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          provider: input.provider,
+          party_size: input.partySize,
+          requested_date: input.requestedDate,
+          requested_time: input.requestedTime,
+        }),
+      },
+    );
+    if (!response.ok) return null;
+    const data = (await response.json()) as { referral_id?: string };
+    return data.referral_id?.trim() || null;
+  } catch {
+    return null;
+  }
 }
 
 export async function fetchRestaurants(

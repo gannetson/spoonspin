@@ -1,0 +1,9 @@
+{
+  "source": "culinary regions",
+  "subdivisions": [
+    { "isoCode": "TH-C", "name": "Central", "type": "culinary region" },
+    { "isoCode": "TH-NE", "name": "Isan", "type": "culinary region" },
+    { "isoCode": "TH-N", "name": "Northern", "type": "culinary region" },
+    { "isoCode": "TH-S", "name": "Southern", "type": "culinary region" }
+  ]
+}
