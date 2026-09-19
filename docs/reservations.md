@@ -161,11 +161,12 @@ Affiliate networks (e.g. Awin country programmes) are separate from the B2B API 
 | Phase | Status |
 |-------|--------|
 | 1 Places identity + provider-neutral models | Done |
-| 2 ReservationService + adapters + fallbacks | Done (`not_configured` until partner creds) |
-| 3 Live provider HTTP | Blocked on partner credentials |
-| 4 API + RestaurantView booking CTA | Done |
+| 2 ReservationService + adapters + fallbacks | Done |
+| 3 Live provider HTTP | TheFork timeslots client is implemented (mocked in CI). Needs partner credentials. Zenchef HTTP still blocked on unpublished partner spec — do not invent endpoints. |
+| 4 API + Dine/detail booking CTA | Done (TheFork profile URLs → `BOOK_EXTERNALLY`; date/party on detail when `RESERVATIONS_ENABLED`) |
 | 5 Referral click tracking | Done (schema + `POST …/reservation-clicks`); webhooks later |
 | 6 Tests + docs | Done for current surface |
+| 7 Attach TheFork URLs from `ratings_json` | Done (`npm run db:promote-thefork-links`; also on review-link enrich + score updates) |
 
 ## SpoonSpin API
 
@@ -183,4 +184,53 @@ POST /api/admin/restaurants/:id/reconcile-places
 ```bash
 npm run agent:reconcile-places -- --limit=20
 npm run agent:reconcile-places -- --force
+npm run db:promote-thefork-links   # ratings_json TheFork URLs → reservation_providers
+npm run agent:review-links         # also upserts TheFork booking links when a profile is found
+```
+
+Catalog ingest (`server/reservations/catalogIngest.ts`) **attaches** booking ids onto curated rows only. A raw TheFork dump must not appear in Dine until Google Places identity + authenticity review exist. There is no public TheFork restaurant-search endpoint.
+
+## Partner outreach (send these; do not scrape)
+
+### TheFork — integrations@thefork.com
+
+Subject: Spoonspin NL booking-funnel partnership (availability + source attribution)
+
+```
+Hello TheFork integrations team,
+
+Spoonspin (https://spoonspin.nl) is a Netherlands-focused cuisine discovery app. Users spin a country, then dine at curated restaurants here.
+
+We would like partner access to the B2B API (https://docs.thefork.io) to:
+
+1. Auth0 client_id / client_secret for https://auth.thefork.io/oauth/token
+2. Live availabilities / timeslots for restaurants we already identify (TheFork restaurant id from thefork.nl/restaurant/…-r{id})
+3. Confirm whether our partner tier includes a restaurant directory or search API (not in the public docs). We will not scrape thefork.nl.
+4. A source / affiliate id for outbound bookings from Spoonspin (NL market). We have not found a thefork.nl Awin programme.
+
+Use case: show “Book a table” on our Dine results and, when credentials allow, tonight’s available times. Identity stays Google Places; TheFork is a booking layer, not our search index.
+
+Company: Spoonspin
+Product: https://spoonspin.nl
+Contact: [your email]
+
+Thank you
+```
+
+### Zenchef — https://www.zenchef.com/integrations / api-tech-help@zenchef.com
+
+Subject: Spoonspin discovery-partner availability (NL), source tag spoonspin
+
+```
+Hello Zenchef integrations,
+
+Spoonspin is a Dutch cuisine-discovery app (https://spoonspin.nl). We would like the same reservation-service path as Heerlijk.nl / deBuik:
+
+- Query availability for connected restaurants
+- Create reservations tagged with source “spoonspin”
+- Partner API docs + production credentials (base URL, auth)
+
+We will not invent endpoints from the public Resengo swagger. Formitable is treated as Zenchef (2024 merger); we will not add a separate Formitable adapter.
+
+Thank you
 ```

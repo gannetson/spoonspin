@@ -4,7 +4,6 @@ import {
   ChevronDown,
   GlassWater,
   LayoutGrid,
-  LoaderCircle,
   UtensilsCrossed,
   Warehouse,
 } from "lucide-react";
@@ -16,7 +15,8 @@ import {
 } from "@/components/AdminDiscoverModal";
 import { useT } from "@/i18n/LocaleContext";
 import { zClass } from "@/lib/stacking";
-import { useAnchoredToast, usePortalMenu } from "@/lib/usePortalMenu";
+import { usePortalMenu } from "@/lib/usePortalMenu";
+import { AdminStatusToast } from "@/components/AdminStatusToast";
 
 type AdminCookMenuProps = {
   country: Country;
@@ -41,11 +41,6 @@ export function AdminCookMenu({
   const [dinnerBusy, setDinnerBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { position: statusPosition } = useAnchoredToast({
-    active: Boolean(dinnerBusy || status || error),
-    triggerRef,
-    width: 256,
-  });
 
   async function onComposeDinner() {
     setOpen(false);
@@ -150,34 +145,6 @@ export function AdminCookMenu({
         )
       : null;
 
-  const statusToast =
-    (dinnerBusy || status || error) && statusPosition
-      ? createPortal(
-          <div
-            style={{ top: statusPosition.top, left: statusPosition.left }}
-            className={`fixed ${zClass.popover} w-max max-w-[16rem] rounded-lg border border-ink/10 bg-cream px-3 py-2 text-sm text-ink shadow-md`}
-          >
-            {dinnerBusy ? (
-              <span className="inline-flex items-center gap-2 text-ink-soft">
-                <LoaderCircle className="size-4 animate-spin" />
-                {t("admin.country.composingDinner")}
-              </span>
-            ) : null}
-            {status ? (
-              <span role="status" className="text-ink-soft">
-                {status}
-              </span>
-            ) : null}
-            {error ? (
-              <span role="alert" className="text-tomato">
-                {error}
-              </span>
-            ) : null}
-          </div>,
-          document.body,
-        )
-      : null;
-
   return (
     <div ref={rootRef} className="relative">
       <button
@@ -201,7 +168,13 @@ export function AdminCookMenu({
       </button>
 
       {menu}
-      {statusToast}
+      <AdminStatusToast
+        triggerRef={triggerRef}
+        busy={dinnerBusy}
+        busyLabel={t("admin.country.composingDinner")}
+        status={status}
+        error={error}
+      />
 
       {discoverKind ? (
         <AdminDiscoverModal

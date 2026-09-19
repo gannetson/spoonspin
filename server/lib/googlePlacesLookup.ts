@@ -110,9 +110,15 @@ export type GooglePlaceMatch = {
 export type GroundedPlace = GooglePlaceMatch & {
   /** Alias or query that found this place. */
   matchedQuery?: string;
-  source: "google" | "osm" | "tripadvisor";
+  source: "google" | "osm" | "tripadvisor" | "zenchef" | "thefork" | "yelp";
   /** Tripadvisor Restaurant_Review profile when found via Apify. */
   tripadvisorUrl?: string;
+  /** Canonical yelp.com/biz profile when found via Apify. */
+  yelpUrl?: string;
+  /** Zenchef booking widget when found via the partner restaurant list. */
+  zenchefUrl?: string;
+  /** Canonical thefork.nl restaurant URL when a profile id is known. */
+  theForkUrl?: string;
 };
 
 export const NL_DISCOVER_CITIES = [
@@ -335,6 +341,7 @@ export async function searchGoogleRestaurantsByCuisine(input: {
   cities?: string[];
   focus?: string;
   maxPerQuery?: number;
+  onProgress?: (message: string) => void;
 }): Promise<GroundedPlace[]> {
   const apiKey = getGooglePlacesApiKey();
   if (!apiKey) return [];
@@ -352,7 +359,8 @@ export async function searchGoogleRestaurantsByCuisine(input: {
   const maxPerQuery = input.maxPerQuery ?? 8;
   const byId = new Map<string, GroundedPlace>();
 
-  for (const city of cities) {
+  for (const [index, city] of cities.entries()) {
+    input.onProgress?.(`Google Places · ${city} (${index + 1}/${cities.length})`);
     const batch = await Promise.all(
       aliases.map(async (alias) => {
         const textQuery = focus

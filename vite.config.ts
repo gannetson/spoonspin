@@ -23,7 +23,9 @@ export default defineConfig({
     proxy: {
       "/api": {
         target: apiTarget,
-        changeOrigin: true,
+        // Keep the browser's Host (localhost:5173) so OAuth redirect URIs and
+        // post-login redirects stay on the SPA origin instead of the API port.
+        changeOrigin: false,
         // Admin OpenAI discover/expand calls can take well over a minute.
         timeout: 300_000,
         proxyTimeout: 300_000,

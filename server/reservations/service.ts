@@ -1,5 +1,10 @@
 import { listRestaurantReservationLinks } from "../db/reservations.ts";
 import type { StoredRestaurant } from "../db/restaurants.ts";
+import {
+  isPlausibleTheForkRestaurantId,
+  normalizeTheForkBookingUrl,
+  parseTheForkRestaurantId,
+} from "../../src/restaurants/reviewLinks.ts";
 import { createGuestplanAdapter } from "./adapters/guestplan.ts";
 import { createTheForkAdapter } from "./adapters/thefork.ts";
 import { createZenchefAdapter } from "./adapters/zenchef.ts";
@@ -152,6 +157,22 @@ export function optionFromVerifiedLink(
   };
 }
 
+/** Deep-link from a stored TheFork profile URL when no reservation_providers row exists yet. */
+export function optionFromTheForkRatings(
+  restaurant: StoredRestaurant,
+): BookingOption | null {
+  const raw = restaurant.ratings?.theFork?.url?.trim();
+  if (!raw) return null;
+  const url = normalizeTheForkBookingUrl(raw);
+  const id = url ? parseTheForkRestaurantId(url) : null;
+  if (!url || !id || !isPlausibleTheForkRestaurantId(id)) return null;
+  return {
+    provider: "thefork",
+    action: "BOOK_EXTERNALLY",
+    url,
+  };
+}
+
 export type ReservationServiceDeps = {
   adapters?: ReservationProviderAdapter[];
   listLinks?: (restaurantId: string) => Promise<RestaurantReservationLink[]>;
@@ -232,6 +253,11 @@ export function createReservationService(deps: ReservationServiceDeps = {}) {
     const deepLinkOptions = links
       .map(optionFromVerifiedLink)
       .filter((opt): opt is BookingOption => Boolean(opt));
+
+    if (!deepLinkOptions.some((opt) => opt.provider === "thefork")) {
+      const fromRatings = optionFromTheForkRatings(restaurant);
+      if (fromRatings) deepLinkOptions.push(fromRatings);
+    }
 
     const ranked = [...liveOptions, ...deepLinkOptions].sort((a, b) =>
       compareBookingOptions(a, b, request.time, priority),

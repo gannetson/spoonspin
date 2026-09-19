@@ -19,7 +19,7 @@ const catalogByCode = new Map(
 );
 
 type ProfilePageProps = {
-  /** tasted = Dishes digested (did only); planned = Planned plates (want only). */
+  /** tasted = Dishes digested (did only); planned = Plates planned (want only). */
   variant?: PlatePageVariant;
 };
 

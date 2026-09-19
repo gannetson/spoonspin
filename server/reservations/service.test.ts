@@ -9,6 +9,7 @@ import {
   buildFallbackOption,
   compareBookingOptions,
   createReservationService,
+  optionFromTheForkRatings,
   optionFromVerifiedLink,
 } from "./service";
 import type { AvailabilitySlot, BookingOption, RestaurantReservationLink } from "./types";
@@ -171,6 +172,21 @@ describe("fallback and ranking", () => {
       optionFromVerifiedLink({ ...link, matchStatus: "candidate" }),
     ).toBeNull();
   });
+
+  it("builds BOOK_EXTERNALLY from a stored TheFork ratings URL", () => {
+    const option = optionFromTheForkRatings(
+      restaurant({
+        ratings: {
+          theFork: {
+            url: "https://www.thefork.nl/restaurant/test-spot-r827794/reviews",
+          },
+        },
+      }),
+    );
+    expect(option?.action).toBe("BOOK_EXTERNALLY");
+    expect(option?.provider).toBe("thefork");
+    expect(option?.url).toBe("https://www.thefork.nl/restaurant/test-spot-r827794");
+  });
 });
 
 describe("createReservationService", () => {
@@ -246,5 +262,21 @@ describe("createReservationService", () => {
     const best = await service.getBestBookingOption(restaurant());
     expect(best.action).toBe("BOOK_EXTERNALLY");
     expect(best.provider).toBe("zenchef");
+  });
+
+  it("uses a TheFork ratings URL when no reservation link exists", async () => {
+    const service = createReservationService({
+      listLinks: async () => [],
+    });
+    const best = await service.getBestBookingOption(
+      restaurant({
+        ratings: {
+          theFork: { url: "https://www.thefork.nl/restaurant/test-spot-r827794" },
+        },
+      }),
+    );
+    expect(best.action).toBe("BOOK_EXTERNALLY");
+    expect(best.provider).toBe("thefork");
+    expect(best.url).toBe("https://www.thefork.nl/restaurant/test-spot-r827794");
   });
 });

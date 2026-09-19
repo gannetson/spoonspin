@@ -14,6 +14,7 @@ import {
   createReservationReferral,
   upsertRestaurantReservationLink,
 } from "./reservations";
+import { upsertTheForkLinkFromRatings } from "../reservations/theForkFromRatings";
 
 const TEST_DATABASE_URL =
   process.env.TEST_DATABASE_URL?.trim() || "postgresql://localhost:5432/spoonspin_test";
@@ -148,5 +149,48 @@ describe("google place identity + reservation links", () => {
     expect(referralId).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
     );
+  });
+
+  it("promotes a stored TheFork ratings URL into a verified reservation link", async () => {
+    await upsertRestaurant({
+      id: "osm:node/40",
+      name: "Fork Spot",
+      address: "Haarlemmerstraat 1",
+      city: "Leiden",
+      cuisineCodes: ["it"],
+      cuisineTags: ["italian"],
+      source: "overpass",
+      osmId: "node/40",
+      mapsUrl: "https://maps.google.com/?q=Fork+Spot",
+      ratings: {
+        theFork: { url: "https://www.thefork.nl/restaurant/fork-spot-r77777" },
+      },
+    });
+
+    const wrote = await upsertTheForkLinkFromRatings({
+      id: "osm:node/40",
+      ratings: {
+        theFork: { url: "https://www.thefork.nl/restaurant/fork-spot-r77777" },
+      },
+    });
+    expect(wrote).toBe(true);
+
+    const links = await listRestaurantReservationLinks("osm:node/40");
+    expect(links).toHaveLength(1);
+    expect(links[0]).toMatchObject({
+      providerKey: "thefork",
+      externalRestaurantId: "77777",
+      bookingUrl: "https://www.thefork.nl/restaurant/fork-spot-r77777",
+      matchStatus: "verified",
+      active: true,
+    });
+
+    const again = await upsertTheForkLinkFromRatings({
+      id: "osm:node/40",
+      ratings: {
+        theFork: { url: "https://www.thefork.nl/restaurant/fork-spot-r77777" },
+      },
+    });
+    expect(again).toBe(false);
   });
 });

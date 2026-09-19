@@ -66,6 +66,9 @@ import {
   rewriteRestaurantText,
   rewriteShopText,
 } from "../openai/adminDiscover.ts";
+import { sanitizeAdminErrorMessage } from "../openai/httpError.ts";
+import { isZenchefDiscoverConfigured } from "../lib/zenchefRestaurantSearch.ts";
+import { startNdjson } from "../lib/ndjson.ts";
 import { findCuisineImageFromQueries, sameImageUrl } from "../lib/wikimedia.ts";
 import { fetchBestWebsiteRestaurantPhoto } from "../lib/websiteImages.ts";
 import {
@@ -198,9 +201,7 @@ const recipeCopyPatchSchema = z
 const restaurantCopyPatchSchema = z
   .object({
     name: z.string().min(1).max(200).optional(),
-    website: z
-      .union([z.string().url().max(2000), z.literal(""), z.null()])
-      .optional(),
+    website: z.union([z.string().url().max(2000), z.literal(""), z.null()]).optional(),
     authenticityNotes: z.string().max(4000).nullish(),
     cuisineCodes: z
       .array(z.string().regex(/^[a-z]{2}$/i))
@@ -234,7 +235,10 @@ const restaurantSchema = z.object({
   authenticityRating: z.number().min(1).max(5).nullish(),
   phone: z.string().nullish(),
   verified: z.boolean().nullish(),
-  cuisineCodes: z.array(z.string().regex(/^[a-z]{2}$/i)).max(12).nullish(),
+  cuisineCodes: z
+    .array(z.string().regex(/^[a-z]{2}$/i))
+    .max(12)
+    .nullish(),
   /** Google Place ID when known from discover / Places grounding. */
   placeId: z.string().min(3).max(256).nullish(),
 });
@@ -262,7 +266,10 @@ const orderOptionSchema = z.object({
   signatureDish: z.string().nullish(),
   imageUrl: z.string().nullish(),
   imageAttribution: z.string().nullish(),
-  cuisineCodes: z.array(z.string().regex(/^[a-z]{2}$/i)).max(12).nullish(),
+  cuisineCodes: z
+    .array(z.string().regex(/^[a-z]{2}$/i))
+    .max(12)
+    .nullish(),
 });
 
 const orderOptionCopyPatchSchema = z
@@ -331,7 +338,9 @@ function publicErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof z.ZodError) {
     return "OpenAI returned data we could not parse. Try querying again.";
   }
-  if (error instanceof Error && error.message) return error.message;
+  if (error instanceof Error && error.message) {
+    return sanitizeAdminErrorMessage(error.message);
+  }
   return fallback;
 }
 
@@ -354,10 +363,16 @@ function openaiRequired(res: import("express").Response): boolean {
 }
 
 function placesRequired(res: import("express").Response): boolean {
-  if (isGooglePlacesConfigured() || isApifyConfigured()) return true;
+  if (
+    isGooglePlacesConfigured() ||
+    isApifyConfigured() ||
+    isZenchefDiscoverConfigured()
+  ) {
+    return true;
+  }
   res.status(503).json({
     message:
-      "Restaurant discover needs GOOGLE_PLACES_API_KEY and/or APIFY_TOKEN (Tripadvisor).",
+      "Restaurant discover needs GOOGLE_PLACES_API_KEY, APIFY_TOKEN (Tripadvisor), or Zenchef partner credentials.",
   });
   return false;
 }
@@ -395,8 +410,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
     } catch (error) {
       console.error("Admin overview failed", error);
       res.status(500).json({
-        message:
-          error instanceof Error ? error.message : "Could not load admin overview.",
+        message: publicErrorMessage(error, "Could not load admin overview."),
       });
     }
   });
@@ -409,8 +423,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
     } catch (error) {
       console.error("Admin fill-status failed", error);
       res.status(500).json({
-        message:
-          error instanceof Error ? error.message : "Could not load fill status.",
+        message: publicErrorMessage(error, "Could not load fill status."),
       });
     }
   });
@@ -512,7 +525,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         }
         res.json({ country: updated });
       } catch (error) {
-        const message = error instanceof Error ? error.message : "Could not update text.";
+        const message = publicErrorMessage(error, "Could not update text.");
         const status = message.includes("at least") ? 400 : 500;
         if (status === 500) {
           console.error("Update country text failed", error);
@@ -735,18 +748,39 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           res.status(404).json({ message: "Country not found." });
           return;
         }
-        const result = await discoverCountryRestaurants({
-          countryCode: country.code,
-          countryName: country.name,
-          query: parsed.data.query,
-          cuisineAliases: country.cuisineAliases,
+        const stream = startNdjson(res);
+        req.on("close", () => {
+          /* Client hung up; discover still finishes but we stop writing. */
         });
-        res.json(result);
+        try {
+          const result = await discoverCountryRestaurants({
+            countryCode: country.code,
+            countryName: country.name,
+            query: parsed.data.query,
+            cuisineAliases: country.cuisineAliases,
+            onProgress: stream.log,
+          });
+          stream.send({
+            type: "result",
+            notes: result.notes,
+            restaurants: result.restaurants,
+          });
+          stream.end();
+        } catch (error) {
+          console.error("Discover restaurants failed", error);
+          stream.send({
+            type: "error",
+            message: publicErrorMessage(error, "Could not discover restaurants."),
+          });
+          stream.end();
+        }
       } catch (error) {
         console.error("Discover restaurants failed", error);
-        res.status(500).json({
-          message: publicErrorMessage(error, "Could not discover restaurants."),
-        });
+        if (!res.headersSent) {
+          res.status(500).json({
+            message: publicErrorMessage(error, "Could not discover restaurants."),
+          });
+        }
       }
     },
   );
@@ -783,10 +817,9 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         for (const place of parsed.data.restaurants) {
           const placeCuisineCodes = Array.from(
             new Set(
-              (place.cuisineCodes?.length
-                ? place.cuisineCodes
-                : [country.code]
-              ).map((code) => code.trim().toLowerCase()).filter((code) => /^[a-z]{2}$/.test(code)),
+              (place.cuisineCodes?.length ? place.cuisineCodes : [country.code])
+                .map((code) => code.trim().toLowerCase())
+                .filter((code) => /^[a-z]{2}$/.test(code)),
             ),
           );
           const primaryCode = placeCuisineCodes[0] ?? country.code;
@@ -824,8 +857,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           let googlePlaceId = place.placeId?.trim() || null;
 
           const needsPlacesEnrichment =
-            isGooglePlacesConfigured() &&
-            (lat == null || lng == null || !googlePlaceId);
+            isGooglePlacesConfigured() && (lat == null || lng == null || !googlePlaceId);
           if (needsPlacesEnrichment) {
             try {
               const match = await lookupGoogleRestaurant({
@@ -885,8 +917,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
             lat,
             lng,
             cuisineCodes: placeCuisineCodes,
-            cuisineTags:
-              cuisineTags.length > 0 ? cuisineTags : placeCuisineCodes,
+            cuisineTags: cuisineTags.length > 0 ? cuisineTags : placeCuisineCodes,
             website,
             phone,
             source: "admin-discover",
@@ -1044,10 +1075,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         const options: OrderOption[] = parsed.data.options.map((option) => {
           const cuisineCodes = Array.from(
             new Set(
-              (option.cuisineCodes?.length
-                ? option.cuisineCodes
-                : [country.code]
-              )
+              (option.cuisineCodes?.length ? option.cuisineCodes : [country.code])
                 .map((code) => code.trim().toLowerCase())
                 .filter((code) => /^[a-z]{2}$/.test(code)),
             ),
@@ -1160,9 +1188,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
         const body = parsed.data;
         const nextName = body.name?.trim() || existing.name;
         const nextNotes =
-          body.notes === undefined
-            ? existing.notes
-            : body.notes?.trim() || undefined;
+          body.notes === undefined ? existing.notes : body.notes?.trim() || undefined;
         const nextSignature =
           body.signatureDish === undefined
             ? existing.signatureDish
@@ -1582,7 +1608,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Delete recipe failed", error);
         res.status(500).json({
-          message: error instanceof Error ? error.message : "Could not delete recipe.",
+          message: publicErrorMessage(error, "Could not delete recipe."),
         });
       }
     },
@@ -1673,10 +1699,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Select recipe for dinner failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error
-              ? error.message
-              : "Could not select recipe for dinner.",
+          message: publicErrorMessage(error, "Could not select recipe for dinner."),
         });
       }
     },
@@ -1698,7 +1721,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Remove drink failed", error);
         res.status(500).json({
-          message: error instanceof Error ? error.message : "Could not remove drink.",
+          message: publicErrorMessage(error, "Could not remove drink."),
         });
       }
     },
@@ -1765,8 +1788,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Replace drink image failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not replace drink image.",
+          message: publicErrorMessage(error, "Could not replace drink image."),
         });
       }
     },
@@ -1808,8 +1830,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Replace drink text failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not replace drink text.",
+          message: publicErrorMessage(error, "Could not replace drink text."),
         });
       }
     },
@@ -1831,8 +1852,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Add drink to dinner failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not add drink to dinner.",
+          message: publicErrorMessage(error, "Could not add drink to dinner."),
         });
       }
     },
@@ -1854,8 +1874,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Remove dinner course failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not remove dinner course.",
+          message: publicErrorMessage(error, "Could not remove dinner course."),
         });
       }
     },
@@ -1877,8 +1896,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Remove dinner drink failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not remove dinner drink.",
+          message: publicErrorMessage(error, "Could not remove dinner drink."),
         });
       }
     },
@@ -1960,8 +1978,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Replace recipe image failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not replace recipe image.",
+          message: publicErrorMessage(error, "Could not replace recipe image."),
         });
       }
     },
@@ -2015,8 +2032,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Replace recipe text failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not replace recipe text.",
+          message: publicErrorMessage(error, "Could not replace recipe text."),
         });
       }
     },
@@ -2126,7 +2142,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Patch recipe failed", error);
         res.status(500).json({
-          message: error instanceof Error ? error.message : "Could not update recipe.",
+          message: publicErrorMessage(error, "Could not update recipe."),
         });
       }
     },
@@ -2153,7 +2169,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Delete shop failed", error);
         res.status(500).json({
-          message: error instanceof Error ? error.message : "Could not delete shop.",
+          message: publicErrorMessage(error, "Could not delete shop."),
         });
       }
     },
@@ -2194,8 +2210,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Replace shop text failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not replace shop text.",
+          message: publicErrorMessage(error, "Could not replace shop text."),
         });
       }
     },
@@ -2216,8 +2231,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Delete restaurant failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not delete restaurant.",
+          message: publicErrorMessage(error, "Could not delete restaurant."),
         });
       }
     },
@@ -2259,10 +2273,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Admin restaurant reservations failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error
-              ? error.message
-              : "Could not load reservation associations.",
+          message: publicErrorMessage(error, "Could not load reservation associations."),
         });
       }
     },
@@ -2279,9 +2290,8 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           res.status(404).json({ message: "Restaurant not found." });
           return;
         }
-        const { reconcileRestaurantWithGooglePlaces } = await import(
-          "../lib/reconcileRestaurantPlaces.ts"
-        );
+        const { reconcileRestaurantWithGooglePlaces } =
+          await import("../lib/reconcileRestaurantPlaces.ts");
         const result = await reconcileRestaurantWithGooglePlaces(existing);
         if (!result.ok) {
           res.status(result.status === "not_configured" ? 503 : 404).json({
@@ -2297,8 +2307,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Reconcile Places failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not reconcile Places.",
+          message: publicErrorMessage(error, "Could not reconcile Places."),
         });
       }
     },
@@ -2311,8 +2320,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       const parsed = restaurantCopyPatchSchema.safeParse(req.body ?? {});
       if (!parsed.success) {
         res.status(400).json({
-          message:
-            parsed.error.issues[0]?.message ?? "Invalid restaurant edit payload.",
+          message: parsed.error.issues[0]?.message ?? "Invalid restaurant edit payload.",
         });
         return;
       }
@@ -2346,8 +2354,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Patch restaurant failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not update restaurant.",
+          message: publicErrorMessage(error, "Could not update restaurant."),
         });
       }
     },
@@ -2460,10 +2467,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Replace restaurant image failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error
-              ? error.message
-              : "Could not replace restaurant image.",
+          message: publicErrorMessage(error, "Could not replace restaurant image."),
         });
       }
     },
@@ -2521,8 +2525,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Replace restaurant text failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not replace restaurant text.",
+          message: publicErrorMessage(error, "Could not replace restaurant text."),
         });
       }
     },
@@ -2577,8 +2580,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Find restaurant menu failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not find restaurant menu.",
+          message: publicErrorMessage(error, "Could not find restaurant menu."),
         });
       }
     },
@@ -2627,8 +2629,7 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
       } catch (error) {
         console.error("Find restaurant scores failed", error);
         res.status(500).json({
-          message:
-            error instanceof Error ? error.message : "Could not find restaurant scores.",
+          message: publicErrorMessage(error, "Could not find restaurant scores."),
         });
       }
     },

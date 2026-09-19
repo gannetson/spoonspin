@@ -32,6 +32,7 @@
     "agent:ratings": "tsx --tsconfig tsconfig.app.json scripts/enrich-ratings.ts",
     "agent:review-links": "tsx --tsconfig tsconfig.app.json scripts/enrich-review-links.ts",
     "agent:reconcile-places": "tsx --tsconfig tsconfig.app.json scripts/reconcile-restaurant-places.ts",
+    "db:promote-thefork-links": "tsx --tsconfig tsconfig.app.json scripts/promote-thefork-reservation-links.ts",
     "agent:compose-dinners": "tsx --tsconfig tsconfig.app.json scripts/compose-dinners.ts",
     "agent:complete-menus": "tsx --tsconfig tsconfig.app.json scripts/complete-cook-menus.ts",
     "db:rebuild-cuisines": "tsx --tsconfig tsconfig.app.json scripts/rebuild-cuisine-codes.ts",

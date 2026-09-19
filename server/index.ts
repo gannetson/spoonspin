@@ -194,6 +194,11 @@ app.get("/api/restaurants/:id/reservation-options", async (req, res) => {
       return;
     }
 
+    const { upsertTheForkLinkFromRatings } = await import(
+      "./reservations/theForkFromRatings.ts"
+    );
+    await upsertTheForkLinkFromRatings(row);
+
     const options = await reservationService.getReservationOptions(row, {
       date: parsed.data.date,
       time: parsed.data.time,

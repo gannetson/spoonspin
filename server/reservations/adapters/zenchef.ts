@@ -17,8 +17,9 @@ import {
  *
  * Official docs confirm availability + reservation APIs exist for partners, but
  * credentials and full endpoint docs require partnership
- * (https://www.zenchef.com/integrations or help@zenchef.com).
- * Until configured, every call returns `not_configured` — no invented endpoints.
+ * (https://www.zenchef.com/integrations or api-tech-help@zenchef.com).
+ * Do not invent HTTP paths. Live availability stays `unsupported` until the
+ * partner spec is in hand (Formitable REST is per-restaurant, not a catalog).
  */
 export function createZenchefAdapter(): ReservationProviderAdapter {
   return {

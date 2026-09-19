@@ -11,6 +11,8 @@ import { formatDistanceKm } from "@/lib/haversine";
 import { AdminItemMenu, type AdminItemAction } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
+import { RestaurantBookingActions } from "@/components/RestaurantBookingActions";
+import { isTheForkRestaurantUrl } from "@/restaurants/reviewLinks";
 import { useT } from "@/i18n/LocaleContext";
 
 type RestaurantCardProps = {
@@ -38,9 +40,11 @@ export function RestaurantCard({
   const cuisineFlags = cuisineFlagsFor(restaurant.cuisineCodes);
   const priceLabel = formatPriceLevel(restaurant.priceLevel);
   const sourceRatings = listSourceRatings(restaurant.ratings).slice(0, 2);
-  const reviewLinks = listReviewLinks(restaurant);
+  const reviewLinks = listReviewLinks(restaurant).filter((link) => {
+    if (link.source !== "theFork") return true;
+    return !isTheForkRestaurantUrl(restaurant.ratings?.theFork?.url ?? "");
+  });
   const photoUrl = restaurant.photoUrl?.trim() || null;
-  const hasWebsite = Boolean(restaurant.website?.trim());
 
   return (
     <li>
@@ -165,33 +169,18 @@ export function RestaurantCard({
               ) : null}
             </button>
 
-            <div className="flex flex-wrap gap-2 pt-0.5">
-              {hasWebsite ? (
-                <a
-                  href={restaurant.website}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={(event) => event.stopPropagation()}
-                  className="inline-flex min-h-9 items-center gap-1.5 rounded-full bg-tomato px-3.5 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                >
-                  {t("dine.website")}
-                  <ExternalLink aria-hidden="true" className="size-3.5" />
-                </a>
-              ) : null}
-              <a
-                href={restaurant.mapsUrl}
-                target="_blank"
-                rel="noreferrer"
-                onClick={(event) => event.stopPropagation()}
-                className={
-                  hasWebsite
-                    ? "inline-flex min-h-9 items-center gap-1.5 rounded-full border border-ink/15 px-3.5 text-sm font-semibold text-ink hover:border-tomato hover:text-tomato"
-                    : "inline-flex min-h-9 items-center gap-1.5 rounded-full bg-tomato px-3.5 text-sm font-semibold text-cream hover:bg-tomato-deep"
-                }
-              >
-                {t("dine.openInGoogleMaps")}
-                <ExternalLink aria-hidden="true" className="size-3.5" />
-              </a>
+            <div
+              className="flex flex-wrap gap-2 pt-0.5"
+              onClick={(event) => event.stopPropagation()}
+              onKeyDown={(event) => event.stopPropagation()}
+            >
+              <RestaurantBookingActions
+                restaurantId={restaurant.id}
+                website={restaurant.website}
+                mapsUrl={restaurant.mapsUrl}
+                theForkUrl={restaurant.ratings?.theFork?.url}
+                compact
+              />
               {reviewLinks.map((link) => (
                 <a
                   key={link.source}

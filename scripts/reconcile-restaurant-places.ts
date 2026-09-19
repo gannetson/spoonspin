@@ -14,6 +14,7 @@ import "dotenv/config";
 import { listRestaurants, closeDb } from "../server/db/restaurants.ts";
 import { isGooglePlacesConfigured } from "../server/lib/googlePlacesPhoto.ts";
 import { reconcileRestaurantWithGooglePlaces } from "../server/lib/reconcileRestaurantPlaces.ts";
+import { attachProviderLinksToRestaurant } from "../server/reservations/catalogIngest.ts";
 
 async function main() {
   const limitArg = process.argv.find((arg) => arg.startsWith("--limit="));
@@ -45,7 +46,12 @@ async function main() {
     });
     if (result.ok) {
       ok += 1;
-      console.log(`✓ ${restaurant.name} → ${result.restaurant.googlePlaceId}`);
+      const attached = await attachProviderLinksToRestaurant(result.restaurant);
+      console.log(
+        `✓ ${restaurant.name} → ${result.restaurant.googlePlaceId}${
+          attached ? " · TheFork linked" : ""
+        }`,
+      );
     } else if (result.status === "not_found") {
       skipped += 1;
       console.log(`· ${restaurant.name}: ${result.message}`);

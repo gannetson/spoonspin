@@ -1,19 +1,14 @@
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
-import {
-  ChevronDown,
-  FilePenLine,
-  ImagePlus,
-  Images,
-  LoaderCircle,
-  X,
-} from "lucide-react";
+import { ChevronDown, FilePenLine, ImagePlus, Images, X } from "lucide-react";
 import type { Country } from "@/types/content";
 import { replaceCountryImage, updateCountryText } from "@/admin/countryTools";
+import { formatAdminErrorMessage } from "@/admin/formatAdminError";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
 import { zClass } from "@/lib/stacking";
-import { useAnchoredToast, usePortalMenu } from "@/lib/usePortalMenu";
+import { usePortalMenu } from "@/lib/usePortalMenu";
+import { AdminStatusToast } from "@/components/AdminStatusToast";
 
 type AdminCountryHeroMenuProps = {
   country: Country;
@@ -43,11 +38,6 @@ export function AdminCountryHeroMenu({
   const [imageBusy, setImageBusy] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const { position: statusPosition } = useAnchoredToast({
-    active: Boolean(imageBusy || status || error),
-    triggerRef,
-    width: 256,
-  });
 
   useEffect(() => {
     if (!textOpen) return;
@@ -179,34 +169,6 @@ export function AdminCountryHeroMenu({
         )
       : null;
 
-  const statusToast =
-    (imageBusy || status || error) && statusPosition
-      ? createPortal(
-          <div
-            style={{ top: statusPosition.top, left: statusPosition.left }}
-            className={`fixed ${zClass.popover} w-max max-w-[16rem] rounded-lg border border-ink/10 bg-cream px-3 py-2 text-sm text-ink shadow-md`}
-          >
-            {imageBusy ? (
-              <span className="inline-flex items-center gap-2 text-ink-soft">
-                <LoaderCircle className="size-4 animate-spin" />
-                {t("admin.country.findingImage")}
-              </span>
-            ) : null}
-            {status ? (
-              <span role="status" className="text-ink-soft">
-                {status}
-              </span>
-            ) : null}
-            {error ? (
-              <span role="alert" className="text-tomato">
-                {error}
-              </span>
-            ) : null}
-          </div>,
-          document.body,
-        )
-      : null;
-
   const textModal = textOpen
     ? createPortal(
         <div
@@ -267,8 +229,11 @@ export function AdminCountryHeroMenu({
                 />
               </label>
               {textError ? (
-                <p role="alert" className="text-sm font-semibold text-tomato">
-                  {textError}
+                <p
+                  role="alert"
+                  className="text-sm font-semibold leading-snug break-words text-tomato"
+                >
+                  {formatAdminErrorMessage(textError, t)}
                 </p>
               ) : null}
               <div className="flex flex-wrap gap-2">
@@ -316,7 +281,13 @@ export function AdminCountryHeroMenu({
       </button>
 
       {menu}
-      {statusToast}
+      <AdminStatusToast
+        triggerRef={triggerRef}
+        busy={imageBusy}
+        busyLabel={t("admin.country.findingImage")}
+        status={status}
+        error={error}
+      />
       {textModal}
     </div>
   );

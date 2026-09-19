@@ -338,6 +338,7 @@ export async function searchTripadvisorRestaurants(input: {
   query?: string;
   cuisineAliases?: string[];
   maxPerCity?: number;
+  onProgress?: (message: string) => void;
 }): Promise<{ places: GroundedPlace[]; notes: string }> {
   if (!isApifyConfigured()) {
     return {
@@ -355,16 +356,21 @@ export async function searchTripadvisorRestaurants(input: {
 
   // Cap cities to control Apify cost/latency.
   const searchCities = cities.slice(0, 2);
+  input.onProgress?.(
+    `Tripadvisor · ${searchCities.join(", ")} (Apify, often a minute+)`,
+  );
 
   const settled = await Promise.allSettled(
-    searchCities.map((city) =>
-      runTripadvisorLeadsQuery({
+    searchCities.map(async (city) => {
+      const places = await runTripadvisorLeadsQuery({
         cuisine,
         // English location string so tripadvisor.com returns EN listings.
         location: `${city}, Netherlands`,
         maxResults: maxPerCity,
-      }),
-    ),
+      });
+      input.onProgress?.(`Tripadvisor · ${city}: ${places.length} hit(s)`);
+      return places;
+    }),
   );
 
   const places: GroundedPlace[] = [];

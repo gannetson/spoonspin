@@ -1,4 +1,11 @@
-import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type RefObject,
+} from "react";
 
 export type PortalMenuPosition = {
   top: number;
@@ -96,19 +103,24 @@ type UseAnchoredToastOptions = {
   active: boolean;
   width?: number;
   gap?: number;
+  /** Used to flip above the trigger when the toast would overflow the viewport. */
+  estimatedHeight?: number;
   triggerRef: RefObject<HTMLElement | null>;
+  panelRef?: RefObject<HTMLElement | null>;
 };
 
 /** Positions a small status toast near a trigger (also portaled). */
 export function useAnchoredToast({
   active,
-  width = 224,
-  gap = 4,
+  width = 288,
+  gap = 8,
+  estimatedHeight = 96,
   triggerRef,
+  panelRef,
 }: UseAnchoredToastOptions) {
   const [position, setPosition] = useState<PortalMenuPosition | null>(null);
 
-  function updatePosition() {
+  const updatePosition = useCallback(() => {
     const trigger = triggerRef.current;
     if (!trigger || !active) {
       setPosition(null);
@@ -116,12 +128,20 @@ export function useAnchoredToast({
     }
     const rect = trigger.getBoundingClientRect();
     const left = Math.min(Math.max(8, rect.right - width), window.innerWidth - width - 8);
-    setPosition({ top: rect.bottom + gap, left });
-  }
+    const panelHeight = panelRef?.current?.offsetHeight ?? estimatedHeight;
+    let top = rect.bottom + gap;
+    if (top + panelHeight > window.innerHeight - 8) {
+      top = Math.max(8, rect.top - gap - panelHeight);
+    }
+    setPosition((prev) => {
+      if (prev && prev.top === top && prev.left === left) return prev;
+      return { top, left };
+    });
+  }, [active, width, gap, estimatedHeight, triggerRef, panelRef]);
 
   useLayoutEffect(() => {
     updatePosition();
-  }, [active, width, gap]);
+  }, [updatePosition]);
 
   useEffect(() => {
     if (!active) return;
@@ -134,7 +154,7 @@ export function useAnchoredToast({
       window.removeEventListener("resize", onReposition);
       window.removeEventListener("scroll", onReposition, true);
     };
-  }, [active, width, gap]);
+  }, [active, updatePosition]);
 
   return { position, updatePosition };
 }

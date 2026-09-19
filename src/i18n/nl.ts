@@ -8,7 +8,7 @@ export const nl: Messages = {
   "app.signOut": "Uitloggen",
   "app.admin": "Beheer",
   "app.profile": "Hapjes verteerd",
-  "app.planned": "Geplande borden",
+  "app.planned": "Borden gepland",
   "app.fallback.unknownCountry":
     "We konden geen gepubliceerd land vinden voor “{code}”. Kies opnieuw om verder te gaan.",
   "app.countries.loading": "Landen laden…",
@@ -352,6 +352,10 @@ export const nl: Messages = {
   "restaurant.booking.visitWebsite": "Website",
   "restaurant.booking.viewOnMap": "Google Maps",
   "restaurant.booking.adminProviders": "Reserveringsproviders",
+  "restaurant.booking.date": "Datum",
+  "restaurant.booking.time": "Tijd",
+  "restaurant.booking.partySize": "Gasten",
+  "restaurant.booking.availableTimes": "Beschikbare tijden",
 
   "share.button": "Delen",
   "share.ariaLabel": "Deel dit land",
@@ -652,6 +656,21 @@ export const nl: Messages = {
   "admin.country.imageUpdated": "Afbeelding bijgewerkt · {dishName}",
   "admin.country.imageError": "Kon afbeelding niet vervangen.",
 
+  "admin.error.generic": "Die actie is mislukt. Probeer het opnieuw.",
+  "admin.error.dismissAria": "Sluiten",
+  "admin.error.openai.credits":
+    "OpenAI heeft geen credits meer. Voeg facturering toe op platform.openai.com en probeer opnieuw.",
+  "admin.error.openai.rateLimit":
+    "OpenAI beperkt het aantal verzoeken. Wacht even en probeer opnieuw.",
+  "admin.error.openai.auth":
+    "OpenAI wees de API-sleutel af. Controleer OPENAI_API_KEY in .env.",
+  "admin.error.openai.unavailable":
+    "OpenAI is tijdelijk niet beschikbaar. Probeer het zo opnieuw.",
+  "admin.error.openai.generic": "OpenAI-verzoek mislukt. Probeer het opnieuw.",
+  "admin.error.signIn": "Log opnieuw in.",
+  "admin.error.timeout":
+    "De server reageerde te traag. Probeer opnieuw, of herstart de API.",
+
   "admin.item.menuAria": "Adminmenu voor {label}",
   "admin.item.remove": "Verwijderen",
   "admin.item.remove.hint": "Dit item verwijderen",
@@ -715,16 +734,15 @@ export const nl: Messages = {
   "admin.orderOption.edit.countries.addAnother": "Nog een toevoegen…",
   "admin.orderOption.edit.countries.clear": "Alles wissen",
   "admin.orderOption.edit.countries.remove": "{name} verwijderen",
-  "admin.orderOption.edit.countries.hint":
-    "Landen waar deze keuken bij hoort.",
-  "admin.orderOption.edit.countries.empty": "Geen landen komen overeen met die zoekopdracht.",
+  "admin.orderOption.edit.countries.hint": "Landen waar deze keuken bij hoort.",
+  "admin.orderOption.edit.countries.empty":
+    "Geen landen komen overeen met die zoekopdracht.",
   "admin.orderOption.edit.save": "Wijzigingen opslaan",
   "admin.orderOption.edit.saving": "Opslaan…",
   "admin.orderOption.edit.cancel": "Annuleren",
   "admin.orderOption.edit.error.name": "Naam is verplicht.",
   "admin.orderOption.edit.error.countries": "Selecteer minstens één keukenland.",
-  "admin.orderOption.edit.error.url":
-    "Voer een geldige URL in, of laat het veld leeg.",
+  "admin.orderOption.edit.error.url": "Voer een geldige URL in, of laat het veld leeg.",
   "admin.orderOption.edit.error.links":
     "Geef minstens één Thuisbezorgd- of Uber Eats-link op.",
   "admin.orderOption.edit.error.save": "Kon besteloptie niet opslaan.",
@@ -754,7 +772,8 @@ export const nl: Messages = {
   "admin.restaurant.edit.countries.hint":
     "Voeg één of meer landen toe waar deze keuken bij hoort.",
   "admin.restaurant.edit.countries.selected": "{count} geselecteerd",
-  "admin.restaurant.edit.countries.empty": "Geen landen komen overeen met die zoekopdracht.",
+  "admin.restaurant.edit.countries.empty":
+    "Geen landen komen overeen met die zoekopdracht.",
   "admin.restaurant.edit.save": "Wijzigingen opslaan",
   "admin.restaurant.edit.saving": "Opslaan…",
   "admin.restaurant.edit.cancel": "Annuleren",
@@ -830,7 +849,7 @@ export const nl: Messages = {
     "Geen gerechten teruggekregen. Probeer een andere focus.",
   "admin.discover.restaurants.title": "Restaurants zoeken",
   "admin.discover.restaurants.hint":
-    "Google Places + OpenStreetMap, plus Tripadvisor via Apify wanneer APIFY_TOKEN is gezet (Engelstalige listings). Alleen locaties met een straatadres in NL.",
+    "Google Places, OpenStreetMap, Tripadvisor (Apify), Zenchef-partnercatalogus en TheFork B2B wanneer credentials gezet zijn. Alleen locaties met een straatadres in NL.",
   "admin.discover.restaurants.placeholder":
     "Optionele focus: bijv. Amsterdam, familiebedrijf, vegan",
   "admin.discover.restaurants.empty":
@@ -868,6 +887,8 @@ export const nl: Messages = {
   "admin.discover.close": "Sluiten",
   "admin.discover.query": "Zoeken",
   "admin.discover.querying": "Bezig…",
+  "admin.discover.progress": "Zoeklog",
+  "admin.discover.log.starting": "Zoeken starten…",
   "admin.discover.error.generic": "Zoeken mislukt.",
   "admin.discover.error.selectOne": "Selecteer minstens één item om toe te voegen.",
   "admin.discover.error.save": "Kon niet opslaan.",
@@ -1105,7 +1126,7 @@ export const nl: Messages = {
   "profile.countriesHeading": "Landen op je paspoort",
   "profile.tagsHeading": "Verteerde hapjes",
 
-  "planned.title": "Geplande borden",
+  "planned.title": "Borden gepland",
   "planned.eyebrow": "Verlanglijst",
   "planned.subtitle":
     "Recepten, dranken en restaurants die je als Wil markeerde — tellen nog niet als geproefd.",

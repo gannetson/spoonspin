@@ -309,6 +309,10 @@ async function main() {
         userRating: aggregated.rating ?? null,
         reviewCount: aggregated.reviewCount ?? null,
       });
+      const { upsertTheForkLinkFromRatings } = await import(
+        "../server/reservations/theForkFromRatings.ts"
+      );
+      await upsertTheForkLinkFromRatings({ id: place.id, ratings });
 
       resolved += gained;
       if (after.ta && after.fork) fullyDone.add(place.id);

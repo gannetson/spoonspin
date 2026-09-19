@@ -96,6 +96,41 @@ export function isTheForkRestaurantUrl(url: string): boolean {
   }
 }
 
+/** Numeric TheFork restaurant id from `/restaurant/…-r123456`. */
+export function parseTheForkRestaurantId(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    const match = parsed.pathname.match(/\/restaurant\/[a-z0-9-]+-r(\d+)/i);
+    return match?.[1] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** Drop test placeholders (r123456) and too-short ids. */
+export function isPlausibleTheForkRestaurantId(id: string): boolean {
+  if (!/^\d{5,}$/.test(id)) return false;
+  return id !== "123456";
+}
+
+/** Canonical NL booking URL (no tracking params). Null when the URL is not a profile. */
+export function normalizeTheForkBookingUrl(url: string): string | null {
+  if (!isTheForkRestaurantUrl(url)) return null;
+  try {
+    const parsed = new URL(url);
+    parsed.hash = "";
+    parsed.search = "";
+    parsed.hostname = "www.thefork.nl";
+    parsed.pathname = parsed.pathname.replace(/\/(avis|reviews|menu)\/?$/i, "");
+    if (parsed.pathname.endsWith("/")) {
+      parsed.pathname = parsed.pathname.slice(0, -1);
+    }
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
 export function isOpenTableRestaurantUrl(url: string): boolean {
   try {
     const parsed = new URL(url);

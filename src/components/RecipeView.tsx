@@ -11,6 +11,7 @@ import { handleRecipeAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useEditRecipe } from "@/admin/EditRecipeContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
 import { useT } from "@/i18n/LocaleContext";
+import { recipeDisplayName } from "@/lib/recipeDisplay";
 
 type RecipeViewProps = {
   country: Country;
@@ -53,6 +54,7 @@ export function RecipeView({
   );
   const isNational = recipe.id === country.nationalDishId;
   const imageSrc = recipe.imageUrl?.trim() || null;
+  const display = recipeDisplayName(recipe);
   const adminKey = `recipe:${recipe.id}`;
 
   const sourceLabel = recipe.sourceUrl?.includes("wikibooks.org")
@@ -83,7 +85,7 @@ export function RecipeView({
         {canEditRecipe ? (
           <AdminItemMenu
             className="absolute right-4 top-4"
-            label={recipe.name}
+            label={display.title}
             tone="dark"
             showSelectForDinner
             showEditText
@@ -140,10 +142,10 @@ export function RecipeView({
             id="recipe-heading"
             className="font-display text-4xl text-burgundy sm:text-5xl"
           >
-            {recipe.name}
+            {display.title}
           </h2>
-          {recipe.localName ? (
-            <p className="mt-1 text-lg text-ink-soft">{recipe.localName}</p>
+          {display.subtitle ? (
+            <p className="mt-1 text-lg text-ink-soft">{display.subtitle}</p>
           ) : null}
           <p className="mt-4 max-w-2xl text-ink-soft">{recipe.description}</p>
           <ItemTagBar

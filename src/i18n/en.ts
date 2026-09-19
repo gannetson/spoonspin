@@ -8,7 +8,7 @@ export const en: Messages = {
   "app.signOut": "Sign out",
   "app.admin": "Admin",
   "app.profile": "Dishes digested",
-  "app.planned": "Planned plates",
+  "app.planned": "Plates planned",
   "app.fallback.unknownCountry":
     "We could not find a published country for “{code}”. Pick again to continue.",
   "app.countries.loading": "Loading countries…",
@@ -346,6 +346,10 @@ export const en: Messages = {
   "restaurant.booking.visitWebsite": "Website",
   "restaurant.booking.viewOnMap": "Google Maps",
   "restaurant.booking.adminProviders": "Reservation providers",
+  "restaurant.booking.date": "Date",
+  "restaurant.booking.time": "Time",
+  "restaurant.booking.partySize": "Guests",
+  "restaurant.booking.availableTimes": "Tables available",
 
   "share.button": "Share",
   "share.ariaLabel": "Share this country",
@@ -643,6 +647,19 @@ export const en: Messages = {
   "admin.country.imageUpdated": "Updated image · {dishName}",
   "admin.country.imageError": "Could not replace image.",
 
+  "admin.error.generic": "That action failed. Try again.",
+  "admin.error.dismissAria": "Dismiss",
+  "admin.error.openai.credits":
+    "OpenAI has no credits left. Add billing at platform.openai.com, then try again.",
+  "admin.error.openai.rateLimit":
+    "OpenAI is rate-limiting requests. Wait a moment and try again.",
+  "admin.error.openai.auth": "OpenAI rejected the API key. Check OPENAI_API_KEY in .env.",
+  "admin.error.openai.unavailable":
+    "OpenAI is temporarily unavailable. Try again in a moment.",
+  "admin.error.openai.generic": "OpenAI request failed. Try again.",
+  "admin.error.signIn": "Please sign in again.",
+  "admin.error.timeout": "The server timed out. Try again, or restart the API.",
+
   "admin.item.menuAria": "{label} admin menu",
   "admin.item.remove": "Remove",
   "admin.item.remove.hint": "Delete this entry",
@@ -696,15 +713,13 @@ export const en: Messages = {
     "What to order and why this place fits the cuisine…",
   "admin.orderOption.edit.thuisbezorgd": "Thuisbezorgd link",
   "admin.orderOption.edit.ubereats": "Uber Eats link",
-  "admin.orderOption.edit.links.hint":
-    "Add one or both links. At least one is required.",
+  "admin.orderOption.edit.links.hint": "Add one or both links. At least one is required.",
   "admin.orderOption.edit.countries": "Cuisine countries",
   "admin.orderOption.edit.countries.add": "Type to add a country…",
   "admin.orderOption.edit.countries.addAnother": "Add another…",
   "admin.orderOption.edit.countries.clear": "Clear all",
   "admin.orderOption.edit.countries.remove": "Remove {name}",
-  "admin.orderOption.edit.countries.hint":
-    "Countries this place’s cuisine belongs to.",
+  "admin.orderOption.edit.countries.hint": "Countries this place’s cuisine belongs to.",
   "admin.orderOption.edit.countries.empty": "No countries match that search.",
   "admin.orderOption.edit.save": "Save changes",
   "admin.orderOption.edit.saving": "Saving…",
@@ -761,7 +776,8 @@ export const en: Messages = {
   "admin.recipe.edit.localName": "Local name",
   "admin.recipe.edit.region": "Region (optional)",
   "admin.recipe.edit.region.none": "No region (national)",
-  "admin.recipe.edit.region.hint": "Link this dish to a province or area when it is regional.",
+  "admin.recipe.edit.region.hint":
+    "Link this dish to a province or area when it is regional.",
   "admin.recipe.edit.servings": "Servings",
   "admin.recipe.edit.prepMinutes": "Prep (minutes)",
   "admin.recipe.edit.cookMinutes": "Cook (minutes)",
@@ -813,7 +829,7 @@ export const en: Messages = {
   "admin.discover.recipes.empty": "No dishes returned. Try a different focus.",
   "admin.discover.restaurants.title": "Find restaurants",
   "admin.discover.restaurants.hint":
-    "Google Places + OpenStreetMap, plus Tripadvisor via Apify when APIFY_TOKEN is set (English listings). Only venues with a street-level NL address are listed.",
+    "Google Places, OpenStreetMap, Tripadvisor (Apify), Zenchef partner catalog, and TheFork B2B when credentials are set. Only venues with a street-level NL address are listed.",
   "admin.discover.restaurants.placeholder":
     "Optional focus: e.g. Amsterdam, family-run, vegan",
   "admin.discover.restaurants.empty":
@@ -850,6 +866,8 @@ export const en: Messages = {
   "admin.discover.close": "Close",
   "admin.discover.query": "Query",
   "admin.discover.querying": "Querying…",
+  "admin.discover.progress": "Search log",
+  "admin.discover.log.starting": "Starting search…",
   "admin.discover.error.generic": "Discovery failed.",
   "admin.discover.error.selectOne": "Select at least one item to add.",
   "admin.discover.error.save": "Could not save.",
@@ -1086,7 +1104,7 @@ export const en: Messages = {
   "profile.countriesHeading": "Countries on your passport",
   "profile.tagsHeading": "Digested dishes",
 
-  "planned.title": "Planned plates",
+  "planned.title": "Plates planned",
   "planned.eyebrow": "Wishlist",
   "planned.subtitle":
     "Recipes, drinks, and restaurants you’ve marked Want to — not counted as tasted yet.",

@@ -24,6 +24,7 @@ import {
 import { cookBannerUrl } from "@/content/countries/cuisineImages";
 import { SuggestModal } from "@/components/SuggestModal";
 import { RecipeCard } from "@/components/RecipeCard";
+import { recipeDisplayName } from "@/lib/recipeDisplay";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
@@ -402,6 +403,7 @@ export function CookMenu({
                 {dinner.courses.map((course, index) => {
                   const recipe = recipesById.get(course.recipeId);
                   if (!recipe) return null;
+                  const display = recipeDisplayName(recipe);
                   const imageUrl = recipe.imageUrl?.trim() || null;
                   const imageLeft = index % 2 === 0;
                   return (
@@ -414,7 +416,7 @@ export function CookMenu({
                       {canEditRecipe ? (
                         <AdminItemMenu
                           className="absolute right-3 top-3 z-10"
-                          label={recipe.name}
+                          label={display.title}
                           showEditText
                           removeHintKey="admin.item.removeFromDinner.hint"
                           replaceImageHintKey="admin.item.replaceImage.dish.hint"
@@ -459,10 +461,10 @@ export function CookMenu({
                           })}
                         </p>
                         <h4 className="font-display text-3xl text-burgundy">
-                          {recipe.name}
-                          {recipe.localName ? (
+                          {display.title}
+                          {display.subtitle ? (
                             <span className="mt-1 block font-sans text-base font-normal text-ink-soft">
-                              {recipe.localName}
+                              {display.subtitle}
                             </span>
                           ) : null}
                         </h4>

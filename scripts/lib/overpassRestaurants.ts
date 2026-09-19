@@ -49,50 +49,106 @@ export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/** Netherlands mainland + islands, Overpass south,west,north,east. */
+export const NL_BBOX = {
+  south: 50.75,
+  west: 3.2,
+  north: 53.6,
+  east: 7.23,
+};
+
+function cuisineRegex(tags: string[]): string {
+  return tags.map((tag) => tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
+}
+
 export function buildOverpassQuery(
   tags: string[],
   lat: number,
   lng: number,
   radiusMeters: number,
+  timeoutSeconds = 90,
 ): string {
-  const cuisineRegex = tags
-    .map((tag) => tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
-    .join("|");
-
   return `
-[out:json][timeout:90];
+[out:json][timeout:${timeoutSeconds}];
 (
-  nwr["amenity"~"^(restaurant|fast_food|cafe)$"]["cuisine"~"${cuisineRegex}",i](around:${radiusMeters},${lat},${lng});
+  nwr["amenity"~"^(restaurant|fast_food|cafe)$"]["cuisine"~"${cuisineRegex(tags)}",i](around:${radiusMeters},${lat},${lng});
 );
 out center tags;
 `.trim();
+}
+
+export function buildOverpassBboxQuery(
+  tags: string[],
+  bbox: { south: number; west: number; north: number; east: number } = NL_BBOX,
+  timeoutSeconds = 25,
+): string {
+  return `
+[out:json][timeout:${timeoutSeconds}];
+(
+  nwr["amenity"~"^(restaurant|fast_food|cafe)$"]["cuisine"~"${cuisineRegex(tags)}",i](${bbox.south},${bbox.west},${bbox.north},${bbox.east});
+);
+out center tags;
+`.trim();
+}
+
+export type FetchOverpassOptions = {
+  /** Client abort. Overpass can hang indefinitely without this. */
+  timeoutMs?: number;
+  maxAttempts?: number;
+  retryWaitMs?: (attempt: number) => number;
+  /** Harvest retries a timed-out hub on the next mirror. Live search should not. */
+  retryOnAbort?: boolean;
+};
+
+function isAbortError(error: unknown): boolean {
+  return (
+    (error instanceof Error && error.name === "TimeoutError") ||
+    (error instanceof Error && error.name === "AbortError") ||
+    (error instanceof DOMException && error.name === "AbortError")
+  );
 }
 
 export async function fetchOverpass(
   query: string,
   attempt = 1,
   endpointIndex = 0,
+  options: FetchOverpassOptions = {},
 ): Promise<OverpassElement[]> {
+  const timeoutMs = options.timeoutMs ?? 90_000;
+  const maxAttempts = options.maxAttempts ?? 6;
+  const retryWaitMs = options.retryWaitMs ?? ((n: number) => n * 10_000);
+  const retryOnAbort = options.retryOnAbort ?? true;
   const endpoint = OVERPASS_ENDPOINTS[endpointIndex % OVERPASS_ENDPOINTS.length]!;
-  const response = await fetch(endpoint, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
-      "User-Agent": OVERPASS_USER_AGENT,
-    },
-    body: `data=${encodeURIComponent(query)}`,
-  });
+
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
+        "User-Agent": OVERPASS_USER_AGENT,
+      },
+      body: `data=${encodeURIComponent(query)}`,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
+  } catch (error) {
+    if (retryOnAbort && isAbortError(error) && attempt < maxAttempts) {
+      console.log(`overpass timed out on ${endpoint}, retry #${attempt} on next mirror…`);
+      return fetchOverpass(query, attempt + 1, endpointIndex + 1, options);
+    }
+    throw error;
+  }
 
   if (
     (response.status === 429 || response.status === 504 || response.status === 502) &&
-    attempt < 6
+    attempt < maxAttempts
   ) {
-    const waitMs = attempt * 10000;
+    const waitMs = retryWaitMs(attempt);
     console.log(
       `overpass ${response.status} on ${endpoint}, retry #${attempt} in ${waitMs}ms…`,
     );
     await sleep(waitMs);
-    return fetchOverpass(query, attempt + 1, endpointIndex + 1);
+    return fetchOverpass(query, attempt + 1, endpointIndex + 1, options);
   }
 
   if (!response.ok) {

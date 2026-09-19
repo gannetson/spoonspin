@@ -1,4 +1,4 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState, type RefObject } from "react";
 import { LoaderCircle, X } from "lucide-react";
 import type { Country, Drink, OrderOption, SpecialtyShop } from "@/types/content";
 import {
@@ -16,6 +16,7 @@ import {
   type DiscoveredRestaurant,
 } from "@/admin/countryTools";
 import { fetchCountry } from "@/content/client";
+import { formatAdminErrorMessage } from "@/admin/formatAdminError";
 import { useT } from "@/i18n/LocaleContext";
 import { zClass } from "@/lib/stacking";
 import { getPreferredDineCity } from "@/restaurants/locationPreference";
@@ -44,9 +45,9 @@ type Item =
 
 type State =
   | { status: "idle" }
-  | { status: "loading" }
+  | { status: "loading"; logs: string[] }
   | { status: "ready"; notes: string; items: Item[] }
-  | { status: "error"; message: string }
+  | { status: "error"; message: string; logs?: string[] }
   | { status: "saved"; message: string };
 
 function itemKey(kind: AdminDiscoverKind, index: number, name: string): string {
@@ -90,6 +91,8 @@ export function AdminDiscoverModal({
   const [state, setState] = useState<State>({ status: "idle" });
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [saving, setSaving] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+  const logEndRef = useRef<HTMLLIElement | null>(null);
 
   const copy = {
     title: t(`admin.discover.${kind}.title`),
@@ -100,12 +103,20 @@ export function AdminDiscoverModal({
 
   useEffect(() => {
     if (!open) return;
+    abortRef.current?.abort();
+    abortRef.current = null;
     setQuery("");
     setCity(defaultCity?.trim() || getPreferredDineCity());
     setState({ status: "idle" });
     setSelected(new Set());
     setSaving(false);
   }, [open, kind, country.code, defaultCity]);
+
+  const loadingLogs = state.status === "loading" ? state.logs : null;
+  useEffect(() => {
+    if (!loadingLogs) return;
+    logEndRef.current?.scrollIntoView({ block: "nearest" });
+  }, [loadingLogs]);
 
   useEffect(() => {
     if (!open) return;
@@ -119,8 +130,20 @@ export function AdminDiscoverModal({
   if (!open) return null;
 
   async function runDiscover() {
-    setState({ status: "loading" });
+    abortRef.current?.abort();
+    const abort = new AbortController();
+    abortRef.current = abort;
+    const logs = [t("admin.discover.log.starting")];
+    setState({ status: "loading", logs: [...logs] });
     setSelected(new Set());
+
+    const appendLog = (message: string) => {
+      logs.push(message);
+      if (!abort.signal.aborted) {
+        setState({ status: "loading", logs: [...logs] });
+      }
+    };
+
     try {
       if (kind === "recipes") {
         const result = await discoverRecipes(country.code, query);
@@ -132,7 +155,11 @@ export function AdminDiscoverModal({
         setState({ status: "ready", notes: result.notes, items });
         setSelected(new Set(items.map((item) => item.key)));
       } else if (kind === "restaurants") {
-        const result = await discoverRestaurants(country.code, query);
+        const result = await discoverRestaurants(country.code, query, {
+          onLog: appendLog,
+          signal: abort.signal,
+        });
+        if (abort.signal.aborted) return;
         const items: Item[] = result.restaurants.map((item, index) => ({
           kind: "restaurants",
           item,
@@ -172,10 +199,12 @@ export function AdminDiscoverModal({
         setSelected(new Set(items.map((item) => item.key)));
       }
     } catch (error) {
+      if (abort.signal.aborted) return;
       setState({
         status: "error",
         message:
           error instanceof Error ? error.message : t("admin.discover.error.generic"),
+        logs: kind === "restaurants" ? [...logs] : undefined,
       });
     }
   }
@@ -396,8 +425,11 @@ export function AdminDiscoverModal({
           </div>
 
           {state.status === "error" ? (
-            <p role="alert" className="mt-4 text-sm text-tomato">
-              {state.message}
+            <p
+              role="alert"
+              className="mt-4 rounded-xl border border-tomato/30 bg-white px-3 py-2 text-sm leading-snug break-words text-tomato"
+            >
+              {formatAdminErrorMessage(state.message, t)}
             </p>
           ) : null}
 
@@ -409,6 +441,16 @@ export function AdminDiscoverModal({
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 sm:px-7">
+          {state.status === "loading" ||
+          (state.status === "error" && state.logs && state.logs.length > 0) ? (
+            <DiscoverProgressLog
+              logs={state.status === "loading" ? state.logs : (state.logs ?? [])}
+              live={state.status === "loading"}
+              heading={t("admin.discover.progress")}
+              logEndRef={logEndRef}
+            />
+          ) : null}
+
           {state.status === "ready" ? (
             <div className="space-y-4">
               <p className="text-sm text-ink-soft">
@@ -666,6 +708,45 @@ export function AdminDiscoverModal({
           ) : null}
         </div>
       </div>
+    </div>
+  );
+}
+
+function DiscoverProgressLog({
+  logs,
+  live,
+  heading,
+  logEndRef,
+}: {
+  logs: string[];
+  live: boolean;
+  heading: string;
+  logEndRef: RefObject<HTMLLIElement | null>;
+}) {
+  return (
+    <div
+      className="mb-4 rounded-2xl border border-ink/10 bg-parchment/70 px-4 py-3"
+      role="status"
+      aria-live="polite"
+      aria-relevant="additions"
+    >
+      <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">
+        {live ? (
+          <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" />
+        ) : null}
+        {heading}
+      </p>
+      <ol className="mt-2 max-h-48 space-y-1 overflow-y-auto font-mono text-xs">
+        {logs.map((line, index) => (
+          <li
+            key={`${index}:${line}`}
+            ref={index === logs.length - 1 ? logEndRef : undefined}
+            className={index === logs.length - 1 ? "text-ink" : "text-ink-soft"}
+          >
+            {line}
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }

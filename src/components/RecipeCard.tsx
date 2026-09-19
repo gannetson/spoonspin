@@ -4,6 +4,7 @@ import { AdminItemMenu, type AdminItemAction } from "@/components/AdminItemMenu"
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { useT } from "@/i18n/LocaleContext";
+import { recipeDisplayName } from "@/lib/recipeDisplay";
 
 const COURSE_KEYS: Record<RecipeCategory, string> = {
   starter: "cook.course.starter",
@@ -46,6 +47,7 @@ export function RecipeCard({
   adminError = null,
   onAdminAction,
 }: RecipeCardProps) {
+  const display = recipeDisplayName(recipe);
   const t = useT();
   const isNational = variant === "national";
   const isDinner = variant === "dinner";
@@ -120,11 +122,11 @@ export function RecipeCard({
 
               <div className="min-w-0">
                 <p className="truncate font-display text-xl leading-tight text-burgundy sm:text-2xl">
-                  {recipe.name}
+                  {display.title}
                 </p>
-                {recipe.localName ? (
+                {display.subtitle ? (
                   <p className="mt-0.5 truncate text-sm text-ink-soft">
-                    {recipe.localName}
+                    {display.subtitle}
                   </p>
                 ) : null}
                 {recipe.description.trim() ? (
@@ -167,7 +169,7 @@ export function RecipeCard({
           {isAdmin && onAdminAction ? (
             <AdminItemMenu
               className="absolute right-2 top-2"
-              label={recipe.name}
+              label={display.title}
               tone="light"
               showSelectForDinner
               showEditText={showEditText}

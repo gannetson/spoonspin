@@ -8,6 +8,9 @@ import {
 import {
   isTheForkRestaurantUrl,
   isTripadvisorRestaurantUrl,
+  isPlausibleTheForkRestaurantId,
+  normalizeTheForkBookingUrl,
+  parseTheForkRestaurantId,
   pickReviewProfileUrl,
 } from "./reviewLinks";
 
@@ -95,5 +98,25 @@ describe("review profile URL matching", () => {
       { name: "Marani", city: "Delft" },
     );
     expect(url).toBe("https://www.thefork.nl/restaurant/marani-delft-r654321");
+  });
+
+  it("parses and canonicalizes TheFork booking URLs", () => {
+    const raw =
+      "https://www.thefork.fr/restaurant/marani-delft-r654321/reviews?utm_source=x";
+    expect(parseTheForkRestaurantId(raw)).toBe("654321");
+    expect(normalizeTheForkBookingUrl(raw)).toBe(
+      "https://www.thefork.nl/restaurant/marani-delft-r654321",
+    );
+    expect(
+      normalizeTheForkBookingUrl("https://www.thefork.nl/search?text=Marani"),
+    ).toBeNull();
+    expect(
+      parseTheForkRestaurantId("https://www.thefork.nl/restaurant/fake-r123456"),
+    ).toBe("123456");
+    expect(
+      parseTheForkRestaurantId("https://www.thefork.nl/restaurant/marani-delft-r654321"),
+    ).toBe("654321");
+    expect(isPlausibleTheForkRestaurantId("123456")).toBe(false);
+    expect(isPlausibleTheForkRestaurantId("654321")).toBe(true);
   });
 });

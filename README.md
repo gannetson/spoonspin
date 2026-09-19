@@ -81,6 +81,7 @@ After the first start, seed content if needed: `npm run db:import-content`.
 | `npm run db:export-content`       | Export countries/recipes/restaurants → `data/content-dump.json`   |
 | `npm run db:import-content`       | Import content dump into Postgres                                 |
 | `npm run db:seed-content`         | Alias for `db:import-content`                                     |
+| `npm run db:promote-thefork-links`| Attach TheFork profile URLs in ratings to booking links           |
 | `npm run deploy:prod`             | SSH → pull → build → restart API                                  |
 
 ## Environment variables

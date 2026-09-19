@@ -1,4 +1,5 @@
 import type { Recipe } from "@/types/content";
+import { recipeDisplayName } from "@/lib/recipeDisplay";
 import { SITE_ORIGIN } from "./documentMeta";
 
 function upsertJsonLd(id: string, data: unknown): void {
@@ -76,12 +77,13 @@ export function setRecipeJsonLd(input: {
   countryCode: string;
 }): void {
   const { recipe, countryName, countryCode } = input;
+  const display = recipeDisplayName(recipe);
   const url = `${SITE_ORIGIN}/?country=${encodeURIComponent(countryCode.toLowerCase())}&recipe=${encodeURIComponent(recipe.id)}`;
 
   const data: Record<string, unknown> = {
     "@context": "https://schema.org",
     "@type": "Recipe",
-    name: recipe.name,
+    name: display.title,
     description: recipe.description,
     url,
     recipeYield: String(recipe.servings),
@@ -98,6 +100,10 @@ export function setRecipeJsonLd(input: {
       text,
     })),
   };
+
+  if (display.subtitle) {
+    data.alternateName = display.subtitle;
+  }
 
   if (recipe.imageUrl) {
     data.image = [recipe.imageUrl];

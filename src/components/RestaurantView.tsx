@@ -19,6 +19,7 @@ import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
 import { RestaurantBookingActions } from "@/components/RestaurantBookingActions";
+import { isTheForkRestaurantUrl } from "@/restaurants/reviewLinks";
 import { handleRestaurantAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useEditRestaurant } from "@/admin/EditRestaurantContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
@@ -315,10 +316,16 @@ export function RestaurantView({
           restaurantId={restaurant.id}
           website={restaurant.website}
           mapsUrl={restaurant.mapsUrl}
+          theForkUrl={restaurant.ratings?.theFork?.url}
           isAdmin={isAdmin}
         />
         <div className="flex flex-wrap gap-3">
-          {listReviewLinks(restaurant).map((link) => (
+          {listReviewLinks(restaurant)
+            .filter((link) => {
+              if (link.source !== "theFork") return true;
+              return !isTheForkRestaurantUrl(restaurant.ratings?.theFork?.url ?? "");
+            })
+            .map((link) => (
             <a
               key={link.source}
               href={link.href}

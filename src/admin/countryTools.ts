@@ -6,6 +6,7 @@ import type {
   RecipeCategory,
   SpecialtyShop,
 } from "@/types/content";
+import { readDiscoverRestaurantStream } from "@/admin/discoverStream";
 
 export type DiscoveredRestaurant = {
   name: string;
@@ -110,11 +111,37 @@ export function addRecipes(code: string, recipes: Array<Recipe | DishCandidate>)
   });
 }
 
-export function discoverRestaurants(code: string, query?: string) {
-  return postAdmin<{ notes: string; restaurants: DiscoveredRestaurant[] }>(
+export async function discoverRestaurants(
+  code: string,
+  query?: string,
+  options?: { onLog?: (message: string) => void; signal?: AbortSignal },
+) {
+  const response = await fetch(
     `/api/admin/countries/${encodeURIComponent(code)}/discover/restaurants`,
-    { query },
+    {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query }),
+      signal: options?.signal,
+    },
   );
+  const contentType = response.headers.get("content-type") ?? "";
+  if (contentType.includes("application/x-ndjson") && response.body) {
+    return readDiscoverRestaurantStream<DiscoveredRestaurant>(
+      response,
+      options?.onLog ?? (() => undefined),
+    );
+  }
+  const data = await readJson<{
+    notes: string;
+    restaurants: DiscoveredRestaurant[];
+    message?: string;
+  }>(response);
+  if (!response.ok) {
+    throw new Error(data.message ?? "Admin request failed.");
+  }
+  return data;
 }
 
 export function addRestaurants(
@@ -448,19 +475,13 @@ export type RestaurantCopyPatch = {
   cuisineCodes?: string[];
 };
 
-export async function patchRestaurantFields(
-  id: string,
-  patch: RestaurantCopyPatch,
-) {
-  const response = await fetch(
-    `/api/admin/restaurants/${encodeURIComponent(id)}`,
-    {
-      method: "PATCH",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(patch),
-    },
-  );
+export async function patchRestaurantFields(id: string, patch: RestaurantCopyPatch) {
+  const response = await fetch(`/api/admin/restaurants/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(patch),
+  });
   const data = await readJson<{
     restaurant?: import("@/restaurants/types").Restaurant;
     message?: string;

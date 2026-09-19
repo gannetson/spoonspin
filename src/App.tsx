@@ -39,6 +39,7 @@ import {
 import type { Restaurant } from "@/restaurants/types";
 import { useT } from "@/i18n/LocaleContext";
 import { TagsProvider } from "@/tags/TagsContext";
+import { recipeDisplayName } from "@/lib/recipeDisplay";
 import { countryMeta, homeMeta, recipeMeta, setDocumentMeta } from "@/seo/documentMeta";
 import {
   clearSeoJsonLd,
@@ -465,7 +466,7 @@ export default function App() {
     if (selectedRecipe) {
       setDocumentMeta(
         recipeMeta(
-          selectedRecipe.name,
+          recipeDisplayName(selectedRecipe).title,
           selectedCountry.name,
           selectedCountry.code,
           selectedRecipe.id,

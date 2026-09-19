@@ -1405,7 +1405,18 @@ export async function updateRestaurantScoresAndAuthenticity(
       new Date().toISOString(),
     ],
   );
-  return getRestaurantById(id);
+  const updated = await getRestaurantById(id);
+  if (updated) {
+    try {
+      const { upsertTheForkLinkFromRatings } = await import(
+        "../reservations/theForkFromRatings.ts"
+      );
+      await upsertTheForkLinkFromRatings(updated);
+    } catch (error) {
+      console.warn(`[reservations] TheFork attach skipped for ${id}`, error);
+    }
+  }
+  return updated;
 }
 
 export async function searchLocalRestaurants(

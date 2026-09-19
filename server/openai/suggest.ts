@@ -12,6 +12,7 @@ import {
   officialWebsiteOrUndefined,
   searchGoogleRestaurantsByQuery,
 } from "../lib/googlePlacesLookup.ts";
+import { formatOpenAiHttpError } from "./httpError.ts";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 
@@ -155,7 +156,7 @@ export async function chatJson(system: string, user: string): Promise<unknown> {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`OpenAI request failed (${response.status}): ${body.slice(0, 280)}`);
+    throw new Error(formatOpenAiHttpError(response.status, body));
   }
 
   const data = (await response.json()) as {

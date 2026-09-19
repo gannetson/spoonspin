@@ -13,7 +13,8 @@ import {
 } from "lucide-react";
 import { useT } from "@/i18n/LocaleContext";
 import { zClass } from "@/lib/stacking";
-import { useAnchoredToast, usePortalMenu } from "@/lib/usePortalMenu";
+import { usePortalMenu } from "@/lib/usePortalMenu";
+import { AdminStatusToast } from "@/components/AdminStatusToast";
 
 export type AdminItemAction =
   | "remove"
@@ -75,11 +76,6 @@ export function AdminItemMenu({
   const menuId = useId();
   const { open, setOpen, rootRef, triggerRef, panelRef, position } = usePortalMenu({
     estimatedHeight: 280,
-  });
-  const { position: statusPosition } = useAnchoredToast({
-    active: Boolean(status || error),
-    triggerRef,
-    width: 224,
   });
 
   function run(action: AdminItemAction) {
@@ -248,22 +244,6 @@ export function AdminItemMenu({
         )
       : null;
 
-  const statusToast =
-    (status || error) && statusPosition
-      ? createPortal(
-          <p
-            role={error ? "alert" : "status"}
-            style={{ top: statusPosition.top, left: statusPosition.left }}
-            className={`fixed ${zClass.popover} max-w-56 rounded-xl px-2 py-1 text-xs shadow-sm ${
-              error ? "bg-cream text-tomato" : "bg-cream text-ink-soft"
-            }`}
-          >
-            {error ?? status}
-          </p>,
-          document.body,
-        )
-      : null;
-
   return (
     <div
       ref={rootRef}
@@ -294,7 +274,7 @@ export function AdminItemMenu({
       </button>
 
       {menu}
-      {statusToast}
+      <AdminStatusToast triggerRef={triggerRef} status={status} error={error} />
     </div>
   );
 }
