@@ -98,6 +98,8 @@ import { stableMapsUrl } from "../../src/restaurants/utils.ts";
 
 const querySchema = z.object({
   query: z.string().max(200).optional(),
+  /** Region selected in the UI, so discovery looks for that region's dishes. */
+  regionId: z.string().max(64).nullish(),
 });
 
 const orderOptionsDiscoverSchema = z.object({
@@ -323,6 +325,9 @@ const dishCandidateSchema = z.object({
   description: z.string().min(20),
   category: z.enum(["starter", "main", "side", "dessert", "snack"]),
   region: z.string().nullish(),
+  /** Region the dish was discovered for, kept so the stub stays filterable. */
+  regionId: z.string().max(64).nullish(),
+  regionName: z.string().max(120).nullish(),
 });
 
 function isFullRecipe(
@@ -339,23 +344,31 @@ function isFullRecipe(
 }
 
 /**
- * Keep a proposed region id only when that region exists for the country.
- * `restaurants.region_id` is a foreign key, so an unknown id would abort the
- * whole save rather than simply going untagged.
+ * Resolve a region id the client sent, but only when it really belongs to this
+ * country. `restaurants.region_id` is a foreign key, so an unknown id would
+ * abort a whole save rather than simply going untagged.
  */
-async function resolveStorableRegionId(
+async function resolveCountryRegion(
   countryCode: string,
   regionId: string | null | undefined,
-): Promise<string | null> {
+): Promise<{ id: string; name: string } | null> {
   const wanted = regionId?.trim();
   if (!wanted) return null;
   try {
     const region = await getRegionById(wanted);
-    return region && region.countryCode === countryCode.toLowerCase() ? region.id : null;
+    if (!region || region.countryCode !== countryCode.toLowerCase()) return null;
+    return { id: region.id, name: region.name };
   } catch (error) {
     console.warn(`Region lookup failed for ${wanted}`, error);
     return null;
   }
+}
+
+async function resolveStorableRegionId(
+  countryCode: string,
+  regionId: string | null | undefined,
+): Promise<string | null> {
+  return (await resolveCountryRegion(countryCode, regionId))?.id ?? null;
 }
 
 /**
@@ -612,11 +625,16 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           ...(country.standaloneRecipes ?? []).map((recipe) => recipe.name),
           ...existingIds,
         ];
+        // A selected region narrows the search to that region's home cooking
+        // rather than the country's national dishes.
+        const region = await resolveCountryRegion(country.code, parsed.data.regionId);
         const result = await discoverCountryRecipes({
           countryCode: country.code,
           countryName: country.name,
           query: parsed.data.query,
           existingNames,
+          regionId: region?.id,
+          regionName: region?.name,
         });
         res.json(result);
       } catch (error) {
@@ -656,6 +674,8 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
           countryCode: string;
           countryName: string;
           recipeId: string;
+          regionId?: string;
+          regionName?: string;
           candidate?: {
             id: string;
             name: string;
@@ -704,7 +724,11 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
               localName: recipe.localName ?? undefined,
               description: recipe.description,
               category: recipe.category,
-              region: recipe.region ?? undefined,
+              region: recipe.region ?? recipe.regionName ?? undefined,
+              // Without these the dish lands unfiled, and the region it was
+              // discovered for would still look empty in Cook mode.
+              regionId: recipe.regionId ?? undefined,
+              regionName: recipe.regionName ?? undefined,
               servings: 4,
               prepMinutes: 20,
               cookMinutes: 30,
@@ -724,13 +748,15 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
               countryCode: country.code,
               countryName: country.name,
               recipeId: id,
+              regionId: recipe.regionId ?? undefined,
+              regionName: recipe.regionName ?? undefined,
               candidate: {
                 id,
                 name: recipe.name,
                 localName: recipe.localName ?? undefined,
                 description: recipe.description,
                 category: recipe.category,
-                region: recipe.region ?? undefined,
+                region: recipe.region ?? recipe.regionName ?? undefined,
               },
             });
           }
@@ -755,6 +781,8 @@ export function registerAdminCountryRoutes(app: import("express").Express): void
               countryCode: country.code,
               countryName: country.name,
               recipeId: recipe.id,
+              regionId: planned.regionId,
+              regionName: planned.regionName,
               candidate: planned.candidate
                 ? { ...planned.candidate, id: recipe.id }
                 : undefined,

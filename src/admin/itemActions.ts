@@ -438,5 +438,59 @@ export async function handleRestaurantAdminAction(input: {
     input.onUpdated(result.restaurant);
     return "Text updated";
   }
+  if (action === "replace-all") {
+    return runReplaceAll(input);
+  }
   throw new Error("Unsupported restaurant action.");
+}
+
+/**
+ * Run image, text and score enrichment for one restaurant.
+ *
+ * Sequentially, deliberately: each call returns a whole updated restaurant, so
+ * firing them together would have the slowest response overwrite the other two.
+ *
+ * A failing step does not abandon the rest — these are independent lookups, and
+ * losing the scores is no reason to skip the photo. The summary names whatever
+ * failed, and only a clean sweep of failures is reported as an error.
+ */
+async function runReplaceAll(input: {
+  countryName: string;
+  countryCode?: string;
+  restaurant: Restaurant;
+  onUpdated: (restaurant: Restaurant) => void;
+}): Promise<string> {
+  const { countryName, countryCode, restaurant } = input;
+  const steps: { label: string; run: () => Promise<{ restaurant: Restaurant }> }[] = [
+    { label: "image", run: () => replaceRestaurantImage(restaurant.id, countryName) },
+    {
+      label: "text",
+      run: () => replaceRestaurantText(restaurant.id, countryName, countryCode),
+    },
+    { label: "scores", run: () => findRestaurantScores(restaurant.id, countryName) },
+  ];
+
+  const done: string[] = [];
+  const failed: string[] = [];
+  let firstError: unknown;
+
+  for (const step of steps) {
+    try {
+      const result = await step.run();
+      input.onUpdated(result.restaurant);
+      done.push(step.label);
+    } catch (error) {
+      firstError ??= error;
+      failed.push(step.label);
+    }
+  }
+
+  if (done.length === 0) {
+    throw firstError instanceof Error
+      ? firstError
+      : new Error("Replace all failed for every step.");
+  }
+  return failed.length === 0
+    ? `Image, text and scores updated`
+    : `Updated ${done.join(", ")} · ${failed.join(", ")} failed`;
 }

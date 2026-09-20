@@ -209,7 +209,6 @@ export function RestaurantCard({
               label={restaurant.name}
               showEditText
               editTextLabelKey="admin.item.editRestaurant"
-              editTextHintKey="admin.item.editRestaurant.hint"
               showRestaurantResearch
               busy={adminBusy}
               status={adminStatus}

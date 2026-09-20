@@ -123,13 +123,8 @@ export function AdminCountryHeroMenu({
               className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment disabled:opacity-60"
             >
               <ImagePlus className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.replaceImage")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.replaceImage.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.replaceImage")}
               </span>
             </button>
             <button
@@ -139,13 +134,8 @@ export function AdminCountryHeroMenu({
               className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
             >
               <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.selectImage")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.selectImage.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.selectImage")}
               </span>
             </button>
             <button
@@ -155,13 +145,8 @@ export function AdminCountryHeroMenu({
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
             >
               <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.editText")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.editText.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.editText")}
               </span>
             </button>
           </div>,

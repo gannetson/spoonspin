@@ -89,7 +89,6 @@ export function RecipeView({
             tone="dark"
             showSelectForDinner
             showEditText
-            replaceImageHintKey="admin.item.replaceImage.dish.hint"
             busy={Boolean(busy[adminKey])}
             status={status[adminKey]}
             error={error[adminKey]}

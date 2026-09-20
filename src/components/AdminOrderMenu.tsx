@@ -49,13 +49,8 @@ export function AdminOrderMenu({
               className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
             >
               <ShoppingBag className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.dine.findOrderOptions")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.dine.findOrderOptions.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.dine.findOrderOptions")}
               </span>
             </button>
           </div>,

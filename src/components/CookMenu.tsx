@@ -351,6 +351,8 @@ export function CookMenu({
                   country={country}
                   onCountryUpdated={onCountryUpdated}
                   tone="dark"
+                  regionId={regionId}
+                  regionName={regionName}
                 />
               </div>
             ) : null}
@@ -418,8 +420,6 @@ export function CookMenu({
                           className="absolute right-3 top-3 z-10"
                           label={display.title}
                           showEditText
-                          removeHintKey="admin.item.removeFromDinner.hint"
-                          replaceImageHintKey="admin.item.replaceImage.dish.hint"
                           busy={Boolean(busy[`dinner-course:${course.recipeId}`])}
                           status={status[`dinner-course:${course.recipeId}`]}
                           error={error[`dinner-course:${course.recipeId}`]}
@@ -505,9 +505,6 @@ export function CookMenu({
                             <AdminItemMenu
                               className="absolute right-0 top-0 z-10"
                               label={drink.name}
-                              removeHintKey="admin.item.removeFromDinner.hint"
-                              selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
-                              replaceImageHintKey="admin.item.replaceImage.drink.hint"
                               busy={Boolean(busy[`dinner-drink:${suggestion.drinkName}`])}
                               status={status[`dinner-drink:${suggestion.drinkName}`]}
                               error={error[`dinner-drink:${suggestion.drinkName}`]}
@@ -528,7 +525,6 @@ export function CookMenu({
                               className="absolute right-0 top-0 z-10"
                               label={suggestion.drinkName}
                               removeOnly
-                              removeHintKey="admin.item.removeFromDinner.hint"
                               busy={Boolean(busy[`dinner-drink:${suggestion.drinkName}`])}
                               status={status[`dinner-drink:${suggestion.drinkName}`]}
                               error={error[`dinner-drink:${suggestion.drinkName}`]}
@@ -875,8 +871,6 @@ function DrinkCard({
             className="absolute right-2 top-2"
             label={drink.name}
             showSelectForDinner
-            selectForDinnerHintKey="admin.item.selectForDinner.drink.hint"
-            replaceImageHintKey="admin.item.replaceImage.drink.hint"
             busy={adminBusy}
             status={adminStatus}
             error={adminError}

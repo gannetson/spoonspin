@@ -23,7 +23,9 @@ export function RegionSelect({
   const t = useT();
   const resolvedLabel = label ?? t("region.select.label");
 
-  if (regions.length === 0) return null;
+  // One region is not a choice: "all" and that region select the same dishes,
+  // so the control would only add a decision without offering an alternative.
+  if (regions.length <= 1) return null;
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-2">

@@ -173,7 +173,6 @@ export function RecipeCard({
               tone="light"
               showSelectForDinner
               showEditText={showEditText}
-              replaceImageHintKey="admin.item.replaceImage.dish.hint"
               busy={adminBusy}
               status={adminStatus}
               error={adminError}

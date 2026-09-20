@@ -34,6 +34,9 @@ type AdminDiscoverModalProps = {
   onRestaurantsAdded?: () => void;
   /** Prefill for order-option city (Dine “Search near …”). */
   defaultCity?: string;
+  /** Region selected in Cook mode; scopes recipe discovery to that region. */
+  regionId?: string | null;
+  regionName?: string | null;
 };
 
 type Item =
@@ -82,6 +85,8 @@ export function AdminDiscoverModal({
   onCountryUpdated,
   onRestaurantsAdded,
   defaultCity,
+  regionId = null,
+  regionName = null,
 }: AdminDiscoverModalProps) {
   const t = useT();
   const titleId = useId();
@@ -146,10 +151,14 @@ export function AdminDiscoverModal({
 
     try {
       if (kind === "recipes") {
-        const result = await discoverRecipes(country.code, query);
+        const result = await discoverRecipes(country.code, query, regionId);
         const items: Item[] = result.recipes.map((item, index) => ({
           kind: "recipes",
-          item,
+          // Carry the region through to the save, so a dish found for Sichuan
+          // is stored under Sichuan rather than landing unfiled.
+          item: regionId
+            ? { ...item, regionId, regionName: regionName ?? undefined }
+            : item,
           key: itemKey("recipes", index, item.name),
         }));
         setState({ status: "ready", notes: result.notes, items });

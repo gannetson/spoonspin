@@ -7,6 +7,7 @@ import {
   Images,
   LoaderCircle,
   MoreVertical,
+  Sparkles,
   Star,
   Trash2,
   UtensilsCrossed,
@@ -24,6 +25,7 @@ export type AdminItemAction =
   | "replace-text"
   | "find-menu"
   | "find-scores"
+  | "replace-all"
   | "select-for-dinner";
 
 type AdminItemMenuProps = {
@@ -34,16 +36,12 @@ type AdminItemMenuProps = {
   /** Manual sectioned recipe / restaurant copy editor. */
   showEditText?: boolean;
   editTextLabelKey?: string;
-  editTextHintKey?: string;
   /** Recipe/drink: add to the Dinner tab composition. */
   showSelectForDinner?: boolean;
   /** Only show the remove action (e.g. dinner membership). */
   removeOnly?: boolean;
-  removeHintKey?: string;
-  selectForDinnerHintKey?: string;
   /** Restaurant-only enrichment actions. */
   showRestaurantResearch?: boolean;
-  replaceImageHintKey?: string;
   busy?: boolean;
   status?: string | null;
   error?: string | null;
@@ -58,13 +56,9 @@ export function AdminItemMenu({
   showReplaceText = true,
   showEditText = false,
   editTextLabelKey = "admin.item.editRecipe",
-  editTextHintKey = "admin.item.editRecipe.hint",
   showSelectForDinner = false,
   removeOnly = false,
-  removeHintKey = "admin.item.remove.hint",
-  selectForDinnerHintKey = "admin.item.selectForDinner.hint",
   showRestaurantResearch = false,
-  replaceImageHintKey = "admin.item.replaceImage.hint",
   busy = false,
   status = null,
   error = null,
@@ -100,14 +94,7 @@ export function AdminItemMenu({
               className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
             >
               <Trash2 className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.item.remove")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t(removeHintKey)}
-                </span>
-              </span>
+              <span className="font-semibold text-ink">{t("admin.item.remove")}</span>
             </button>
             {!removeOnly && showReplaceImage ? (
               <>
@@ -118,17 +105,8 @@ export function AdminItemMenu({
                   className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
                 >
                   <ImagePlus className="mt-0.5 size-4 shrink-0 text-tomato" />
-                  <span>
-                    <span className="block font-semibold text-ink">
-                      {t("admin.item.replaceImage")}
-                    </span>
-                    <span className="mt-0.5 block text-xs text-ink-soft">
-                      {t(
-                        showRestaurantResearch
-                          ? "admin.item.replaceImage.restaurant.hint"
-                          : replaceImageHintKey,
-                      )}
-                    </span>
+                  <span className="font-semibold text-ink">
+                    {t("admin.item.replaceImage")}
                   </span>
                 </button>
                 <button
@@ -138,13 +116,8 @@ export function AdminItemMenu({
                   className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
                 >
                   <Images className="mt-0.5 size-4 shrink-0 text-tomato" />
-                  <span>
-                    <span className="block font-semibold text-ink">
-                      {t("admin.item.selectImage")}
-                    </span>
-                    <span className="mt-0.5 block text-xs text-ink-soft">
-                      {t("admin.item.selectImage.hint")}
-                    </span>
+                  <span className="font-semibold text-ink">
+                    {t("admin.item.selectImage")}
                   </span>
                 </button>
               </>
@@ -157,14 +130,7 @@ export function AdminItemMenu({
                 className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
               >
                 <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
-                <span>
-                  <span className="block font-semibold text-ink">
-                    {t(editTextLabelKey)}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-ink-soft">
-                    {t(editTextHintKey)}
-                  </span>
-                </span>
+                <span className="font-semibold text-ink">{t(editTextLabelKey)}</span>
               </button>
             ) : null}
             {!removeOnly && showReplaceText ? (
@@ -175,13 +141,8 @@ export function AdminItemMenu({
                 className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
               >
                 <FilePenLine className="mt-0.5 size-4 shrink-0 text-tomato" />
-                <span>
-                  <span className="block font-semibold text-ink">
-                    {t("admin.item.replaceText")}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-ink-soft">
-                    {t("admin.item.replaceText.hint")}
-                  </span>
+                <span className="font-semibold text-ink">
+                  {t("admin.item.replaceText")}
                 </span>
               </button>
             ) : null}
@@ -193,13 +154,8 @@ export function AdminItemMenu({
                 className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
               >
                 <UtensilsCrossed className="mt-0.5 size-4 shrink-0 text-tomato" />
-                <span>
-                  <span className="block font-semibold text-ink">
-                    {t("admin.item.selectForDinner")}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-ink-soft">
-                    {t(selectForDinnerHintKey)}
-                  </span>
+                <span className="font-semibold text-ink">
+                  {t("admin.item.selectForDinner")}
                 </span>
               </button>
             ) : null}
@@ -208,17 +164,28 @@ export function AdminItemMenu({
                 <button
                   type="button"
                   role="menuitem"
+                  onClick={() => run("replace-all")}
+                  className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
+                >
+                  <Sparkles className="mt-0.5 size-4 shrink-0 text-tomato" />
+                  <span>
+                    <span className="block font-semibold text-ink">
+                      {t("admin.item.replaceAll")}
+                    </span>
+                    <span className="block text-xs text-ink-soft">
+                      {t("admin.item.replaceAll.hint")}
+                    </span>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  role="menuitem"
                   onClick={() => run("find-menu")}
                   className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
                 >
                   <ClipboardList className="mt-0.5 size-4 shrink-0 text-tomato" />
-                  <span>
-                    <span className="block font-semibold text-ink">
-                      {t("admin.item.findMenu")}
-                    </span>
-                    <span className="mt-0.5 block text-xs text-ink-soft">
-                      {t("admin.item.findMenu.hint")}
-                    </span>
+                  <span className="font-semibold text-ink">
+                    {t("admin.item.findMenu")}
                   </span>
                 </button>
                 <button
@@ -228,13 +195,8 @@ export function AdminItemMenu({
                   className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
                 >
                   <Star className="mt-0.5 size-4 shrink-0 text-tomato" />
-                  <span>
-                    <span className="block font-semibold text-ink">
-                      {t("admin.item.findScores")}
-                    </span>
-                    <span className="mt-0.5 block text-xs text-ink-soft">
-                      {t("admin.item.findScores.hint")}
-                    </span>
+                  <span className="font-semibold text-ink">
+                    {t("admin.item.findScores")}
                   </span>
                 </button>
               </>

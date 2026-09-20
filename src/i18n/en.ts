@@ -816,6 +816,8 @@ export const en: Messages = {
   "admin.item.selectForDinner.drink.hint":
     "Add this drink to tonight’s dinner (keeps other drinks)",
   "admin.item.removeFromDinner.hint": "Remove from tonight’s dinner only",
+  "admin.item.replaceAll": "Replace all",
+  "admin.item.replaceAll.hint": "Image, text and scores in one go",
   "admin.item.findMenu": "Find menu",
   "admin.item.findMenu.hint": "Research dishes and save a menu",
   "admin.item.findScores": "Find scores",

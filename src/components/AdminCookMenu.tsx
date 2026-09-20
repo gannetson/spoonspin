@@ -22,6 +22,9 @@ type AdminCookMenuProps = {
   country: Country;
   onCountryUpdated: (country: Country) => void;
   tone?: "light" | "dark";
+  /** Region selected in Cook mode; recipe discovery follows it. */
+  regionId?: string | null;
+  regionName?: string | null;
 };
 
 type CookDiscoverKind = Exclude<AdminDiscoverKind, "restaurants" | "orderOptions">;
@@ -31,6 +34,8 @@ export function AdminCookMenu({
   country,
   onCountryUpdated,
   tone = "dark",
+  regionId = null,
+  regionName = null,
 }: AdminCookMenuProps) {
   const t = useT();
   const menuId = useId();
@@ -82,13 +87,8 @@ export function AdminCookMenu({
               className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
             >
               <UtensilsCrossed className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.findRecipes")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.findRecipes.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.findRecipes")}
               </span>
             </button>
             <button
@@ -99,13 +99,8 @@ export function AdminCookMenu({
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment disabled:opacity-60"
             >
               <LayoutGrid className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.composeDinner")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.composeDinner.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.composeDinner")}
               </span>
             </button>
             <button
@@ -115,13 +110,8 @@ export function AdminCookMenu({
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
             >
               <GlassWater className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.findDrinks")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.findDrinks.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.findDrinks")}
               </span>
             </button>
             <button
@@ -131,13 +121,8 @@ export function AdminCookMenu({
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
             >
               <Warehouse className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.findShops")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.findShops.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.findShops")}
               </span>
             </button>
           </div>,
@@ -183,6 +168,8 @@ export function AdminCookMenu({
           open
           onClose={() => setDiscoverKind(null)}
           onCountryUpdated={onCountryUpdated}
+          regionId={regionId}
+          regionName={regionName}
         />
       ) : null}
     </div>

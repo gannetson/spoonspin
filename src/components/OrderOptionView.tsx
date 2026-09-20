@@ -75,7 +75,6 @@ export function OrderOptionView({
             tone="dark"
             showEditText
             editTextLabelKey="admin.item.editOrderOption"
-            editTextHintKey="admin.item.editOrderOption.hint"
             busy={Boolean(busy[adminKey])}
             status={status[adminKey]}
             error={error[adminKey]}

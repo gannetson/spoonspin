@@ -42,14 +42,7 @@ export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
               className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-parchment"
             >
               <Users className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.users")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.users.hint")}
-                </span>
-              </span>
+              <span className="font-semibold text-ink">{t("admin.country.users")}</span>
             </Link>
             <Link
               to="/admin"
@@ -58,13 +51,8 @@ export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
             >
               <LayoutGrid className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.overview")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.overview.hint")}
-                </span>
+              <span className="font-semibold text-ink">
+                {t("admin.country.overview")}
               </span>
             </Link>
             <Link
@@ -74,14 +62,7 @@ export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
             >
               <Activity className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.reports")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.reports.hint")}
-                </span>
-              </span>
+              <span className="font-semibold text-ink">{t("admin.country.reports")}</span>
             </Link>
             <Link
               to="/admin/review"
@@ -90,14 +71,7 @@ export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
             >
               <ClipboardList className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.review")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.review.hint")}
-                </span>
-              </span>
+              <span className="font-semibold text-ink">{t("admin.country.review")}</span>
             </Link>
             <Link
               to="/admin/flags"
@@ -106,14 +80,7 @@ export function AdminNavMenu({ tone = "light" }: AdminNavMenuProps) {
               className="flex w-full items-start gap-3 border-t border-ink/10 px-4 py-3 text-left hover:bg-parchment"
             >
               <Flag className="mt-0.5 size-4 shrink-0 text-tomato" />
-              <span>
-                <span className="block font-semibold text-ink">
-                  {t("admin.country.flags")}
-                </span>
-                <span className="mt-0.5 block text-xs text-ink-soft">
-                  {t("admin.country.flags.hint")}
-                </span>
-              </span>
+              <span className="font-semibold text-ink">{t("admin.country.flags")}</span>
             </Link>
           </div>,
           document.body,

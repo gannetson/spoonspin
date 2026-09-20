@@ -175,7 +175,6 @@ export function RestaurantView({
             tone="dark"
             showEditText
             editTextLabelKey="admin.item.editRestaurant"
-            editTextHintKey="admin.item.editRestaurant.hint"
             showRestaurantResearch
             busy={Boolean(busy[adminKey])}
             status={status[adminKey]}

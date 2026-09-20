@@ -30,6 +30,8 @@
     "agent:curate": "tsx --tsconfig tsconfig.app.json scripts/curate-restaurants.ts",
     "agent:proef": "tsx --tsconfig tsconfig.app.json scripts/import-proef-de-wereld.ts",
     "agent:ratings": "tsx --tsconfig tsconfig.app.json scripts/enrich-ratings.ts",
+    "import:restaurant-sheet": "tsx --tsconfig tsconfig.app.json scripts/import-restaurant-sheet.ts",
+    "db:backfill-restaurant-regions": "tsx --tsconfig tsconfig.app.json scripts/backfill-restaurant-regions.ts",
     "agent:review-links": "tsx --tsconfig tsconfig.app.json scripts/enrich-review-links.ts",
     "agent:reconcile-places": "tsx --tsconfig tsconfig.app.json scripts/reconcile-restaurant-places.ts",
     "db:promote-thefork-links": "tsx --tsconfig tsconfig.app.json scripts/promote-thefork-reservation-links.ts",

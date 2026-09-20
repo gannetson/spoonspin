@@ -243,7 +243,6 @@ export function OrderHome({
                     label={option.name}
                     showEditText
                     editTextLabelKey="admin.item.editOrderOption"
-                    editTextHintKey="admin.item.editOrderOption.hint"
                     busy={Boolean(busy[`order:${option.id}`])}
                     status={status[`order:${option.id}`]}
                     error={error[`order:${option.id}`]}

@@ -835,6 +835,8 @@ export const nl: Messages = {
   "admin.item.selectForDinner.drink.hint":
     "Voeg deze drank toe aan het diner (andere dranken blijven staan)",
   "admin.item.removeFromDinner.hint": "Alleen uit het diner vanavond verwijderen",
+  "admin.item.replaceAll": "Alles vervangen",
+  "admin.item.replaceAll.hint": "Afbeelding, tekst en scores in één keer",
   "admin.item.findMenu": "Menu zoeken",
   "admin.item.findMenu.hint": "Onderzoek gerechten en sla een menu op",
   "admin.item.findScores": "Scores zoeken",

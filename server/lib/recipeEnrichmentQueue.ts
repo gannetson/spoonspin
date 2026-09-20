@@ -17,6 +17,9 @@ export type RecipeEnrichmentJob = {
   countryCode: string;
   countryName: string;
   recipeId: string;
+  /** Region the dish was discovered for; expansion keeps the recipe filed there. */
+  regionId?: string;
+  regionName?: string;
   /** When set, expand this candidate into a full recipe before image lookup. */
   candidate?: DishCandidate;
 };
@@ -97,6 +100,8 @@ async function expandStub(job: RecipeEnrichmentJob): Promise<void> {
   const expanded = await expandDishCandidates({
     countryCode: job.countryCode,
     countryName: job.countryName,
+    regionId: job.regionId,
+    regionName: job.regionName,
     dishes: [
       {
         ...candidate,
@@ -112,7 +117,8 @@ async function expandStub(job: RecipeEnrichmentJob): Promise<void> {
     localName: recipe.localName,
     description: recipe.description,
     category: recipe.category,
-    region: recipe.region ?? candidate.region,
+    region: recipe.region ?? candidate.region ?? job.regionName,
+    ...(job.regionId ? { regionId: job.regionId, regionName: job.regionName } : {}),
     servings: recipe.servings,
     prepMinutes: recipe.prepMinutes,
     cookMinutes: recipe.cookMinutes,

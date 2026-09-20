@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
@@ -32,5 +32,34 @@ describe("AdminItemMenu errors", () => {
     await screen.findByRole("alert");
     await user.click(screen.getByRole("button", { name: "Dismiss" }));
     expect(screen.queryByRole("alert")).toBeNull();
+  });
+});
+
+describe("AdminItemMenu restaurant actions", () => {
+  it("offers 'Replace all' for restaurants", async () => {
+    const user = userEvent.setup();
+    const onAction = vi.fn();
+    render(
+      <LocaleProvider>
+        <AdminItemMenu label="Sofra" showRestaurantResearch onAction={onAction} />
+      </LocaleProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: /sofra/i }));
+    await user.click(await screen.findByRole("menuitem", { name: /replace all/i }));
+    expect(onAction).toHaveBeenCalledWith("replace-all");
+  });
+
+  it("does not offer it for items with no restaurant research", async () => {
+    const user = userEvent.setup();
+    render(
+      <LocaleProvider>
+        <AdminItemMenu label="Pad Thai" onAction={() => undefined} />
+      </LocaleProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: /pad thai/i }));
+    await screen.findByRole("menu");
+    expect(screen.queryByRole("menuitem", { name: /replace all/i })).toBeNull();
   });
 });

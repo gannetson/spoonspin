@@ -13,7 +13,14 @@ import {
   pickRandomCountry,
   rememberCountryCode,
 } from "@/lib/picker";
-import type { Country, Drink, OrderOption, Recipe, Region, SpecialtyShop } from "@/types/content";
+import type {
+  Country,
+  Drink,
+  OrderOption,
+  Recipe,
+  Region,
+  SpecialtyShop,
+} from "@/types/content";
 import { CountryCard } from "@/components/CountryCard";
 import { CountrySelect } from "@/components/CountrySelect";
 import { RegionSelect } from "@/components/RegionSelect";
@@ -136,12 +143,22 @@ export default function App() {
     };
   }, [selectedCountry]);
 
+  /**
+   * A country with a single region offers no choice, so the selector is hidden
+   * and any region in the URL is ignored — otherwise the filter would stay
+   * stuck on with no control left to clear it, silently hiding every dish that
+   * has not been filed under that one region.
+   */
+  const regionChoiceAvailable = countryRegions.length > 1;
   const selectedRegion = useMemo(
-    () => countryRegions.find((region) => region.id === regionId),
-    [countryRegions, regionId],
+    () =>
+      regionChoiceAvailable
+        ? countryRegions.find((region) => region.id === regionId)
+        : undefined,
+    [countryRegions, regionChoiceAvailable, regionId],
   );
   const staleRegionParam =
-    regionsLoaded && Boolean(regionId) && !selectedRegion;
+    regionsLoaded && Boolean(regionId) && regionChoiceAvailable && !selectedRegion;
 
   const [communityRecipes, setCommunityRecipes] = useState<Recipe[]>([]);
   const [communityDrinks, setCommunityDrinks] = useState<Drink[]>([]);
@@ -728,7 +745,7 @@ export default function App() {
                     id="result-country-select"
                     label={t("app.countrySelect.labelResult")}
                   />
-                  {mode === "cook" && countryRegions.length > 0 ? (
+                  {mode === "cook" && regionChoiceAvailable ? (
                     <RegionSelect
                       regions={countryRegions}
                       value={selectedRegion?.id ?? ""}
@@ -743,7 +760,10 @@ export default function App() {
               {mode === "cook" && !selectedRecipe && !selectedShop ? (
                 <CookMenu
                   country={selectedCountry}
-                  regionId={selectedRegion?.id ?? (regionsLoaded ? null : regionId)}
+                  regionId={
+                    selectedRegion?.id ??
+                    (regionsLoaded || !regionChoiceAvailable ? null : regionId)
+                  }
                   regionName={selectedRegion?.name ?? null}
                   communityRecipes={communityRecipes}
                   communityDrinks={communityDrinks}

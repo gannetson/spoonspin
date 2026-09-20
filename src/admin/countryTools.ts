@@ -47,6 +47,10 @@ export type DishCandidate = {
   localName?: string;
   description: string;
   category: RecipeCategory;
+  region?: string;
+  /** Region this dish was discovered for, so it saves filed under that region. */
+  regionId?: string;
+  regionName?: string;
 };
 
 async function readJson<T>(response: Response): Promise<T & { message?: string }> {
@@ -107,10 +111,10 @@ export async function updateCountryText(code: string, introduction: string) {
   return data;
 }
 
-export function discoverRecipes(code: string, query?: string) {
+export function discoverRecipes(code: string, query?: string, regionId?: string | null) {
   return postAdmin<{ notes: string; recipes: DishCandidate[] }>(
     `/api/admin/countries/${encodeURIComponent(code)}/discover/recipes`,
-    { query },
+    { query, regionId: regionId ?? undefined },
   );
 }
 

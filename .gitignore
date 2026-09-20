@@ -4,6 +4,10 @@ dist-ssr
 *.local
 .env
 data/
+# The sheet-import grounding cache is a deliberate, shareable artefact: it is
+# resolved once against Google Places and replayed on production so the import
+# costs nothing there and writes exactly what was reviewed locally.
+!data/restaurant-sheet-cache.json
 # Keep region ISO catalogs under server/db/regions/data/ (not fill-agent data/)
 !server/db/regions/data/
 !server/db/regions/data/**
