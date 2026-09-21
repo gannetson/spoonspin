@@ -125,11 +125,62 @@ function getApiKey(): string | null {
   return process.env.OPENAI_API_KEY?.trim() || null;
 }
 
-function getModel(): string {
-  return process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini";
+/**
+ * Tasks that may run on their own model.
+ *
+ * The work varies a lot in difficulty. Filling in a restaurant's blurb, menu
+ * and scores from pages we already fetched is mechanical, while deciding
+ * whether a venue is really Armenian rather than Georgian is the judgement the
+ * whole discovery pipeline rests on. Pinning one model to all of it means
+ * either overpaying for the easy work or degrading the hard work.
+ */
+export type OpenAiTask =
+  /** Restaurant blurb / menu / score completion — mechanical extraction. */
+  | "restaurant-completion"
+  /** The cuisine authenticity gate — quality-critical, downgrade with care. */
+  | "restaurant-verify"
+  | "recipe-completion"
+  | "image-query"
+  | "content-completion"
+  | "review-search";
+
+const DEFAULT_MODEL = "gpt-4o-mini";
+
+// All defaults are eligible for the small-model daily data-sharing allowance.
+// Recipe instructions and cuisine judgments retain mini; grounded extraction
+// and photo search wording use nano. No automatic paid-model escalation.
+const TASK_MODELS: Record<OpenAiTask, string> = {
+  "restaurant-completion": "gpt-4.1-nano",
+  "restaurant-verify": "gpt-4o-mini",
+  "recipe-completion": "gpt-4o-mini",
+  "image-query": "gpt-4.1-nano",
+  "content-completion": "gpt-4.1-nano",
+  "review-search": "gpt-4.1-mini",
+};
+
+/** `OPENAI_MODEL_RESTAURANT_COMPLETION`, etc. */
+function envKeyForTask(task: OpenAiTask): string {
+  return `OPENAI_MODEL_${task.toUpperCase().replace(/-/g, "_")}`;
 }
 
-export async function chatJson(system: string, user: string): Promise<unknown> {
+/**
+ * Model for a task: explicit task override, global override, then task default.
+ * Existing deployment overrides remain authoritative.
+ */
+export function getModel(task?: OpenAiTask): string {
+  const perTask = task ? process.env[envKeyForTask(task)]?.trim() : undefined;
+  return (
+    perTask ||
+    process.env.OPENAI_MODEL?.trim() ||
+    (task ? TASK_MODELS[task] : DEFAULT_MODEL)
+  );
+}
+
+export async function chatJson(
+  system: string,
+  user: string,
+  options?: { task?: OpenAiTask },
+): Promise<unknown> {
   const apiKey = getApiKey();
   if (!apiKey) {
     throw new Error(
@@ -144,7 +195,7 @@ export async function chatJson(system: string, user: string): Promise<unknown> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: getModel(),
+      model: getModel(options?.task),
       temperature: 0.3,
       response_format: { type: "json_object" },
       messages: [

@@ -589,6 +589,7 @@ JSON shape:
     "sourceUrl": string?
   }]
 }`,
+      { task: "recipe-completion" },
     );
 
     const parsed = z
@@ -1469,6 +1470,7 @@ JSON shape:
     "reason": string?
   }]
 }`,
+    { task: "restaurant-verify" },
   );
 
   const parsed = restaurantsVerifySchema.parse(raw);
@@ -2173,6 +2175,7 @@ JSON shape:
   "dishName": string,
   "searchQueries": string[]
 }`,
+    { task: "image-query" },
   );
 
   return imageDiscoverSchema.parse(raw);
@@ -2295,6 +2298,7 @@ JSON shape:
   "servingSuggestion": string?,
   "drinkPairing": string?
 }`,
+    { task: "recipe-completion" },
   );
   const parsed = recipeRewriteSchema.parse(raw);
   return {
@@ -2347,6 +2351,7 @@ JSON shape:
   "type": "beer"|"wine"|"spirit"|"cocktail"|"soft-drink"|"tea"|"coffee"?,
   "alcoholic": boolean?
 }`,
+    { task: "content-completion" },
   );
   const parsed = drinkRewriteSchema.parse(raw);
   return {
@@ -2384,6 +2389,7 @@ JSON shape:
   "address": string?,
   "website": string?
 }`,
+    { task: "content-completion" },
   );
   const parsed = shopRewriteSchema.parse(raw);
   const website =
@@ -2466,6 +2472,7 @@ JSON shape:
   "cuisineVerdict": "clear" | "unclear",
   "cuisineCodes": ["et", "er"]
 }`,
+    { task: "content-completion" },
   );
   const parsed = orderOptionRewriteSchema.parse(raw);
   const url =
@@ -2562,6 +2569,7 @@ JSON shape:
   "cuisineVerdict": "clear" | "unclear",
   "cuisineCodes": ["et", "er"]
 }`,
+    { task: "restaurant-completion" },
   );
   const parsed = restaurantRewriteSchema.parse(raw);
   let cuisineCodes = normalizeCountryCodes(parsed.cuisineCodes);
@@ -2648,6 +2656,7 @@ JSON shape:
     "cuisineCodes": ["lb"]
   }]
 }`,
+    { task: "restaurant-completion" },
   );
   const parsed = restaurantMenuSchema.parse(raw);
 
@@ -2754,6 +2763,7 @@ JSON shape:
     "theFork": { "score": number, "count": number?, "scale": 5|10?, "url": string? }?
   }
 }`,
+    { task: "restaurant-completion" },
   );
   const parsed = restaurantScoresSchema.parse(raw);
   const fetchedAt = new Date().toISOString();
@@ -2829,6 +2839,7 @@ JSON shape:
   "notes": string,
   "searchQueries": string[]
 }`,
+    { task: "image-query" },
   );
   return itemImageQueriesSchema.parse(raw);
 }
@@ -3032,6 +3043,7 @@ JSON shape:
   "courses": [{"recipeId": string, "role": "starter"|"main"|"side"|"dessert"|"snack"|"extra", "note": string}],
   "drinks": [{"drinkName": string, "note": string}]
 }`,
+    { task: "content-completion" },
   );
 
   const parsed = dinnerComposeSchema.parse(raw);

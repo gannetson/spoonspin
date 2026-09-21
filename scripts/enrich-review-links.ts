@@ -1,4 +1,5 @@
 #!/usr/bin/env tsx
+import { getModel } from "../server/openai/suggest.ts";
 /**
  * Resolve real Tripadvisor / The Fork / OpenTable restaurant profile URLs.
  * Reads/writes Postgres reviewed restaurants only (progress in data/).
@@ -121,7 +122,7 @@ async function openAiWebSearchSources(query: string): Promise<string[]> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: process.env.OPENAI_MODEL?.trim() || "gpt-4.1-mini",
+      model: getModel("review-search"),
       tools: [{ type: "web_search" }],
       include: ["web_search_call.action.sources"],
       tool_choice: "required",
@@ -309,9 +310,8 @@ async function main() {
         userRating: aggregated.rating ?? null,
         reviewCount: aggregated.reviewCount ?? null,
       });
-      const { upsertTheForkLinkFromRatings } = await import(
-        "../server/reservations/theForkFromRatings.ts"
-      );
+      const { upsertTheForkLinkFromRatings } =
+        await import("../server/reservations/theForkFromRatings.ts");
       await upsertTheForkLinkFromRatings({ id: place.id, ratings });
 
       resolved += gained;
