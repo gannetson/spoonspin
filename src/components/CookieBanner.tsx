@@ -15,7 +15,7 @@ export function CookieBanner() {
       role="dialog"
       aria-labelledby="cookie-banner-title"
       aria-describedby="cookie-banner-body"
-      className={`fixed inset-x-0 bottom-0 ${zClass.cookieBanner} p-3 sm:p-4`}
+      className={`fixed inset-x-0 bottom-0 ${zClass.cookieBanner} p-3 print:hidden sm:p-4`}
     >
       <div className="mx-auto max-w-3xl rounded-2xl border border-ink/10 bg-cream/95 p-4 shadow-[0_-8px_40px_rgba(20,32,28,0.12)] backdrop-blur-sm sm:p-5">
         <h2

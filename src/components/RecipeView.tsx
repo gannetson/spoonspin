@@ -1,5 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ExternalLink, PlayCircle, Printer } from "lucide-react";
+import {
+  ArrowLeft,
+  ExternalLink,
+  PlayCircle,
+  Printer,
+  ShoppingBasket,
+} from "lucide-react";
 import type { Country, Drink, Recipe } from "@/types/content";
 import { useAuth } from "@/auth/AuthContext";
 import { isEditorOrAdmin } from "@/auth/roles";
@@ -7,6 +13,7 @@ import { formatQuantity, scaleIngredients } from "@/lib/scaleIngredients";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { ItemTagBar } from "@/components/ItemTagBar";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
+import { ShoppingListModal } from "@/components/ShoppingListModal";
 import { handleRecipeAdminAction, useAdminItemBusy } from "@/admin/itemActions";
 import { useEditRecipe } from "@/admin/EditRecipeContext";
 import { useSelectImage } from "@/admin/SelectImageContext";
@@ -45,8 +52,10 @@ export function RecipeView({
   const { openSelectImage } = useSelectImage();
   const { openEditRecipe } = useEditRecipe();
   const [servings, setServings] = useState(recipe.servings);
+  const [shoppingListOpen, setShoppingListOpen] = useState(false);
   useEffect(() => {
     setServings(recipe.servings);
+    setShoppingListOpen(false);
   }, [recipe.id, recipe.servings]);
   const scaled = useMemo(
     () => scaleIngredients(recipe.ingredients, recipe.servings, servings),
@@ -66,7 +75,7 @@ export function RecipeView({
   return (
     <article
       aria-labelledby="recipe-heading"
-      className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream shadow-sm print:border-0 print:shadow-none"
+      className="overflow-hidden rounded-[2rem] border border-ink/10 bg-cream shadow-sm print-recipe print:rounded-none print:border-0 print:bg-white print:shadow-none"
     >
       <div className="relative h-52 overflow-hidden sm:h-72 print:hidden">
         {imageSrc ? (
@@ -222,25 +231,37 @@ export function RecipeView({
           </ul>
         ) : null}
 
-        <div className="mt-6 flex flex-wrap items-center gap-3 print:hidden">
-          <label htmlFor="servings" className="text-sm font-semibold text-ink">
-            {t("recipe.adjustServings")}
-          </label>
-          <input
-            id="servings"
-            type="number"
-            min={1}
-            max={24}
-            value={servings}
-            onChange={(event) => {
-              const next = Number(event.target.value);
-              if (Number.isFinite(next) && next >= 1) setServings(next);
-            }}
-            className="min-h-11 w-24 rounded-xl border border-ink/20 bg-white px-3 text-ink"
-          />
-          <p className="text-sm text-ink-soft">
-            {t("recipe.scaledFrom", { count: recipe.servings })}
-          </p>
+        <div className="mt-6 print:hidden">
+          <div className="flex flex-wrap items-center gap-3">
+            <label htmlFor="servings" className="text-sm font-semibold text-ink">
+              {t("recipe.adjustServings")}
+            </label>
+            <input
+              id="servings"
+              type="number"
+              min={1}
+              max={24}
+              value={servings}
+              onChange={(event) => {
+                const next = Number(event.target.value);
+                if (Number.isFinite(next) && next >= 1) setServings(next);
+              }}
+              className="min-h-11 w-24 rounded-xl border border-ink/20 bg-white px-3 text-ink"
+            />
+            <p className="text-sm text-ink-soft">
+              {t("recipe.scaledFrom", { count: recipe.servings })}
+            </p>
+          </div>
+          {scaled.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => setShoppingListOpen(true)}
+              className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-tomato px-5 text-sm font-semibold text-cream hover:bg-tomato-deep sm:w-auto"
+            >
+              <ShoppingBasket aria-hidden="true" className="size-4" />
+              {t("recipe.shoppingList.create")}
+            </button>
+          ) : null}
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-2">
@@ -313,6 +334,15 @@ export function RecipeView({
           </div>
         </section>
       </div>
+      {shoppingListOpen ? (
+        <ShoppingListModal
+          open
+          recipeTitle={display.title}
+          servings={servings}
+          ingredients={scaled}
+          onClose={() => setShoppingListOpen(false)}
+        />
+      ) : null}
     </article>
   );
 }

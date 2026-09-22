@@ -524,12 +524,13 @@ export default function App() {
   const showHome = !selectedCountry && !spinning && !countriesLoading;
   const showCompactHeader = !showHome;
   const switcherTone = showHome ? "dark" : "light";
+  const hideChromeForRecipePrint = Boolean(selectedRecipe);
 
   return (
-    <div className="relative passport-grid min-h-screen">
+    <div className="relative min-h-screen passport-grid print:min-h-0 print:bg-white">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-cream focus:px-3 focus:py-2"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-cream focus:px-3 focus:py-2 print:hidden"
       >
         {t("app.skipToContent")}
       </a>
@@ -537,7 +538,7 @@ export default function App() {
       <header
         className={`mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 pt-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6 ${
           showHome ? "absolute inset-x-0 top-0 z-20" : "pb-2"
-        }`}
+        } ${hideChromeForRecipePrint ? "print:hidden" : ""}`}
       >
         {showCompactHeader ? (
           <button
@@ -614,7 +615,13 @@ export default function App() {
 
       <main
         id="main"
-        className={showHome ? "" : "mx-auto w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6"}
+        className={
+          showHome
+            ? ""
+            : `mx-auto w-full max-w-5xl px-4 pb-16 pt-4 sm:px-6${
+                hideChromeForRecipePrint ? " print:px-0 print:pb-0 print:pt-0" : ""
+              }`
+        }
       >
         <div aria-live="polite" className="sr-only">
           {announcement}
@@ -670,22 +677,26 @@ export default function App() {
         {selectedCountry ? (
           <TagsProvider countryCode={selectedCountry.code}>
             <section
-              className="space-y-6"
+              className={`space-y-6${hideChromeForRecipePrint ? " print:space-y-0" : ""}`}
               aria-label={t("app.result.ariaLabel", {
                 name: selectedCountry.name,
               })}
               aria-busy={spinning}
             >
-              <CountryCard
-                country={selectedCountry}
-                regionName={selectedRegion?.name ?? null}
-                spinning={spinning}
-                spinningCountry={spinNames[0]}
-                onSpin={pickCountry}
-                onCountryUpdated={handleCountryUpdated}
-              />
+              <div className={hideChromeForRecipePrint ? "print:hidden" : undefined}>
+                <CountryCard
+                  country={selectedCountry}
+                  regionName={selectedRegion?.name ?? null}
+                  spinning={spinning}
+                  spinningCountry={spinNames[0]}
+                  onSpin={pickCountry}
+                  onCountryUpdated={handleCountryUpdated}
+                />
+              </div>
 
-              <div className="space-y-4">
+              <div
+                className={`space-y-4${hideChromeForRecipePrint ? " print:hidden" : ""}`}
+              >
                 <div className="grid gap-4 md:grid-cols-3">
                   <ModeButton
                     active={mode === "cook"}
@@ -874,7 +885,9 @@ export default function App() {
           </TagsProvider>
         ) : null}
       </main>
-      <SiteFooter />
+      <div className={hideChromeForRecipePrint ? "print:hidden" : undefined}>
+        <SiteFooter />
+      </div>
     </div>
   );
 }

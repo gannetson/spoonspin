@@ -49,12 +49,12 @@ export function RestaurantCard({
   return (
     <li>
       <div className="group relative overflow-hidden rounded-2xl bg-cream text-ink ring-1 ring-ink/10 transition hover:ring-tomato/35">
-        <div className="relative flex cursor-pointer">
+        <div className="relative grid cursor-pointer grid-cols-[7rem_minmax(0,1fr)] sm:min-h-[8rem] sm:grid-cols-[10rem_minmax(0,1fr)]">
           <button
             type="button"
             onClick={onOpen}
             aria-label={t("dine.openRestaurantAria", { name: restaurant.name })}
-            className="relative h-32 w-28 shrink-0 cursor-pointer self-stretch sm:h-auto sm:w-40"
+            className="relative h-32 w-full cursor-pointer self-stretch sm:h-auto sm:row-span-2"
           >
             {photoUrl ? (
               <img
@@ -71,37 +71,41 @@ export function RestaurantCard({
             )}
           </button>
 
-          <div
-            className={`flex min-w-0 flex-1 flex-col justify-center gap-2 px-4 py-3 sm:px-5 ${
+          <button
+            type="button"
+            onClick={onOpen}
+            className={`flex min-w-0 cursor-pointer flex-col justify-center gap-1.5 px-4 pt-3 text-left sm:px-5 sm:pb-1 ${
               isAdmin ? "pr-14" : ""
             }`}
           >
+            <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
+              <h3 className="font-display text-xl leading-tight text-burgundy transition group-hover:text-tomato sm:text-2xl">
+                {restaurant.name}
+              </h3>
+              {restaurant.distanceKm != null ? (
+                <p className="shrink-0 pt-1 text-sm font-semibold text-ink">
+                  {t("dine.distanceAway", {
+                    distance: formatDistanceKm(restaurant.distanceKm),
+                  })}
+                </p>
+              ) : null}
+            </div>
+
+            <p className="flex items-start gap-1.5 text-sm text-ink-soft">
+              <MapPin aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
+              <span className="sm:line-clamp-1">
+                {restaurant.address}
+                {restaurant.city ? ` · ${restaurant.city}` : ""}
+              </span>
+            </p>
+          </button>
+
+          <div className="col-span-2 flex min-w-0 flex-col justify-center gap-2 px-4 pb-3 pt-2 sm:col-span-1 sm:col-start-2 sm:px-5 sm:pt-0">
             <button
               type="button"
               onClick={onOpen}
               className="min-w-0 cursor-pointer space-y-1.5 text-left"
             >
-              <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
-                <h3 className="font-display text-xl leading-tight text-burgundy transition group-hover:text-tomato sm:text-2xl">
-                  {restaurant.name}
-                </h3>
-                {restaurant.distanceKm != null ? (
-                  <p className="shrink-0 pt-1 text-sm font-semibold text-ink">
-                    {t("dine.distanceAway", {
-                      distance: formatDistanceKm(restaurant.distanceKm),
-                    })}
-                  </p>
-                ) : null}
-              </div>
-
-              <p className="flex items-start gap-1.5 text-sm text-ink-soft">
-                <MapPin aria-hidden="true" className="mt-0.5 size-3.5 shrink-0" />
-                <span className="line-clamp-1">
-                  {restaurant.address}
-                  {restaurant.city ? ` · ${restaurant.city}` : ""}
-                </span>
-              </p>
-
               {(cuisineFlags.length > 0 ||
                 restaurant.authenticityRating != null ||
                 restaurant.rating != null ||

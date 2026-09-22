@@ -69,9 +69,9 @@ export function RecipeCard({
           <button
             type="button"
             onClick={onOpen}
-            className="flex min-w-0 flex-1 cursor-pointer text-left"
+            className="grid min-w-0 flex-1 cursor-pointer grid-cols-[7rem_minmax(0,1fr)] text-left sm:min-h-[7.5rem] sm:grid-cols-[9rem_minmax(0,1fr)]"
           >
-            <div className="relative h-28 w-28 shrink-0 self-stretch sm:h-auto sm:min-h-[7.5rem] sm:w-36">
+            <div className="relative h-28 w-full self-stretch sm:h-auto sm:row-span-2">
               {imageUrl ? (
                 <img
                   src={imageUrl}
@@ -89,7 +89,7 @@ export function RecipeCard({
             </div>
 
             <div
-              className={`flex min-w-0 flex-1 flex-col justify-center gap-1.5 px-4 py-3 sm:gap-2 sm:px-5 ${
+              className={`flex min-w-0 flex-col justify-center gap-1.5 px-4 pt-3 sm:gap-2 sm:px-5 sm:pb-1 ${
                 isAdmin ? "pr-14" : ""
               }`}
             >
@@ -121,7 +121,7 @@ export function RecipeCard({
               </div>
 
               <div className="min-w-0">
-                <p className="truncate font-display text-xl leading-tight text-burgundy sm:text-2xl">
+                <p className="font-display text-xl leading-tight text-burgundy sm:truncate sm:text-2xl">
                   {display.title}
                 </p>
                 {display.subtitle ? (
@@ -129,12 +129,17 @@ export function RecipeCard({
                     {display.subtitle}
                   </p>
                 ) : null}
-                {recipe.description.trim() ? (
-                  <p className="mt-1.5 line-clamp-2 text-sm leading-snug text-ink-soft">
-                    {recipe.description.trim()}
-                  </p>
-                ) : null}
               </div>
+            </div>
+
+            <div
+              className="col-span-2 flex min-w-0 flex-col justify-center gap-1.5 px-4 pb-3 pt-1.5 sm:col-span-1 sm:col-start-2 sm:gap-2 sm:px-5 sm:pt-0"
+            >
+              {recipe.description.trim() ? (
+                <p className="line-clamp-2 text-sm leading-snug text-ink-soft">
+                  {recipe.description.trim()}
+                </p>
+              ) : null}
 
               {showMeta && !isSimple ? (
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-ink-soft">

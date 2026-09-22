@@ -1,5 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { AWIN_THUISBEZORGD_MID, wrapThuisbezorgdAffiliateUrl } from "./affiliateLinks";
+import {
+  AWIN_THUISBEZORGD_MID,
+  wrapThuisbezorgdAffiliateUrl,
+} from "./affiliateLinks";
 import { getPublicConfig, type PublicConfig } from "../lib/publicConfig";
 
 const emptyConfig: PublicConfig = {
