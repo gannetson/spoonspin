@@ -179,9 +179,43 @@ export async function fetchOverpass(
   return data.elements ?? [];
 }
 
+/**
+ * Place name for a venue: the first address key OSM has, from city down to hamlet.
+ * Falls back to "" (callers show the country) rather than guessing a nearby city.
+ */
+export const CITY_TAG_KEYS = [
+  "addr:city",
+  "addr:town",
+  "addr:village",
+  "addr:municipality",
+  "addr:hamlet",
+  "addr:place",
+  "is_in:city",
+] as const;
+
+export function cityFromTags(tags: Record<string, string>): string {
+  for (const key of CITY_TAG_KEYS) {
+    const value = tags[key]?.trim();
+    if (value) return value;
+  }
+  return "";
+}
+
 export function elementToRestaurant(
   element: OverpassElement,
   countryCode: string,
+): RestaurantUpsert | null {
+  return elementToRestaurantForCodes(element, [countryCode]);
+}
+
+/**
+ * One OSM element to one restaurant row, tagged with every country in
+ * `countryCodes` whose specialty cuisine tags it carries (a "chinese;thai"
+ * place gets both). Null when it has no name or matches none of them.
+ */
+export function elementToRestaurantForCodes(
+  element: OverpassElement,
+  countryCodes: string[],
 ): RestaurantUpsert | null {
   const tags = element.tags ?? {};
   const name = tags.name?.trim();
@@ -192,9 +226,8 @@ export function elementToRestaurant(
     .map((part) => part.trim().toLowerCase())
     .filter(Boolean);
 
-  if (!hasPrimaryCuisineMatch(countryCode, cuisineTags)) {
-    return null;
-  }
+  const matched = countryCodes.filter((code) => hasPrimaryCuisineMatch(code, cuisineTags));
+  if (matched.length === 0) return null;
 
   const lat = element.lat ?? element.center?.lat ?? null;
   const lng = element.lon ?? element.center?.lon ?? null;
@@ -202,7 +235,7 @@ export function elementToRestaurant(
     .filter(Boolean)
     .join(" ")
     .trim();
-  const city = tags["addr:city"] || tags["addr:place"] || tags["addr:town"] || "";
+  const city = cityFromTags(tags);
   const postcode = tags["addr:postcode"] || null;
   const addressParts = [street, postcode, city].filter(Boolean);
   const address =
@@ -220,7 +253,7 @@ export function elementToRestaurant(
     postcode,
     lat,
     lng,
-    cuisineCodes: [countryCode],
+    cuisineCodes: matched,
     cuisineTags,
     website: tags.website || tags["contact:website"] || null,
     phone: tags.phone || tags["contact:phone"] || null,

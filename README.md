@@ -170,23 +170,34 @@ The importer keeps Netherlands venues with known cuisine tags (evidence A–C), 
 ### Incremental gather agent (more restaurants over time)
 
 ```bash
-# Status / remaining jobs
+# Status: tiles searched, tiles due for refresh, reviewed coverage per country
 npm run agent:gather -- --status
 
-# Process next small batch (default 4 hub×cuisine jobs), then promote specialty matches
+# Search the next batch of tiles (default 8), then promote specialty matches
 npm run agent:gather
 
-# Larger batch
-npm run agent:gather -- --batch 8 --hubs nl-major --radius-km 25
+# Larger batch, or only fetch and count without touching the database
+npm run agent:gather -- --batch 20
+npm run agent:gather -- --dry-run --batch 1 --countries cn,th
+
+# Search tiles again that were last searched more than N days ago (default 30, 0 = off)
+npm run agent:gather -- --refresh-days 14
 
 # Promote from already-harvested OSM rows only (no network)
 npm run agent:gather -- --promote-only
 
 # Reset job progress (does not delete restaurants)
 npm run agent:gather -- --reset
+
+# The older circle search around hub cities (also what --hubs / --radius-km select)
+npm run agent:gather -- --mode hubs --hubs nl-major --radius-km 25
 ```
 
-Progress lives in `data/gather-progress.json` (gitignored). Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Sparse cuisines are harvested first. Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in admin.
+By default the gather agent cuts the Netherlands into 0.5° tiles (54 of them, tiles nearest the big cities first). One Overpass request per tile asks for every specialty cuisine at once, and each place is tagged with all the countries whose cuisine tags it carries. That covers the whole country with about 1/80 of the requests the circle search needed. A tile that times out is split into four and retried; a tile only counts as done when all its parts succeeded.
+
+Re-searching is safe: a harvest never overwrites a reviewed row, a row from another source, or one matched to Google Places. For those it only adds cuisine codes and fills empty website, phone and postcode. Untouched OSM rows are updated only when OSM changed, and unchanged places cost no write.
+
+Progress lives in `data/gather-progress.json` (gitignored; `completedAt` holds when each tile last finished). Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in admin.
 
 ### Scheduled fill (all countries × Randstad cities)
 

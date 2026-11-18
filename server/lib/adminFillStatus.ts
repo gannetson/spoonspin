@@ -5,6 +5,13 @@ import {
 } from "../db/fillProgress.ts";
 import { countByCuisineCode, listRestaurants } from "../db/restaurants.ts";
 import { FILL_CITIES } from "../../scripts/lib/fillCities.ts";
+import { NL_BBOX } from "../../scripts/lib/overpassRestaurants.ts";
+import {
+  DEFAULT_TILE_DEG,
+  buildTiles,
+  tagSignature,
+  unionCuisineTags,
+} from "../../scripts/lib/overpassTiles.ts";
 import { getCountryRecipes } from "../../src/content/countries/menuAccessors.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import type { Country } from "../../src/types/content.ts";
@@ -160,8 +167,18 @@ export async function buildAdminFillStatus(): Promise<AdminFillStatusResponse> {
   const osmCountries = published.filter(
     (c) => osmTagsForCountry(c.code).length > 0,
   ).length;
-  const expectedJobs =
-    osmCountries > 0 ? osmCountries * RANDSTAD_HUB_COUNT : null;
+  // The gather agent searches tiles (one request per tile, every cuisine at once).
+  // Its job ids carry a signature of the cuisine tags, so only ids for today's
+  // set of published countries count. Older circle-search ids are ignored once
+  // tile ids exist.
+  const tilePrefix = `tiles:${DEFAULT_TILE_DEG}:${tagSignature(unionCuisineTags(published.map((c) => c.code)))}:`;
+  const tilesDone = progress.gatherCompletedJobIds.filter((id) => id.startsWith(tilePrefix)).length;
+  const usesTiles = progress.gatherCompletedJobIds.some((id) => id.startsWith("tiles:"));
+  const expectedJobs = usesTiles
+    ? buildTiles(NL_BBOX, DEFAULT_TILE_DEG).length
+    : osmCountries > 0
+      ? osmCountries * RANDSTAD_HUB_COUNT
+      : null;
 
   let pendingRestaurantEnrichment = 0;
   for (const restaurant of restaurants) {
@@ -202,7 +219,7 @@ export async function buildAdminFillStatus(): Promise<AdminFillStatusResponse> {
     cookIncomplete,
     restaurantGaps,
     gather: {
-      completedJobIds: progress.gatherCompletedJobIds.length,
+      completedJobIds: usesTiles ? tilesDone : progress.gatherCompletedJobIds.length,
       expectedJobs,
     },
     retryHint:

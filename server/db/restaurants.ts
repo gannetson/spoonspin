@@ -1,3 +1,4 @@
+import { planOsmMerge } from "./osmMerge.ts";
 import { Pool, type PoolClient, type QueryResultRow } from "pg";
 import {
   countryCodesFromOsmTags,
@@ -954,6 +955,73 @@ export async function upsertRestaurant(restaurant: RestaurantUpsert): Promise<st
     );
     return await upsertRestaurantOnce(restaurant);
   }
+}
+
+export type OsmHarvestResult = {
+  inserted: number;
+  updated: number;
+  merged: number;
+  unchanged: number;
+};
+
+/**
+ * Store a batch of harvested OSM places without disturbing what is already there.
+ * One query finds the rows that exist; `planOsmMerge` decides per place whether
+ * to insert, skip, update a plain OSM row, or only merge into a reviewed or
+ * enriched one. Unchanged places cost no write, so re-harvesting is cheap.
+ */
+export async function mergeOsmHarvest(
+  places: RestaurantUpsert[],
+): Promise<OsmHarvestResult> {
+  const result: OsmHarvestResult = { inserted: 0, updated: 0, merged: 0, unchanged: 0 };
+  if (places.length === 0) return result;
+  const db = await ensureDb();
+
+  const existingByOsmId = new Map<string, StoredRestaurant>();
+  const CHUNK = 500;
+  for (let i = 0; i < places.length; i += CHUNK) {
+    const ids = places.slice(i, i + CHUNK).map((place) => place.osmId);
+    const rows = await db.query(`SELECT * FROM restaurants WHERE osm_id = ANY($1::text[])`, [ids]);
+    for (const row of rows.rows) {
+      const stored = rowToStored(row);
+      existingByOsmId.set(stored.osmId, stored);
+    }
+  }
+
+  for (const place of places) {
+    const plan = planOsmMerge(existingByOsmId.get(place.osmId), place);
+    if (plan.action === "skip") {
+      result.unchanged += 1;
+    } else if (plan.action === "insert") {
+      await upsertRestaurant(place);
+      result.inserted += 1;
+    } else if (plan.action === "update") {
+      await upsertRestaurant(place);
+      result.updated += 1;
+    } else {
+      await db.query(
+        `UPDATE restaurants SET
+          cuisine_codes = $1::jsonb,
+          cuisine_tags = $2::jsonb,
+          website = COALESCE(NULLIF(website, ''), $3),
+          phone = COALESCE(NULLIF(phone, ''), $4),
+          postcode = COALESCE(NULLIF(postcode, ''), $5),
+          updated_at = $6::timestamptz
+        WHERE id = $7`,
+        [
+          JSON.stringify(plan.cuisineCodes),
+          JSON.stringify(plan.cuisineTags),
+          plan.website,
+          plan.phone,
+          plan.postcode,
+          new Date().toISOString(),
+          existingByOsmId.get(place.osmId)!.id,
+        ],
+      );
+      result.merged += 1;
+    }
+  }
+  return result;
 }
 
 async function upsertRestaurantOnce(restaurant: RestaurantUpsert): Promise<string> {

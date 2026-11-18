@@ -4,8 +4,8 @@
  *
  * Lanes (safe to run separately so OpenAI / Apify / OSM never pile on):
  *   cook         — wiki dishes → complete menus → dinners → recipe enrich
- *   restaurants  — OSM gather @ Randstad hubs (Amsterdam, Rotterdam, Den Haag,
- *                  Leiden, Utrecht) + promote unreviewed specialty matches
+ *   restaurants  — OSM gather by tile (whole country, every cuisine per request)
+ *                  + promote unreviewed specialty matches
  *   orders       — Apify order options per country × city hub
  *   daily        — one small batch of each lane (default for cron)
  *
@@ -303,7 +303,7 @@ async function runCookLane(batch: number) {
 }
 
 async function runRestaurantsLane(batch: number, code?: string) {
-  console.log("\n=== Lane: restaurants (Randstad hubs) ===");
+  console.log("\n=== Lane: restaurants (OSM tiles, whole country) ===");
   const countries = await listCountriesFromDb();
   const codes = countries
     .filter((c) => c.status === "published")
@@ -313,13 +313,14 @@ async function runRestaurantsLane(batch: number, code?: string) {
     console.warn("No published countries to harvest.");
     return;
   }
+  // Tile search: the whole country, every cuisine in one request per tile (see
+  // gather-restaurants.ts). A tile is far more productive than a hub x country
+  // job, so a lane run does at least a few of them.
   const args = [
+    "--mode",
+    "tiles",
     "--batch",
-    String(batch),
-    "--hubs",
-    "randstad",
-    "--radius-km",
-    "25",
+    String(Math.max(batch, 4)),
     "--countries",
     codes.join(","),
   ];
