@@ -14,7 +14,7 @@ The lanes used to be a chain of separate scripts, each leaving gaps for the next
 | Lane | One run does |
 |------|--------------|
 | **cook** | per country: Wikipedia dish research → 35-recipe menu with national dishes flagged → a photo and links for every recipe → a dinner that only uses recipes that exist → country image |
-| **restaurants** | next map tiles → store places (never overwriting reviewed rows) → promote → per restaurant: cuisine verdict + description, photo, menu, scores, Google/Tripadvisor rating |
+| **restaurants** | Overture tiles, then OSM tiles → store places (never overwriting reviewed rows; one venue found by both sources stays one row) → promote → per restaurant: cuisine verdict + description, photo, menu, scores, Google/Tripadvisor rating |
 | **orders** | Apify jobs per country × city: Thuisbezorgd (NL) / Takeaway.com (BE) / Lieferando (DE) plus Uber Eats, then notes and cuisine verification |
 | **daily** | all three, small batches |
 
@@ -45,6 +45,8 @@ Admins can inspect gaps on **`/admin`** (Content fill panel). The order matrix t
 After new order options are saved, and after gather promotes restaurants, OpenAI enrichment runs. Enrichment may **reassign** cuisine countries from page evidence, or **remove** restaurants / order options when evidence was fetched but cuisine remains unclear.
 
 ## Restaurants (tiles)
+
+Two sources feed the same table: **OSM** (`agent:gather`, needs a `cuisine=*` tag) and **Overture Maps** (`agent:overture`, category-based, free, via DuckDB; see the README). The restaurants lane runs Overture first, then gather, which promotes and enriches everything unreviewed. In a first test one Düsseldorf/Cologne tile gave 2,279 Overture rows for cuisine categories, where the matching OSM request timed out.
 
 - The map is cut into 0.5° tiles on one shared grid; a tile is one Overpass request for every cuisine at once. A tile that times out is split into four.
 - A tile is *done* when it was searched with today's set of cuisine tags; it becomes due again when a country is published or after `--refresh-days` (default 30).
@@ -80,7 +82,7 @@ Check `agent:fill -- --status` after the first week: the cook lane had not run f
 Rough throughput:
 
 - **Cook:** 3 countries a day to complete (about 200 countries need the extra recipes and photos, so weeks), plus a photo sweep over recipes anywhere.
-- **Restaurants:** 16 tiles per run, about 100 tiles for the three regions, then monthly refreshes.
+- **Restaurants:** 16 OSM tiles and 6 Overture tiles per run, about 100 tiles for the three regions, then monthly refreshes.
 - **Orders:** the matrix is countries × cities (about 200 × 28), so it is a long tail; city-by-city order means Leiden is finished first. Every job costs Apify credit.
 
 ## Order platforms

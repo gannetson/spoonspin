@@ -1,4 +1,5 @@
-import { planOsmMerge } from "./osmMerge.ts";
+import { planAddOnlyMerge, planOsmMerge } from "./osmMerge.ts";
+import { findMatchingVenue } from "./venueMatch.ts";
 import { Pool, type PoolClient, type QueryResultRow } from "pg";
 import {
   cityAnchorByName,
@@ -1026,6 +1027,100 @@ export async function mergeOsmHarvest(
       );
       result.merged += 1;
     }
+  }
+  return result;
+}
+
+export type ExternalHarvestResult = {
+  inserted: number;
+  /** Same venue as a stored row (any source): cuisines and empty contact fields added. */
+  merged: number;
+  unchanged: number;
+};
+
+/**
+ * Store places from a second source (Overture) that OSM may already have.
+ *
+ * Each place is first looked up by its own key (a re-harvest), then by "same venue":
+ * a stored row within 150 m with a matching name, whatever its source. A venue we
+ * already have only gains cuisine codes and empty contact fields; its name, address and
+ * links stay as they are. Only a place with no match becomes a new row. `bounds` is the
+ * area the places came from, so one query finds every stored row they could match.
+ */
+export async function mergeExternalHarvest(
+  places: RestaurantUpsert[],
+  bounds: { south: number; west: number; north: number; east: number },
+): Promise<ExternalHarvestResult> {
+  const result: ExternalHarvestResult = { inserted: 0, merged: 0, unchanged: 0 };
+  if (places.length === 0) return result;
+  const db = await ensureDb();
+
+  // A margin past the tile edge: the same venue can sit just across the border in the other source.
+  const margin = 0.003;
+  const rows = await db.query(
+    `SELECT * FROM restaurants
+      WHERE lat BETWEEN $1 AND $2 AND lng BETWEEN $3 AND $4`,
+    [bounds.south - margin, bounds.north + margin, bounds.west - margin, bounds.east + margin],
+  );
+  const stored = rows.rows.map(rowToStored);
+  const byOsmId = new Map(stored.map((row) => [row.osmId, row]));
+
+  for (const place of places) {
+    const existing =
+      byOsmId.get(place.osmId) ??
+      findMatchingVenue(
+        { name: place.name, lat: place.lat ?? null, lng: place.lng ?? null },
+        stored,
+      );
+
+    if (!existing) {
+      const id = await upsertRestaurant(place);
+      // Later places in this batch can match this one, so two Overture entries for one venue stay one row.
+      const row = await db.query(`SELECT * FROM restaurants WHERE id = $1`, [id]);
+      if (row.rows[0]) {
+        const added = rowToStored(row.rows[0]);
+        stored.push(added);
+        byOsmId.set(added.osmId, added);
+      }
+      result.inserted += 1;
+      continue;
+    }
+
+    // A person (or Google Places) vouched for a reviewed row's cuisine; a second source's
+    // category must not add another. It may still fill an empty website or phone.
+    const plan = planAddOnlyMerge(
+      existing,
+      existing.reviewed ? { ...place, cuisineCodes: [], cuisineTags: [] } : place,
+    );
+    if (plan.action === "skip") {
+      result.unchanged += 1;
+      continue;
+    }
+    await db.query(
+      `UPDATE restaurants SET
+        cuisine_codes = $1::jsonb,
+        cuisine_tags = $2::jsonb,
+        website = COALESCE(NULLIF(website, ''), $3),
+        phone = COALESCE(NULLIF(phone, ''), $4),
+        postcode = COALESCE(NULLIF(postcode, ''), $5),
+        updated_at = $6::timestamptz
+      WHERE id = $7`,
+      [
+        JSON.stringify(plan.cuisineCodes),
+        JSON.stringify(plan.cuisineTags),
+        plan.website,
+        plan.phone,
+        plan.postcode,
+        new Date().toISOString(),
+        existing.id,
+      ],
+    );
+    existing.cuisineCodes = plan.cuisineCodes;
+    existing.cuisineTags = plan.cuisineTags;
+    if (plan.website) existing.website = plan.website;
+    if (plan.phone) existing.phone = plan.phone;
+    if (plan.postcode) existing.postcode = plan.postcode;
+    result.merged += 1;
   }
   return result;
 }

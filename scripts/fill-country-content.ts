@@ -325,6 +325,19 @@ async function runRestaurantsLane(batch: number, code?: string, promoteLimit = 4
     "--countries",
     codes.join(","),
   ];
+  // Overture first (a second, category-based source; free, no key). Its new places are
+  // unreviewed, so the gather run below promotes and enriches them with the OSM ones.
+  // It exits 2 when its optional DuckDB dependency is missing: that is a warning, not a stop.
+  const overture = await runNpmScript("agent:overture", [
+    "--batch",
+    String(Math.max(batch * 2, 6)),
+  ]);
+  if (overture === 2) {
+    console.warn("agent:overture skipped: @duckdb/node-api is not installed on this machine.");
+  } else if (overture !== 0) {
+    console.warn(`agent:overture exited ${overture}`);
+  }
+
   const exit = await runNpmScript("agent:gather", args);
   if (exit !== 0) console.warn(`agent:gather exited ${exit}`);
 }

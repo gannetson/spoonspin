@@ -69,30 +69,42 @@ const union = (a: string[], b: string[]) => Array.from(new Set([...a, ...b]));
 const includesAll = (haystack: string[], needles: string[]) =>
   needles.every((needle) => haystack.includes(needle));
 
+/**
+ * Add what is new and nothing else: cuisine codes and tags, and contact fields that are
+ * empty. Never touches name, address or links. Used for protected rows and whenever the
+ * incoming place comes from a different source than the stored row.
+ */
+export function planAddOnlyMerge(
+  existing: ExistingOsmRow,
+  incoming: RestaurantUpsert,
+): Extract<MergePlan, { action: "merge" }> | { action: "skip" } {
+  const codesKnown = includesAll(existing.cuisineCodes, incoming.cuisineCodes);
+  const tagsKnown = includesAll(existing.cuisineTags, incoming.cuisineTags);
+  const website = blank(existing.website) && !blank(incoming.website) ? incoming.website! : null;
+  const phone = blank(existing.phone) && !blank(incoming.phone) ? incoming.phone! : null;
+  const postcode =
+    blank(existing.postcode) && !blank(incoming.postcode) ? incoming.postcode! : null;
+  if (codesKnown && tagsKnown && !website && !phone && !postcode) return { action: "skip" };
+  return {
+    action: "merge",
+    cuisineCodes: union(existing.cuisineCodes, incoming.cuisineCodes),
+    cuisineTags: union(existing.cuisineTags, incoming.cuisineTags),
+    website,
+    phone,
+    postcode,
+  };
+}
+
 export function planOsmMerge(
   existing: ExistingOsmRow | undefined,
   incoming: RestaurantUpsert,
 ): MergePlan {
   if (!existing) return { action: "insert" };
 
+  if (isProtectedRow(existing)) return planAddOnlyMerge(existing, incoming);
+
   const codesKnown = includesAll(existing.cuisineCodes, incoming.cuisineCodes);
   const tagsKnown = includesAll(existing.cuisineTags, incoming.cuisineTags);
-
-  if (isProtectedRow(existing)) {
-    const website = blank(existing.website) && !blank(incoming.website) ? incoming.website! : null;
-    const phone = blank(existing.phone) && !blank(incoming.phone) ? incoming.phone! : null;
-    const postcode =
-      blank(existing.postcode) && !blank(incoming.postcode) ? incoming.postcode! : null;
-    if (codesKnown && tagsKnown && !website && !phone && !postcode) return { action: "skip" };
-    return {
-      action: "merge",
-      cuisineCodes: union(existing.cuisineCodes, incoming.cuisineCodes),
-      cuisineTags: union(existing.cuisineTags, incoming.cuisineTags),
-      website,
-      phone,
-      postcode,
-    };
-  }
 
   const unchanged =
     codesKnown &&

@@ -76,6 +76,7 @@ After the first start, seed content if needed: `npm run db:import-content`.
 | `npm run agent:recipes`           | Photos/links for recipes still missing them (DB-driven, resumable)|
 | `npm run agent:restaurant-photos` | Enrich restaurants with photos (Postgres)                         |
 | `npm run agent:restaurants`       | One-shot OSM harvest for chosen hubs/cuisines                     |
+| `npm run agent:overture`          | Overture Maps restaurants by cuisine category (second source)     |
 | `npm run agent:gather`            | Incremental gather over time (resumable batches)                  |
 | `npm run agent:curate`            | Import `data/curated-restaurants.json` → Postgres                 |
 | `npm run agent:ratings`           | Enrich guest ratings in Postgres (Google / Tripadvisor)           |
@@ -206,6 +207,22 @@ By default the gather agent cuts the Netherlands, Belgium and western Germany (A
 Re-searching is safe: a harvest never overwrites a reviewed row, a row from another source, or one matched to Google Places. For those it only adds cuisine codes and fills empty website, phone and postcode. Untouched OSM rows are updated only when OSM changed, and unchanged places cost no write.
 
 Progress lives in Postgres (`content_fill_progress`, shared with cron and the API) and is mirrored in `data/gather-progress.json` (gitignored). Each finished tile records when it was searched and with which set of cuisine tags, so publishing a new country re-searches only what needs it, not every tile. Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in admin.
+
+### Overture Maps harvest (a second source of restaurants)
+
+OSM only finds a restaurant when someone tagged its cuisine. [Overture Maps](https://overturemaps.org/) places have real categories (`korean_restaurant`), so `agent:overture` finds many more, for free (no key, no per-call cost). It reads Overture's public files with DuckDB, one 0.5° tile at a time, over the same NL, Belgium and western Germany grid.
+
+```bash
+npm run agent:overture -- --status
+npm run agent:overture -- --batch 6                 # next 6 tiles
+npm run agent:overture -- --dry-run --batch 1 --regions de-west   # fetch and count, no database
+npm run agent:overture -- --min-confidence 0.8      # default 0.7
+```
+
+- A place OSM already has is matched by name and distance (150 m) and not added twice; the stored row only gains cuisines and empty website/phone. A reviewed row never gains a cuisine from a second source.
+- New places arrive unreviewed. `agent:gather` promotes and enriches them like OSM places, and its cuisine check removes the ones whose website contradicts the category.
+- Only categories that name one country's cuisine count (`src/restaurants/overtureCuisineMap.ts`); broad ones (`pizza_restaurant`, `asian_restaurant`) are ignored. `--dry-run` lists the unmapped restaurant categories in a tile, to spot cuisines worth adding.
+- `@duckdb/node-api` is an optional dependency. If its binary is missing for your platform, `agent:overture` says so and the fill lane carries on with OSM only.
 
 ### Scheduled fill (all countries × NL, Belgium and western Germany)
 

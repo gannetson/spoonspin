@@ -26,6 +26,7 @@
     "agent:cuisine-images": "tsx --tsconfig tsconfig.app.json scripts/enrich-cuisine-images.ts",
     "agent:restaurant-photos": "tsx --tsconfig tsconfig.app.json scripts/enrich-restaurant-photos.ts",
     "agent:restaurants": "tsx --tsconfig tsconfig.app.json scripts/restaurant-agent.ts",
+    "agent:overture": "tsx --tsconfig tsconfig.app.json scripts/gather-overture.ts",
     "agent:gather": "tsx --tsconfig tsconfig.app.json scripts/gather-restaurants.ts",
     "agent:fill": "tsx --tsconfig tsconfig.app.json scripts/fill-country-content.ts",
     "agent:curate": "tsx --tsconfig tsconfig.app.json scripts/curate-restaurants.ts",
@@ -86,5 +87,8 @@
     "typescript": "~6.0.2",
     "vite": "^8.2.0",
     "vitest": "^4.1.10"
+  },
+  "optionalDependencies": {
+    "@duckdb/node-api": "^1.4.5-r.1"
   }
 }
