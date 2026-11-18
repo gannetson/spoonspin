@@ -13,6 +13,8 @@ export type ContentFillProgressPayload = {
   cookCompletedCodes: string[];
   cookFailedCodes: string[];
   gatherCompletedJobIds: string[];
+  /** Tile harvest: when each tile was last fully searched, and with which cuisine-tag set. */
+  gatherTiles: Record<string, { at: string; sig: string }>;
   totals: {
     runs: number;
     orderOptionsAdded: number;
@@ -35,6 +37,7 @@ export function defaultFillProgress(): ContentFillProgressPayload {
     cookCompletedCodes: [],
     cookFailedCodes: [],
     gatherCompletedJobIds: [],
+    gatherTiles: {},
     totals: {
       runs: 0,
       orderOptionsAdded: 0,
@@ -44,6 +47,17 @@ export function defaultFillProgress(): ContentFillProgressPayload {
       cookMenusCompleted: 0,
     },
   };
+}
+
+function asTileMap(value: unknown): Record<string, { at: string; sig: string }> {
+  if (!value || typeof value !== "object") return {};
+  const out: Record<string, { at: string; sig: string }> = {};
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (!entry || typeof entry !== "object") continue;
+    const { at, sig } = entry as Record<string, unknown>;
+    if (typeof at === "string" && typeof sig === "string") out[key] = { at, sig };
+  }
+  return out;
 }
 
 function asStringArray(value: unknown): string[] {
@@ -77,6 +91,7 @@ export function normalizeFillProgress(
     cookCompletedCodes: asStringArray(p.cookCompletedCodes),
     cookFailedCodes: asStringArray(p.cookFailedCodes),
     gatherCompletedJobIds: asStringArray(p.gatherCompletedJobIds),
+    gatherTiles: asTileMap(p.gatherTiles),
     totals: {
       runs: Number(totals.runs ?? 0) || 0,
       orderOptionsAdded: Number(totals.orderOptionsAdded ?? 0) || 0,

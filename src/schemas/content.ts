@@ -43,6 +43,7 @@ export const recipeSchema = z.object({
   regionId: z.string().min(1).optional(),
   regionName: z.string().min(1).optional(),
   region: z.string().min(1).optional(),
+  isNational: z.boolean().optional(),
 });
 
 export const specialtyShopSchema = z.object({

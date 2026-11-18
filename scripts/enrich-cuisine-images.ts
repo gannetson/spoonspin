@@ -39,7 +39,7 @@ const RECIPE_ENRICH_PATH = path.join(rootDir, "data/recipe-enrichments.json");
 const USER_AGENT =
   "SpoonSpin/0.1 (https://github.com/gannetson/spoonspin; cuisine background images)";
 
-type CuisineImage = {
+export type CuisineImage = {
   imageUrl: string;
   imageAttribution?: string;
   source: "national-dish" | "wikipedia" | "commons";
@@ -278,7 +278,7 @@ async function commonsCuisineImage(
   return null;
 }
 
-async function enrichCountry(code: string, name: string): Promise<CuisineImage | null> {
+export async function enrichCountry(code: string, name: string): Promise<CuisineImage | null> {
   const fromDish = await nationalDishImage(code);
   if (fromDish) return fromDish;
 
@@ -378,8 +378,14 @@ async function main() {
   );
 }
 
-main().catch(async (error) => {
-  console.error(error);
-  await closeDb();
-  process.exit(1);
-});
+const isDirectRun =
+  process.argv[1] != null &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
+  main().catch(async (error) => {
+    console.error(error);
+    await closeDb();
+    process.exit(1);
+  });
+}

@@ -72,7 +72,8 @@ After the first start, seed content if needed: `npm run db:import-content`.
 | `npm run test:e2e`                | Playwright main journey                                           |
 | `npm run validate:content`        | Zod validation for thin catalog stubs                             |
 | `npm run content:wikipedia`       | Refresh Wikipedia cuisine summaries → `data/` (optional research) |
-| `npm run agent:recipes`           | Enrich recipe photos/links in Postgres                            |
+| `npm run agent:cook`              | Finish countries in one run: menu, photos, dinner, country image  |
+| `npm run agent:recipes`           | Photos/links for recipes still missing them (DB-driven, resumable)|
 | `npm run agent:restaurant-photos` | Enrich restaurants with photos (Postgres)                         |
 | `npm run agent:restaurants`       | One-shot OSM harvest for chosen hubs/cuisines                     |
 | `npm run agent:gather`            | Incremental gather over time (resumable batches)                  |
@@ -173,8 +174,15 @@ The importer keeps Netherlands venues with known cuisine tags (evidence A–C), 
 # Status: tiles searched, tiles due for refresh, reviewed coverage per country
 npm run agent:gather -- --status
 
-# Search the next batch of tiles (default 8), then promote specialty matches
+# Search the next batch of tiles (default 8), then promote specialty matches and
+# finish each promoted restaurant (text, photo, menu, scores, Google/Tripadvisor rating)
 npm run agent:gather
+
+# Only some regions: nl, be, de-west (default: all three)
+npm run agent:gather -- --regions be,de-west
+
+# How many restaurants to promote (and enrich) per run, default 400
+npm run agent:gather -- --promote-limit 800
 
 # Larger batch, or only fetch and count without touching the database
 npm run agent:gather -- --batch 20
@@ -193,22 +201,23 @@ npm run agent:gather -- --reset
 npm run agent:gather -- --mode hubs --hubs nl-major --radius-km 25
 ```
 
-By default the gather agent cuts the Netherlands into 0.5° tiles (54 of them, tiles nearest the big cities first). One Overpass request per tile asks for every specialty cuisine at once, and each place is tagged with all the countries whose cuisine tags it carries. That covers the whole country with about 1/80 of the requests the circle search needed. A tile that times out is split into four and retried; a tile only counts as done when all its parts succeeded.
+By default the gather agent cuts the Netherlands, Belgium and western Germany (Aachen, Cologne, Düsseldorf, the Ruhr) into 0.5° tiles on one shared grid, tiles nearest the big cities first. Regions are defined in `src/restaurants/coverage.ts`. One Overpass request per tile asks for every specialty cuisine at once, and each place is tagged with all the countries whose cuisine tags it carries. That covers all three regions with about 1/80 of the requests the circle search needed. A tile that times out is split into four and retried; a tile only counts as done when all its parts succeeded.
 
 Re-searching is safe: a harvest never overwrites a reviewed row, a row from another source, or one matched to Google Places. For those it only adds cuisine codes and fills empty website, phone and postcode. Untouched OSM rows are updated only when OSM changed, and unchanged places cost no write.
 
-Progress lives in `data/gather-progress.json` (gitignored; `completedAt` holds when each tile last finished). Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in admin.
+Progress lives in Postgres (`content_fill_progress`, shared with cron and the API) and is mirrored in `data/gather-progress.json` (gitignored). Each finished tile records when it was searched and with which set of cuisine tags, so publishing a new country re-searches only what needs it, not every tile. Re-run whenever you like, or on a schedule (`/loop 30m npm run agent:gather` in Cursor). Promoted places get authenticity 3–4 and `reviewSource: gather-agent` until you tighten them in admin.
 
-### Scheduled fill (all countries × Randstad cities)
+### Scheduled fill (all countries × NL, Belgium and western Germany)
 
 See **[docs/content-fill-strategy.md](docs/content-fill-strategy.md)** for the full plan.
 
-Fills cook menus, restaurants, and order options for **Leiden, Amsterdam, Rotterdam, Den Haag, Utrecht**:
+Fills cook menus (35 recipes, national dishes flagged, photos, dinner), restaurants (tile harvest, promotion, enrichment) and order options. Order jobs run city by city: the five Randstad hubs first (Leiden, Amsterdam, Rotterdam, Den Haag, Utrecht), then Antwerpen, Brussel, Aachen, Köln, Düsseldorf and the other cities in `src/restaurants/coverage.ts`.
 
 ```bash
 npm run agent:fill -- --status
-npm run agent:fill -- --lane daily --batch 2
+npm run agent:fill -- --lane daily --batch 3
 npm run agent:fill -- --lane orders --batch 3
+npm run agent:cook -- --code gb          # one country, everything, in one run
 ```
 
 Sample cron: [`deploy/cron/spoonspin-content.cron`](deploy/cron/spoonspin-content.cron). Sample systemd timer: [`deploy/systemd/`](deploy/systemd/).

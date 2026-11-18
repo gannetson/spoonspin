@@ -6,11 +6,11 @@ SHELL=/bin/bash
 PATH=/usr/local/bin:/usr/bin:/bin
 APP_DIR=/home/CONTENT_USER/spoonspin
 
-# Cook (OpenAI) — 06:15 daily
-15 6 * * * cd $APP_DIR && /usr/bin/npm run agent:fill -- --lane cook --batch 2 >>/var/log/spoonspin-fill-cook.log 2>&1
+# Cook (OpenAI): menu + photos + dinner + country image per country — 06:15 daily
+15 6 * * * cd $APP_DIR && /usr/bin/npm run agent:fill -- --lane cook --batch 3 >>/var/log/spoonspin-fill-cook.log 2>&1
 
-# Restaurants OSM Randstad — 12:15 daily
+# Restaurants: OSM tiles (NL + BE + western DE), promote, enrich — 12:15 daily
 15 12 * * * cd $APP_DIR && /usr/bin/npm run agent:fill -- --lane restaurants --batch 4 >>/var/log/spoonspin-fill-restaurants.log 2>&1
 
-# Order options Apify (Leiden, Amsterdam, Rotterdam, Den Haag, Utrecht) — 20:30 daily
+# Order options via Apify, city by city (Randstad first, then BE/DE) — 20:30 daily
 30 20 * * * cd $APP_DIR && /usr/bin/npm run agent:fill -- --lane orders --batch 3 >>/var/log/spoonspin-fill-orders.log 2>&1

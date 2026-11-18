@@ -1,15 +1,21 @@
 /**
  * Background enrichment for newly added recipes:
- * expand stub → image (Wikimedia).
+ * expand stub → image (Wikimedia, then Wikipedia/Wikidata/Openverse).
  * Runs in-process (no external queue); jobs are fire-and-forget after admin add.
  */
 
-import { getRecipeRow, updateRecipeFields, updateRecipeImage } from "../db/content.ts";
+import {
+  getRecipeRow,
+  markRecipeImageAttempt,
+  updateRecipeFields,
+  updateRecipeImage,
+} from "../db/content.ts";
 import {
   discoverItemImageQueries,
   expandDishCandidates,
   type DishCandidate,
 } from "../openai/adminDiscover.ts";
+import { findDishImage } from "./dishImages.ts";
 import { findCuisineImageFromQueries } from "./wikimedia.ts";
 import type { Recipe } from "../../src/types/content.ts";
 
@@ -159,10 +165,20 @@ async function enrichImage(
     `${recipe.name} ${countryName} cuisine dish`,
     `${recipe.localName ?? recipe.name} dish food`,
   ];
-  const image = await findCuisineImageFromQueries(queries, {
-    excludeUrls: [recipe.imageUrl],
-  });
-  if (!image) return;
+  const image =
+    (await findCuisineImageFromQueries(queries, {
+      excludeUrls: [recipe.imageUrl],
+    })) ??
+    // Commons had nothing: try Wikipedia, Wikidata, Openverse (and TheMealDB with a key).
+    (await findDishImage({
+      name: recipe.name,
+      localName: recipe.localName,
+      countryName,
+    }));
+  if (!image) {
+    await markRecipeImageAttempt(countryCode, recipeId);
+    return;
+  }
 
   await updateRecipeImage(countryCode, recipeId, image.url, image.attribution);
 }

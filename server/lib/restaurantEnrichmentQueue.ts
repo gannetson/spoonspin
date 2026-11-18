@@ -1,6 +1,6 @@
 /**
  * Background enrichment for newly added restaurants:
- * image → authenticity text → menu → guest scores.
+ * image → authenticity text → menu → guest scores → Google/Tripadvisor ratings.
  * Runs in-process (no external queue); jobs are fire-and-forget after admin add.
  */
 
@@ -12,6 +12,7 @@ import {
   updateRestaurantPhoto,
   updateRestaurantScoresAndAuthenticity,
 } from "../db/restaurants.ts";
+import { enrichRestaurantRatings, isRatingsConfigured } from "./restaurantRatings.ts";
 import {
   researchRestaurantMenu,
   researchRestaurantScores,
@@ -107,6 +108,12 @@ export async function enrichRestaurantFully(job: RestaurantEnrichmentJob): Promi
   await enrichScores(restaurantId, countryName).catch((error) => {
     console.warn(`[enrich] scores failed ${restaurantId}`, error);
   });
+
+  if (isRatingsConfigured()) {
+    await enrichRestaurantRatings(restaurantId).catch((error) => {
+      console.warn(`[enrich] ratings failed ${restaurantId}`, error);
+    });
+  }
 
   console.info(`[enrich] done ${restaurantId}`);
 }

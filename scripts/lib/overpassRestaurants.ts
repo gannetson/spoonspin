@@ -2,6 +2,7 @@ import {
   hasPrimaryCuisineMatch,
   osmTagsForCountry,
 } from "../../src/restaurants/osmCuisineMap.ts";
+import { hostCountryForPoint, type HostCountry } from "../../src/restaurants/coverage.ts";
 import type { RestaurantUpsert } from "../../server/db/restaurants.ts";
 import { upsertRestaurant } from "../../server/db/restaurants.ts";
 
@@ -56,6 +57,7 @@ export const NL_BBOX = {
   north: 53.6,
   east: 7.23,
 };
+// Wider coverage (Belgium, western Germany) lives in src/restaurants/coverage.ts.
 
 function cuisineRegex(tags: string[]): string {
   return tags.map((tag) => tag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|");
@@ -201,6 +203,19 @@ export function cityFromTags(tags: Record<string, string>): string {
   return "";
 }
 
+const HOST_COUNTRY_NAME: Record<HostCountry, string> = {
+  nl: "Netherlands",
+  be: "Belgium",
+  de: "Germany",
+};
+
+/** Country name shown when OSM has no address: from the coordinates, else the Netherlands. */
+export function fallbackPlaceName(lat: number | null, lng: number | null): string {
+  if (lat == null || lng == null) return HOST_COUNTRY_NAME.nl;
+  const host = hostCountryForPoint({ lat, lng });
+  return HOST_COUNTRY_NAME[host ?? "nl"];
+}
+
 export function elementToRestaurant(
   element: OverpassElement,
   countryCode: string,
@@ -240,7 +255,9 @@ export function elementToRestaurantForCodes(
   const addressParts = [street, postcode, city].filter(Boolean);
   const address =
     addressParts.join(", ") ||
-    (lat != null && lng != null ? `${lat.toFixed(5)}, ${lng.toFixed(5)}` : "Netherlands");
+    (lat != null && lng != null
+      ? `${lat.toFixed(5)}, ${lng.toFixed(5)}`
+      : fallbackPlaceName(lat, lng));
 
   const osmId = `${element.type}/${element.id}`;
   const mapsQuery = encodeURIComponent(`${name} ${address}`);
@@ -249,7 +266,7 @@ export function elementToRestaurantForCodes(
     id: `osm:${osmId}`,
     name,
     address,
-    city: city || "Netherlands",
+    city: city || fallbackPlaceName(lat, lng),
     postcode,
     lat,
     lng,

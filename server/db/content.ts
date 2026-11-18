@@ -87,6 +87,7 @@ function rowToRecipe(row: QueryResultRow): Recipe {
     videoUrl: row.video_url == null ? undefined : String(row.video_url),
     regionId: row.region_id == null ? undefined : String(row.region_id),
     regionName: row.region_name == null ? undefined : String(row.region_name),
+    isNational: row.is_national === true ? true : undefined,
   };
 }
 
@@ -289,12 +290,12 @@ export async function replaceCountryRecipes(
         country_code, id, menu_slot, sort_order, name, local_name, description,
         category, servings, prep_minutes, cook_minutes, wait_time, difficulty, dietary_labels,
         ingredients, steps, substitutions, serving_suggestion, drink_pairing,
-        image_url, image_attribution, source_url, video_url, region_id, updated_at
+        image_url, image_attribution, source_url, video_url, region_id, is_national, updated_at
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7,
         $8, $9, $10, $11, $12, $13, $14::jsonb,
         $15::jsonb, $16::jsonb, $17::jsonb, $18, $19,
-        $20, $21, $22, $23, $24, NOW()
+        $20, $21, $22, $23, $24, $25, NOW()
       )`,
       [
         code,
@@ -321,6 +322,7 @@ export async function replaceCountryRecipes(
         recipe.sourceUrl ?? null,
         recipe.videoUrl ?? null,
         regionId,
+        recipe.isNational === true,
       ],
     );
   }
@@ -472,12 +474,12 @@ export async function appendMoreRecipes(
         country_code, id, menu_slot, sort_order, name, local_name, description,
         category, servings, prep_minutes, cook_minutes, wait_time, difficulty, dietary_labels,
         ingredients, steps, substitutions, serving_suggestion, drink_pairing,
-        image_url, image_attribution, source_url, video_url, region_id, updated_at
+        image_url, image_attribution, source_url, video_url, region_id, is_national, updated_at
       ) VALUES (
         $1, $2, 'more', $3, $4, $5, $6,
         $7, $8, $9, $10, $11, $12, $13::jsonb,
         $14::jsonb, $15::jsonb, $16::jsonb, $17, $18,
-        $19, $20, $21, $22, $23, NOW()
+        $19, $20, $21, $22, $23, $24, NOW()
       )
       ON CONFLICT (country_code, id) DO UPDATE SET
         menu_slot = EXCLUDED.menu_slot,
@@ -502,6 +504,7 @@ export async function appendMoreRecipes(
         source_url = EXCLUDED.source_url,
         video_url = EXCLUDED.video_url,
         region_id = EXCLUDED.region_id,
+        is_national = EXCLUDED.is_national,
         updated_at = NOW()`,
       [
         code,
@@ -527,6 +530,7 @@ export async function appendMoreRecipes(
         saved.sourceUrl ?? null,
         saved.videoUrl ?? null,
         regionId,
+        saved.isNational === true,
       ],
     );
     inserted.push(saved);
@@ -619,6 +623,7 @@ export async function updateRecipeFields(
       source_url = $20,
       video_url = $21,
       region_id = $22,
+      is_national = $23,
       updated_at = NOW()
      WHERE country_code = $1 AND id = $2`,
     [
@@ -644,6 +649,7 @@ export async function updateRecipeFields(
       next.sourceUrl ?? null,
       next.videoUrl ?? null,
       regionId,
+      next.isNational === true,
     ],
   );
   if (!next.waitTime?.trim()) {
@@ -662,6 +668,69 @@ export async function updateRecipeImage(
     imageUrl,
     imageAttribution: imageAttribution ?? undefined,
   });
+}
+
+/** Remember that we looked for this recipe's photo, so a dish with no photo is not retried every run. */
+export async function markRecipeImageAttempt(
+  countryCode: string,
+  recipeId: string,
+): Promise<void> {
+  const db = await ensureDb();
+  await db.query(
+    `UPDATE recipes SET image_attempted_at = NOW() WHERE country_code = $1 AND id = $2`,
+    [countryCode.toLowerCase(), recipeId],
+  );
+}
+
+export type RecipeNeedingMedia = {
+  countryCode: string;
+  countryName: string;
+  recipe: Recipe;
+};
+
+/**
+ * Recipes that still need a photo or links, straight from the database (not from a
+ * local progress file): no image (or, with `fixBad`, an image that is not a photo file),
+ * not tried within `cooldownDays`. Admin uploads are never selected for replacement.
+ */
+export async function listRecipesNeedingMedia(options: {
+  countryCode?: string;
+  limit?: number;
+  cooldownDays?: number;
+  fixBad?: boolean;
+  includeMissingLinks?: boolean;
+}): Promise<RecipeNeedingMedia[]> {
+  const db = await ensureDb();
+  const cooldown = Math.max(0, options.cooldownDays ?? 14);
+  const missingImage = options.fixBad
+    ? `(recipes.image_url IS NULL OR recipes.image_url = ''
+        OR (recipes.image_url !~* '\\.(jpe?g|png|webp|gif)(\\?|$)'
+            AND recipes.image_url NOT LIKE '/uploads/%'))`
+    : `(recipes.image_url IS NULL OR recipes.image_url = '')`;
+  const missingLinks = options.includeMissingLinks
+    ? ` OR recipes.source_url IS NULL OR recipes.video_url IS NULL`
+    : "";
+  const result = await db.query(
+    `SELECT ${RECIPE_SELECT}, countries.name AS country_name
+       FROM recipes
+       LEFT JOIN regions ON recipes.region_id = regions.id
+       JOIN countries ON countries.code = recipes.country_code
+      WHERE ($1::text IS NULL OR recipes.country_code = $1)
+        AND ((${missingImage}
+              AND (recipes.image_attempted_at IS NULL
+                   OR recipes.image_attempted_at < NOW() - make_interval(days => $2::int)))
+             ${missingLinks})
+      ORDER BY recipes.is_national DESC,
+               (recipes.menu_slot <> 'more') DESC,
+               recipes.country_code, recipes.sort_order
+      LIMIT $3`,
+    [options.countryCode?.toLowerCase() ?? null, cooldown, options.limit ?? 40],
+  );
+  return result.rows.map((row) => ({
+    countryCode: String(row.country_code),
+    countryName: String(row.country_name),
+    recipe: rowToRecipe(row),
+  }));
 }
 
 export async function removeSpecialtyShop(

@@ -13,6 +13,7 @@
  *   is granted (see affiliateLinks.ts).
  */
 
+import { findCityAnchorInText, type HostCountry } from "./coverage.ts";
 import { wrapThuisbezorgdAffiliateUrl } from "./affiliateLinks";
 
 function slugify(value: string): string {
@@ -159,6 +160,8 @@ export type DeliveryPlatformId = "thuisbezorgd" | "ubereats";
 
 export type DeliveryPlatformLink = {
   id: DeliveryPlatformId;
+  /** Which brand's copy to show: Thuisbezorgd/Takeaway.com/Lieferando share the "thuisbezorgd" id. */
+  brand: ThuisbezorgdBrand | "ubereats";
   href: string;
   searchLabel: string;
 };
@@ -178,7 +181,33 @@ function uberCitySlug(cityOrPostcode: string | undefined): string {
   return UBER_CITY_SLUG[slug] ?? DEFAULT_UBER_CITY;
 }
 
+/** Where the diner is ordering from: a known BE/DE city, otherwise the Netherlands. */
+export function hostCountryOfInput(cityOrPostcode: string | undefined): HostCountry {
+  const raw = cityOrPostcode?.trim() ?? "";
+  if (!raw || /^\d{4}\s?[A-Za-z]{2}\b/.test(raw)) return "nl";
+  return findCityAnchorInText(raw)?.country ?? "nl";
+}
+
+export type ThuisbezorgdBrand = "thuisbezorgd" | "takeaway" | "lieferando";
+
+/** The Just Eat Takeaway brand behind a stored "thuisbezorgd" link: NL, BE or DE site. */
+export function thuisbezorgdBrandForUrl(url: string | undefined): ThuisbezorgdBrand {
+  try {
+    const host = new URL(url ?? "").hostname;
+    if (/(^|\.)lieferando\.de$/i.test(host)) return "lieferando";
+    if (/(^|\.)takeaway\.com$/i.test(host)) return "takeaway";
+  } catch {
+    // fall through
+  }
+  return "thuisbezorgd";
+}
+
 export function buildThuisbezorgdUrl(input: DeliveryLinkInput): string {
+  const host = hostCountryOfInput(input.cityOrPostcode);
+  // Belgium and Germany: the country landing page. City/cuisine path slugs differ per
+  // site and are not stable enough to guess, so the diner enters their address there.
+  if (host === "be") return "https://www.takeaway.com/be/";
+  if (host === "de") return "https://www.lieferando.de/";
   const code = input.countryCode.toLowerCase();
   const cuisine = THUISBEZORGD_CUISINE_SLUG[code];
   const city = citySlug(input.cityOrPostcode);
@@ -197,6 +226,8 @@ export function buildThuisbezorgdUrl(input: DeliveryLinkInput): string {
 }
 
 export function buildUberEatsUrl(input: DeliveryLinkInput): string {
+  const host = hostCountryOfInput(input.cityOrPostcode);
+  if (host !== "nl") return `https://www.ubereats.com/${host}`;
   const code = input.countryCode.toLowerCase();
   const cuisine = UBER_CUISINE_SLUG[code];
   const city = uberCitySlug(input.cityOrPostcode);
@@ -216,9 +247,14 @@ export function deliveryPlatformLinks(
   const cityLabel = city ? `${input.countryName} · ${city}` : input.countryName;
   const marketingAllowed = input.marketingAllowed === true;
 
+  const host = hostCountryOfInput(input.cityOrPostcode);
+  const jetBrand: ThuisbezorgdBrand =
+    host === "be" ? "takeaway" : host === "de" ? "lieferando" : "thuisbezorgd";
+
   return [
     {
       id: "thuisbezorgd",
+      brand: jetBrand,
       href: wrapThuisbezorgdAffiliateUrl(buildThuisbezorgdUrl(input), {
         marketingAllowed,
       }),
@@ -226,6 +262,7 @@ export function deliveryPlatformLinks(
     },
     {
       id: "ubereats",
+      brand: "ubereats",
       href: buildUberEatsUrl(input),
       searchLabel: cityLabel,
     },
@@ -236,8 +273,15 @@ export function deliveryPlatformLinks(
 export function isPlausibleThuisbezorgdUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
-    if (!/(^|\.)thuisbezorgd\.nl$/i.test(parsed.hostname)) return false;
     const path = parsed.pathname.replace(/\/+$/, "") || "/";
+    // Belgium (Takeaway.com) and Germany (Lieferando) are the same platform family.
+    if (/(^|\.)takeaway\.com$/i.test(parsed.hostname)) {
+      return /^\/be(\/(en|nl|fr))?\/(menu|menukaart|carte)\/[a-z0-9][a-z0-9-]*$/i.test(path);
+    }
+    if (/(^|\.)lieferando\.de$/i.test(parsed.hostname)) {
+      return /^\/(en\/)?(speisekarte|menu)\/[a-z0-9][a-z0-9-]*$/i.test(path);
+    }
+    if (!/(^|\.)thuisbezorgd\.nl$/i.test(parsed.hostname)) return false;
     // Real restaurant menus: /menu/{slug} or /en/menu/{slug}
     if (/^\/(en\/)?menu\/[a-z0-9][a-z0-9-]*$/i.test(path)) return true;
     // Cuisine / city browse: /bestel/...
@@ -248,16 +292,16 @@ export function isPlausibleThuisbezorgdUrl(url: string): boolean {
   }
 }
 
-/** True when an Uber Eats URL matches known public NL path shapes. */
+/** True when an Uber Eats URL matches known public NL, BE or DE path shapes. */
 export function isPlausibleUberEatsUrl(url: string): boolean {
   try {
     const parsed = new URL(url);
     if (!/(^|\.)ubereats\.com$/i.test(parsed.hostname)) return false;
     const path = parsed.pathname.replace(/\/+$/, "") || "/";
     return (
-      /^\/nl\/store\/[^/]+\/[^/]+$/i.test(path) ||
-      /^\/nl\/category\/[a-z0-9-]+\/[a-z0-9-]+$/i.test(path) ||
-      /^\/nl\/city\/[a-z0-9-]+$/i.test(path)
+      /^\/(nl|be|de)(-[a-z]{2})?\/store\/[^/]+\/[^/]+$/i.test(path) ||
+      /^\/(nl|be|de)(-[a-z]{2})?\/category\/[a-z0-9-]+\/[a-z0-9-]+$/i.test(path) ||
+      /^\/(nl|be|de)(-[a-z]{2})?\/city\/[a-z0-9-]+$/i.test(path)
     );
   } catch {
     return false;

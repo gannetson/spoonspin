@@ -268,6 +268,8 @@ export const en: Messages = {
   "order.option.openAria": "Open {name}",
   "order.option.view": "View",
   "order.option.open.thuisbezorgd": "Order on Thuisbezorgd",
+  "order.option.open.takeaway": "Order on Takeaway.com",
+  "order.option.open.lieferando": "Order on Lieferando",
   "order.option.open.ubereats": "Order on Uber Eats",
   "order.option.noLinks": "No delivery links yet.",
   "dine.tabs.label": "Dine sections",
@@ -292,6 +294,14 @@ export const en: Messages = {
   "dine.order.thuisbezorgd.hint":
     "Open the {name} cuisine page on Thuisbezorgd.nl — enter your address there to see who delivers.",
   "dine.order.thuisbezorgd.cta": "Open Thuisbezorgd.nl",
+  "dine.order.takeaway.title": "Takeaway.com",
+  "dine.order.takeaway.hint":
+    "Open Takeaway.com Belgium — enter your address there to see who delivers {name} food near {query}.",
+  "dine.order.takeaway.cta": "Open Takeaway.com",
+  "dine.order.lieferando.title": "Lieferando",
+  "dine.order.lieferando.hint":
+    "Open Lieferando — enter your address there to see who delivers {name} food near {query}.",
+  "dine.order.lieferando.cta": "Open Lieferando",
   "dine.order.ubereats.title": "Uber Eats",
   "dine.order.ubereats.hint":
     "Browse {name} restaurants on Uber Eats near {query}. Enter your address on Uber to confirm delivery.",

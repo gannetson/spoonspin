@@ -83,7 +83,7 @@ function pickRandom<T>(items: T[]): T | undefined {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-async function fetchJson<T>(url: string): Promise<T | null> {
+export async function fetchJson<T>(url: string): Promise<T | null> {
   const response = await fetch(url, {
     headers: {
       Accept: "application/json",
@@ -98,7 +98,7 @@ async function fetchJson<T>(url: string): Promise<T | null> {
   return (await response.json()) as T;
 }
 
-async function resolveCommonsTitle(
+export async function resolveCommonsTitle(
   title: string,
 ): Promise<{ url: string; attribution: string } | null> {
   if (/\.(pdf|webm|svg|tif|tiff)$/i.test(title)) return null;

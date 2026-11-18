@@ -3,6 +3,12 @@ import {
   uberCuisineSlug,
 } from "../../src/restaurants/deliveryLinks.ts";
 import {
+  anchorsInText,
+  cityAnchorByName,
+  normalizeCity,
+  type HostCountry,
+} from "../../src/restaurants/coverage.ts";
+import {
   envActor,
   getApifyToken,
   isApifyConfigured,
@@ -14,44 +20,24 @@ export { getApifyToken, isApifyConfigured };
 const DEFAULT_TB_ACTOR = "jarvismoney/thuisbezorgd-takeaway-scraper";
 const DEFAULT_UE_ACTOR = "borderline/uber-eats-scraper-ppr";
 
-/** Representative NL delivery hubs (postcode is enough for TB). */
-const NL_SEARCH_HUBS: { city: string; address: string; aliases: string[] }[] = [
-  {
-    city: "Leiden",
-    address: "2312AB Leiden",
-    aliases: ["leiden"],
-  },
-  {
-    city: "Amsterdam",
-    address: "1012AB Amsterdam",
-    aliases: ["amsterdam", "ams"],
-  },
-  {
-    city: "Rotterdam",
-    address: "3011AB Rotterdam",
-    aliases: ["rotterdam", "rtm"],
-  },
-  {
-    city: "Utrecht",
-    address: "3511AB Utrecht",
-    aliases: ["utrecht"],
-  },
-  {
-    city: "Den Haag",
-    address: "2511AB Den Haag",
-    aliases: ["den haag", "the hague", "hague", "'s-gravenhage", "gravenhage"],
-  },
-  {
-    city: "Eindhoven",
-    address: "5611AB Eindhoven",
-    aliases: ["eindhoven"],
-  },
-];
+/** A delivery hub: where we ask the platforms "who delivers here?". */
+export type SearchHub = { city: string; address: string; country: HostCountry };
 
-const DEFAULT_HUB = NL_SEARCH_HUBS[0]!;
+const DEFAULT_LIEFERANDO_ACTOR = "studio-amba/takeaway-scraper";
+
+function hubFromAnchor(anchor: { name: string; address: string; country: HostCountry }): SearchHub {
+  return { city: anchor.name, address: anchor.address, country: anchor.country };
+}
+
+const DEFAULT_HUB: SearchHub = hubFromAnchor(cityAnchorByName("Leiden")!);
 
 export type GroundedOrderListing = {
+  /**
+   * "thuisbezorgd" is the Just Eat Takeaway family: Thuisbezorgd.nl in the
+   * Netherlands, Takeaway.com in Belgium and Lieferando in Germany. `brand` says which.
+   */
   platform: "thuisbezorgd" | "ubereats";
+  brand?: "thuisbezorgd" | "takeaway" | "lieferando";
   name: string;
   url: string;
   city?: string;
@@ -80,65 +66,52 @@ export function cuisineSearchTerms(countryCode: string, countryName: string): st
 }
 
 function hubsMatchingText(raw: string): {
-  hubs: { city: string; address: string }[];
+  hubs: SearchHub[];
   remainder: string;
 } {
-  const lower = raw.toLowerCase();
   const postcodeMatch = raw.match(/\b(\d{4}\s*[A-Za-z]{2})\b/);
   if (postcodeMatch) {
     const postcode = postcodeMatch[1]!.replace(/\s+/g, "").toUpperCase();
     const rest = raw.replace(postcodeMatch[0], "").trim();
     return {
-      hubs: [{ city: rest || postcode, address: `${postcode} Netherlands` }],
+      hubs: [{ city: rest || postcode, address: `${postcode} Netherlands`, country: "nl" }],
       remainder: rest,
     };
   }
 
-  const matched = NL_SEARCH_HUBS.filter((hub) =>
-    hub.aliases.some(
-      (alias) =>
-        lower === alias ||
-        lower.includes(alias) ||
-        new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(
-          raw,
-        ),
-    ),
-  );
-
-  let remainder = raw;
-  for (const hub of matched) {
-    for (const alias of hub.aliases) {
-      remainder = remainder.replace(new RegExp(alias, "ig"), " ");
-    }
-  }
-  remainder = remainder.replace(/\s+/g, " ").trim();
-
+  const matched = anchorsInText(raw);
   if (matched.length > 0) {
+    let remainder = normalizeCity(raw);
+    for (const anchor of matched) {
+      for (const alias of anchor.aliases) {
+        remainder = remainder.replace(
+          new RegExp(`(^|[^a-z])${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?=$|[^a-z])`, "g"),
+          "$1 ",
+        );
+      }
+    }
     return {
-      hubs: matched.map((hub) => ({ city: hub.city, address: hub.address })),
-      remainder,
+      hubs: matched.map(hubFromAnchor),
+      remainder: remainder.replace(/\s+/g, " ").trim(),
     };
   }
 
   const city = raw.trim();
   if (city) {
     return {
-      hubs: [{ city, address: `${city} Netherlands` }],
+      hubs: [{ city, address: `${city} Netherlands`, country: "nl" }],
       remainder: "",
     };
   }
 
-  return {
-    hubs: [{ city: DEFAULT_HUB.city, address: DEFAULT_HUB.address }],
-    remainder: "",
-  };
+  return { hubs: [DEFAULT_HUB], remainder: "" };
 }
 
 export function resolveSearchHubs(
   query?: string,
   city?: string,
 ): {
-  hubs: { city: string; address: string }[];
+  hubs: SearchHub[];
   focusTerms: string[];
 } {
   const cityRaw = city?.trim() ?? "";
@@ -153,26 +126,11 @@ export function resolveSearchHubs(
   }
 
   if (!queryRaw) {
-    return {
-      hubs: [{ city: DEFAULT_HUB.city, address: DEFAULT_HUB.address }],
-      focusTerms: [],
-    };
+    return { hubs: [DEFAULT_HUB], focusTerms: [] };
   }
 
-  const lower = queryRaw.toLowerCase();
   const hasPostcode = /\b\d{4}\s*[A-Za-z]{2}\b/.test(queryRaw);
-  const matchedKnown = NL_SEARCH_HUBS.filter((hub) =>
-    hub.aliases.some(
-      (alias) =>
-        lower === alias ||
-        lower.includes(alias) ||
-        new RegExp(`\\b${alias.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "i").test(
-          queryRaw,
-        ),
-    ),
-  );
-
-  if (hasPostcode || matchedKnown.length > 0) {
+  if (hasPostcode || anchorsInText(queryRaw).length > 0) {
     const fromQuery = hubsMatchingText(queryRaw);
     return {
       hubs: fromQuery.hubs,
@@ -181,10 +139,7 @@ export function resolveSearchHubs(
   }
 
   // Cuisine / focus only — search near Leiden unless a city was supplied.
-  return {
-    hubs: [{ city: DEFAULT_HUB.city, address: DEFAULT_HUB.address }],
-    focusTerms: [queryRaw],
-  };
+  return { hubs: [DEFAULT_HUB], focusTerms: [queryRaw] };
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {
@@ -228,20 +183,33 @@ function absoluteHttpUrl(url: string | undefined): string | undefined {
   }
 }
 
-function normalizeThuisbezorgdUrl(url: string): string | undefined {
+type JetBrand = "thuisbezorgd" | "takeaway" | "lieferando";
+
+function jetBrandForHost(hostname: string): JetBrand | null {
+  if (/(^|\.)thuisbezorgd\.nl$/i.test(hostname)) return "thuisbezorgd";
+  if (/(^|\.)takeaway\.com$/i.test(hostname)) return "takeaway";
+  if (/(^|\.)lieferando\.de$/i.test(hostname)) return "lieferando";
+  return null;
+}
+
+/** Just Eat Takeaway restaurant URL on one of its Dutch, Belgian or German sites. */
+function normalizeJetUrl(url: string | undefined): { url: string; brand: JetBrand } | undefined {
   const absolute = absoluteHttpUrl(url);
   if (!absolute) return undefined;
   try {
     const parsed = new URL(absolute);
-    if (!/(^|\.)thuisbezorgd\.nl$/i.test(parsed.hostname)) return undefined;
-    // Prefer /menu/ paths; keep as-is when already a menu or bestel page.
-    return parsed.toString();
+    const brand = jetBrandForHost(parsed.hostname);
+    if (!brand) return undefined;
+    return { url: parsed.toString(), brand };
   } catch {
     return undefined;
   }
 }
 
-function normalizeUberEatsUrl(url: string): string | undefined {
+function normalizeUberEatsUrl(
+  url: string | undefined,
+  country: HostCountry = "nl",
+): string | undefined {
   const absolute = absoluteHttpUrl(url);
   if (!absolute) return undefined;
   try {
@@ -249,9 +217,9 @@ function normalizeUberEatsUrl(url: string): string | undefined {
     if (!/(^|\.)ubereats\.com$/i.test(parsed.hostname)) return undefined;
     // Force www + keep path (actors sometimes omit www / use other locales).
     parsed.hostname = "www.ubereats.com";
-    // Prefer NL storefront when the path is locale-relative store.
+    // Locale-relative store paths get the storefront of the country we searched.
     if (/^\/store\//i.test(parsed.pathname)) {
-      parsed.pathname = `/nl${parsed.pathname}`;
+      parsed.pathname = `/${country}${parsed.pathname}`;
     }
     return parsed.toString();
   } catch {
@@ -263,15 +231,18 @@ export function mapThuisbezorgdItem(item: unknown): GroundedOrderListing | null 
   const row = asRecord(item);
   if (!row) return null;
   const name = asString(row.name);
-  const url = normalizeThuisbezorgdUrl(asString(row.url));
-  if (!name || !url) return null;
+  const jet = normalizeJetUrl(asString(row.url));
+  if (!name || !jet) return null;
+  const url = jet.url;
   const rating = asNumber(row.rating);
   const ratingCount = asNumber(row.ratingCount);
   const city = asString(row.city);
   const cuisines = asStringArray(row.cuisines);
   const fee = asNumber(row.deliveryFee);
-  const minOrder = asNumber(row.minimumOrder);
-  const eta = asString(row.deliveryEtaMinutes);
+  // Thuisbezorgd/Takeaway.com and the Lieferando actor name these fields differently.
+  const minOrder = asNumber(row.minimumOrder) ?? asNumber(row.minimumOrderValue);
+  const etaRaw = row.deliveryEtaMinutes ?? row.deliveryTimeMinutes;
+  const eta = typeof etaRaw === "number" ? `${etaRaw} min` : asString(etaRaw);
   const bits = [
     rating != null
       ? `${rating.toFixed(1)}★${ratingCount != null ? ` (${ratingCount})` : ""}`
@@ -283,6 +254,7 @@ export function mapThuisbezorgdItem(item: unknown): GroundedOrderListing | null 
   ].filter(Boolean);
   return {
     platform: "thuisbezorgd",
+    brand: jet.brand,
     name,
     url,
     city,
@@ -293,11 +265,14 @@ export function mapThuisbezorgdItem(item: unknown): GroundedOrderListing | null 
   };
 }
 
-export function mapUberEatsItem(item: unknown): GroundedOrderListing | null {
+export function mapUberEatsItem(
+  item: unknown,
+  country: HostCountry = "nl",
+): GroundedOrderListing | null {
   const row = asRecord(item);
   if (!row) return null;
   const name = asString(row.title) || asString(row.sanitizedTitle) || asString(row.name);
-  const url = normalizeUberEatsUrl(asString(row.url));
+  const url = normalizeUberEatsUrl(asString(row.url), country);
   if (!name || !url) return null;
 
   const location = asRecord(row.location);
@@ -356,7 +331,9 @@ function matchesCuisineFocus(listing: GroundedOrderListing, terms: string[]): bo
   });
 }
 
+/** Thuisbezorgd.nl (country "nl") and Takeaway.com Belgium (country "be"). */
 async function searchThuisbezorgd(input: {
+  country: "nl" | "be";
   addresses: string[];
   cuisineTerms: string[];
   maxRestaurants: number;
@@ -366,7 +343,7 @@ async function searchThuisbezorgd(input: {
     actor,
     body: {
       addresses: input.addresses,
-      country: "nl",
+      country: input.country,
       serviceType: "delivery",
       openNowOnly: false,
       cuisines: input.cuisineTerms.slice(0, 6),
@@ -380,8 +357,32 @@ async function searchThuisbezorgd(input: {
     .filter((item): item is GroundedOrderListing => item != null);
 }
 
+/** Lieferando.de: one location per run, no cuisine filter (filtered afterwards). */
+async function searchLieferando(input: {
+  city: string;
+  maxRestaurants: number;
+}): Promise<GroundedOrderListing[]> {
+  const actor = envActor("APIFY_LIEFERANDO_ACTOR", DEFAULT_LIEFERANDO_ACTOR);
+  const items = await runActorDatasetItems({
+    actor,
+    body: {
+      country: "de",
+      location: input.city,
+      serviceType: "delivery",
+      maxResults: input.maxRestaurants,
+      scrapeMenus: false,
+    },
+  });
+  return items
+    .map(mapThuisbezorgdItem)
+    .filter((item): item is GroundedOrderListing => item != null);
+}
+
+const UBER_LOCALE: Record<HostCountry, string> = { nl: "nl-NL", be: "nl-BE", de: "de-DE" };
+
 async function searchUberEats(input: {
   address: string;
+  country: HostCountry;
   query: string;
   maxRows: number;
 }): Promise<GroundedOrderListing[]> {
@@ -389,9 +390,9 @@ async function searchUberEats(input: {
   const items = await runActorDatasetItems({
     actor,
     body: {
-      locale: "nl-NL",
+      locale: UBER_LOCALE[input.country],
       address: input.address,
-      addressCountry: "NL",
+      addressCountry: input.country.toUpperCase(),
       query: input.query,
       storeType: "RESTAURANTS",
       maxRows: input.maxRows,
@@ -399,13 +400,21 @@ async function searchUberEats(input: {
     },
   });
   return items
-    .map(mapUberEatsItem)
+    .map((item) => mapUberEatsItem(item, input.country))
     .filter((item): item is GroundedOrderListing => item != null);
 }
 
+const BRAND_LABEL: Record<JetBrand, string> = {
+  thuisbezorgd: "Thuisbezorgd",
+  takeaway: "Takeaway.com",
+  lieferando: "Lieferando",
+};
+
 /**
- * Search Thuisbezorgd + Uber Eats for real restaurants delivering in NL.
- * Returns grounded listings with platform menu/store URLs (no LLM invention).
+ * Search the delivery platforms for real restaurants in the Netherlands, Belgium or
+ * western Germany: Thuisbezorgd / Takeaway.com / Lieferando (one Just Eat Takeaway
+ * family) plus Uber Eats. Returns grounded listings with platform menu/store URLs
+ * (no LLM invention).
  */
 export async function searchDeliveryOrderOptions(input: {
   countryCode: string;
@@ -416,7 +425,7 @@ export async function searchDeliveryOrderOptions(input: {
 }): Promise<{ listings: GroundedOrderListing[]; notes: string }> {
   if (!isApifyConfigured()) {
     throw new Error(
-      "APIFY_TOKEN is not configured. Add it to .env to discover order options from Thuisbezorgd / Uber Eats.",
+      "APIFY_TOKEN is not configured. Add it to .env to discover order options from Thuisbezorgd / Takeaway.com / Lieferando / Uber Eats.",
     );
   }
 
@@ -427,22 +436,60 @@ export async function searchDeliveryOrderOptions(input: {
     [...focusTerms, ...cuisineTerms].filter(Boolean).slice(0, 4).join(" ").trim() ||
     input.countryName;
 
-  const addresses = hubs.map((hub) => hub.address);
-  // Uber Eats actor is address+query once; use the first hub (or only matched city).
-  const uberAddress = hubs[0]!.address;
+  const hubsIn = (country: HostCountry) => hubs.filter((hub) => hub.country === country);
+  const nlHubs = hubsIn("nl");
+  const beHubs = hubsIn("be");
+  const deHubs = hubsIn("de");
+  const uberHub = hubs[0]!;
 
-  const settled = await Promise.allSettled([
-    searchThuisbezorgd({
-      addresses,
-      cuisineTerms: [...cuisineTerms, ...focusTerms],
-      maxRestaurants: maxPerPlatform * Math.min(hubs.length, 3),
-    }),
-    searchUberEats({
-      address: uberAddress,
+  type Task = { label: string; family: "jet" | "uber"; run: Promise<GroundedOrderListing[]> };
+  const tasks: Task[] = [];
+  const jetCuisines = [...cuisineTerms, ...focusTerms];
+  if (nlHubs.length > 0) {
+    tasks.push({
+      label: "Thuisbezorgd",
+      family: "jet",
+      run: searchThuisbezorgd({
+        country: "nl",
+        addresses: nlHubs.map((hub) => hub.address),
+        cuisineTerms: jetCuisines,
+        maxRestaurants: maxPerPlatform * Math.min(nlHubs.length, 3),
+      }),
+    });
+  }
+  if (beHubs.length > 0) {
+    tasks.push({
+      label: "Takeaway.com",
+      family: "jet",
+      run: searchThuisbezorgd({
+        country: "be",
+        addresses: beHubs.map((hub) => hub.address),
+        cuisineTerms: jetCuisines,
+        maxRestaurants: maxPerPlatform * Math.min(beHubs.length, 3),
+      }),
+    });
+  }
+  for (const hub of deHubs.slice(0, 3)) {
+    tasks.push({
+      label: `Lieferando ${hub.city}`,
+      family: "jet",
+      // Lieferando lists hundreds of places per city and cannot filter by cuisine, so
+      // fetch a wide page and keep the matching ones below.
+      run: searchLieferando({ city: hub.city, maxRestaurants: Math.max(maxPerPlatform * 8, 80) }),
+    });
+  }
+  tasks.push({
+    label: "Uber Eats",
+    family: "uber",
+    run: searchUberEats({
+      address: uberHub.address,
+      country: uberHub.country,
       query: searchQuery,
       maxRows: maxPerPlatform,
     }),
-  ]);
+  });
+
+  const settled = await Promise.allSettled(tasks.map((task) => task.run));
 
   const errors: string[] = [];
   const listings: GroundedOrderListing[] = [];
@@ -460,33 +507,25 @@ export async function searchDeliveryOrderOptions(input: {
     }
   };
 
-  if (settled[0].status === "fulfilled") {
-    let tb = settled[0].value;
-    // Soft filter when actor cuisine filter is loose.
-    const filtered = tb.filter((item) =>
-      matchesCuisineFocus(item, [...cuisineTerms, ...focusTerms]),
-    );
-    if (filtered.length >= 3) tb = filtered;
-    pushUnique(tb.slice(0, maxPerPlatform));
-  } else {
-    console.error("Thuisbezorgd Apify search failed", settled[0].reason);
-    errors.push(
-      settled[0].reason instanceof Error
-        ? settled[0].reason.message
-        : "Thuisbezorgd search failed",
-    );
-  }
-
-  if (settled[1].status === "fulfilled") {
-    pushUnique(settled[1].value.slice(0, maxPerPlatform));
-  } else {
-    console.error("Uber Eats Apify search failed", settled[1].reason);
-    errors.push(
-      settled[1].reason instanceof Error
-        ? settled[1].reason.message
-        : "Uber Eats search failed",
-    );
-  }
+  settled.forEach((result, index) => {
+    const task = tasks[index]!;
+    if (result.status === "rejected") {
+      console.error(`${task.label} Apify search failed`, result.reason);
+      errors.push(
+        result.reason instanceof Error ? result.reason.message : `${task.label} search failed`,
+      );
+      return;
+    }
+    let batch = result.value;
+    if (task.family === "jet") {
+      // Soft filter when the actor's cuisine filter is loose (or missing, as for Lieferando).
+      const filtered = batch.filter((item) =>
+        matchesCuisineFocus(item, [...cuisineTerms, ...focusTerms]),
+      );
+      if (filtered.length >= 3) batch = filtered;
+    }
+    pushUnique(batch.slice(0, maxPerPlatform));
+  });
 
   if (listings.length === 0) {
     throw new Error(
@@ -496,8 +535,16 @@ export async function searchDeliveryOrderOptions(input: {
   }
 
   const hubLabel = hubs.map((hub) => hub.city).join(", ");
+  const jetCounts = (Object.keys(BRAND_LABEL) as JetBrand[])
+    .map((brand) => ({
+      brand,
+      n: listings.filter((l) => l.platform === "thuisbezorgd" && (l.brand ?? "thuisbezorgd") === brand)
+        .length,
+    }))
+    .filter((row) => row.n > 0)
+    .map((row) => `${row.n} ${BRAND_LABEL[row.brand]}`);
   const notes = [
-    `Grounded via Apify: ${listings.filter((l) => l.platform === "thuisbezorgd").length} Thuisbezorgd + ${listings.filter((l) => l.platform === "ubereats").length} Uber Eats near ${hubLabel}.`,
+    `Grounded via Apify: ${[...jetCounts, `${listings.filter((l) => l.platform === "ubereats").length} Uber Eats`].join(" + ")} near ${hubLabel}.`,
     `Query: ${searchQuery}.`,
     errors.length > 0 ? `Partial failures: ${errors.join(" | ")}` : null,
   ]

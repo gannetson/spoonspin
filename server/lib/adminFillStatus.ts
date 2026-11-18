@@ -5,13 +5,13 @@ import {
 } from "../db/fillProgress.ts";
 import { countByCuisineCode, listRestaurants } from "../db/restaurants.ts";
 import { FILL_CITIES } from "../../scripts/lib/fillCities.ts";
-import { NL_BBOX } from "../../scripts/lib/overpassRestaurants.ts";
 import {
   DEFAULT_TILE_DEG,
-  buildTiles,
+  buildCoverageTiles,
   tagSignature,
   unionCuisineTags,
 } from "../../scripts/lib/overpassTiles.ts";
+import { TARGET_RECIPES } from "./cookTargets.ts";
 import { getCountryRecipes } from "../../src/content/countries/menuAccessors.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import type { Country } from "../../src/types/content.ts";
@@ -19,8 +19,6 @@ import type { Country } from "../../src/types/content.ts";
 const RANDSTAD_HUB_COUNT = 5;
 /** Reviewed restaurants below this for a cuisine → treat as a gather gap. */
 const LOW_RESTAURANT_THRESHOLD = 3;
-/** Cook library target (core menu + moreRecipes). */
-const TARGET_RECIPES = 20;
 
 export type FillOrderCellStatus = "done" | "pending" | "failed";
 
@@ -167,15 +165,17 @@ export async function buildAdminFillStatus(): Promise<AdminFillStatusResponse> {
   const osmCountries = published.filter(
     (c) => osmTagsForCountry(c.code).length > 0,
   ).length;
-  // The gather agent searches tiles (one request per tile, every cuisine at once).
-  // Its job ids carry a signature of the cuisine tags, so only ids for today's
-  // set of published countries count. Older circle-search ids are ignored once
-  // tile ids exist.
-  const tilePrefix = `tiles:${DEFAULT_TILE_DEG}:${tagSignature(unionCuisineTags(published.map((c) => c.code)))}:`;
-  const tilesDone = progress.gatherCompletedJobIds.filter((id) => id.startsWith(tilePrefix)).length;
-  const usesTiles = progress.gatherCompletedJobIds.some((id) => id.startsWith("tiles:"));
+  // The gather agent searches map tiles (one request per tile, every cuisine at once)
+  // across NL, BE and western DE. A tile counts as done when it was searched with
+  // today's set of published cuisines; older circle-search ids are ignored.
+  const tileKeys = buildCoverageTiles(undefined, DEFAULT_TILE_DEG).map(
+    (tile) => `tiles:${DEFAULT_TILE_DEG}:${tile.id}`,
+  );
+  const signature = tagSignature(unionCuisineTags(published.map((c) => c.code)));
+  const tilesDone = tileKeys.filter((key) => progress.gatherTiles[key]?.sig === signature).length;
+  const usesTiles = Object.keys(progress.gatherTiles).length > 0;
   const expectedJobs = usesTiles
-    ? buildTiles(NL_BBOX, DEFAULT_TILE_DEG).length
+    ? tileKeys.length
     : osmCountries > 0
       ? osmCountries * RANDSTAD_HUB_COUNT
       : null;

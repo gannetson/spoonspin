@@ -271,6 +271,8 @@ export const nl: Messages = {
   "order.option.openAria": "{name} openen",
   "order.option.view": "Bekijken",
   "order.option.open.thuisbezorgd": "Bestellen via Thuisbezorgd",
+  "order.option.open.takeaway": "Bestellen via Takeaway.com",
+  "order.option.open.lieferando": "Bestellen via Lieferando",
   "order.option.open.ubereats": "Bestellen via Uber Eats",
   "order.option.noLinks": "Nog geen bezorglinks.",
   "dine.tabs.label": "Uit eten-secties",
@@ -296,6 +298,14 @@ export const nl: Messages = {
   "dine.order.thuisbezorgd.hint":
     "Open de keukenpagina voor {name} op Thuisbezorgd.nl — vul daar je adres in om te zien wie bezorgt.",
   "dine.order.thuisbezorgd.cta": "Open Thuisbezorgd.nl",
+  "dine.order.takeaway.title": "Takeaway.com",
+  "dine.order.takeaway.hint":
+    "Open Takeaway.com België — vul daar je adres in om te zien wie {name} bezorgt bij {query}.",
+  "dine.order.takeaway.cta": "Open Takeaway.com",
+  "dine.order.lieferando.title": "Lieferando",
+  "dine.order.lieferando.hint":
+    "Open Lieferando — vul daar je adres in om te zien wie {name} bezorgt bij {query}.",
+  "dine.order.lieferando.cta": "Open Lieferando",
   "dine.order.ubereats.title": "Uber Eats",
   "dine.order.ubereats.hint":
     "Bekijk restaurants met {name} op Uber Eats bij {query}. Vul op Uber je adres in om bezorging te bevestigen.",

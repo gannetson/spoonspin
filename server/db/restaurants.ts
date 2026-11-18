@@ -1,6 +1,10 @@
 import { planOsmMerge } from "./osmMerge.ts";
 import { Pool, type PoolClient, type QueryResultRow } from "pg";
 import {
+  cityAnchorByName,
+  findCityAnchorInText,
+} from "../../src/restaurants/coverage.ts";
+import {
   countryCodesFromOsmTags,
   hasPrimaryCuisineMatch,
   osmTagsForCountry,
@@ -554,6 +558,8 @@ async function migrate(db: Pool) {
       ON recipes (country_code, menu_slot, sort_order);
 
     ALTER TABLE recipes ADD COLUMN IF NOT EXISTS wait_time TEXT;
+    ALTER TABLE recipes ADD COLUMN IF NOT EXISTS is_national BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE recipes ADD COLUMN IF NOT EXISTS image_attempted_at TIMESTAMPTZ;
 
     CREATE TABLE IF NOT EXISTS user_tags (
       id TEXT PRIMARY KEY,
@@ -1195,29 +1201,17 @@ export type LocalSearchOptions = {
   reviewedOnly?: boolean;
 };
 
-const CITY_ANCHORS: Record<string, { lat: number; lng: number }> = {
-  leiden: { lat: 52.1601, lng: 4.497 },
-  amsterdam: { lat: 52.3676, lng: 4.9041 },
-  rotterdam: { lat: 51.9244, lng: 4.4777 },
-  utrecht: { lat: 52.0907, lng: 5.1214 },
-  "den haag": { lat: 52.0705, lng: 4.3007 },
-  "the hague": { lat: 52.0705, lng: 4.3007 },
-  "s-gravenhage": { lat: 52.0705, lng: 4.3007 },
-  haarlem: { lat: 52.3874, lng: 4.6462 },
-  delft: { lat: 52.0116, lng: 4.3571 },
-  eindhoven: { lat: 51.4416, lng: 5.4697 },
-};
-
+/** Where Dine searches start when the visitor typed a city instead of sharing a location. */
 function resolveSearchAnchor(
   cityOrPostcode?: string,
   visitorLocation?: { lat: number; lng: number },
 ): { lat: number; lng: number } | undefined {
   if (visitorLocation) return visitorLocation;
-  const key = cityOrPostcode?.trim().toLowerCase() ?? "";
-  for (const [city, coords] of Object.entries(CITY_ANCHORS)) {
-    if (key.includes(city)) return coords;
-  }
-  return CITY_ANCHORS.leiden;
+  const found = findCityAnchorInText(cityOrPostcode ?? "");
+  if (found) return { lat: found.lat, lng: found.lng };
+  // Unknown text (a postcode, a village): start from the app's default city.
+  const fallback = cityAnchorByName("Leiden")!;
+  return { lat: fallback.lat, lng: fallback.lng };
 }
 
 export async function listRestaurants(options?: {

@@ -2,7 +2,8 @@
 /**
  * Complete incomplete countries to cook-ready menus:
  * starter + main + side + dessert + menu drink, cook_ready = true,
- * plus enough moreRecipes to reach TARGET_RECIPES (20+) per country.
+ * plus enough moreRecipes to reach TARGET_RECIPES (35 by default) per country, with
+ * the country's national dishes (hints from Wikipedia, confirmed by the model) flagged.
  * When the country has administrative regions, also gather recipes per region.
  *
  *   npm run agent:complete-menus
@@ -39,13 +40,18 @@ import {
 } from "../server/openai/adminDiscover.ts";
 import { chatJson } from "../server/openai/suggest.ts";
 import {
+  TARGET_RECIPES,
+  TARGET_RECIPES_PER_REGION,
+} from "../server/lib/cookTargets.ts";
+import { loadNationalDishes } from "./lib/nationalDishes.ts";
+import {
   getCountryDrinks,
   getCountryRecipes,
 } from "../src/content/countries/menuAccessors.ts";
 import type { Country, Recipe, RecipeCategory } from "../src/types/content.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const DISHES_PATH = path.join(rootDir, "data/dishes-by-country.json");
+export const DISHES_PATH = path.join(rootDir, "data/dishes-by-country.json");
 const PROGRESS_PATH = path.join(rootDir, "data/complete-menus-progress.json");
 
 const CORE_SLOTS: Array<"starter" | "main" | "side" | "dessert"> = [
@@ -55,10 +61,7 @@ const CORE_SLOTS: Array<"starter" | "main" | "side" | "dessert"> = [
   "dessert",
 ];
 
-/** Aim for a rich Cook library per cuisine (core 4 + moreRecipes). */
-const TARGET_RECIPES = 20;
-/** Full recipes linked to each administrative region when a catalog exists. */
-const TARGET_RECIPES_PER_REGION = 4;
+// Target sizes live in server/lib/cookTargets.ts (shared with the admin fill status).
 /** Cap region passes per country in a batch run (all regions when --code / --force). */
 const MAX_REGIONS_PER_COUNTRY_RUN = 4;
 
@@ -73,7 +76,7 @@ type WikiDish = {
   videoUrl?: string;
 };
 
-type WikiCountryDishes = {
+export type WikiCountryDishes = {
   code: string;
   name: string;
   dishes: WikiDish[];
@@ -129,7 +132,7 @@ function slugify(value: string): string {
     .slice(0, 40);
 }
 
-function loadJson<T>(filePath: string, fallback: T): T {
+export function loadJson<T>(filePath: string, fallback: T): T {
   if (!fs.existsSync(filePath)) return fallback;
   return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
 }
@@ -256,6 +259,7 @@ function recipeToCandidate(recipe: Recipe): DishCandidate {
     description: recipe.description,
     category: recipe.category === "snack" ? "starter" : recipe.category,
     region: recipe.regionName ?? recipe.region,
+    isNational: recipe.isNational,
   };
 }
 
@@ -409,7 +413,8 @@ async function assignSlotsWithLlm(input: {
 }): Promise<Record<"starter" | "main" | "side" | "dessert", string>> {
   const raw = await chatJson(
     `You are a cuisine editor for Spoon Spin. Reply with JSON only.
-Pick four distinct dishes for a classic home dinner: starter, main, side, dessert.`,
+Pick four distinct dishes for a classic home dinner: starter, main, side, dessert.
+Prefer a candidate marked isNational (a widely regarded national dish) for the main when one fits.`,
     `Country: ${input.countryName} (${input.countryCode})
 Candidates:
 ${JSON.stringify(
@@ -417,6 +422,7 @@ ${JSON.stringify(
     id: dish.id,
     name: dish.name,
     category: dish.category,
+    isNational: dish.isNational ? true : undefined,
     description: dish.description.slice(0, 120),
   })),
   null,
@@ -456,6 +462,16 @@ Use only ids from the list. All four must be different.`,
   return parsed;
 }
 
+/**
+ * The country's headline dish: the main course when it is a flagged national dish,
+ * otherwise a flagged main from the rest of the menu, otherwise the main course.
+ */
+export function pickNationalDishId(main: Recipe, all: Recipe[]): string {
+  if (main.isNational) return main.id;
+  const flaggedMain = all.find((recipe) => recipe.isNational && recipe.category === "main");
+  return (flaggedMain ?? main).id;
+}
+
 function buildIntroduction(country: Country): string {
   const intro = country.introduction?.trim() || "";
   if (intro.length >= 60) return intro;
@@ -473,10 +489,10 @@ function ensureAliases(country: Country): string[] {
   return [...new Set(aliases)];
 }
 
-async function completeCountry(
+export async function completeCountry(
   country: Country,
   dishesByCountry: Record<string, WikiCountryDishes>,
-  options?: { fillAllRegions?: boolean },
+  options?: { fillAllRegions?: boolean; nationalDishes?: Record<string, string[]> },
 ): Promise<{ recipeCount: number; drinkCount: number; regionRecipes: number }> {
   await seedCountryRegions(country.code);
   const existingRecipes = getCountryRecipes(country).filter(isFullRecipe);
@@ -496,6 +512,8 @@ async function completeCountry(
       countryCode: country.code,
       countryName: country.name,
       existingNames,
+      targetCount: `${TARGET_RECIPES + 1}–${TARGET_RECIPES + 8}`,
+      nationalDishHints: options?.nationalDishes?.[country.code],
     }),
   );
   let candidates: DishCandidate[] = discovered.recipes.map((dish) => ({
@@ -518,6 +536,12 @@ async function completeCountry(
     }
     candidates.push(dish);
   }
+
+  // National dishes first: they are what the core menu and the first "more" slots are built from.
+  candidates = [
+    ...candidates.filter((dish) => dish.isNational),
+    ...candidates.filter((dish) => !dish.isNational),
+  ];
 
   // Top up candidate list when wiki + first discover are thin.
   if (candidates.length < TARGET_RECIPES && isOpenAiConfigured()) {
@@ -649,6 +673,7 @@ async function completeCountry(
         ...reuse,
         id: dish.id,
         category: dish.category,
+        ...(dish.isNational || reuse.isNational ? { isNational: true } : {}),
       });
       continue;
     }
@@ -660,7 +685,7 @@ async function completeCountry(
       }
       continue;
     }
-    resolved.push(made);
+    resolved.push(dish.isNational ? { ...made, isNational: true } : made);
   }
 
   for (const slot of CORE_SLOTS) {
@@ -732,7 +757,7 @@ async function completeCountry(
     ...country,
     introduction: buildIntroduction(country),
     cuisineAliases: ensureAliases(country),
-    nationalDishId: main.id,
+    nationalDishId: pickNationalDishId(main, [starter, main, side, dessert, ...moreRecipes]),
     nationalDrink,
     cookReady: true,
     status: country.status === "draft" ? "published" : country.status,
@@ -805,11 +830,11 @@ async function completeCountry(
   };
 }
 
-function fullRecipeCount(country: Country): number {
+export function fullRecipeCount(country: Country): number {
   return getCountryRecipes(country).filter(isFullRecipe).length;
 }
 
-async function isIncomplete(country: Country): Promise<boolean> {
+export async function isIncomplete(country: Country): Promise<boolean> {
   if (!country.cookReady || fullRecipeCount(country) < TARGET_RECIPES) {
     return true;
   }
@@ -827,6 +852,7 @@ async function main() {
   await getDb();
   const countries = await listCountriesFromDb();
   const dishesByCountry = loadJson<Record<string, WikiCountryDishes>>(DISHES_PATH, {});
+  const nationalDishes = args.status ? {} : await loadNationalDishes();
   const progress = loadProgress();
 
   const pending: Country[] = [];
@@ -836,6 +862,13 @@ async function main() {
       pending.push(country);
     }
   }
+
+  // Countries that failed last time go to the back, so one stubborn country cannot
+  // block the batch every run.
+  const failedBefore = new Set(progress.failedCodes);
+  pending.sort(
+    (a, b) => Number(failedBefore.has(a.code)) - Number(failedBefore.has(b.code)),
+  );
 
   if (args.status) {
     const ready = countries.filter((country) => country.cookReady).length;
@@ -879,6 +912,7 @@ async function main() {
     try {
       const result = await completeCountry(country, dishesByCountry, {
         fillAllRegions: Boolean(args.code || args.force),
+        nationalDishes,
       });
       const latest =
         (await listCountriesFromDb()).find((item) => item.code === country.code) ??
@@ -920,8 +954,14 @@ async function main() {
   console.log(`\nCompleted ${completed} country menu(s).`);
 }
 
-main().catch(async (error) => {
-  console.error(error);
-  await closeDb();
-  process.exit(1);
-});
+const isDirectRun =
+  process.argv[1] != null &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
+  main().catch(async (error) => {
+    console.error(error);
+    await closeDb();
+    process.exit(1);
+  });
+}

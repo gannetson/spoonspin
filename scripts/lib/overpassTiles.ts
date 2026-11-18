@@ -12,6 +12,7 @@
  */
 import type { RestaurantUpsert } from "../../server/db/restaurants.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
+import { coverageRegions, type Bbox as CoverageBbox } from "../../src/restaurants/coverage.ts";
 import {
   NL_BBOX,
   buildOverpassBboxQuery,
@@ -58,6 +59,31 @@ export function buildTiles(bbox: Bbox = NL_BBOX, stepDeg = DEFAULT_TILE_DEG): Ti
     }
   }
   return tiles;
+}
+
+/**
+ * Tiles for several regions on one shared grid. Each box is first widened to whole
+ * multiples of the tile size, so regions that overlap (the NL, BE and DE boxes all
+ * meet near Aachen and Maastricht) produce the same tile ids and each tile is
+ * searched once.
+ */
+export function buildCoverageTiles(
+  regionIds?: string[],
+  stepDeg = DEFAULT_TILE_DEG,
+): Tile[] {
+  const step = hundredths(stepDeg);
+  const byId = new Map<string, Tile>();
+  for (const region of coverageRegions(regionIds)) {
+    const box: CoverageBbox = region.bbox;
+    const snapped = {
+      south: (Math.floor(hundredths(box.south) / step) * step) / 100,
+      west: (Math.floor(hundredths(box.west) / step) * step) / 100,
+      north: (Math.ceil(hundredths(box.north) / step) * step) / 100,
+      east: (Math.ceil(hundredths(box.east) / step) * step) / 100,
+    };
+    for (const tile of buildTiles(snapped, stepDeg)) byId.set(tile.id, tile);
+  }
+  return [...byId.values()];
 }
 
 /** Four quarters of a tile, with ids derived from the parent. */
@@ -192,4 +218,44 @@ export async function harvestTile(
     if (place) places.push(place);
   }
   return { places, elements: seen.size, requests, splits, failed };
+}
+
+/** One tile, searched for every cuisine at once. */
+export type TileJob = { id: string; tile: Tile };
+
+export type TileProgress = {
+  completedJobIds: string[];
+  /** When each job last finished (ISO). */
+  completedAt?: Record<string, string>;
+  /** Cuisine-tag signature each job was searched with. */
+  tileSignatures?: Record<string, string>;
+};
+
+/**
+ * Tiles to search now. `fresh`: never searched, or searched with a cuisine-tag set
+ * other than `signature` (a country was published since). `stale`: up to date but
+ * older than `refreshDays`, oldest first. `refreshDays` 0 turns age-based refresh off.
+ * A job with no recorded signature counts as current, so older progress files keep working.
+ */
+export function dueTileJobs(
+  jobs: TileJob[],
+  progress: TileProgress,
+  refreshDays: number,
+  signature: string,
+  now = Date.now(),
+): { fresh: TileJob[]; stale: TileJob[] } {
+  const done = new Set(progress.completedJobIds);
+  const at = progress.completedAt ?? {};
+  const sigs = progress.tileSignatures ?? {};
+  const isCurrent = (job: TileJob) =>
+    done.has(job.id) && (sigs[job.id] ?? signature) === signature;
+  const fresh = jobs.filter((job) => !isCurrent(job));
+  const staleBefore = now - refreshDays * 86_400_000;
+  const stale =
+    refreshDays > 0
+      ? jobs
+          .filter((job) => isCurrent(job) && at[job.id] && Date.parse(at[job.id]!) < staleBefore)
+          .sort((a, b) => Date.parse(at[a.id]!) - Date.parse(at[b.id]!))
+      : [];
+  return { fresh, stale };
 }

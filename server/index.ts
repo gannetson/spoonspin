@@ -32,6 +32,7 @@ import { registerSuggestionRoutes } from "./routes/suggestions.ts";
 import { getUploadsRoot, registerMeRoutes } from "./routes/me.ts";
 import { isOpenAiConfigured } from "./openai/suggest.ts";
 import { isApifyConfigured } from "./lib/apifyOrderSearch.ts";
+import { cityAnchorByName, findCityAnchorInText } from "../src/restaurants/coverage.ts";
 import { warnIfOAuthMisconfigured } from "./auth/oauth.ts";
 import { reservationService } from "./reservations/service.ts";
 import { createReservationReferral } from "./db/reservations.ts";
@@ -412,21 +413,10 @@ function toApiRestaurant(
   const location =
     row.lat != null && row.lng != null ? { lat: row.lat, lng: row.lng } : undefined;
 
-  const anchors: Record<string, { lat: number; lng: number }> = {
-    leiden: { lat: 52.1601, lng: 4.497 },
-    amsterdam: { lat: 52.3676, lng: 4.9041 },
-    rotterdam: { lat: 51.9244, lng: 4.4777 },
-    utrecht: { lat: 52.0907, lng: 5.1214 },
-    "den haag": { lat: 52.0705, lng: 4.3007 },
-    "the hague": { lat: 52.0705, lng: 4.3007 },
-    delft: { lat: 52.0116, lng: 4.3571 },
-    haarlem: { lat: 52.3874, lng: 4.6462 },
-  };
   let anchor = visitorLocation;
   if (!anchor) {
-    const key = cityOrPostcode?.trim().toLowerCase() ?? "leiden";
-    anchor =
-      Object.entries(anchors).find(([city]) => key.includes(city))?.[1] ?? anchors.leiden;
+    const found = findCityAnchorInText(cityOrPostcode ?? "") ?? cityAnchorByName("Leiden")!;
+    anchor = { lat: found.lat, lng: found.lng };
   }
 
   return {

@@ -21,6 +21,7 @@
     "validate:content": "vitest run src/content/countries/content.test.ts",
     "content:wikipedia": "tsx --tsconfig tsconfig.app.json scripts/fetch-wikipedia-cuisines.ts",
     "agent:dishes": "tsx --tsconfig tsconfig.app.json scripts/discover-wikipedia-dishes.ts",
+    "agent:cook": "tsx --tsconfig tsconfig.app.json scripts/cook-countries.ts",
     "agent:recipes": "tsx --tsconfig tsconfig.app.json scripts/enrich-recipes.ts",
     "agent:cuisine-images": "tsx --tsconfig tsconfig.app.json scripts/enrich-cuisine-images.ts",
     "agent:restaurant-photos": "tsx --tsconfig tsconfig.app.json scripts/enrich-restaurant-photos.ts",

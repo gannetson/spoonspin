@@ -8,8 +8,9 @@
  * over days/weeks without repeating finished jobs.
  *
  * Two ways to search (--mode):
- *   tiles (default)  The country is cut into lat/lng tiles; one Overpass request per
- *                    tile asks for every specialty cuisine at once. Whole country,
+ *   tiles (default)  NL, Belgium and western Germany (--regions nl,be,de-west) are cut
+ *                    into lat/lng tiles; one Overpass request per
+ *                    tile asks for every specialty cuisine at once. Whole regions,
  *                    about 1/80 of the requests, tiles nearest big cities first. A
  *                    tile that times out is split in four. Finished tiles are searched
  *                    again after --refresh-days, so new and closed places show up.
@@ -18,7 +19,8 @@
  *                    (hub x country). Kept for --hubs / --radius-km runs.
  *
  * Examples:
- *   npm run agent:gather                       # next batch of tiles, then promote
+ *   npm run agent:gather                       # next batch of tiles, then promote and enrich
+ *   npm run agent:gather -- --regions be       # only Belgium
  *   npm run agent:gather -- --batch 20         # more tiles in one run
  *   npm run agent:gather -- --status
  *   npm run agent:gather -- --dry-run --batch 1 --countries cn,th   # fetch only, no DB
@@ -40,7 +42,7 @@ import {
   type StoredRestaurant,
 } from "../server/db/restaurants.ts";
 import { listCountriesFromDb } from "../server/db/content.ts";
-import { mergeFillProgress } from "../server/db/fillProgress.ts";
+import { loadFillProgress, mergeFillProgress } from "../server/db/fillProgress.ts";
 import {
   scheduleRestaurantEnrichments,
   waitForRestaurantEnrichmentIdle,
@@ -52,14 +54,16 @@ import {
 import { isOpenAiConfigured } from "../server/openai/adminDiscover.ts";
 import { OSM_CUISINE_BY_COUNTRY } from "../src/restaurants/osmCuisineMap.ts";
 import { HUBS, harvestCountryAtHub, sleep, type Hub } from "./lib/overpassRestaurants.ts";
+import { CITY_ANCHORS_LIST, coverageRegions } from "../src/restaurants/coverage.ts";
 import {
   DEFAULT_TILE_DEG,
-  buildTiles,
+  buildCoverageTiles,
   harvestTile,
+  dueTileJobs,
   orderTiles,
   tagSignature,
   unionCuisineTags,
-  type Tile,
+  type TileJob,
 } from "./lib/overpassTiles.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -72,12 +76,6 @@ type GatherJob = {
   countryCode: string;
 };
 
-/** One tile, searched for every cuisine at once. */
-type TileJob = {
-  id: string;
-  tile: Tile;
-};
-
 type GatherMode = "tiles" | "hubs";
 
 type GatherProgress = {
@@ -87,6 +85,8 @@ type GatherProgress = {
   completedJobIds: string[];
   /** When each job last finished (ISO). Jobs without an entry are never due for a refresh. */
   completedAt?: Record<string, string>;
+  /** Cuisine-tag signature each tile was searched with. A different set means the tile is due again. */
+  tileSignatures?: Record<string, string>;
   lastRunAt: string | null;
   totals: {
     harvested: number;
@@ -98,6 +98,12 @@ type GatherProgress = {
 type CliOptions = {
   mode: GatherMode;
   tileDeg: number;
+  /** Coverage regions to tile (nl, be, de-west). */
+  regions: string[];
+  /** Max restaurants promoted (and enriched) per run. */
+  promoteLimit: number;
+  /** Max earlier-promoted restaurants whose enrichment never finished, picked up per run. */
+  finishLimit: number;
   /** Tiles finished longer ago than this are searched again; 0 = never. */
   refreshDays: number;
   /** Fetch and count only: no database, no progress file, no promotion. */
@@ -118,6 +124,9 @@ function parseArgs(argv: string[]): CliOptions {
   const options: CliOptions = {
     mode: "tiles",
     tileDeg: DEFAULT_TILE_DEG,
+    regions: [],
+    promoteLimit: 400,
+    finishLimit: 200,
     refreshDays: 30,
     dryRun: false,
     batchGiven: false,
@@ -172,6 +181,19 @@ function parseArgs(argv: string[]): CliOptions {
         throw new Error("--tile-deg must be between 0.1 and 2");
       }
       i += 1;
+    } else if (arg === "--regions" && next) {
+      options.regions = next
+        .split(",")
+        .map((r) => r.trim().toLowerCase())
+        .filter(Boolean);
+      coverageRegions(options.regions); // fail fast on a typo
+      i += 1;
+    } else if (arg === "--finish-limit" && next) {
+      options.finishLimit = Math.max(0, Number(next));
+      i += 1;
+    } else if (arg === "--promote-limit" && next) {
+      options.promoteLimit = Math.max(0, Number(next));
+      i += 1;
     } else if (arg === "--refresh-days" && next) {
       options.refreshDays = Math.max(0, Number(next));
       i += 1;
@@ -224,10 +246,17 @@ function saveProgress(progress: GatherProgress) {
 
 async function syncFillProgress(progress: GatherProgress) {
   try {
+    const gatherTiles: Record<string, { at: string; sig: string }> = {};
+    for (const id of progress.completedJobIds) {
+      const at = progress.completedAt?.[id];
+      const sig = progress.tileSignatures?.[id];
+      if (id.startsWith("tiles:") && at && sig) gatherTiles[id] = { at, sig };
+    }
     await mergeFillProgress({
       lastRestaurantsRunAt: progress.lastRunAt,
       lastRunAt: progress.lastRunAt,
       gatherCompletedJobIds: progress.completedJobIds,
+      gatherTiles,
       totals: {
         restaurantsHarvested: progress.totals.harvested,
         restaurantsPromoted: progress.totals.promoted,
@@ -235,6 +264,44 @@ async function syncFillProgress(progress: GatherProgress) {
     });
   } catch (error) {
     console.warn("Could not sync gather progress to content_fill_progress:", error);
+  }
+}
+
+/**
+ * Local file plus the shared Postgres copy. The database is what cron on a content
+ * machine and the API both see, so it must win when the local file is missing or older:
+ * a tile counts as done if either side says so, with the newer timestamp.
+ */
+async function loadProgressMerged(options: CliOptions): Promise<GatherProgress> {
+  const local = loadProgress(options);
+  if (options.dryRun) return local;
+  try {
+    const remote = await loadFillProgress();
+    const completed = new Set([...local.completedJobIds, ...remote.gatherCompletedJobIds]);
+    const completedAt = { ...(local.completedAt ?? {}) };
+    const tileSignatures = { ...(local.tileSignatures ?? {}) };
+    for (const [id, entry] of Object.entries(remote.gatherTiles)) {
+      const known = completedAt[id];
+      if (!known || Date.parse(entry.at) > Date.parse(known)) {
+        completedAt[id] = entry.at;
+        tileSignatures[id] = entry.sig;
+      }
+      completed.add(id);
+    }
+    return {
+      ...local,
+      completedJobIds: [...completed],
+      completedAt,
+      tileSignatures,
+      totals: {
+        harvested: Math.max(local.totals.harvested, remote.totals.restaurantsHarvested),
+        promoted: Math.max(local.totals.promoted, remote.totals.restaurantsPromoted),
+        runs: local.totals.runs,
+      },
+    };
+  } catch (error) {
+    console.warn("Could not read gather progress from Postgres; using the local file:", error);
+    return local;
   }
 }
 
@@ -250,39 +317,28 @@ async function resolveCountryCodes(options: CliOptions): Promise<string[]> {
     .map((country) => country.code);
 }
 
-const HUBS_FOR_TILE_ORDER = HUBS["nl-major"]!;
-
-/** The tile queue for these countries. A new country changes the tag set, so every id changes. */
-function buildTileJobs(options: CliOptions, countryCodes: string[]): TileJob[] {
-  const signature = tagSignature(unionCuisineTags(countryCodes));
-  const tiles = orderTiles(buildTiles(undefined, options.tileDeg), HUBS_FOR_TILE_ORDER);
-  return tiles.map((tile) => ({
-    id: `tiles:${options.tileDeg}:${signature}:${tile.id}`,
-    tile,
-  }));
-}
+const HUBS_FOR_TILE_ORDER: Hub[] = CITY_ANCHORS_LIST.map((city) => ({
+  id: city.name,
+  name: city.name,
+  lat: city.lat,
+  lng: city.lng,
+}));
 
 /**
- * Tiles to search now: never-searched ones first (nearest big cities first), then
- * finished ones older than `refreshDays`, oldest first. `refreshDays` 0 = no refresh.
+ * The tile queue. Ids depend only on the grid, so publishing a country does not
+ * throw away progress; instead each finished tile records the cuisine-tag set it was
+ * searched with, and a tile whose set has since grown is due again (see dueTileJobs).
  */
-function dueTileJobs(
-  jobs: TileJob[],
-  progress: GatherProgress,
-  refreshDays: number,
-  now = Date.now(),
-): { fresh: TileJob[]; stale: TileJob[] } {
-  const done = new Set(progress.completedJobIds);
-  const at = progress.completedAt ?? {};
-  const fresh = jobs.filter((job) => !done.has(job.id));
-  const staleBefore = now - refreshDays * 86_400_000;
-  const stale =
-    refreshDays > 0
-      ? jobs
-          .filter((job) => done.has(job.id) && at[job.id] && Date.parse(at[job.id]!) < staleBefore)
-          .sort((a, b) => Date.parse(at[a.id]!) - Date.parse(at[b.id]!))
-      : [];
-  return { fresh, stale };
+function buildTileJobs(options: CliOptions): TileJob[] {
+  const tiles = orderTiles(
+    buildCoverageTiles(options.regions, options.tileDeg),
+    HUBS_FOR_TILE_ORDER,
+  );
+  return tiles.map((tile) => ({ id: `tiles:${options.tileDeg}:${tile.id}`, tile }));
+}
+
+function currentTagSignature(countryCodes: string[]): string {
+  return tagSignature(unionCuisineTags(countryCodes));
 }
 
 async function buildJobs(options: CliOptions): Promise<GatherJob[]> {
@@ -418,6 +474,37 @@ async function promoteUnreviewed(limit = 80): Promise<{
   return { promoted, enrichmentJobs };
 }
 
+/**
+ * Restaurants this agent promoted earlier whose enrichment never completed (no OpenAI
+ * key that day, a crash, or more promotions than one run could enrich). The promoted
+ * placeholder note is replaced by the enrichment's text step, so a row that still has
+ * it was never enriched. Curated and hand-reviewed rows are never picked.
+ */
+async function findUnenrichedPromoted(
+  limit: number,
+  skipIds: Set<string>,
+): Promise<Array<{ restaurantId: string; countryCode: string; countryName: string }>> {
+  if (limit <= 0) return [];
+  const rows = await listRestaurants({ reviewedOnly: true });
+  const countries = await listCountriesFromDb();
+  const nameByCode = new Map(countries.map((c) => [c.code, c.name]));
+  const jobs: Array<{ restaurantId: string; countryCode: string; countryName: string }> = [];
+  for (const row of rows) {
+    if (jobs.length >= limit) break;
+    if (row.reviewSource !== "gather-agent") continue;
+    if (!row.authenticityNotes?.startsWith("Promoted from OSM")) continue;
+    if (skipIds.has(row.id)) continue;
+    const countryCode = row.cuisineCodes[0];
+    if (!countryCode) continue;
+    jobs.push({
+      restaurantId: row.id,
+      countryCode,
+      countryName: nameByCode.get(countryCode) ?? countryCode.toUpperCase(),
+    });
+  }
+  return jobs;
+}
+
 async function printReviewedCoverage(options: CliOptions) {
   const reviewed = await countByCuisineCode();
   const countryCodes = await resolveCountryCodes(options);
@@ -435,13 +522,18 @@ async function printTileStatus(options: CliOptions, progress: GatherProgress) {
   const countryCodes = (await resolveCountryCodes(options)).filter(
     (code) => osmTagsForCountry(code).length > 0,
   );
-  const jobs = buildTileJobs(options, countryCodes);
-  const { fresh, stale } = dueTileJobs(jobs, progress, options.refreshDays);
+  const jobs = buildTileJobs(options);
+  const { fresh, stale } = dueTileJobs(
+    jobs,
+    progress,
+    options.refreshDays,
+    currentTagSignature(countryCodes),
+  );
   const searched = jobs.length - fresh.length;
 
   console.log("Gather progress (tiles)");
   console.log(
-    `  grid: ${options.tileDeg}° tiles · ${jobs.length} tiles · ${countryCodes.length} countries searched at once`,
+    `  grid: ${options.tileDeg}° tiles · ${jobs.length} tiles (${coverageRegions(options.regions).map((r) => r.id).join(", ")}) · ${countryCodes.length} cuisines searched at once`,
   );
   console.log(
     `  searched: ${searched}/${jobs.length} · never searched: ${fresh.length} · due for refresh: ${stale.length}` +
@@ -511,7 +603,7 @@ async function main() {
   const options = parseArgs(process.argv.slice(2));
   if (!options.dryRun) await getDb();
 
-  let progress = loadProgress(options);
+  let progress = await loadProgressMerged(options);
   if (options.reset) {
     progress = defaultProgress(options);
     saveProgress(progress);
@@ -531,8 +623,9 @@ async function main() {
     const countryCodes = (await resolveCountryCodes(options)).filter(
       (code) => osmTagsForCountry(code).length > 0,
     );
-    const jobs = buildTileJobs(options, countryCodes);
-    const { fresh, stale } = dueTileJobs(jobs, progress, options.refreshDays);
+    const jobs = buildTileJobs(options);
+    const signature = currentTagSignature(countryCodes);
+    const { fresh, stale } = dueTileJobs(jobs, progress, options.refreshDays, signature);
     const batch = [...fresh, ...stale].slice(0, options.batch);
     if (batch.length === 0) {
       console.log("All tiles are up to date. Use --refresh-days or --reset to search again.");
@@ -566,6 +659,8 @@ async function main() {
           if (result.failed.length === 0) {
             if (!progress.completedJobIds.includes(job.id)) progress.completedJobIds.push(job.id);
             progress.completedAt = { ...(progress.completedAt ?? {}), [job.id]: new Date().toISOString() };
+            progress.tileSignatures = { ...(progress.tileSignatures ?? {}), [job.id]: signature };
+            saveProgress(progress);
           } else {
             console.log(
               `  incomplete: ${result.failed.length} part(s) of this tile failed (${result.failed.join(", ")}); it stays due and is retried next run`,
@@ -620,18 +715,27 @@ async function main() {
   }
 
   process.stdout.write("Promoting specialty OSM matches… ");
-  const promoteResult = await promoteUnreviewed(120);
+  const promoteResult = await promoteUnreviewed(options.promoteLimit);
   promoted = promoteResult.promoted;
   console.log(`${promoted} promoted`);
 
-  if (promoteResult.enrichmentJobs.length > 0 && isOpenAiConfigured()) {
-    const scheduled = scheduleRestaurantEnrichments(promoteResult.enrichmentJobs);
+  const finishJobs = await findUnenrichedPromoted(
+    options.finishLimit,
+    new Set(promoteResult.enrichmentJobs.map((job) => job.restaurantId)),
+  );
+  if (finishJobs.length > 0) {
+    console.log(`Also finishing ${finishJobs.length} earlier-promoted restaurant(s) never enriched`);
+  }
+  const enrichmentJobs = [...promoteResult.enrichmentJobs, ...finishJobs];
+
+  if (enrichmentJobs.length > 0 && isOpenAiConfigured()) {
+    const scheduled = scheduleRestaurantEnrichments(enrichmentJobs);
     console.log(`Scheduled ${scheduled} restaurant enrichment job(s)`);
     console.log("Waiting for restaurant enrichment queue…");
     await waitForRestaurantEnrichmentIdle();
-  } else if (promoteResult.enrichmentJobs.length > 0) {
+  } else if (enrichmentJobs.length > 0) {
     console.log(
-      `Skipped enrichment for ${promoteResult.enrichmentJobs.length} promoted restaurant(s) — OPENAI_API_KEY not set.`,
+      `Skipped enrichment for ${enrichmentJobs.length} promoted restaurant(s) — OPENAI_API_KEY not set.`,
     );
   }
 

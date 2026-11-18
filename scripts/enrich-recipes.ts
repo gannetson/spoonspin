@@ -1,510 +1,140 @@
 #!/usr/bin/env tsx
 /**
- * Enrich cook-ready recipes in Postgres with:
- * - Dish photos (Wikimedia Commons / Wikipedia lead image)
- * - Links to Wikipedia / Wikibooks Cookbook / Google recipe search
- * - YouTube cooking-video search links
+ * Give cook-ready recipes in Postgres a photo and reference links:
+ * - Dish photo: Wikipedia → Commons → Wikidata → Openverse (→ TheMealDB with a key)
+ * - Source link: Wikibooks Cookbook, Wikipedia, or a Google recipe search
+ * - Video link: YouTube search
  *
- * Also writes a research mirror to data/recipe-enrichments.json.
- *
- * Progress: data/recipe-enrich-progress.json
+ * Driven by the database, not a progress file: whatever still has no photo (and was not
+ * tried in the last 14 days) is pending, so a run can be repeated safely. Photos that
+ * exist, admin uploads included, are never replaced; a lookup that finds nothing writes
+ * nothing.
  *
  * Usage:
  *   npm run agent:recipes
- *   npm run agent:recipes -- --batch 40
+ *   npm run agent:recipes -- --batch 80
+ *   npm run agent:recipes -- --code nl
  *   npm run agent:recipes -- --all
- *   npm run agent:recipes -- --fix-bad
+ *   npm run agent:recipes -- --fix-bad     # also replace image URLs that are not photo files
+ *   npm run agent:recipes -- --links       # also fill missing source/video links
  *   npm run agent:recipes -- --status
  */
-
 import "dotenv/config";
-import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { listCountriesFromDb, updateRecipeFields } from "../server/db/content.ts";
+import { listRecipesNeedingMedia } from "../server/db/content.ts";
 import { closeDb, getDb } from "../server/db/restaurants.ts";
-import { getCountryRecipes } from "../src/content/countries/menuAccessors.ts";
-import type { RecipeEnrichment } from "../src/content/recipes/enrichments.ts";
+import { enrichRecipeMedia } from "../server/lib/recipeMedia.ts";
 
-const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT_PATH = path.join(rootDir, "data/recipe-enrichments.json");
-const PROGRESS_PATH = path.join(rootDir, "data/recipe-enrich-progress.json");
-const USER_AGENT =
-  "SpoonSpin/0.1 (https://github.com/gannetson/spoonspin; recipe media enricher)";
-
-const IMAGE_EXT = /\.(jpe?g|png|webp|gif)(\?|$)/i;
-const IMAGE_MIME = /^image\/(jpeg|png|webp|gif)$/i;
-
-type Progress = {
-  completedIds: string[];
-  lifetimeEnriched: number;
-  runs: number;
-  lastRunAt: string | null;
-};
-
-type Job = {
-  id: string;
-  countryCode: string;
-  countryName: string;
-  recipeId: string;
-  recipeName: string;
-  localName?: string;
-};
-
-type CommonsSearch = {
-  query?: { search?: Array<{ title: string }> };
-};
-
-type CommonsImageInfo = {
-  query?: {
-    pages?: Record<
-      string,
-      {
-        title?: string;
-        imageinfo?: Array<{
-          url?: string;
-          mime?: string;
-          extmetadata?: {
-            Artist?: { value?: string };
-            LicenseShortName?: { value?: string };
-          };
-        }>;
-      }
-    >;
+function parseArgs(argv: string[]) {
+  const args = {
+    batch: 40,
+    all: false,
+    status: false,
+    fixBad: false,
+    links: false,
+    code: undefined as string | undefined,
   };
-};
-
-type WikiSummary = {
-  title?: string;
-  type?: string;
-  extract?: string;
-  originalimage?: { source?: string };
-  thumbnail?: { source?: string };
-  content_urls?: { desktop?: { page?: string } };
-};
+  for (let i = 0; i < argv.length; i += 1) {
+    const arg = argv[i];
+    if (arg === "--batch") args.batch = Math.max(1, Number(argv[++i] ?? 40));
+    else if (arg === "--all") args.all = true;
+    else if (arg === "--status") args.status = true;
+    else if (arg === "--fix-bad" || arg === "--force-bad") args.fixBad = true;
+    else if (arg === "--links" || arg === "--force-links") args.links = true;
+    else if (arg === "--code") args.code = argv[++i]?.toLowerCase();
+  }
+  return args;
+}
 
 function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-function parseArgs(argv: string[]) {
-  const args = {
-    batch: 40,
-    status: false,
-    all: false,
-    forceBad: false,
-    forceLinks: false,
-  };
-  for (let i = 0; i < argv.length; i += 1) {
-    const arg = argv[i];
-    if (arg === "--status") args.status = true;
-    if (arg === "--all") args.all = true;
-    if (arg === "--force-bad") args.forceBad = true;
-    if (arg === "--force-links") args.forceLinks = true;
-    if (arg === "--batch") args.batch = Math.max(1, Number(argv[++i] ?? 40));
-  }
-  return args;
-}
-
-function loadJson<T>(filePath: string, fallback: T): T {
-  try {
-    return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
-  } catch {
-    return fallback;
-  }
-}
-
-function saveJson(filePath: string, value: unknown) {
-  fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-}
-
-function isPhotoUrl(url: string | undefined): url is string {
-  if (!url) return false;
-  if (!IMAGE_EXT.test(url)) return false;
-  if (/\.(pdf|webm|svg|tif|tiff)(\?|$)/i.test(url)) return false;
-  return true;
-}
-
-function hasBadOrMissingPhoto(extra?: RecipeEnrichment): boolean {
-  if (!extra?.imageUrl) return true;
-  return !isPhotoUrl(extra.imageUrl);
-}
-
-async function listJobs(): Promise<Job[]> {
-  const countries = await listCountriesFromDb();
-  const jobs: Job[] = [];
-  for (const country of countries) {
-    if (!country.cookReady && getCountryRecipes(country).length === 0) continue;
-    for (const recipe of getCountryRecipes(country)) {
-      jobs.push({
-        id: `${country.code}:${recipe.id}`,
-        countryCode: country.code,
-        countryName: country.name,
-        recipeId: recipe.id,
-        recipeName: recipe.name,
-        localName: recipe.localName,
+/** Enrich up to `limit` recipes still missing media. Returns how many got a photo. */
+export async function enrichPendingRecipes(options: {
+  countryCode?: string;
+  limit: number;
+  fixBad?: boolean;
+  links?: boolean;
+  log?: (line: string) => void;
+}): Promise<{ tried: number; photos: number; failed: number }> {
+  const log = options.log ?? ((line: string) => console.log(line));
+  const pending = await listRecipesNeedingMedia({
+    countryCode: options.countryCode,
+    limit: options.limit,
+    fixBad: options.fixBad,
+    includeMissingLinks: options.links,
+  });
+  let photos = 0;
+  let failed = 0;
+  for (const item of pending) {
+    try {
+      const result = await enrichRecipeMedia({
+        countryCode: item.countryCode,
+        countryName: item.countryName,
+        recipe: item.recipe,
+        fixBad: options.fixBad,
       });
+      if (result.image) photos += 1;
+      log(
+        `  ${item.countryCode}:${item.recipe.id} ${result.image ? `photo (${result.image.source})` : "no photo"}` +
+          `${result.sourceAdded ? " +source" : ""}${result.videoAdded ? " +video" : ""}`,
+      );
+    } catch (error) {
+      failed += 1;
+      log(`  ${item.countryCode}:${item.recipe.id} failed: ${error instanceof Error ? error.message : error}`);
     }
+    await sleep(200);
   }
-  return jobs;
-}
-
-async function fetchJson<T>(url: string): Promise<T | null> {
-  for (let attempt = 0; attempt < 4; attempt += 1) {
-    const response = await fetch(url, {
-      headers: {
-        Accept: "application/json",
-        "User-Agent": USER_AGENT,
-        "Api-User-Agent": USER_AGENT,
-      },
-    });
-    if (response.status === 404) return null;
-    if (response.status === 429) {
-      await sleep(800 * (attempt + 1));
-      continue;
-    }
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status} for ${url}`);
-    }
-    return (await response.json()) as T;
-  }
-  return null;
-}
-
-function attributionFromMeta(
-  extmetadata:
-    | {
-        Artist?: { value?: string };
-        LicenseShortName?: { value?: string };
-      }
-    | undefined,
-): string {
-  const license = extmetadata?.LicenseShortName?.value ?? "Wikimedia Commons";
-  const artist = extmetadata?.Artist?.value?.replace(/<[^>]+>/g, "").trim();
-  return artist ? `${artist} / ${license}` : `Wikimedia Commons / ${license}`;
-}
-
-async function findCommonsImage(
-  query: string,
-): Promise<{ url: string; attribution: string } | null> {
-  const searchUrl =
-    "https://commons.wikimedia.org/w/api.php?" +
-    new URLSearchParams({
-      action: "query",
-      list: "search",
-      srsearch: query,
-      srnamespace: "6",
-      srlimit: "8",
-      format: "json",
-      origin: "*",
-    });
-  const search = await fetchJson<CommonsSearch>(searchUrl);
-  const hits = search?.query?.search ?? [];
-
-  for (const hit of hits) {
-    if (!hit?.title) continue;
-    if (/\.(pdf|webm|svg|tif|tiff)$/i.test(hit.title)) continue;
-
-    const infoUrl =
-      "https://commons.wikimedia.org/w/api.php?" +
-      new URLSearchParams({
-        action: "query",
-        titles: hit.title,
-        prop: "imageinfo",
-        iiprop: "url|mime|extmetadata",
-        format: "json",
-        origin: "*",
-      });
-    const info = await fetchJson<CommonsImageInfo>(infoUrl);
-    const page = Object.values(info?.query?.pages ?? {})[0];
-    const image = page?.imageinfo?.[0];
-    if (!image?.url) continue;
-    if (image.mime && !IMAGE_MIME.test(image.mime)) continue;
-    if (!isPhotoUrl(image.url)) continue;
-
-    return {
-      url: image.url,
-      attribution: attributionFromMeta(image.extmetadata),
-    };
-  }
-
-  return null;
-}
-
-async function findWikipediaPage(titleCandidates: string[]): Promise<WikiSummary | null> {
-  for (const title of titleCandidates) {
-    const encoded = encodeURIComponent(title.replace(/ /g, "_"));
-    const page = await fetchJson<WikiSummary>(
-      `https://en.wikipedia.org/api/rest_v1/page/summary/${encoded}`,
-    );
-    if (!page || page.type === "disambiguation") continue;
-    const extract = page.extract ?? "";
-    if (extract.length < 40) continue;
-    if (
-      !/\b(dish|food|cuisine|recipe|cooked|ingredient|meal|dessert|soup|stew|salad|bread|cake|pie|curry|pasta|rice|meat|fish|cheese)\b/i.test(
-        `${page.title ?? ""} ${extract}`,
-      )
-    ) {
-      continue;
-    }
-    return page;
-  }
-  return null;
-}
-
-async function findWikibooksCookbook(titleCandidates: string[]): Promise<string | null> {
-  const variants: string[] = [];
-  for (const title of titleCandidates) {
-    const clean = title.replace(/^Cookbook:/i, "").trim();
-    if (!clean) continue;
-    variants.push(`Cookbook:${clean}`, `Cookbook:${clean.replace(/\s+/g, "_")}`);
-    // Drop leading country/language adjectives for broader matches
-    const stripped = clean.replace(
-      /^(Dutch|Italian|Japanese|Mexican|Thai|Indian|French|German|Spanish|Greek|Turkish|Korean|Chinese|British|Polish|Portuguese|Brazilian|Peruvian|Argentine|Ethiopian|Moroccan|Lebanese|Vietnamese|Indonesian|Jamaican|Nigerian|Egyptian|Filipino|Bulgarian|Georgian|South African|Senegalese)\s+/i,
-      "",
-    );
-    if (stripped !== clean) variants.push(`Cookbook:${stripped}`);
-  }
-
-  const seen = new Set<string>();
-  for (const cookbookTitle of variants) {
-    const key = cookbookTitle.toLowerCase();
-    if (seen.has(key)) continue;
-    seen.add(key);
-
-    const encoded = encodeURIComponent(cookbookTitle.replace(/ /g, "_"));
-    const page = await fetchJson<WikiSummary>(
-      `https://en.wikibooks.org/api/rest_v1/page/summary/${encoded}`,
-    );
-    if (!page || page.type === "disambiguation") continue;
-    if (!page.title || !/^Cookbook:/i.test(page.title)) continue;
-
-    return (
-      page.content_urls?.desktop?.page ??
-      `https://en.wikibooks.org/wiki/${encodeURIComponent(page.title.replace(/ /g, "_"))}`
-    );
-  }
-  return null;
-}
-
-function youtubeSearchUrl(recipeName: string, countryName: string): string {
-  const q = `${recipeName} ${countryName} recipe`;
-  return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`;
-}
-
-function googleRecipeSearchUrl(recipeName: string, countryName: string): string {
-  // Google recipe filter (udm=18) surfaces recipe cards with ingredients/steps.
-  const q = `${recipeName} ${countryName} recipe`;
-  return `https://www.google.com/search?q=${encodeURIComponent(q)}&udm=18`;
-}
-
-async function enrichJob(
-  job: Job,
-  options: { keepPhoto?: boolean; existing?: RecipeEnrichment } = {},
-): Promise<RecipeEnrichment> {
-  const nameCandidates = [
-    job.localName,
-    job.recipeName,
-    `${job.recipeName} (${job.countryName})`,
-  ].filter((t): t is string => Boolean(t));
-
-  const imageQueries = [
-    `${job.recipeName} ${job.countryName} food`,
-    `${job.recipeName} dish`,
-    job.localName ? `${job.localName} food` : null,
-    `${job.recipeName} ${job.countryName}`,
-    // Broader fallbacks for snack / side dishes with sparse Commons results
-    job.localName ? `${job.localName}` : null,
-    `${job.recipeName}`,
-  ].filter((q): q is string => Boolean(q));
-
-  let image: { url: string; attribution: string } | null = null;
-
-  if (!options.keepPhoto) {
-    const wikiPageForImage = await findWikipediaPage(nameCandidates);
-    const wikiImage =
-      wikiPageForImage?.originalimage?.source ?? wikiPageForImage?.thumbnail?.source;
-    if (isPhotoUrl(wikiImage)) {
-      image = {
-        url: wikiImage,
-        attribution: `Wikipedia / ${wikiPageForImage?.title ?? job.recipeName}`,
-      };
-    }
-
-    if (!image) {
-      for (const query of imageQueries) {
-        image = await findCommonsImage(query);
-        if (image) break;
-        await sleep(100);
-      }
-    }
-  }
-
-  const wikiPage = await findWikipediaPage(nameCandidates);
-
-  const cookbookUrl = await findWikibooksCookbook(
-    [
-      job.localName ?? "",
-      job.recipeName,
-      job.recipeName.replace(
-        /^(Dutch|Italian|Japanese|Mexican|Thai|Indian|French|German|Spanish|Greek|Turkish|Korean|Chinese|British|Polish|Portuguese|Brazilian|Peruvian|Argentine|Ethiopian|Moroccan|Lebanese|Vietnamese|Indonesian|Jamaican|Nigerian|Egyptian|Filipino|Bulgarian|Georgian|South African|Senegalese)\s+/i,
-        "",
-      ),
-    ].filter(Boolean),
-  );
-
-  const wikiUrl =
-    wikiPage?.content_urls?.desktop?.page ??
-    (wikiPage?.title
-      ? `https://en.wikipedia.org/wiki/${encodeURIComponent(wikiPage.title.replace(/ /g, "_"))}`
-      : null);
-
-  const googleUrl = googleRecipeSearchUrl(job.recipeName, job.countryName);
-  const existingSource = options.existing?.sourceUrl;
-  const sourceRank = (url?: string) => {
-    if (!url) return 0;
-    if (url.includes("wikibooks.org")) return 3;
-    if (url.includes("wikipedia.org")) return 2;
-    if (url.includes("google.com")) return 1;
-    return 1;
-  };
-  const candidates = [cookbookUrl, wikiUrl, existingSource, googleUrl].filter(
-    (url): url is string => Boolean(url),
-  );
-  const sourceUrl = candidates.sort((a, b) => sourceRank(b) - sourceRank(a))[0]!;
-
-  const result: RecipeEnrichment = {
-    sourceUrl,
-    videoUrl: youtubeSearchUrl(job.recipeName, job.countryName),
-    fetchedAt: new Date().toISOString(),
-  };
-
-  if (image) {
-    result.imageUrl = image.url;
-    result.imageAttribution = image.attribution;
-  }
-
-  return result;
+  return { tried: pending.length, photos, failed };
 }
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  await getDb();
-  const jobs = await listJobs();
-  const progress = loadJson<Progress>(PROGRESS_PATH, {
-    completedIds: [],
-    lifetimeEnriched: 0,
-    runs: 0,
-    lastRunAt: null,
-  });
-  const completed = new Set(progress.completedIds);
-  const enrichments = loadJson<Record<string, RecipeEnrichment>>(OUT_PATH, {});
-
-  if (args.forceBad) {
-    for (const [id, extra] of Object.entries(enrichments)) {
-      if (hasBadOrMissingPhoto(extra)) {
-        completed.delete(id);
-        delete enrichments[id];
-      }
-    }
-  }
-
-  const pending = jobs.filter((job) => {
-    const existing = enrichments[job.id];
-    if (args.forceLinks) return true;
-    if (args.forceBad && hasBadOrMissingPhoto(existing)) return true;
-    if (
-      completed.has(job.id) &&
-      existing?.sourceUrl &&
-      existing?.videoUrl &&
-      isPhotoUrl(existing.imageUrl)
-    ) {
-      return false;
-    }
-    return !(isPhotoUrl(existing?.imageUrl) && existing?.sourceUrl && existing?.videoUrl);
-  });
+  const db = await getDb();
 
   if (args.status) {
-    const withPhoto = jobs.filter((job) =>
-      isPhotoUrl(enrichments[job.id]?.imageUrl),
-    ).length;
-    const withSource = jobs.filter((job) => enrichments[job.id]?.sourceUrl).length;
-    console.log(
-      `Recipe enrich: ${withPhoto} photos · ${withSource} sources · ${pending.length} pending · ${jobs.length} total`,
+    const total = await db.query<{ n: number; without: number; tried: number }>(
+      `SELECT COUNT(*)::int AS n,
+              COUNT(*) FILTER (WHERE image_url IS NULL OR image_url = '')::int AS without,
+              COUNT(*) FILTER (WHERE (image_url IS NULL OR image_url = '')
+                                 AND image_attempted_at > NOW() - INTERVAL '14 days')::int AS tried
+         FROM recipes
+        WHERE ($1::text IS NULL OR country_code = $1)`,
+      [args.code ?? null],
     );
-    console.log(`Lifetime enriched: ${progress.lifetimeEnriched}`);
-    console.log(`Last run: ${progress.lastRunAt ?? "never"}`);
-    console.log("Next:");
-    for (const job of pending.slice(0, 10)) {
-      console.log(`  - ${job.id} (${job.recipeName})`);
-    }
+    const row = total.rows[0]!;
+    console.log(
+      `Recipe photos: ${row.n - row.without}/${row.n} have a photo · ${row.without} without (${row.tried} tried in the last 14 days, waiting out their cooldown)`,
+    );
     await closeDb();
     return;
   }
 
-  const batch = pending.slice(0, args.all ? pending.length : args.batch);
+  const limit = args.all ? 100_000 : args.batch;
+  console.log(`Recipe media: up to ${args.all ? "all" : limit} recipe(s)`);
+  const result = await enrichPendingRecipes({
+    countryCode: args.code,
+    limit,
+    fixBad: args.fixBad,
+    links: args.links,
+  });
   console.log(
-    `Recipe enrich batch: ${batch.length} job(s) · ${pending.length - batch.length} remaining after`,
+    `\nTried ${result.tried} · ${result.photos} new photo(s) · ${result.tried - result.photos - result.failed} without a photo · ${result.failed} failed`,
   );
-
-  let enriched = 0;
-  for (const job of batch) {
-    process.stdout.write(`Enrich ${job.id}… `);
-    try {
-      const existing = enrichments[job.id];
-      const keepPhoto =
-        args.forceLinks && !args.forceBad && isPhotoUrl(existing?.imageUrl);
-      const result = await enrichJob(job, { keepPhoto, existing });
-      const merged: RecipeEnrichment = {
-        ...existing,
-        ...result,
-        imageUrl: result.imageUrl ?? existing?.imageUrl,
-        imageAttribution: result.imageAttribution ?? existing?.imageAttribution,
-      };
-      enrichments[job.id] = merged;
-      await updateRecipeFields(job.countryCode, job.recipeId, {
-        imageUrl: merged.imageUrl,
-        imageAttribution: merged.imageAttribution,
-        sourceUrl: merged.sourceUrl,
-        videoUrl: merged.videoUrl,
-      });
-      completed.add(job.id);
-      enriched += 1;
-      const sourceKind = result.sourceUrl?.includes("wikibooks")
-        ? "cookbook"
-        : result.sourceUrl?.includes("wikipedia")
-          ? "wiki"
-          : result.sourceUrl?.includes("google")
-            ? "google"
-            : "source";
-      const photo = isPhotoUrl(enrichments[job.id]?.imageUrl) ? "photo" : "no-photo";
-      console.log(
-        [photo, sourceKind, result.videoUrl ? "video" : null].filter(Boolean).join("+"),
-      );
-    } catch (error) {
-      console.log("failed");
-      console.warn(error);
-    }
-    await sleep(200);
-  }
-
-  progress.completedIds = [...completed];
-  progress.lifetimeEnriched += enriched;
-  progress.runs += 1;
-  progress.lastRunAt = new Date().toISOString();
-  saveJson(OUT_PATH, enrichments);
-  saveJson(PROGRESS_PATH, progress);
   await closeDb();
-
-  console.log(`\nWrote ${OUT_PATH} and updated Postgres recipes`);
-  console.log(
-    `Progress: ${completed.size}/${jobs.length} · lifetime ${progress.lifetimeEnriched}`,
-  );
+  if (result.failed > 0) process.exitCode = 1;
 }
 
-main().catch(async (error) => {
-  console.error(error);
-  await closeDb();
-  process.exit(1);
-});
+const isDirectRun =
+  process.argv[1] != null &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
+  main().catch(async (error) => {
+    console.error(error);
+    await closeDb();
+    process.exit(1);
+  });
+}

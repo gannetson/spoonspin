@@ -6,7 +6,10 @@ import { useConsent } from "@/consent/ConsentContext";
 import { usePublicConfig } from "@/lib/usePublicConfig";
 import { getOrderOptions } from "@/content/countries/menuAccessors";
 import { cuisineFlagsFor } from "@/restaurants/cuisineFlags";
-import { deliveryPlatformLinks } from "@/restaurants/deliveryLinks";
+import {
+  deliveryPlatformLinks,
+  thuisbezorgdBrandForUrl,
+} from "@/restaurants/deliveryLinks";
 import {
   orderOptionCuisineCodes,
   orderOptionPlatformLinks,
@@ -348,7 +351,7 @@ export function OrderHome({
                           onClick={(event) => event.stopPropagation()}
                           className="inline-flex min-h-11 w-fit items-center gap-2 rounded-full bg-tomato px-4 text-sm font-semibold text-cream hover:bg-tomato-deep"
                         >
-                          {t("order.option.open.thuisbezorgd")}
+                          {t(`order.option.open.${thuisbezorgdBrandForUrl(links.thuisbezorgd)}`)}
                           <ExternalLink aria-hidden="true" className="size-4" />
                         </a>
                       ) : null}
@@ -413,17 +416,17 @@ export function OrderHome({
                       alt=""
                       className="size-8 rounded-lg object-cover"
                     />
-                    {t(`dine.order.${link.id}.title`)}
+                    {t(`dine.order.${link.brand}.title`)}
                   </p>
                   <p className="mt-1 text-sm text-ink-soft">
-                    {t(`dine.order.${link.id}.hint`, {
+                    {t(`dine.order.${link.brand}.hint`, {
                       name: country.name,
                       query: link.searchLabel,
                     })}
                   </p>
                 </div>
                 <span className="inline-flex min-h-10 w-fit items-center gap-2 rounded-full border border-ink/15 px-3 text-sm font-semibold text-ink">
-                  {t(`dine.order.${link.id}.cta`)}
+                  {t(`dine.order.${link.brand}.cta`)}
                   <ExternalLink aria-hidden="true" className="size-4" />
                 </span>
               </a>

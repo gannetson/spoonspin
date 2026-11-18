@@ -58,6 +58,8 @@ export type Recipe = {
   regionName?: string;
   /** Raw region name when inserting (resolved to regionId in the DB). */
   region?: string;
+  /** A dish widely regarded as a national dish of this country (not an official designation). */
+  isNational?: boolean;
 };
 
 export type SpecialtyShop = {

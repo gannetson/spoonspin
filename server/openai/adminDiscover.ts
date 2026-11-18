@@ -156,11 +156,13 @@ const dishCandidateSchema = z.object({
   description: z.string().min(20),
   category: z.enum(["starter", "main", "side", "dessert", "snack"]),
   region: optionalString,
+  /** True for a dish widely regarded as a national dish of the country. */
+  isNational: z.boolean().optional().catch(undefined),
 });
 
 const recipesDiscoverSchema = z.object({
   notes: z.string(),
-  recipes: z.array(dishCandidateSchema).min(1).max(30),
+  recipes: z.array(dishCandidateSchema).min(1).max(50),
 });
 
 const restaurantConfidenceSchema = z.enum(["high", "medium", "low"]);
@@ -468,6 +470,7 @@ export type DishCandidate = {
   description: string;
   category: Recipe["category"];
   region?: string;
+  isNational?: boolean;
 };
 
 export async function discoverCountryRecipes(input: {
@@ -477,6 +480,13 @@ export async function discoverCountryRecipes(input: {
   existingNames: string[];
   regionId?: string;
   regionName?: string;
+  /** How many dishes to ask for, e.g. "30–36". Defaults to a country-wide or regional range. */
+  targetCount?: string;
+  /**
+   * Dishes cited elsewhere (Wikipedia lists) as national dishes of this country. The
+   * model keeps the ones that are genuinely from this cuisine and flags them `isNational`.
+   */
+  nationalDishHints?: string[];
 }): Promise<{ notes: string; recipes: DishCandidate[] }> {
   const regionLabel = input.regionName?.trim();
   const focus = input.query?.trim()
@@ -495,7 +505,21 @@ export async function discoverCountryRecipes(input: {
     regionName: regionLabel,
   });
   const discoverUserExtra = recipeDiscoverUserExtra(sourcingContext);
-  const targetCount = regionLabel ? "6–10" : "20–24";
+  const targetCount = input.targetCount ?? (regionLabel ? "6–10" : "20–24");
+  const nationalHints = (input.nationalDishHints ?? [])
+    .map((name) => name.trim())
+    .filter(Boolean)
+    .slice(0, 15);
+  const nationalBlock =
+    !regionLabel && !input.query?.trim()
+      ? `
+National dishes: include the dishes most widely regarded as national dishes of ${input.countryName} (typically 3–6; do not claim an official designation if it is contested) and set "isNational": true on them.${
+          nationalHints.length > 0
+            ? `\nCandidates cited elsewhere as national dishes (keep the ones that are genuinely ${input.countryName} cuisine, drop the rest): ${nationalHints.join("; ")}.`
+            : ""
+        }
+`
+      : "";
 
   const raw = await chatJson(
     recipeDiscoverSystemPrompt(sourcingContext),
@@ -506,7 +530,7 @@ Existing dishes (do not repeat): ${existing.join("; ") || "none"}
 ${focus}
 
 Return ${targetCount} distinct dishes when possible (quality still matters; prefer real classics over filler).
-${discoverUserExtra ? `${discoverUserExtra}\n` : ""}
+${nationalBlock}${discoverUserExtra ? `${discoverUserExtra}\n` : ""}
 JSON shape:
 {
   "notes": string,
@@ -515,7 +539,8 @@ JSON shape:
     "localName": string?,
     "description": string,
     "category": "starter"|"main"|"side"|"dessert"|"snack",
-    "region": string?
+    "region": string?,
+    "isNational": boolean? (true only for widely regarded national dishes)
   }]
 }`,
   );
@@ -611,6 +636,7 @@ JSON shape:
         region: regionLabel ?? recipe.region ?? match?.region,
         regionId: input.regionId,
         regionName: regionLabel,
+        ...(match?.isNational ? { isNational: true } : {}),
         sourceUrl: sanitizeRecipeSourceUrl(recipe.sourceUrl, sourcingContext),
         description:
           recipe.description.length >= 40
@@ -1430,7 +1456,7 @@ async function verifyRestaurantAuthenticity(input: {
     .join("\n\n");
 
   const raw = await chatJson(
-    `You verify whether restaurants in the Netherlands are genuine specialists for a given national cuisine.
+    `You verify whether restaurants in the Netherlands, Belgium or western Germany are genuine specialists for a given national cuisine.
 Reply with JSON only.
 
 The candidates were found by searching for the cuisine, so the search itself proves NOTHING. Judge each place only on its own evidence: its name, its Google category, and the fetched page text (website / Tripadvisor / delivery pages). Trust clear cuisine wording in titles and descriptions (e.g. “Yemeni Restaurant”, “Albanese keuken”, a menu of national dishes).
@@ -2441,7 +2467,7 @@ export async function rewriteOrderOptionText(input: {
   const hadPageEvidence = pageEvidence.length > 0;
 
   const raw = await chatJson(
-    `You improve meal-delivery order option blurbs for diners in the Netherlands.
+    `You improve meal-delivery order option blurbs for diners in the Netherlands, Belgium or western Germany.
 Reply with JSON only. Keep the restaurant and platform identity — do not invent a different venue.
 Use fetched Thuisbezorgd / Uber Eats page text (title, description, snippet) as PRIMARY evidence for notes, signature dish, and cuisine countries.
 Ground optionNotes in what the pages say about cuisine, specialties, and dishes. Do not invent claims the pages do not support.
@@ -2536,7 +2562,7 @@ export async function rewriteRestaurantText(input: {
   );
   const hadPageEvidence = pageEvidence.length > 0;
   const raw = await chatJson(
-    `You write concise authenticity notes for restaurants in the Netherlands and identify which national cuisines they match.
+    `You write concise authenticity notes for restaurants in the Netherlands, Belgium or western Germany and identify which national cuisines they match.
 Reply with JSON only.
 Use fetched page text (official website, Tripadvisor, TheFork, etc. — title, description, snippet) as PRIMARY evidence.
 Ground authenticityNotes in what those pages say about cuisine, specialties, and atmosphere. Prefer paraphrasing page claims over inventing.
@@ -2623,7 +2649,7 @@ export async function researchRestaurantMenu(input: {
   ]);
 
   const raw = await chatJson(
-    `You research restaurant menus in the Netherlands.
+    `You research restaurant menus in the Netherlands, Belgium or western Germany.
 Reply with JSON only. Prefer dishes this specific restaurant is known to serve.
 If the exact menu is unknown, list typical authentic dishes this venue would plausibly offer.
 Aim for 8–25 items. Do not invent fake euro prices unless reasonably confident.
@@ -2739,7 +2765,7 @@ export async function researchRestaurantScores(input: {
   };
 }> {
   const raw = await chatJson(
-    `You research public guest ratings and price level for restaurants in the Netherlands.
+    `You research public guest ratings and price level for restaurants in the Netherlands, Belgium or western Germany.
 Reply with JSON only. Use best-known Google, Tripadvisor, and The Fork scores when available.
 Google and Tripadvisor use a 5-point scale; The Fork often uses 10 — set "scale" accordingly.
 priceLevel is 1–4 (€ to €€€€).
@@ -2881,6 +2907,10 @@ export async function composeDinnerSuggestion(input: {
     localName?: string;
     description: string;
     category: string;
+    /** A widely regarded national dish: a good anchor for the dinner. */
+    isNational?: boolean;
+    /** Has a photo. The dinner page leads with images, so prefer these. */
+    hasImage?: boolean;
   }>;
   drinks: Array<{
     name: string;
@@ -2907,6 +2937,7 @@ Reply with JSON only.
 Rules:
 - Pick 3–5 courses from the provided recipe list only (use exact recipeId values).
 - Prefer a natural arc: starter → main → side and/or dessert (snack allowed).
+- Anchor the dinner on a recipe marked isNational when one fits, and prefer recipes with hasImage true when quality is otherwise equal.
 - Include 1–3 drink suggestions from the provided drink names only (exact drinkName).
 - Write a warm, specific description (why this dinner tastes like the country) — not generic tourism copy.
 - Per-course notes must be 2–4 sentence story beats that flow from course to course (prose, not card blurbs).

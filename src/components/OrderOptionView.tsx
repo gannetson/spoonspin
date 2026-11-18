@@ -9,6 +9,7 @@ import {
   orderOptionPlatformLinks,
   resolveOrderPlatformHref,
 } from "@/restaurants/orderOptionLinks";
+import { thuisbezorgdBrandForUrl } from "@/restaurants/deliveryLinks";
 import { platformLogoSrc } from "@/restaurants/platformLogos";
 import { AdminItemMenu } from "@/components/AdminItemMenu";
 import { MediaPlaceholder } from "@/components/MediaPlaceholder";
@@ -172,7 +173,7 @@ export function OrderOptionView({
                 alt=""
                 className="size-5 rounded-md object-cover"
               />
-              {t("order.option.open.thuisbezorgd")}
+              {t(`order.option.open.${thuisbezorgdBrandForUrl(links.thuisbezorgd)}`)}
               <ExternalLink aria-hidden="true" className="size-4" />
             </a>
           ) : null}

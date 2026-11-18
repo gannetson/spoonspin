@@ -45,7 +45,10 @@ import {
 } from "../server/openai/adminDiscover.ts";
 import type { Country } from "../src/types/content.ts";
 import { getCountryRecipes } from "../src/content/countries/menuAccessors.ts";
-import { FILL_CITIES } from "./lib/fillCities.ts";
+import { cityAnchorByName, normalizeCity } from "../src/restaurants/coverage.ts";
+import { TARGET_RECIPES } from "../server/lib/cookTargets.ts";
+import { runCookPipeline } from "./lib/cookPipeline.ts";
+import { FILL_CITIES, ORDER_FILL_CITIES } from "./lib/fillCities.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PROGRESS_PATH = path.join(rootDir, "data", "fill-content-progress.json");
@@ -70,6 +73,7 @@ type CliOptions = {
   cities: string[];
   delayMs: number;
   resetOrders: boolean;
+  promoteLimit: number;
 };
 
 function parseArgs(argv: string[]): CliOptions {
@@ -77,9 +81,10 @@ function parseArgs(argv: string[]): CliOptions {
     lane: "daily",
     batch: 3,
     statusOnly: false,
-    cities: [...FILL_CITIES],
+    cities: [...ORDER_FILL_CITIES],
     delayMs: 8_000,
     resetOrders: false,
+    promoteLimit: 400,
   };
 
   for (let i = 0; i < argv.length; i += 1) {
@@ -108,6 +113,9 @@ function parseArgs(argv: string[]): CliOptions {
       i += 1;
     } else if (arg === "--delay-ms" && next) {
       options.delayMs = Math.max(0, Number(next));
+      i += 1;
+    } else if (arg === "--promote-limit" && next) {
+      options.promoteLimit = Math.max(0, Number(next));
       i += 1;
     } else if (arg === "--status") {
       options.statusOnly = true;
@@ -171,35 +179,39 @@ function runNpmScript(script: string, args: string[]): Promise<number> {
 }
 
 function cityNeedle(city: string): string {
-  return city.toLowerCase().replace(/^the\s+/, "").trim();
+  return normalizeCity(city).replace(/^the\s+/, "");
+}
+
+/** Spellings of a city that count as "this city" in a stored option's free-text city. */
+function cityMatchNeedles(city: string): string[] {
+  const known = cityAnchorByName(city);
+  return known ? known.aliases : [cityNeedle(city)];
 }
 
 function countryHasCityOrders(country: Country, city: string): boolean {
-  const needle = cityNeedle(city);
+  const needles = cityMatchNeedles(city);
   return (country.orderOptions ?? []).some((option) => {
-    const optionCity = (option.city ?? "").toLowerCase();
+    const optionCity = normalizeCity(option.city ?? "");
     if (!optionCity) return false;
-    if (needle === "den haag") {
-      return (
-        optionCity.includes("den haag") ||
-        optionCity.includes("the hague") ||
-        optionCity.includes("'s-gravenhage")
-      );
-    }
-    return optionCity.includes(needle);
+    return needles.some((needle) => optionCity.includes(needle));
   });
 }
 
+/**
+ * Order jobs, city by city (Leiden first, then the rest of the Randstad, then the
+ * biggest neighbouring cities): a partial run always leaves whole cities finished.
+ * Within a city, countries run in catalog order.
+ */
 function buildOrderJobs(
   countries: Country[],
   cities: string[],
   codeFilter?: string,
 ): OrderJob[] {
   const jobs: OrderJob[] = [];
-  for (const country of countries) {
-    if (codeFilter && country.code !== codeFilter) continue;
-    if (country.status !== "published" && !country.cookReady) continue;
-    for (const city of cities) {
+  for (const city of cities) {
+    for (const country of countries) {
+      if (codeFilter && country.code !== codeFilter) continue;
+      if (country.status !== "published" && !country.cookReady) continue;
       jobs.push({
         id: `${country.code}:${cityNeedle(city).replace(/\s+/g, "-")}`,
         countryCode: country.code,
@@ -215,13 +227,13 @@ async function printStatus(options: CliOptions, progress: FillProgress) {
   const published = countries.filter((c) => c.status === "published");
   const cookReady = published.filter((c) => c.cookReady);
   const incomplete = published.filter(
-    (c) => !c.cookReady || getCountryRecipes(c).length < 20,
+    (c) => !c.cookReady || getCountryRecipes(c).length < TARGET_RECIPES,
   );
 
   console.log("Content fill strategy status");
   console.log(`  cities: ${options.cities.join(", ")}`);
   console.log(
-    `  countries: ${published.length} published · ${cookReady.length} cook-ready · ${incomplete.length} cook-incomplete / under 20 recipes`,
+    `  countries: ${published.length} published · ${cookReady.length} cook-ready · ${incomplete.length} cook-incomplete / under ${TARGET_RECIPES} recipes`,
   );
   console.log(
     `  OpenAI: ${isOpenAiConfigured() ? "configured" : "missing OPENAI_API_KEY"}`,
@@ -261,7 +273,7 @@ async function printStatus(options: CliOptions, progress: FillProgress) {
   }
 
   if (incomplete.length > 0) {
-    console.log("\nCook incomplete / under 20 recipes (sample):");
+    console.log(`\nCook incomplete / under ${TARGET_RECIPES} recipes (sample):`);
     for (const country of incomplete.slice(0, 12)) {
       console.log(
         `  · ${country.code} ${country.name} (${getCountryRecipes(country).length} recipes)`,
@@ -277,33 +289,23 @@ async function printStatus(options: CliOptions, progress: FillProgress) {
   }
 }
 
-async function runCookLane(batch: number) {
+async function runCookLane(batch: number, code?: string): Promise<boolean> {
   console.log("\n=== Lane: cook ===");
-  if (!isOpenAiConfigured()) {
-    console.warn("Skipping cook lane — OPENAI_API_KEY not set.");
-    return;
+  // One pass per country: dishes → menu (35 recipes, national dishes) → photos and
+  // links → dinner → country image, all in this process. See scripts/lib/cookPipeline.ts.
+  const { failed } = await runCookPipeline({
+    batch,
+    code,
+    photoSweep: Math.max(batch * 20, 60),
+  });
+  if (failed.length > 0) {
+    console.warn(`Cook lane: ${failed.length} country(ies) need another look: ${failed.join(", ")}`);
   }
-  // Dishes research feeds complete-menus; small batch each run.
-  let code = await runNpmScript("agent:dishes", ["--batch", String(batch)]);
-  if (code !== 0) console.warn(`agent:dishes exited ${code}`);
-  code = await runNpmScript("agent:complete-menus", ["--batch", String(batch)]);
-  if (code !== 0) console.warn(`agent:complete-menus exited ${code}`);
-  code = await runNpmScript("agent:compose-dinners", ["--batch", String(batch)]);
-  if (code !== 0) console.warn(`agent:compose-dinners exited ${code}`);
-  code = await runNpmScript("agent:recipes", [
-    "--batch",
-    String(Math.max(batch * 8, 20)),
-  ]);
-  if (code !== 0) console.warn(`agent:recipes exited ${code}`);
-  code = await runNpmScript("agent:cuisine-images", [
-    "--batch",
-    String(Math.max(batch * 4, 10)),
-  ]);
-  if (code !== 0) console.warn(`agent:cuisine-images exited ${code}`);
+  return failed.length === 0;
 }
 
-async function runRestaurantsLane(batch: number, code?: string) {
-  console.log("\n=== Lane: restaurants (OSM tiles, whole country) ===");
+async function runRestaurantsLane(batch: number, code?: string, promoteLimit = 400) {
+  console.log("\n=== Lane: restaurants (NL + BE + western DE tiles) ===");
   const countries = await listCountriesFromDb();
   const codes = countries
     .filter((c) => c.status === "published")
@@ -313,14 +315,13 @@ async function runRestaurantsLane(batch: number, code?: string) {
     console.warn("No published countries to harvest.");
     return;
   }
-  // Tile search: the whole country, every cuisine in one request per tile (see
-  // gather-restaurants.ts). A tile is far more productive than a hub x country
-  // job, so a lane run does at least a few of them.
+  // Tile mode: each run searches the next `batch` map tiles for every cuisine at once,
+  // promotes what it finds and enriches it (text, photo, menu, ratings) before returning.
   const args = [
-    "--mode",
-    "tiles",
     "--batch",
-    String(Math.max(batch, 4)),
+    String(Math.max(batch * 4, 8)),
+    "--promote-limit",
+    String(promoteLimit),
     "--countries",
     codes.join(","),
   ];
@@ -447,13 +448,14 @@ async function main() {
     `Fill content · lane=${options.lane} · batch=${options.batch} · cities=${options.cities.join(",")}`,
   );
 
+  let laneFailed = false;
   try {
     if (options.lane === "cook" || options.lane === "daily") {
-      await runCookLane(options.batch);
+      if (!(await runCookLane(options.batch, options.code))) laneFailed = true;
       progress = await loadProgress();
     }
     if (options.lane === "restaurants" || options.lane === "daily") {
-      await runRestaurantsLane(options.batch, options.code);
+      await runRestaurantsLane(options.batch, options.code, options.promoteLimit);
       progress = await loadProgress();
     }
     if (options.lane === "orders" || options.lane === "daily") {
@@ -464,7 +466,8 @@ async function main() {
     await closeDb();
   }
 
-  console.log("\nDone.");
+  console.log(laneFailed ? "\nDone, with failures (see above)." : "\nDone.");
+  if (laneFailed) process.exitCode = 1;
 }
 
 const isDirectRun =

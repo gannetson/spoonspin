@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url";
 import { countryCatalog } from "../src/content/countries/catalog.ts";
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const OUT_PATH = path.join(rootDir, "data/dishes-by-country.json");
+export const OUT_PATH = path.join(rootDir, "data/dishes-by-country.json");
 const PROGRESS_PATH = path.join(rootDir, "data/dish-discover-progress.json");
 const WIKI_PATH = path.join(rootDir, "data/wikipedia-cuisines.json");
 const USER_AGENT =
@@ -44,7 +44,7 @@ type DishRecord = {
   videoUrl?: string;
 };
 
-type CountryDishes = {
+export type CountryDishes = {
   code: string;
   name: string;
   cuisinePage?: string;
@@ -96,7 +96,7 @@ function parseArgs(argv: string[]) {
   return args;
 }
 
-function loadJson<T>(filePath: string, fallback: T): T {
+export function loadJson<T>(filePath: string, fallback: T): T {
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
   } catch {
@@ -104,7 +104,7 @@ function loadJson<T>(filePath: string, fallback: T): T {
   }
 }
 
-function saveJson(filePath: string, value: unknown) {
+export function saveJson(filePath: string, value: unknown) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
 }
@@ -356,7 +356,7 @@ async function enrichDish(
   };
 }
 
-async function discoverForCountry(entry: {
+export async function discoverForCountry(entry: {
   code: string;
   name: string;
 }): Promise<CountryDishes> {
@@ -496,7 +496,13 @@ async function main() {
   );
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+const isDirectRun =
+  process.argv[1] != null &&
+  path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
+  main().catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });
+}

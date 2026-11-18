@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildCoverageTiles,
   buildTiles,
+  dueTileJobs,
   harvestTile,
   isLoadError,
   orderTiles,
@@ -222,5 +224,84 @@ describe("harvestTile", () => {
     });
     for (const tag of unionCuisineTags(["cn", "th"])) expect(query).toContain(tag);
     expect(query).toContain(`(${tile!.south},${tile!.west},${tile!.north},${tile!.east})`);
+  });
+});
+
+describe("buildCoverageTiles", () => {
+  it("covers NL, BE and western Germany on one grid with unique ids", () => {
+    const all = buildCoverageTiles();
+    expect(new Set(all.map((t) => t.id)).size).toBe(all.length);
+    const covers = (lat: number, lng: number) =>
+      all.some((t) => lat >= t.south && lat <= t.north && lng >= t.west && lng <= t.east);
+    expect(covers(52.37, 4.9)).toBe(true); // Amsterdam
+    expect(covers(51.22, 4.4)).toBe(true); // Antwerp
+    expect(covers(50.85, 4.35)).toBe(true); // Brussels
+    expect(covers(50.78, 6.08)).toBe(true); // Aachen
+    expect(covers(50.94, 6.96)).toBe(true); // Cologne
+    expect(covers(51.23, 6.77)).toBe(true); // Dusseldorf
+    expect(covers(50.63, 5.58)).toBe(true); // Liege
+  });
+
+  it("is aligned to the grid, so overlapping regions share tile ids", () => {
+    const nl = buildCoverageTiles(["nl"]);
+    const be = buildCoverageTiles(["be"]);
+    const both = buildCoverageTiles(["nl", "be"]);
+    const shared = nl.filter((t) => be.some((b) => b.id === t.id)).length;
+    expect(shared).toBeGreaterThan(0);
+    expect(both).toHaveLength(nl.length + be.length - shared);
+    for (const t of both) {
+      expect(Math.round(t.south * 100) % 50).toBe(0);
+      expect(Math.round(t.west * 100) % 50).toBe(0);
+    }
+  });
+
+  it("rejects an unknown region", () => {
+    expect(() => buildCoverageTiles(["xx"])).toThrow(/Unknown region/);
+  });
+});
+
+describe("dueTileJobs", () => {
+  const tile = (id: string) => ({ id, tile: { id, south: 0, west: 0, north: 1, east: 1 } });
+  const jobs = [tile("a"), tile("b"), tile("c")];
+  const day = 86_400_000;
+  const now = Date.parse("2026-11-18T00:00:00Z");
+  const ago = (days: number) => new Date(now - days * day).toISOString();
+
+  it("never-searched tiles are fresh, old finished ones are stale, recent ones are skipped", () => {
+    const { fresh, stale } = dueTileJobs(
+      jobs,
+      {
+        completedJobIds: ["b", "c"],
+        completedAt: { b: ago(40), c: ago(2) },
+        tileSignatures: { b: "s1", c: "s1" },
+      },
+      30,
+      "s1",
+      now,
+    );
+    expect(fresh.map((j) => j.id)).toEqual(["a"]);
+    expect(stale.map((j) => j.id)).toEqual(["b"]);
+  });
+
+  it("a tile searched with a different tag set is fresh again", () => {
+    const { fresh } = dueTileJobs(
+      jobs,
+      { completedJobIds: ["a"], completedAt: { a: ago(1) }, tileSignatures: { a: "old" } },
+      30,
+      "new",
+      now,
+    );
+    expect(fresh.map((j) => j.id)).toEqual(["a", "b", "c"]);
+  });
+
+  it("refreshDays 0 turns age-based refresh off", () => {
+    const { stale } = dueTileJobs(
+      jobs,
+      { completedJobIds: ["a"], completedAt: { a: ago(400) }, tileSignatures: { a: "s" } },
+      0,
+      "s",
+      now,
+    );
+    expect(stale).toEqual([]);
   });
 });

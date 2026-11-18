@@ -15,19 +15,19 @@ describe("resolveSearchHubs", () => {
 
   it("uses an explicit city and keeps query as focus", () => {
     const { hubs, focusTerms } = resolveSearchHubs("Thai", "Leiden");
-    expect(hubs).toEqual([{ city: "Leiden", address: "2312AB Leiden" }]);
+    expect(hubs).toEqual([{ city: "Leiden", address: "2312AB Leiden", country: "nl" }]);
     expect(focusTerms).toEqual(["Thai"]);
   });
 
   it("accepts a freeform city hint", () => {
     const { hubs, focusTerms } = resolveSearchHubs(undefined, "Haarlem");
-    expect(hubs).toEqual([{ city: "Haarlem", address: "Haarlem Netherlands" }]);
+    expect(hubs).toEqual([{ city: "Haarlem", address: "2011AB Haarlem", country: "nl" }]);
     expect(focusTerms).toEqual([]);
   });
 
   it("picks a city from the query and keeps cuisine focus", () => {
     const { hubs, focusTerms } = resolveSearchHubs("Amsterdam Thai");
-    expect(hubs).toEqual([{ city: "Amsterdam", address: "1012AB Amsterdam" }]);
+    expect(hubs).toEqual([{ city: "Amsterdam", address: "1012AB Amsterdam", country: "nl" }]);
     expect(focusTerms.join(" ").toLowerCase()).toContain("thai");
   });
 
@@ -41,6 +41,21 @@ describe("resolveSearchHubs", () => {
     const { hubs, focusTerms } = resolveSearchHubs("sushi");
     expect(hubs.map((hub) => hub.city)).toEqual(["Leiden"]);
     expect(focusTerms).toEqual(["sushi"]);
+  });
+});
+
+describe("resolveSearchHubs beyond the Netherlands", () => {
+  it("finds Belgian and German cities by any common spelling", () => {
+    expect(resolveSearchHubs(undefined, "Antwerp").hubs).toEqual([
+      { city: "Antwerpen", address: "Meir 1, 2000 Antwerpen", country: "be" },
+    ]);
+    expect(resolveSearchHubs(undefined, "Cologne").hubs[0]).toMatchObject({
+      city: "Köln",
+      country: "de",
+    });
+    const { hubs, focusTerms } = resolveSearchHubs("Aachen Indian");
+    expect(hubs[0]).toMatchObject({ city: "Aachen", country: "de" });
+    expect(focusTerms.join(" ")).toContain("indian");
   });
 });
 
@@ -83,6 +98,37 @@ describe("mapThuisbezorgdItem", () => {
         url: "https://example.com/menu/x",
       }),
     ).toBeNull();
+  });
+});
+
+describe("mapThuisbezorgdItem across the Just Eat Takeaway family", () => {
+  it("maps a Lieferando listing and its field names", () => {
+    const listing = mapThuisbezorgdItem({
+      name: "Deutsches Haus",
+      url: "https://www.lieferando.de/speisekarte/deutsches-haus-aachen",
+      city: "Aachen",
+      rating: 4.4,
+      ratingCount: 6349,
+      cuisines: ["Indian", "German dishes"],
+      deliveryFee: 2,
+      minimumOrderValue: 10,
+      deliveryTimeMinutes: 33,
+    });
+    expect(listing).toMatchObject({
+      platform: "thuisbezorgd",
+      brand: "lieferando",
+      name: "Deutsches Haus",
+      city: "Aachen",
+    });
+    expect(listing?.notes).toContain("min €10.00");
+    expect(listing?.notes).toContain("ETA 33");
+  });
+
+  it("maps a Takeaway.com Belgium listing", () => {
+    expect(
+      mapThuisbezorgdItem({ name: "Sushi Gent", url: "https://www.takeaway.com/be/menu/sushi-gent" })
+        ?.brand,
+    ).toBe("takeaway");
   });
 });
 
