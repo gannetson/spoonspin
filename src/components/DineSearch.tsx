@@ -99,6 +99,14 @@ export function DineSearch({
   const [suggestOpen, setSuggestOpen] = useState(false);
   const [reviewTarget, setReviewTarget] = useState<SuggestReviewTarget | null>(null);
 
+  /**
+   * Whether a search has already produced the list on screen. Once it has, that
+   * list belongs to the country we searched for, so switching country (spinning
+   * the spoon, or picking one) has to re-run it instead of leaving the previous
+   * cuisine's restaurants under the new country's heading.
+   */
+  const hasSearchedRef = useRef(false);
+
   const searchRef = useRef({
     country,
     regionId,
@@ -128,6 +136,7 @@ export function DineSearch({
 
   async function runSearch(location = visitorLocation) {
     const city = cityOrPostcode.trim();
+    hasSearchedRef.current = true;
     setLocationError(null);
     setState({ status: "loading" });
     const result = await fetchRestaurants({
@@ -189,12 +198,20 @@ export function DineSearch({
       t: translate,
     } = searchRef.current;
 
-    if (!city.trim()) return;
-    if (refreshKey === 0 && !remember) return;
+    // Nothing to search with. Drop any list from the country we just left
+    // rather than showing it under the new one.
+    if (!city.trim()) {
+      if (hasSearchedRef.current) setState({ status: "idle" });
+      return;
+    }
+    // On first mount we only search by ourselves for a city the visitor chose
+    // to keep. After they have searched once, a country switch refreshes.
+    if (refreshKey === 0 && !remember && !hasSearchedRef.current) return;
 
     let cancelled = false;
 
     async function autoSearch() {
+      hasSearchedRef.current = true;
       setLocationError(null);
       setState({ status: "loading" });
       const result = await fetchRestaurants({
