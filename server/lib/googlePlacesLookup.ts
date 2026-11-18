@@ -121,7 +121,7 @@ export type GroundedPlace = GooglePlaceMatch & {
   rank?: number;
   /** Cuisine labels the source itself assigned (Tripadvisor cuisines, OSM cuisine=*). */
   sourceCuisineTags?: string[];
-  source: "google" | "osm" | "tripadvisor" | "zenchef" | "thefork";
+  source: "google" | "osm" | "overture" | "tripadvisor" | "zenchef" | "thefork";
   /** Tripadvisor Restaurant_Review profile when found via Apify. */
   tripadvisorUrl?: string;
   /** Zenchef booking widget when found via the partner restaurant list. */

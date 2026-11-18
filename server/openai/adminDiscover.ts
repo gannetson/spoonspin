@@ -16,6 +16,7 @@ import {
   type RankedQueryResult,
 } from "../lib/googlePlacesLookup.ts";
 import { searchOsmRestaurantsForCountry } from "../lib/osmRestaurantSearch.ts";
+import { searchStoredRestaurantsForCountry } from "../lib/storedRestaurantSearch.ts";
 import { searchTripadvisorRestaurants } from "../lib/apifyTripadvisorSearch.ts";
 import { fetchPageEvidenceMany, formatPageEvidence } from "../lib/pageEvidence.ts";
 import {
@@ -198,6 +199,11 @@ function confidenceToRating(confidence: "high" | "medium" | "low" | undefined): 
 const WEAK_NAME_RE =
   /\b(hotel|ibis|hilton|marriott|nh hotel|novotel|all.?you.?can.?eat|ayce|buffet|catering|supermarket|toko\s+online)\b/i;
 
+/** The fallback a harvested place gets when OSM has no address: just the country's name. */
+function isCountryNameOnly(address: string): boolean {
+  return ["netherlands", "belgium", "germany"].includes(address.trim().toLowerCase());
+}
+
 function looksWeakCandidate(name: string): boolean {
   return WEAK_NAME_RE.test(name);
 }
@@ -217,7 +223,7 @@ function groundedToDiscovered(
   relevance: RelevanceScore,
 ): DiscoveredRestaurant | null {
   if (looksWeakCandidate(place.name)) return null;
-  if (!place.address?.trim() || place.address === "Netherlands") return null;
+  if (!place.address?.trim() || isCountryNameOnly(place.address)) return null;
 
   const confidence = confidenceFromRelevance(relevance, place);
   const mapsUrl = stableMapsUrl(place.mapsUrl, {
@@ -232,7 +238,9 @@ function groundedToDiscovered(
         ? "Tripadvisor"
         : place.source === "osm"
           ? "OpenStreetMap"
-          : place.source;
+          : place.source === "overture"
+            ? "Overture Maps"
+            : place.source;
 
   return {
     name: place.name,
@@ -266,7 +274,7 @@ function groundedToDiscovered(
     authenticityNotes: relevance.reasons.join("; "),
     authenticityRating: confidenceToRating(confidence),
     phone: place.phone,
-    verified: place.source !== "osm",
+    verified: place.source !== "osm" && place.source !== "overture",
   };
 }
 
@@ -734,7 +742,7 @@ export async function discoverCountryRestaurants(input: {
 
   // Every source runs at once. Google is fast and carries the ranking signal;
   // the others are best-effort supplements that must never stall the search.
-  const [googleResults, osmHits, tripadvisor] = await Promise.all([
+  const [googleResults, osmHits, tripadvisor, storedHits] = await Promise.all([
     hasPlaces
       ? withBudget(
           "Google Places",
@@ -756,6 +764,7 @@ export async function discoverCountryRestaurants(input: {
       () =>
         searchOsmRestaurantsForCountry({
           countryCode: input.countryCode,
+          focus,
           onProgress: log,
         }),
       log,
@@ -776,6 +785,19 @@ export async function discoverCountryRestaurants(input: {
           log,
         )
       : Promise.resolve({ places: [] as GroundedPlace[], notes: "" }),
+    // Already-harvested OSM and Overture places (also Belgium and western Germany): one DB query.
+    withBudget(
+      "Stored harvest",
+      [] as GroundedPlace[],
+      SOURCE_BUDGET_MS,
+      () =>
+        searchStoredRestaurantsForCountry({
+          countryCode: input.countryCode,
+          focus,
+          onProgress: log,
+        }),
+      log,
+    ),
   ]);
 
   if (!hasPlaces) log("Google Places skipped (no API key).");
@@ -800,6 +822,7 @@ export async function discoverCountryRestaurants(input: {
       kind: "demonym" as const,
       places: tripadvisor.places,
     },
+    { query: "stored harvest", kind: "demonym" as const, places: storedHits },
   ]);
 
   const googleHitCount = googleResults.reduce(
@@ -808,7 +831,7 @@ export async function discoverCountryRestaurants(input: {
   );
   log(
     `Merged ${candidates.length} unique venue(s) from ${googleHitCount} Google, ` +
-      `${tripadvisor.places.length} Tripadvisor and ${osmHits.length} OSM hit(s).`,
+      `${tripadvisor.places.length} Tripadvisor, ${osmHits.length} OSM and ${storedHits.length} stored harvest hit(s).`,
   );
 
   if (candidates.length === 0) {
@@ -899,6 +922,7 @@ export async function discoverCountryRestaurants(input: {
             kind: "demonym" as const,
             places: tripadvisor.places,
           },
+          { query: "stored harvest", kind: "demonym" as const, places: storedHits },
           ...umbrellaResults.map((result) => ({
             query: result.query,
             kind: "umbrella" as const,

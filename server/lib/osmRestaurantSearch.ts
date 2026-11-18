@@ -9,6 +9,7 @@ import {
   fetchOverpass,
   NL_BBOX,
 } from "../../scripts/lib/overpassRestaurants.ts";
+import { findCityAnchorInText } from "../../src/restaurants/coverage.ts";
 import { osmTagsForCountry } from "../../src/restaurants/osmCuisineMap.ts";
 import type { GroundedPlace } from "./googlePlacesLookup.ts";
 import { officialWebsiteOrUndefined } from "./googlePlacesLookup.ts";
@@ -31,7 +32,9 @@ const FETCH_TIMEOUT_MS = 27_000;
  */
 function usableAddress(address: string): boolean {
   const trimmed = address.trim();
-  if (!trimmed || trimmed === "Netherlands") return false;
+  if (!trimmed || ["netherlands", "belgium", "germany"].includes(trimmed.toLowerCase())) {
+    return false;
+  }
   // Reject lat,lng-only fallbacks from elementToRestaurant.
   if (/^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(trimmed)) return false;
   return /[a-zA-Z]/.test(trimmed);
@@ -45,19 +48,69 @@ function isTimeoutError(error: unknown): boolean {
   );
 }
 
+type SearchArea = {
+  label: string;
+  bbox: { south: number; west: number; north: number; east: number };
+};
+
+/** A city-sized box: about 30 km tall and 40 km wide, small enough for one quick request. */
+const CITY_HALF_HEIGHT_DEG = 0.15;
+const CITY_HALF_WIDTH_DEG = 0.25;
+
 /**
- * Search OSM specialty tags across the Netherlands in a single Overpass request.
+ * Where to look. The Netherlands is always searched in one nationwide request, as before.
+ * A nationwide request for Belgium and Germany would be far too heavy for a live search,
+ * so those are covered only around a city the admin names in the focus text (the stored
+ * harvest covers the rest of them).
+ */
+export function osmSearchAreas(focus?: string): SearchArea[] {
+  const areas: SearchArea[] = [{ label: "Netherlands", bbox: NL_BBOX }];
+  const city = focus ? findCityAnchorInText(focus) : undefined;
+  if (city && city.country !== "nl") {
+    areas.push({
+      label: city.name,
+      bbox: {
+        south: city.lat - CITY_HALF_HEIGHT_DEG,
+        north: city.lat + CITY_HALF_HEIGHT_DEG,
+        west: city.lng - CITY_HALF_WIDTH_DEG,
+        east: city.lng + CITY_HALF_WIDTH_DEG,
+      },
+    });
+  }
+  return areas;
+}
+
+/**
+ * Search OSM specialty tags in one Overpass request per area (see `osmSearchAreas`).
  * Failures are logged and skipped; never throws to the caller.
  */
 export async function searchOsmRestaurantsForCountry(input: {
   countryCode: string;
+  /** Admin's optional focus text; a Belgian or German city in it adds a search around that city. */
+  focus?: string;
   onProgress?: (message: string) => void;
 }): Promise<GroundedPlace[]> {
   const tags = osmTagsForCountry(input.countryCode);
   if (tags.length === 0) return [];
 
-  input.onProgress?.("OpenStreetMap · Netherlands");
-  const query = buildOverpassBboxQuery(tags, NL_BBOX, QUERY_TIMEOUT_SEC);
+  const batches = await Promise.all(
+    osmSearchAreas(input.focus).map((area) => searchArea(area, tags, input)),
+  );
+
+  const byKey = new Map<string, GroundedPlace>();
+  for (const place of batches.flat()) {
+    if (!byKey.has(place.placeId)) byKey.set(place.placeId, place);
+  }
+  return [...byKey.values()];
+}
+
+async function searchArea(
+  area: SearchArea,
+  tags: string[],
+  input: { countryCode: string; onProgress?: (message: string) => void },
+): Promise<GroundedPlace[]> {
+  input.onProgress?.(`OpenStreetMap · ${area.label}`);
+  const query = buildOverpassBboxQuery(tags, area.bbox, QUERY_TIMEOUT_SEC);
 
   let elements;
   try {
@@ -71,8 +124,11 @@ export async function searchOsmRestaurantsForCountry(input: {
     });
   } catch (error) {
     const reason = isTimeoutError(error) ? "timed out" : "failed";
-    input.onProgress?.(`OpenStreetMap ${reason}; continuing without it.`);
-    console.warn(`OSM discover ${reason} for ${input.countryCode}`, error);
+    input.onProgress?.(`OpenStreetMap (${area.label}) ${reason}; continuing without it.`);
+    console.warn(
+      `OSM discover ${reason} for ${input.countryCode} in ${area.label}`,
+      error,
+    );
     return [];
   }
 

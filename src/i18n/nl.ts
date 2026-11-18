@@ -878,7 +878,7 @@ export const nl: Messages = {
     "Geen gerechten teruggekregen. Probeer een andere focus.",
   "admin.discover.restaurants.title": "Restaurants zoeken",
   "admin.discover.restaurants.hint":
-    "Google Places, OpenStreetMap, Tripadvisor (Apify), Zenchef-partnercatalogus en TheFork B2B wanneer credentials gezet zijn. Alleen locaties met een straatadres in NL.",
+    "Google Places, Tripadvisor (Apify), de Zenchef-partnercatalogus en TheFork B2B (wanneer credentials gezet zijn) zoeken in Nederland. OpenStreetMap en de restaurants die al uit OpenStreetMap en Overture Maps zijn opgehaald dekken ook België en West-Duitsland: noem daar een stad in het focusveld, bijvoorbeeld Antwerpen of Aken. Alleen locaties met een straatadres.",
   "admin.discover.restaurants.placeholder":
     "Optionele focus: bijv. Amsterdam, familiebedrijf, vegan",
   "admin.discover.restaurants.empty":

@@ -25,6 +25,7 @@
  *   npm run agent:gather -- --status
  *   npm run agent:gather -- --dry-run --batch 1 --countries cn,th   # fetch only, no DB
  *   npm run agent:gather -- --refresh-days 14  # re-search tiles older than 14 days
+ *   npm run agent:gather -- --allow-overture-without-website   # promote Overture places that have no website
  *   npm run agent:gather -- --promote-only
  *   npm run agent:gather -- --mode hubs --hubs nl-major --radius-km 25
  */
@@ -51,6 +52,7 @@ import {
   hasPrimaryCuisineMatch,
   osmTagsForCountry,
 } from "../src/restaurants/osmCuisineMap.ts";
+import { canPromote } from "../server/lib/promotionPolicy.ts";
 import { isOpenAiConfigured } from "../server/openai/adminDiscover.ts";
 import { OSM_CUISINE_BY_COUNTRY } from "../src/restaurants/osmCuisineMap.ts";
 import { HUBS, harvestCountryAtHub, sleep, type Hub } from "./lib/overpassRestaurants.ts";
@@ -102,6 +104,8 @@ type CliOptions = {
   regions: string[];
   /** Max restaurants promoted (and enriched) per run. */
   promoteLimit: number;
+  /** Promote Overture places that have no website (default: they stay unreviewed). */
+  allowOvertureWithoutWebsite: boolean;
   /** Max earlier-promoted restaurants whose enrichment never finished, picked up per run. */
   finishLimit: number;
   /** Tiles finished longer ago than this are searched again; 0 = never. */
@@ -127,6 +131,7 @@ function parseArgs(argv: string[]): CliOptions {
     regions: [],
     promoteLimit: 400,
     finishLimit: 200,
+    allowOvertureWithoutWebsite: false,
     refreshDays: 30,
     dryRun: false,
     batchGiven: false,
@@ -188,6 +193,8 @@ function parseArgs(argv: string[]): CliOptions {
         .filter(Boolean);
       coverageRegions(options.regions); // fail fast on a typo
       i += 1;
+    } else if (arg === "--allow-overture-without-website") {
+      options.allowOvertureWithoutWebsite = true;
     } else if (arg === "--finish-limit" && next) {
       options.finishLimit = Math.max(0, Number(next));
       i += 1;
@@ -392,7 +399,10 @@ function scoreAuthenticity(
   };
 }
 
-async function promoteUnreviewed(limit = 80): Promise<{
+async function promoteUnreviewed(
+  limit = 80,
+  policy: { allowOvertureWithoutWebsite?: boolean } = {},
+): Promise<{
   promoted: number;
   enrichmentJobs: Array<{
     restaurantId: string;
@@ -419,6 +429,8 @@ async function promoteUnreviewed(limit = 80): Promise<{
     if (!restaurant.name || restaurant.lat == null || restaurant.lng == null) {
       continue;
     }
+    // Overture places with no website cannot be verified: leave them unreviewed.
+    if (!canPromote(restaurant, policy)) continue;
 
     const matchingCodes = restaurant.cuisineCodes.filter((code) =>
       hasPrimaryCuisineMatch(code, restaurant.cuisineTags),
@@ -715,7 +727,9 @@ async function main() {
   }
 
   process.stdout.write("Promoting specialty OSM matches… ");
-  const promoteResult = await promoteUnreviewed(options.promoteLimit);
+  const promoteResult = await promoteUnreviewed(options.promoteLimit, {
+    allowOvertureWithoutWebsite: options.allowOvertureWithoutWebsite,
+  });
   promoted = promoteResult.promoted;
   console.log(`${promoted} promoted`);
 

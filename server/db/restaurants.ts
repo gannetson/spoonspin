@@ -1309,6 +1309,49 @@ function resolveSearchAnchor(
   return { lat: fallback.lat, lng: fallback.lng };
 }
 
+/**
+ * Harvested restaurants not promoted yet that carry this cuisine, optionally within
+ * `radiusKm` of a point (nearest first). Used by admin discovery to offer what the OSM
+ * and Overture harvests already found, instantly and without an API call.
+ */
+export async function listUnreviewedForCuisine(options: {
+  cuisineCode: string;
+  near?: { lat: number; lng: number; radiusKm: number };
+  limit?: number;
+}): Promise<StoredRestaurant[]> {
+  const db = await ensureDb();
+  const limit = Math.min(Math.max(options.limit ?? 60, 1), 200);
+  const params: unknown[] = [JSON.stringify([options.cuisineCode.toLowerCase()])];
+  let bounds = "";
+  if (options.near) {
+    const { lat, lng, radiusKm } = options.near;
+    const dLat = radiusKm / 111;
+    const dLng = radiusKm / (111 * Math.max(Math.cos((lat * Math.PI) / 180), 0.2));
+    params.push(lat - dLat, lat + dLat, lng - dLng, lng + dLng);
+    bounds = "AND lat BETWEEN $2 AND $3 AND lng BETWEEN $4 AND $5";
+  }
+  // Rows with a website first: they can be checked against their own page.
+  const result = await db.query(
+    `SELECT * FROM restaurants
+      WHERE NOT reviewed
+        AND cuisine_codes @> $1::jsonb
+        AND lat IS NOT NULL AND lng IS NOT NULL
+        ${bounds}
+      ORDER BY (COALESCE(website, '') <> '') DESC, updated_at DESC
+      LIMIT ${options.near ? limit * 4 : limit}`,
+    params,
+  );
+  const rows = result.rows.map(rowToStored);
+  if (!options.near) return rows.slice(0, limit);
+  const { lat, lng } = options.near;
+  const km = (row: StoredRestaurant) =>
+    Math.hypot((row.lat! - lat) * 111, (row.lng! - lng) * 111 * Math.cos((lat * Math.PI) / 180));
+  return rows
+    .filter((row) => km(row) <= options.near!.radiusKm)
+    .sort((a, b) => Number(Boolean(b.website)) - Number(Boolean(a.website)) || km(a) - km(b))
+    .slice(0, limit);
+}
+
 export async function listRestaurants(options?: {
   reviewedOnly?: boolean;
 }): Promise<StoredRestaurant[]> {

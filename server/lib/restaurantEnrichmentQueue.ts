@@ -12,6 +12,7 @@ import {
   updateRestaurantPhoto,
   updateRestaurantScoresAndAuthenticity,
 } from "../db/restaurants.ts";
+import { skipsResearchedMenuAndScores } from "./promotionPolicy.ts";
 import { enrichRestaurantRatings, isRatingsConfigured } from "./restaurantRatings.ts";
 import {
   researchRestaurantMenu,
@@ -94,7 +95,8 @@ export async function enrichRestaurantFully(job: RestaurantEnrichmentJob): Promi
   const textOutcome = await enrichText(restaurantId, countryName, countryCode).catch(
     (error) => {
       console.warn(`[enrich] text failed ${restaurantId}`, error);
-      return { deleted: false as const };
+      // Unknown: do not assume the page was read.
+      return { deleted: false as const, hadPageEvidence: false };
     },
   );
   if (textOutcome.deleted) {
@@ -102,12 +104,19 @@ export async function enrichRestaurantFully(job: RestaurantEnrichmentJob): Promi
     return;
   }
 
-  await enrichMenu(restaurantId, countryName, countryCode).catch((error) => {
-    console.warn(`[enrich] menu failed ${restaurantId}`, error);
-  });
-  await enrichScores(restaurantId, countryName).catch((error) => {
-    console.warn(`[enrich] scores failed ${restaurantId}`, error);
-  });
+  // A machine-promoted place whose own page was not read has nothing to research a menu
+  // or scores from: those steps would fill in typical dishes and estimated numbers.
+  const promoted = await getRestaurantById(restaurantId);
+  if (promoted && skipsResearchedMenuAndScores(promoted, textOutcome.hadPageEvidence)) {
+    console.info(`[enrich] no page evidence, skipping menu and estimated scores ${restaurantId}`);
+  } else {
+    await enrichMenu(restaurantId, countryName, countryCode).catch((error) => {
+      console.warn(`[enrich] menu failed ${restaurantId}`, error);
+    });
+    await enrichScores(restaurantId, countryName).catch((error) => {
+      console.warn(`[enrich] scores failed ${restaurantId}`, error);
+    });
+  }
 
   if (isRatingsConfigured()) {
     await enrichRestaurantRatings(restaurantId).catch((error) => {
@@ -173,9 +182,9 @@ async function enrichText(
   restaurantId: string,
   countryName: string,
   countryCode: string,
-): Promise<{ deleted: boolean }> {
+): Promise<{ deleted: boolean; hadPageEvidence: boolean }> {
   const restaurant = await getRestaurantById(restaurantId);
-  if (!restaurant) return { deleted: false };
+  if (!restaurant) return { deleted: false, hadPageEvidence: false };
 
   const rewritten = await rewriteRestaurantText({
     countryName,
@@ -197,7 +206,7 @@ async function enrichText(
 
   if (rewritten.hadPageEvidence && rewritten.cuisineVerdict === "unclear") {
     await deleteRestaurantById(restaurantId);
-    return { deleted: true };
+    return { deleted: true, hadPageEvidence: true };
   }
 
   await updateRestaurantNotes(restaurantId, rewritten.authenticityNotes, {
@@ -206,7 +215,7 @@ async function enrichText(
         ? rewritten.cuisineCodes
         : undefined,
   });
-  return { deleted: false };
+  return { deleted: false, hadPageEvidence: rewritten.hadPageEvidence };
 }
 
 async function enrichMenu(
