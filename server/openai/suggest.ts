@@ -148,15 +148,26 @@ const DEFAULT_MODEL = "gpt-4o-mini";
 
 // All defaults are eligible for the small-model daily data-sharing allowance.
 // Recipe instructions and cuisine judgments retain mini; grounded extraction
-// and photo search wording use nano. No automatic paid-model escalation.
+// and photo search wording use gpt-5.6-luna (replacing gpt-4.1-nano, shut down
+// 2026-10-23). No automatic paid-model escalation.
 const TASK_MODELS: Record<OpenAiTask, string> = {
-  "restaurant-completion": "gpt-4.1-nano",
+  "restaurant-completion": "gpt-5.6-luna",
   "restaurant-verify": "gpt-4o-mini",
   "recipe-completion": "gpt-4o-mini",
-  "image-query": "gpt-4.1-nano",
-  "content-completion": "gpt-4.1-nano",
+  "image-query": "gpt-5.6-luna",
+  "content-completion": "gpt-5.6-luna",
   "review-search": "gpt-4.1-mini",
 };
+
+/**
+ * The gpt-5.x reasoning models reject any `temperature` other than the default
+ * 1 ("Unsupported value: 'temperature' does not support 0.3 with this model"),
+ * while the gpt-4.x models we still use need the low temperature to keep
+ * extraction deterministic. Send the parameter only where it is accepted.
+ */
+export function supportsTemperature(model: string): boolean {
+  return !/^(gpt-[5-9]|o\d)/.test(model);
+}
 
 /** `OPENAI_MODEL_RESTAURANT_COMPLETION`, etc. */
 function envKeyForTask(task: OpenAiTask): string {
@@ -169,11 +180,13 @@ function envKeyForTask(task: OpenAiTask): string {
  */
 export function getModel(task?: OpenAiTask): string {
   const perTask = task ? process.env[envKeyForTask(task)]?.trim() : undefined;
-  return (
+  const model =
     perTask ||
     process.env.OPENAI_MODEL?.trim() ||
-    (task ? TASK_MODELS[task] : DEFAULT_MODEL)
-  );
+    (task ? TASK_MODELS[task] : DEFAULT_MODEL);
+  return model === "gpt-4.1-nano" || model === "gpt-4.1-nano-2025-04-14"
+    ? "gpt-5.6-luna"
+    : model;
 }
 
 export async function chatJson(
@@ -188,6 +201,7 @@ export async function chatJson(
     );
   }
 
+  const model = getModel(options?.task);
   const response = await fetch(OPENAI_URL, {
     method: "POST",
     headers: {
@@ -195,8 +209,8 @@ export async function chatJson(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: getModel(options?.task),
-      temperature: 0.3,
+      model,
+      ...(supportsTemperature(model) ? { temperature: 0.3 } : {}),
       response_format: { type: "json_object" },
       messages: [
         { role: "system", content: system },

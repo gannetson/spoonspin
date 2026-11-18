@@ -1,5 +1,5 @@
 #!/usr/bin/env tsx
-import { getModel } from "../server/openai/suggest.ts";
+import { getModel, supportsTemperature } from "../server/openai/suggest.ts";
 /**
  * Resolve real Tripadvisor / The Fork / OpenTable restaurant profile URLs.
  * Reads/writes Postgres reviewed restaurants only (progress in data/).
@@ -115,6 +115,7 @@ async function openAiWebSearchSources(query: string): Promise<string[]> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) return [];
 
+  const reviewSearchModel = getModel("review-search");
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
     headers: {
@@ -122,11 +123,11 @@ async function openAiWebSearchSources(query: string): Promise<string[]> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: getModel("review-search"),
+      model: reviewSearchModel,
       tools: [{ type: "web_search" }],
       include: ["web_search_call.action.sources"],
       tool_choice: "required",
-      temperature: 0,
+      ...(supportsTemperature(reviewSearchModel) ? { temperature: 0 } : {}),
       input: `Search for restaurant profile pages (Tripadvisor Restaurant_Review, The Fork /restaurant/…-r…, OpenTable /r/…).\nQuery: ${query}\nReply briefly. Do not invent URLs.`,
     }),
   });
